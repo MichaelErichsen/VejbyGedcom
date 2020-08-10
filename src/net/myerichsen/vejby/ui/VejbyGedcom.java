@@ -1,12 +1,11 @@
-/**
- * 
- */
 package net.myerichsen.vejby.ui;
 
+import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -34,6 +34,8 @@ import javax.swing.table.DefaultTableModel;
 import net.myerichsen.vejby.census.Table;
 
 /**
+ * Main user interface for the Vejby Gedcom application.
+ * 
  * @author michael
  *
  */
@@ -46,6 +48,10 @@ public class VejbyGedcom {
 	// private String[] headers;
 
 	private Table censusTable;
+
+	private JButton btnAnalysr;
+
+	private JButton btnMapningAfFelter;
 
 	/**
 	 * Launch the application.
@@ -116,13 +122,51 @@ public class VejbyGedcom {
 
 		JPanel censuspanel = new JPanel();
 		tabbedPane.addTab("Folket\u00E6llinger", null, censuspanel, null);
-		censuspanel.setLayout(new GridLayout(0, 1, 0, 0));
+		GridBagLayout gbl_censuspanel = new GridBagLayout();
+		gbl_censuspanel.rowHeights = new int[] { 600, 50 };
+		gbl_censuspanel.columnWidths = new int[] { 1059, 0 };
+		gbl_censuspanel.columnWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gbl_censuspanel.rowWeights = new double[] { 0.0, 0.0 };
+		censuspanel.setLayout(gbl_censuspanel);
 
 		JScrollPane censusscrollPane = new JScrollPane();
-		censuspanel.add(censusscrollPane);
+		GridBagConstraints gbc_censusscrollPane = new GridBagConstraints();
+		gbc_censusscrollPane.fill = GridBagConstraints.BOTH;
+		gbc_censusscrollPane.insets = new Insets(0, 0, 5, 0);
+		gbc_censusscrollPane.gridx = 0;
+		gbc_censusscrollPane.gridy = 0;
+		censuspanel.add(censusscrollPane, gbc_censusscrollPane);
 
 		censusJtable = new JTable();
+		censusJtable.setRowSelectionAllowed(false);
 		censusscrollPane.setViewportView(censusJtable);
+
+		JPanel censusButtonPanel = new JPanel();
+		censusButtonPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		GridBagConstraints gbc_censusButtonPanel = new GridBagConstraints();
+		gbc_censusButtonPanel.fill = GridBagConstraints.BOTH;
+		gbc_censusButtonPanel.gridx = 0;
+		gbc_censusButtonPanel.gridy = 1;
+		censuspanel.add(censusButtonPanel, gbc_censusButtonPanel);
+		censusButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+		 btnAnalysr = new JButton("Analys\u00E9r");
+		btnAnalysr.setEnabled(false);
+		btnAnalysr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				analyseCensus();
+			}
+		});
+		
+		btnMapningAfFelter = new JButton("Mapning af felter");
+		btnMapningAfFelter.setEnabled(false);
+		btnMapningAfFelter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mapCensusFields();
+			}
+		});
+		censusButtonPanel.add(btnMapningAfFelter);
+		censusButtonPanel.add(btnAnalysr);
 
 		JPanel baptismpanel = new JPanel();
 		tabbedPane.addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismpanel, null);
@@ -130,7 +174,26 @@ public class VejbyGedcom {
 	}
 
 	/**
-	 * 
+	 * Map census fields into person attributes and event attributes
+	 */
+	protected void mapCensusFields() {
+		CensusFieldMapJDialog mapDialog = new CensusFieldMapJDialog();
+		mapDialog.setCensusTable(censusTable);
+		mapDialog.setVisible(true);
+	}
+
+	/**
+	 * Split the table into households. Split the household into families and
+	 * single persons
+	 */
+	protected void analyseCensus() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * Choose and open a KIP file, remove empty columns and display i a tabbed
+	 * pane.
 	 */
 	protected void openKipFile() {
 		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
@@ -207,8 +270,7 @@ public class VejbyGedcom {
 
 			DefaultTableModel defaultTableModel = new DefaultTableModel(censusArray, headerArray);
 			censusJtable.setModel(defaultTableModel);
-			censusJtable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
+			btnMapningAfFelter.setEnabled(true);
 		}
 	}
 
