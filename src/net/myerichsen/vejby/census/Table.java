@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implement a census table as loaded from a KIP file
@@ -17,11 +19,12 @@ import java.util.Scanner;
  *
  */
 public class Table {
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private int year;
 	private String kipFileName;
 	private List<String> headers;
 	private List<List<String>> persons;
-	// private List<Household> households;
+	private List<Household> households;
 
 	/**
 	 * Constructor
@@ -34,6 +37,77 @@ public class Table {
 		this.year = year;
 		this.kipFileName = kipFileName;
 		persons = new ArrayList<>();
+	}
+
+	/**
+	 * Split the table into households
+	 * 
+	 * @param householdFieldNumber
+	 *            The column in the table that contains the household number
+	 * @return message
+	 */
+	public String createHouseholds(int householdFieldNumber) {
+		setHouseholds(new ArrayList<Household>());
+		Household currentHousehold = null;
+		String currentHouseholdNumber = "";
+		String newHouseholdNumber = "";
+		String currentSourceLocation = "";
+		String newSourceLocation = "";
+
+		// Get each person
+		for (List<String> currentRow : persons) {
+			newHouseholdNumber = currentRow.get(householdFieldNumber);
+			LOGGER.log(Level.FINE, "Household: " + newHouseholdNumber + ", was: " + currentHouseholdNumber);
+
+			// If contents of household or source location has changed, then
+			// create a new
+			// household. Add household to households list
+			if ((!currentHouseholdNumber.equals(newHouseholdNumber))
+					|| (!currentSourceLocation.equals(newSourceLocation))) {
+				currentHousehold = new Household();
+				getHouseholds().add(currentHousehold);
+				currentHouseholdNumber = newHouseholdNumber;
+			}
+
+			// Add current person to household
+			currentHousehold.getRows().add(currentRow);
+		}
+		return getHouseholds().size() + " husholdninger udskilt";
+	}
+
+	/**
+	 * @return the headers
+	 */
+	public List<String> getHeaders() {
+		return headers;
+	}
+
+	/**
+	 * @return the households
+	 */
+	public List<Household> getHouseholds() {
+		return households;
+	}
+
+	/**
+	 * @return the kipFileName
+	 */
+	public String getKipFileName() {
+		return kipFileName;
+	}
+
+	/**
+	 * @return the fields
+	 */
+	public List<List<String>> getPersons() {
+		return persons;
+	}
+
+	/**
+	 * @return the year
+	 */
+	public int getYear() {
+		return year;
 	}
 
 	/**
@@ -70,7 +144,7 @@ public class Table {
 	 * 
 	 * @return message
 	 */
-	public String clearEmptyFields() {
+	public String removeEmptyColumns() {
 		List<Integer> emptyColumns = new ArrayList<>();
 		boolean found;
 
@@ -94,7 +168,7 @@ public class Table {
 
 		for (int i = emptyColumns.size() - 1; i >= 0; i--) {
 			int j = emptyColumns.get(i);
-			System.out.println("Col " + j + " is empty");
+			LOGGER.log(Level.FINE, "Col " + j + " is empty");
 			headers.remove(j);
 
 			for (List<String> ls : persons) {
@@ -110,48 +184,6 @@ public class Table {
 	}
 
 	/**
-	 * Split the table into households
-	 * 
-	 * @param householdFieldNumber
-	 *            The column in the table that contains the household number
-	 * @return message
-	 */
-	public String createHouseholds(int householdFieldNumber) {
-
-		// Get each person
-		// If first then create a new household. Add household to households
-		// list
-		// If contents of householdField has changed, then create a new
-		// household. Add household to households list
-		// Add person to current household
-
-		return "OK";
-
-	}
-
-	/**
-	 * @return the year
-	 */
-	public int getYear() {
-		return year;
-	}
-
-	/**
-	 * @param year
-	 *            the year to set
-	 */
-	public void setYear(int year) {
-		this.year = year;
-	}
-
-	/**
-	 * @return the headers
-	 */
-	public List<String> getHeaders() {
-		return headers;
-	}
-
-	/**
 	 * @param headers
 	 *            the headers to set
 	 */
@@ -160,10 +192,19 @@ public class Table {
 	}
 
 	/**
-	 * @return the fields
+	 * @param households
+	 *            the households to set
 	 */
-	public List<List<String>> getPersons() {
-		return persons;
+	public void setHouseholds(List<Household> households) {
+		this.households = households;
+	}
+
+	/**
+	 * @param kipFileName
+	 *            the kipFileName to set
+	 */
+	public void setKipFileName(String kipFileName) {
+		this.kipFileName = kipFileName;
 	}
 
 	/**
@@ -175,18 +216,11 @@ public class Table {
 	}
 
 	/**
-	 * @return the kipFileName
+	 * @param year
+	 *            the year to set
 	 */
-	public String getKipFileName() {
-		return kipFileName;
-	}
-
-	/**
-	 * @param kipFileName
-	 *            the kipFileName to set
-	 */
-	public void setKipFileName(String kipFileName) {
-		this.kipFileName = kipFileName;
+	public void setYear(int year) {
+		this.year = year;
 	}
 
 	/*

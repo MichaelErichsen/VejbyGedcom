@@ -7,6 +7,12 @@ public class Individual {
 	 * "INDI" tag
 	 */
 	private final static String tag = "INDI";
+	/**
+	 * @return the tag
+	 */
+	public static String getTag() {
+		return tag;
+	}
 	private int id;
 	private String name;
 	private String sex;
@@ -15,51 +21,14 @@ public class Individual {
 	private Date birthDate;
 	private Date deathDate;
 	private String birthPlace;
+
 	private String deathPlace;
 
 	/**
-	 * @return the birthPlace
+	 * @return the address
 	 */
-	public String getBirthPlace() {
-		return birthPlace;
-	}
-
-	/**
-	 * @param birthPlace
-	 *            the birthPlace to set
-	 */
-	public void setBirthPlace(String birthPlace) {
-		this.birthPlace = birthPlace;
-	}
-
-	/**
-	 * @return the deathPlace
-	 */
-	public String getDeathPlace() {
-		return deathPlace;
-	}
-
-	/**
-	 * @param deathPlace
-	 *            the deathPlace to set
-	 */
-	public void setDeathPlace(String deathPlace) {
-		this.deathPlace = deathPlace;
-	}
-
-	/**
-	 * @return the trades
-	 */
-	public String getTrades() {
-		return trades;
-	}
-
-	/**
-	 * @param trades
-	 *            the trades to set
-	 */
-	public void setTrades(String trades) {
-		this.trades = trades;
+	public String getAddress() {
+		return address;
 	}
 
 	/**
@@ -70,11 +39,10 @@ public class Individual {
 	}
 
 	/**
-	 * @param birthDate
-	 *            the birthDate to set
+	 * @return the birthPlace
 	 */
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
+	public String getBirthPlace() {
+		return birthPlace;
 	}
 
 	/**
@@ -85,11 +53,10 @@ public class Individual {
 	}
 
 	/**
-	 * @param deathDate
-	 *            the deathDate to set
+	 * @return the deathPlace
 	 */
-	public void setDeathDate(Date deathDate) {
-		this.deathDate = deathDate;
+	public String getDeathPlace() {
+		return deathPlace;
 	}
 
 	/**
@@ -100,26 +67,10 @@ public class Individual {
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	/**
@@ -130,18 +81,10 @@ public class Individual {
 	}
 
 	/**
-	 * @param sex
-	 *            the sex to set
+	 * @return the trades
 	 */
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-
-	/**
-	 * @return the address
-	 */
-	public String getAddress() {
-		return address;
+	public String getTrades() {
+		return trades;
 	}
 
 	/**
@@ -153,10 +96,67 @@ public class Individual {
 	}
 
 	/**
-	 * @return the tag
+	 * @param birthDate
+	 *            the birthDate to set
 	 */
-	public static String getTag() {
-		return tag;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	/**
+	 * @param birthPlace
+	 *            the birthPlace to set
+	 */
+	public void setBirthPlace(String birthPlace) {
+		this.birthPlace = birthPlace;
+	}
+
+	/**
+	 * @param deathDate
+	 *            the deathDate to set
+	 */
+	public void setDeathDate(Date deathDate) {
+		this.deathDate = deathDate;
+	}
+
+	/**
+	 * @param deathPlace
+	 *            the deathPlace to set
+	 */
+	public void setDeathPlace(String deathPlace) {
+		this.deathPlace = deathPlace;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @param sex
+	 *            the sex to set
+	 */
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	/**
+	 * @param trades
+	 *            the trades to set
+	 */
+	public void setTrades(String trades) {
+		this.trades = trades;
 	}
 
 	/*

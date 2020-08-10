@@ -19,11 +19,12 @@ public class GedcomFile {
 	// static variable single_instance of type Singleton
 	private static GedcomFile single_instance = null;
 
-	private List<Family> families;
-
-	private GedcomFile() {
-		super();
-		setFamilies(new ArrayList<Family>());
+	/**
+	 * @return
+	 */
+	public static GedcomFile getFile() {
+		return null;
+		// TODO Auto-generated method stub
 	}
 
 	// static method to create instance of Singleton class
@@ -34,23 +35,22 @@ public class GedcomFile {
 		return single_instance;
 	}
 
+	private List<Family> families;
+
+	private GedcomFile() {
+		super();
+		setFamilies(new ArrayList<Family>());
+	}
+
+	public void addFamily(Family family) {
+		families.add(family);
+	}
+
 	/**
 	 * @return the families
 	 */
 	public List<Family> getFamilies() {
 		return families;
-	}
-
-	/**
-	 * @param families
-	 *            the families to set
-	 */
-	public void setFamilies(List<Family> families) {
-		this.families = families;
-	}
-
-	public void addFamily(Family family) {
-		families.add(family);
 	}
 
 	public void print(File gedcomFile) throws Exception {
@@ -72,6 +72,14 @@ public class GedcomFile {
 			throw new Exception(e);
 		}
 
+	}
+
+	/**
+	 * @param families
+	 *            the families to set
+	 */
+	public void setFamilies(List<Family> families) {
+		this.families = families;
 	}
 
 	/**
@@ -113,13 +121,5 @@ public class GedcomFile {
 
 		// Trailer
 		fw.write("0 TRLR\n");
-	}
-
-	/**
-	 * @return
-	 */
-	public static GedcomFile getFile() {
-		return null;
-		// TODO Auto-generated method stub
 	}
 }

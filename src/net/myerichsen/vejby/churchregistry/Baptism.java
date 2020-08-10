@@ -42,23 +42,12 @@ import java.beans.PropertyChangeEvent;
 
 // TODO Mark output file with date and time
 public class Baptism {
-	private JFrame frmKirkebogDb;
-	private JTextField nametextField;
-	private JTextField fatherNametextField;
-	private JTextField fatherTradetextField;
-	private JTextField fatherAddresstextField;
-	private JTextField motherNametextField;
-	private JTextField motherAddresstextField;
-	private JDateChooser birthdateChooser;
-	private JDateChooser homeBaptismdateChooser;
-	private JDateChooser baptismdateChooser;
-	private JEditorPane godParentseditorPane;
-
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					Baptism window = new Baptism();
@@ -69,12 +58,50 @@ public class Baptism {
 			}
 		});
 	}
+	private JFrame frmKirkebogDb;
+	private JTextField nametextField;
+	private JTextField fatherNametextField;
+	private JTextField fatherTradetextField;
+	private JTextField fatherAddresstextField;
+	private JTextField motherNametextField;
+	private JTextField motherAddresstextField;
+	private JDateChooser birthdateChooser;
+	private JDateChooser homeBaptismdateChooser;
+	private JDateChooser baptismdateChooser;
+
+	private JEditorPane godParentseditorPane;
 
 	/**
 	 * Create the application.
 	 */
 	public Baptism() {
 		initialize();
+	}
+
+	/**
+	 * Birth date changed
+	 */
+	protected void birthDateChanged() {
+		Date date = birthdateChooser.getDate();
+		homeBaptismdateChooser.setDate(date);
+		baptismdateChooser.setDate(date);
+	}
+
+	/**
+	 * Cancel button was pressed
+	 */
+	protected void clearScreen() {
+		nametextField.setText("");
+		fatherNametextField.setText("");
+		fatherTradetextField.setText("");
+		fatherAddresstextField.setText("");
+		motherNametextField.setText("");
+		motherAddresstextField.setText("");
+		birthdateChooser.setCalendar(null);
+		homeBaptismdateChooser.setCalendar(null);
+		baptismdateChooser.setCalendar(null);
+		godParentseditorPane.setText("");
+
 	}
 
 	/**
@@ -103,6 +130,7 @@ public class Baptism {
 
 		birthdateChooser = new JDateChooser();
 		birthdateChooser.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				birthDateChanged();
 			}
@@ -295,32 +323,6 @@ public class Baptism {
 			}
 		});
 		panel.add(dismissButton);
-
-	}
-
-	/**
-	 * Birth date changed
-	 */
-	protected void birthDateChanged() {
-		Date date = birthdateChooser.getDate();
-		homeBaptismdateChooser.setDate(date);
-		baptismdateChooser.setDate(date);
-	}
-
-	/**
-	 * Cancel button was pressed
-	 */
-	protected void clearScreen() {
-		nametextField.setText("");
-		fatherNametextField.setText("");
-		fatherTradetextField.setText("");
-		fatherAddresstextField.setText("");
-		motherNametextField.setText("");
-		motherAddresstextField.setText("");
-		birthdateChooser.setCalendar(null);
-		homeBaptismdateChooser.setCalendar(null);
-		baptismdateChooser.setCalendar(null);
-		godParentseditorPane.setText("");
 
 	}
 

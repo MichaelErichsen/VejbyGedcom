@@ -9,18 +9,25 @@ public class Family {
 	private List<Individual> children;
 
 	/**
+	 * 
+	 */
+	public Family() {
+		super();
+		children = new ArrayList<Individual>();
+	}
+
+	/**
+	 * @return the children
+	 */
+	public List<Individual> getChildren() {
+		return children;
+	}
+
+	/**
 	 * @return the father
 	 */
 	public Individual getFather() {
 		return father;
-	}
-
-	/**
-	 * @param father
-	 *            the father to set
-	 */
-	public void setFather(Individual father) {
-		this.father = father;
 	}
 
 	/**
@@ -31,18 +38,11 @@ public class Family {
 	}
 
 	/**
-	 * @param mother
-	 *            the mother to set
+	 * @param child
 	 */
-	public void setMother(Individual mother) {
-		this.mother = mother;
-	}
-
-	/**
-	 * @return the children
-	 */
-	public List<Individual> getChildren() {
-		return children;
+	public void setChild(Individual child) {
+		children.add(child);
+		
 	}
 
 	/**
@@ -54,19 +54,19 @@ public class Family {
 	}
 
 	/**
-	 * 
+	 * @param father
+	 *            the father to set
 	 */
-	public Family() {
-		super();
-		children = new ArrayList<Individual>();
+	public void setFather(Individual father) {
+		this.father = father;
 	}
 
 	/**
-	 * @param child
+	 * @param mother
+	 *            the mother to set
 	 */
-	public void setChild(Individual child) {
-		children.add(child);
-		
+	public void setMother(Individual mother) {
+		this.mother = mother;
 	}
 	
 	@Override

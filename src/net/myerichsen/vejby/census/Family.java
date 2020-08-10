@@ -1,11 +1,10 @@
-/**
- * 
- */
 package net.myerichsen.vejby.census;
 
 import java.util.List;
 
 /**
+ * A family as extracted from a household in a census file
+ * 
  * @author michael
  *
  */
@@ -22,11 +21,10 @@ public class Family {
 	}
 
 	/**
-	 * @param children
-	 *            the children to set
+	 * @return the father
 	 */
-	public void setChildren(List<Person> children) {
-		this.children = children;
+	public Person getFather() {
+		return father;
 	}
 
 	/**
@@ -37,18 +35,11 @@ public class Family {
 	}
 
 	/**
-	 * @param mother
-	 *            the mother to set
+	 * @param children
+	 *            the children to set
 	 */
-	public void setMother(Person mother) {
-		this.mother = mother;
-	}
-
-	/**
-	 * @return the father
-	 */
-	public Person getFather() {
-		return father;
+	public void setChildren(List<Person> children) {
+		this.children = children;
 	}
 
 	/**
@@ -57,6 +48,35 @@ public class Family {
 	 */
 	public void setFather(Person father) {
 		this.father = father;
+	}
+
+	/**
+	 * @param mother
+	 *            the mother to set
+	 */
+	public void setMother(Person mother) {
+		this.mother = mother;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (father != null) {
+			sb.append("Fader: " + father.getName() + ", ");
+		}
+
+		if (mother != null) {
+			sb.append("Moder: " + mother.getName() + ", ");
+		}
+		
+//		for (Person person : children) {
+//			sb.append("Barn: " + person.getName() + ", ");			
+//		}
+	
+		return sb.toString();
 	}
 
 }
