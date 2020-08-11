@@ -32,6 +32,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import net.myerichsen.vejby.census.Table;
+import javax.swing.JLabel;
+import com.toedter.calendar.JDateChooser;
+import javax.swing.JTextField;
+import javax.swing.JEditorPane;
+import java.awt.Panel;
 
 /**
  * Main user interface for the Vejby Gedcom application.
@@ -39,6 +44,9 @@ import net.myerichsen.vejby.census.Table;
  * @author michael
  *
  */
+
+// TODO Use mapping object to create persons and events and sources from households
+
 public class VejbyGedcom {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -52,6 +60,12 @@ public class VejbyGedcom {
 	private JButton btnAnalysr;
 
 	private JButton btnMapningAfFelter;
+	private JTextField textField;
+	private JTextField textField_1;
+	private JTextField textField_2;
+	private JTextField textField_3;
+	private JTextField textField_4;
+	private JTextField textField_5;
 
 	/**
 	 * Launch the application.
@@ -170,6 +184,76 @@ public class VejbyGedcom {
 
 		JPanel baptismpanel = new JPanel();
 		tabbedPane.addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismpanel, null);
+		
+		JLabel lblNewLabel = new JLabel("F\u00F8dselsdato");
+		baptismpanel.add(lblNewLabel);
+		
+		JDateChooser birthdateChooser = new JDateChooser();
+		baptismpanel.add(birthdateChooser);
+		
+		JLabel lblNavn = new JLabel("Navn");
+		baptismpanel.add(lblNavn);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		baptismpanel.add(textField);
+		
+		JLabel lblHjemmedbsdato = new JLabel("Hjemmed\u00E5bsdato");
+		baptismpanel.add(lblHjemmedbsdato);
+		
+		JDateChooser homeBaptismdateChooser = new JDateChooser();
+		baptismpanel.add(homeBaptismdateChooser);
+		
+		JLabel lblDbsdato = new JLabel("D\u00E5bsdato");
+		baptismpanel.add(lblDbsdato);
+		
+		JDateChooser baptismdateChooser = new JDateChooser();
+		baptismpanel.add(baptismdateChooser);
+		
+		JLabel lblFadersNavn = new JLabel("Faders navn");
+		baptismpanel.add(lblFadersNavn);
+		
+		textField_1 = new JTextField();
+		textField_1.setColumns(10);
+		baptismpanel.add(textField_1);
+		
+		JLabel lblFadersHndtering = new JLabel("Faders h\u00E5ndtering");
+		baptismpanel.add(lblFadersHndtering);
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		baptismpanel.add(textField_2);
+		
+		JLabel lblFadersBopl = new JLabel("Faders bop\u00E6l");
+		baptismpanel.add(lblFadersBopl);
+		
+		textField_3 = new JTextField();
+		textField_3.setColumns(10);
+		baptismpanel.add(textField_3);
+		
+		JLabel lblModersNavn = new JLabel("Moders navn");
+		baptismpanel.add(lblModersNavn);
+		
+		textField_4 = new JTextField();
+		textField_4.setColumns(10);
+		baptismpanel.add(textField_4);
+		
+		JLabel lblModersBopl = new JLabel("Moders bop\u00E6l");
+		baptismpanel.add(lblModersBopl);
+		
+		textField_5 = new JTextField();
+		textField_5.setColumns(10);
+		baptismpanel.add(textField_5);
+		
+		JLabel lblFaddere = new JLabel("Faddere");
+		baptismpanel.add(lblFaddere);
+		
+		JEditorPane godParentseditorPane = new JEditorPane();
+		baptismpanel.add(godParentseditorPane);
+		
+		Panel panel = new Panel();
+		baptismpanel.add(panel);
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 	}
 
