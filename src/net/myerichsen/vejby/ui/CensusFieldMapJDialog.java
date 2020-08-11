@@ -37,6 +37,8 @@ public class CensusFieldMapJDialog extends JDialog {
 	private static final long serialVersionUID = -8669257676955258942L;
 	
 	// FIXME OK not working
+	// TODO Both handle an age and alternatively a birth date or year
+	
 	/**
 	 * Launch the application.
 	 */

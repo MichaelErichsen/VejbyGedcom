@@ -134,10 +134,7 @@ public class CensusJPanel extends JPanel {
 	 */
 	protected void openKipFile() {
 		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
-		// JFileChooser kipChooser = new JFileChooser(
-		// "C://Users//michael//Documents//The Master Genealogist
-		// v9//Kilder//DDD");
-		JFileChooser kipChooser = new JFileChooser("C://Users//michael//Documents//VejbyGedcom");
+		JFileChooser kipChooser = new JFileChooser("C://Users//michael//git//VejbyGedcom//Documentation");
 
 		kipChooser.setFileFilter(ff);
 
