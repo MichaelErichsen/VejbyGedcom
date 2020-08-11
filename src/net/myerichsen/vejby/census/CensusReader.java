@@ -11,6 +11,7 @@ import java.util.logging.Logger;
  * the household into families and single persons
  * 
  * @author michael
+ * @deprecated
  *
  */
 public class CensusReader {

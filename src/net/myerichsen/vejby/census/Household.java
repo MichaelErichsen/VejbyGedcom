@@ -129,22 +129,6 @@ public class Household {
 	}
 
 	/**
-	 * @param rows
-	 *            the rows to set
-	 */
-	public void setRows(List<List<String>> rows) {
-		this.rows = rows;
-	}
-
-	/**
-	 * @param singles
-	 *            the singles to set
-	 */
-	public void setSingles(List<Person> singles) {
-		this.singles = singles;
-	}
-
-	/**
 	 * @param family
 	 * @param position
 	 * @return
@@ -169,5 +153,21 @@ public class Household {
 				|| (position.contains("søn"))) {
 			family.getChildren().add(person);
 		}
+	}
+
+	/**
+	 * @param rows
+	 *            the rows to set
+	 */
+	public void setRows(List<List<String>> rows) {
+		this.rows = rows;
+	}
+
+	/**
+	 * @param singles
+	 *            the singles to set
+	 */
+	public void setSingles(List<Person> singles) {
+		this.singles = singles;
 	}
 }
