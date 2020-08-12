@@ -1,11 +1,10 @@
-/**
- * 
- */
 package net.myerichsen.vejby.gedcom;
 
 /**
- * @author michael
- *
+ * Constants for GEDCOM sex.
+ * 
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  */
 public class Sex {
 

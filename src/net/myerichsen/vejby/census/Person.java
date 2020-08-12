@@ -3,11 +3,12 @@ package net.myerichsen.vejby.census;
 /**
  * Person data available from a census
  * 
- * @author michael
+ * @author Michael Erichsen
+ * @version 13. aug 2020
  *
  */
 public class Person {
-	private int id;
+	private final int id;
 	private String name;
 	private String sex;
 	private String trades;
@@ -16,6 +17,16 @@ public class Person {
 	private String deathDate;
 	private String birthPlace;
 	private String deathPlace;
+
+	/**
+	 * Constructor
+	 *
+	 * @param id
+	 */
+	public Person(int id) {
+		super();
+		this.id = id;
+	}
 
 	/**
 	 * @return the address
@@ -118,14 +129,6 @@ public class Person {
 	 */
 	public void setDeathPlace(String deathPlace) {
 		this.deathPlace = deathPlace;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	/**

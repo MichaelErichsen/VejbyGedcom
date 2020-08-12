@@ -16,15 +16,12 @@ import javax.swing.SwingConstants;
 /**
  * Main user interface for the Vejby Gedcom application.
  * 
- * @author michael
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  *
  */
 
 public class VejbyGedcom {
-	// private final static Logger LOGGER =
-	// Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private JFrame frmVejbyGedcomIndtastning;
-
 	/**
 	 * Launch the application.
 	 */
@@ -41,6 +38,10 @@ public class VejbyGedcom {
 			}
 		});
 	}
+
+	// private final static Logger LOGGER =
+	// Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private JFrame frmVejbyGedcomIndtastning;
 
 	/**
 	 * Create the application.
@@ -86,10 +87,10 @@ public class VejbyGedcom {
 		gbc_tabbedPane.gridx = 0;
 		gbc_tabbedPane.gridy = 0;
 		frmVejbyGedcomIndtastning.getContentPane().add(tabbedPane, gbc_tabbedPane);
-		
+
 		CensusJPanel censusJPanel_1 = new CensusJPanel();
 		tabbedPane.addTab("Folket\u00E6llinger", null, censusJPanel_1, null);
-		
+
 		BaptismJpanel baptismJpanel = new BaptismJpanel();
 		tabbedPane.addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismJpanel, null);
 	}

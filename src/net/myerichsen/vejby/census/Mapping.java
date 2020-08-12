@@ -4,7 +4,8 @@ package net.myerichsen.vejby.census;
  * Mapping between census fields and individual, census event, birth event, and
  * trade event.
  * 
- * @author michael
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  *
  */
 public class Mapping {
@@ -48,7 +49,7 @@ public class Mapping {
 
 		for (int i = 0; i < mappingMatrix.length; i++) {
 			sb.append(mappingMatrix[i][0] + ":\t" + mappingMatrix[i][1] + ",\t " + mappingMatrix[i][2] + ",\t "
-					+ mappingMatrix[i][3] + ",\t" + mappingMatrix[i][4] + "\n");
+					+ mappingMatrix[i][3] + ",\t" + mappingMatrix[i][4] + ",\t" + mappingMatrix[i][5] + "\n");
 		}
 		return sb.toString();
 	}

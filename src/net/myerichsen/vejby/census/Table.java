@@ -15,7 +15,8 @@ import java.util.logging.Logger;
 /**
  * Implement a census table as loaded from a KIP file
  * 
- * @author michael
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  *
  */
 public class Table {
@@ -53,6 +54,7 @@ public class Table {
 		String newHouseholdNumber = "";
 		String currentSourceLocation = "";
 		String newSourceLocation = "";
+		int id = 0;
 
 		// Get each person
 		for (List<String> currentRow : persons) {
@@ -60,11 +62,10 @@ public class Table {
 			LOGGER.log(Level.FINE, "Household: " + newHouseholdNumber + ", was: " + currentHouseholdNumber);
 
 			// If contents of household or source location has changed, then
-			// create a new
-			// household. Add household to households list
+			// create a new household. Add household to households list
 			if ((!currentHouseholdNumber.equals(newHouseholdNumber))
 					|| (!currentSourceLocation.equals(newSourceLocation))) {
-				currentHousehold = new Household();
+				currentHousehold = new Household(id++);
 				getHouseholds().add(currentHousehold);
 				currentHouseholdNumber = newHouseholdNumber;
 			}
@@ -76,10 +77,43 @@ public class Table {
 	}
 
 	/**
+	 * @param householdId
+	 * @param familyId
+	 * @return The family
+	 */
+	public Family getFamily(int householdId, int familyId) {
+		for (Household household : households) {
+			if (household.getId() == householdId) {
+				List<Family> families = household.getFamilies();
+				for (Family family : families) {
+					if (family.getFamilyId() == familyId) {
+						return family;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * @return the headers
 	 */
 	public List<String> getHeaders() {
 		return headers;
+	}
+
+	/**
+	 * @param id
+	 *            Id of the household
+	 * @return The household
+	 */
+	public Household getHousehold(int id) {
+		for (Household household : households) {
+			if (household.getId() == id) {
+				return household;
+			}
+		}
+		return null;
 	}
 
 	/**

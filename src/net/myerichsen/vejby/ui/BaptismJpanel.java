@@ -10,6 +10,8 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Date;
 
@@ -24,11 +26,12 @@ import com.toedter.calendar.JDateChooser;
 import net.myerichsen.vejby.gedcom.Family;
 import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 
 /**
- * @author michael
+ * Data entry panel for church registry baptism entries.
+ * 
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  *
  */
 public class BaptismJpanel extends JPanel {
@@ -46,9 +49,6 @@ public class BaptismJpanel extends JPanel {
 
 	private JEditorPane godParentseditorPane;
 
-	// FIXME First date field eats all space
-	// FIXME Border missing for godparents
-	
 	/**
 	 * Create the panel.
 	 */
@@ -57,7 +57,7 @@ public class BaptismJpanel extends JPanel {
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0 };
 		setLayout(gridBagLayout);
 
 		JLabel lblFdselsdato = new JLabel("F\u00F8dselsdato");
@@ -69,6 +69,7 @@ public class BaptismJpanel extends JPanel {
 
 		JDateChooser birthdateChooser = new JDateChooser();
 		birthdateChooser.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				birthDateChanged();
 			}
@@ -79,7 +80,7 @@ public class BaptismJpanel extends JPanel {
 		gbc_dateChooser.gridx = 1;
 		gbc_dateChooser.gridy = 0;
 		add(birthdateChooser, gbc_dateChooser);
-		
+
 		JLabel lblNavn = new JLabel("Navn");
 		GridBagConstraints gbc_lblNavn = new GridBagConstraints();
 		gbc_lblNavn.insets = new Insets(0, 0, 5, 5);
@@ -220,6 +221,7 @@ public class BaptismJpanel extends JPanel {
 
 		godParentseditorPane = new JEditorPane();
 		GridBagConstraints gbc_godParentseditorPane = new GridBagConstraints();
+		gbc_godParentseditorPane.weighty = 5.0;
 		gbc_godParentseditorPane.insets = new Insets(0, 0, 5, 0);
 		gbc_godParentseditorPane.fill = GridBagConstraints.BOTH;
 		gbc_godParentseditorPane.gridx = 1;
@@ -275,9 +277,12 @@ public class BaptismJpanel extends JPanel {
 		fatherAddresstextField.setText("");
 		motherNametextField.setText("");
 		motherAddresstextField.setText("");
-		birthdateChooser.setCalendar(null);
-		homeBaptismdateChooser.setCalendar(null);
-		baptismdateChooser.setCalendar(null);
+		try {
+			birthdateChooser.setCalendar(null);
+			homeBaptismdateChooser.setCalendar(null);
+			baptismdateChooser.setCalendar(null);
+		} catch (Exception ignoredException) {
+		}
 		godParentseditorPane.setText("");
 
 	}

@@ -17,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,37 +24,25 @@ import net.myerichsen.vejby.census.Mapping;
 import net.myerichsen.vejby.census.Table;
 
 /**
- * This JDialog displays six columns. The first one is field number. The second
- * one is populated by the reduced table headers. The others have a choice for
- * each cell with the relevant attributes for each type.
+ * This Census field map dialog displays six columns.
+ * 
+ * The first one is field number. The second one is populated by the reduced
+ * table headers. The others have a choice for each cell with the relevant
+ * attributes for each type.
  * 
  * @author Michael Erichsen
- *
+ * @version 13. aug. 2020
  */
 public class CensusFieldMapJDialog extends JDialog {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static final long serialVersionUID = -8669257676955258942L;
-	
-	// FIXME OK not working
+
+	// FIXME OK button not working
 	// TODO Both handle an age and alternatively a birth date or year
-	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			CensusFieldMapJDialog dialog = new CensusFieldMapJDialog();
-			dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 	private final JPanel mappingcontentPanel = new JPanel();
 	private JTable mappingtable;
 	private JButton okButton;
 	private int rowCount;
-
 	private String[][] data;
 
 	/**
@@ -68,8 +55,8 @@ public class CensusFieldMapJDialog extends JDialog {
 		mappingcontentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(mappingcontentPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_mappingcontentPanel = new GridBagLayout();
-		gbl_mappingcontentPanel.columnWeights = new double[] { 0.0, 0.0 };
-		gbl_mappingcontentPanel.rowWeights = new double[] { 0.0 };
+		gbl_mappingcontentPanel.columnWeights = new double[] { 1.0, 0.0 };
+		gbl_mappingcontentPanel.rowWeights = new double[] { 1.0 };
 		mappingcontentPanel.setLayout(gbl_mappingcontentPanel);
 		{
 			JScrollPane mappingscrollPane = new JScrollPane();
@@ -86,17 +73,14 @@ public class CensusFieldMapJDialog extends JDialog {
 		}
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				okButton = new JButton("OK");
+				okButton = new JButton("Gem");
 				okButton.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						// TODO Does not set any data in rhe mapping object
-						Mapping mapping = new Mapping(rowCount, 5);
-						mapping.setMappingMatrix(data);
-						LOGGER.log(Level.INFO, mapping.toString());
+						saveMapping();
 
 					}
 				});
@@ -108,16 +92,28 @@ public class CensusFieldMapJDialog extends JDialog {
 			{
 				JButton cancelButton = new JButton("Fortryd");
 				cancelButton.addActionListener(new ActionListener() {
+
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						dispose();
 						setVisible(false);
 					}
+
 				});
 				cancelButton.setActionCommand("Fortryd");
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	/**
+	 * Save the table to a mapping object
+	 */
+	private void saveMapping() {
+		// TODO Does not set any data in rhe mapping object
+		Mapping mapping = new Mapping(rowCount, 5);
+		mapping.setMappingMatrix(data);
+		LOGGER.log(Level.INFO, mapping.toString());
 	}
 
 	/**
@@ -145,15 +141,28 @@ public class CensusFieldMapJDialog extends JDialog {
 
 		JComboBox<String> individualcomboBox = new JComboBox<String>();
 		individualcomboBox.addItem("Bruges ikke");
+		individualcomboBox.addItem("Id");
 		individualcomboBox.addItem("Navn");
 		individualcomboBox.addItem("Køn");
 		individualcomboBox.addItem("Fødselsår");
+		individualcomboBox.addItem("Alder");
 		individualcomboBox.addItem("Fødested");
-		individualcomboBox.addItem("Ægtestand");
+		individualcomboBox.addItem("Civilstand");
+		individualcomboBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// FIXME Must be the contents of the first column
+				// TODO Find which cell editor is active in
+
+				data[3][individualcomboBox.getSelectedIndex()] = individualcomboBox.getSelectedItem().toString();
+				// mappingtable.getCellEditor().stopCellEditing();
+			}
+		});
 		mappingtable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(individualcomboBox));
 
 		JComboBox<String> censuscombobox = new JComboBox<String>();
 		censuscombobox.addItem("Bruges ikke");
+		censuscombobox.addItem("Alder");
 		censuscombobox.addItem("År");
 		censuscombobox.addItem("Sted");
 		mappingtable.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(censuscombobox));
@@ -162,7 +171,7 @@ public class CensusFieldMapJDialog extends JDialog {
 		birthcombox.addItem("Bruges ikke");
 		birthcombox.addItem("Fødselsår");
 		birthcombox.addItem("Fødested");
-		mappingtable.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(birthcombox));
+		mappingtable.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(birthcombox));
 
 		JComboBox<String> tradecombox = new JComboBox<String>();
 		tradecombox.addItem("Bruges ikke");

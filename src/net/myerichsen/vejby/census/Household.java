@@ -6,7 +6,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author michael
+ * A household as extracted from a census file
+ * 
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  *
  */
 public class Household {
@@ -14,15 +17,20 @@ public class Household {
 	private List<List<String>> rows;
 	private List<Family> families;
 	private List<Person> singles;
+	private int id;
 
 	/**
 	 * Constructor
+	 * 
+	 * @param id
+	 *            Id of this household in the census
 	 */
-	public Household() {
+	public Household(int id) {
 		super();
 		rows = new ArrayList<List<String>>();
 		families = new ArrayList<Family>();
 		singles = new ArrayList<Person>();
+		this.id = id;
 	}
 
 	/**
@@ -30,6 +38,13 @@ public class Household {
 	 */
 	public List<Family> getFamilies() {
 		return families;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
 	}
 
 	/**
@@ -51,6 +66,8 @@ public class Household {
 	 * children. Each household contains either a single or one or more families
 	 * and perhaps further singles (tenants, lodgers, servants, etc.)
 	 * 
+	 * Currently only the first family is identified
+	 * 
 	 * @param sexFieldNumber
 	 *            The column in the table that contains the sex
 	 * @return message
@@ -66,7 +83,7 @@ public class Household {
 		LOGGER.log(Level.FINE, "---------------------------------------------------\n");
 
 		// Create a family
-		Family family = new Family();
+		Family family = new Family(id, 1);
 
 		for (List<String> row : rows) {
 			LOGGER.log(Level.FINE, row.get(2) + " " + row.get(3) + " " + row.get(5));
@@ -75,7 +92,7 @@ public class Household {
 
 			// Create a person from the row
 			// TODO 1845 specific columns
-			person = new Person();
+			person = new Person(Integer.parseInt(row.get(1)));
 			person.setName(row.get(5));
 			person.setSex(sex);
 			String trade = row.get(9);
@@ -83,7 +100,7 @@ public class Household {
 
 			try {
 				int birthDate = (1845 - Integer.parseInt(row.get(7)));
-				person.setBirthDate("Abt" + birthDate);
+				person.setBirthDate("Abt. " + birthDate);
 			} catch (NumberFormatException e) {
 				person.setBirthDate(row.get(7));
 			}
@@ -91,12 +108,12 @@ public class Household {
 			person.setBirthPlace(row.get(11));
 
 			if (first) {
-
 				if (sex.startsWith("M")) {
 					family.setFather(person);
 				} else {
 					family.setMother(person);
 				}
+				first = false;
 			} else {
 				setFamilyRole(family, trade, person);
 			}
@@ -156,6 +173,14 @@ public class Household {
 	}
 
 	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
 	 * @param rows
 	 *            the rows to set
 	 */
@@ -169,5 +194,15 @@ public class Household {
 	 */
 	public void setSingles(List<Person> singles) {
 		this.singles = singles;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getRows().get(0).get(2) + " " + getRows().get(0).get(3);
 	}
 }

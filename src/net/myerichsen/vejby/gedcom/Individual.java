@@ -2,17 +2,23 @@ package net.myerichsen.vejby.gedcom;
 
 import java.util.Date;
 
+/**
+ * Class representing an individual in GEDCOM.
+ * 
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
+ *
+ */
 public class Individual {
-	/**
-	 * "INDI" tag
-	 */
 	private final static String tag = "INDI";
+
 	/**
 	 * @return the tag
 	 */
 	public static String getTag() {
 		return tag;
 	}
+
 	private int id;
 	private String name;
 	private String sex;

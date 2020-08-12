@@ -3,6 +3,13 @@ package net.myerichsen.vejby.gedcom;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class representing a family in GEDCOM.
+ * 
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
+ *
+ */
 public class Family {
 	private Individual father;
 	private Individual mother;
@@ -42,7 +49,7 @@ public class Family {
 	 */
 	public void setChild(Individual child) {
 		children.add(child);
-		
+
 	}
 
 	/**
@@ -68,24 +75,24 @@ public class Family {
 	public void setMother(Individual mother) {
 		this.mother = mother;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		if (father != null) {
 			sb.append(father);
-				
+
 		}
-		
+
 		if (mother != null) {
 			sb.append(mother);
 		}
-		
+
 		for (Individual child : children) {
 			sb.append(child);
 		}
-		
+
 		return sb.toString();
-		
+
 	}
 }

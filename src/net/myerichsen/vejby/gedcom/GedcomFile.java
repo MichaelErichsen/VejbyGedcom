@@ -10,10 +10,10 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
+ * Class representing a GEDCOM file.
  * 
- * 
- * @author michael
- *
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  */
 public class GedcomFile {
 	// static variable single_instance of type Singleton

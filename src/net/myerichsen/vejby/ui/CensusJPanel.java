@@ -28,15 +28,18 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import net.myerichsen.vejby.census.Household;
 import net.myerichsen.vejby.census.Table;
 
 /**
- * @author michael
+ * This panel displays a census table as loaded from a KIP file.
+ * 
+ * @author Michael Erichsen
+ * @version 13. aug. 2020
  *
  */
 public class CensusJPanel extends JPanel {
 	private static final long serialVersionUID = -6638275102973476672L;
-
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	private JTable censusJtable;
@@ -44,9 +47,6 @@ public class CensusJPanel extends JPanel {
 	private JButton btnMapningAfFelter;
 	private Table censusTable;
 	private JButton btnbenKipFil;
-
-	// TODO Use mapping object to create persons and events and sources from
-	// households
 
 	/**
 	 * Create the panel.
@@ -112,11 +112,24 @@ public class CensusJPanel extends JPanel {
 
 	/**
 	 * Split the table into households. Split the household into families and
-	 * single persons
+	 * single persons.
+	 * 
+	 * Then open the household dialog
 	 */
 	protected void analyseCensus() {
-		// TODO Auto-generated method stub
+		// TODO Get from mapping
+		int householdFieldNumber = 3;
+		int sexFieldNumber = 6;
+		String message = censusTable.createHouseholds(householdFieldNumber);
+		LOGGER.log(Level.INFO, message);
 
+		for (Household household : censusTable.getHouseholds()) {
+			message = household.identifyFamilies(sexFieldNumber);
+			LOGGER.log(Level.FINE, message + " " + household.getFamilies().get(0).toString());
+		}
+
+		HouseholdJDialog householdJDialog = new HouseholdJDialog(censusTable);
+		householdJDialog.setVisible(true);
 	}
 
 	/**
@@ -126,6 +139,8 @@ public class CensusJPanel extends JPanel {
 		CensusFieldMapJDialog mapDialog = new CensusFieldMapJDialog();
 		mapDialog.setCensusTable(censusTable);
 		mapDialog.setVisible(true);
+		// TODO Test if saved or cancelled
+		btnAnalysr.setEnabled(true);
 	}
 
 	/**
