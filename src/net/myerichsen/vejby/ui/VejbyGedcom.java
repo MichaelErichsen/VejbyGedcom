@@ -14,14 +14,28 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
 /**
- * Main user interface for the Vejby Gedcom application.
+ * Main user interface for the Vejby Gedcom application. Implements tabbed
+ * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 14. aug. 2020
  *
  */
 
 public class VejbyGedcom {
+	private JFrame frmVejbyGedcomIndtastning;
+	private JTabbedPane tabbedPane;
+	private CensusMappingJPanel censusMappingJPanel;
+	private HouseholdJPanel householdJPanel;
+	private CensusJPanel censusJPanel;
+
+	/**
+	 * @return the censusJPanel
+	 */
+	public CensusJPanel getCensusJPanel() {
+		return censusJPanel;
+	}
+
 	/**
 	 * Launch the application.
 	 */
@@ -39,15 +53,32 @@ public class VejbyGedcom {
 		});
 	}
 
-	// private final static Logger LOGGER =
-	// Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private JFrame frmVejbyGedcomIndtastning;
-
 	/**
 	 * Create the application.
 	 */
 	public VejbyGedcom() {
 		initialize();
+	}
+
+	/**
+	 * @return the censusMappingJPanel
+	 */
+	public CensusMappingJPanel getCensusMappingJPanel() {
+		return censusMappingJPanel;
+	}
+
+	/**
+	 * @return the householdJPanel
+	 */
+	public HouseholdJPanel getHouseholdJPanel() {
+		return householdJPanel;
+	}
+
+	/**
+	 * @return the tabbedPane
+	 */
+	public JTabbedPane getTabbedPane() {
+		return tabbedPane;
 	}
 
 	/**
@@ -81,18 +112,34 @@ public class VejbyGedcom {
 		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		frmVejbyGedcomIndtastning.getContentPane().setLayout(gridBagLayout);
 
-		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
+		setTabbedPane(new JTabbedPane(SwingConstants.TOP));
 		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
 		gbc_tabbedPane.fill = GridBagConstraints.BOTH;
 		gbc_tabbedPane.gridx = 0;
 		gbc_tabbedPane.gridy = 0;
-		frmVejbyGedcomIndtastning.getContentPane().add(tabbedPane, gbc_tabbedPane);
+		frmVejbyGedcomIndtastning.getContentPane().add(getTabbedPane(), gbc_tabbedPane);
 
-		CensusJPanel censusJPanel_1 = new CensusJPanel();
-		tabbedPane.addTab("Folket\u00E6llinger", null, censusJPanel_1, null);
+		censusJPanel = new CensusJPanel(VejbyGedcom.this);
+		getTabbedPane().addTab("Folket\u00E6llinger", null, censusJPanel, null);
+
+		censusMappingJPanel = new CensusMappingJPanel(VejbyGedcom.this);
+		getTabbedPane().addTab("Mapning af felter", null, censusMappingJPanel, null);
+		getTabbedPane().setEnabledAt(1, false);
+
+		householdJPanel = new HouseholdJPanel(VejbyGedcom.this);
+		getTabbedPane().addTab("Husholdninger", null, householdJPanel, null);
+		getTabbedPane().setEnabledAt(2, false);
 
 		BaptismJpanel baptismJpanel = new BaptismJpanel();
-		tabbedPane.addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismJpanel, null);
+		getTabbedPane().addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismJpanel, null);
+	}
+
+	/**
+	 * @param tabbedPane
+	 *            the tabbedPane to set
+	 */
+	public void setTabbedPane(JTabbedPane tabbedPane) {
+		this.tabbedPane = tabbedPane;
 	}
 
 }

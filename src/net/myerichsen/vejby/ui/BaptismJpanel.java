@@ -31,7 +31,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * Data entry panel for church registry baptism entries.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 14. aug. 2020
  *
  */
 public class BaptismJpanel extends JPanel {
@@ -307,7 +307,8 @@ public class BaptismJpanel extends JPanel {
 		String[] gpArray = string.split("\n");
 
 		Individual gp;
-		for (String s : gpArray) {
+		for (@SuppressWarnings("unused")
+		String s : gpArray) {
 			gp = new Individual();
 			// TODO Set name to s
 			family = new Family();

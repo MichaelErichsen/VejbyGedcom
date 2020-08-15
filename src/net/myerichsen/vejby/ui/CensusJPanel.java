@@ -23,19 +23,20 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-import net.myerichsen.vejby.census.Household;
 import net.myerichsen.vejby.census.Table;
 
 /**
- * This panel displays a census table as loaded from a KIP file.
+ * This panel displays a census table as loaded from a KIP file. It creates a
+ * census table object, but only populates it with census rows.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 14. aug. 2020
  *
  */
 public class CensusJPanel extends JPanel {
@@ -43,15 +44,17 @@ public class CensusJPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	private JTable censusJtable;
-	private JButton btnAnalysr;
 	private JButton btnMapningAfFelter;
 	private Table censusTable;
 	private JButton btnbenKipFil;
+	private DefaultTableModel censusModel;
 
 	/**
 	 * Create the panel.
+	 * 
+	 * @param vejbyGedcom
 	 */
-	public CensusJPanel() {
+	public CensusJPanel(VejbyGedcom vejbyGedcom) {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };
@@ -80,21 +83,15 @@ public class CensusJPanel extends JPanel {
 		add(censusButtonPanel, gbc_censusButtonPanel);
 		censusButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		btnAnalysr = new JButton("Analys\u00E9r");
-		btnAnalysr.setEnabled(false);
-		btnAnalysr.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				analyseCensus();
-			}
-		});
-
 		btnMapningAfFelter = new JButton("Mapning af felter");
 		btnMapningAfFelter.setEnabled(false);
 		btnMapningAfFelter.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mapCensusFields();
+				JTabbedPane pane = vejbyGedcom.getTabbedPane();
+				vejbyGedcom.getCensusMappingJPanel().populateMappingTable(getCensusModel());
+				pane.setEnabledAt(1, true);
+				pane.setSelectedIndex(1);
 			}
 		});
 
@@ -102,52 +99,20 @@ public class CensusJPanel extends JPanel {
 		btnbenKipFil.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openKipFile();
+				openKipFile(vejbyGedcom);
 			}
 		});
 		censusButtonPanel.add(btnbenKipFil);
 		censusButtonPanel.add(btnMapningAfFelter);
-		censusButtonPanel.add(btnAnalysr);
-	}
-
-	/**
-	 * Split the table into households. Split the household into families and
-	 * single persons.
-	 * 
-	 * Then open the household dialog
-	 */
-	protected void analyseCensus() {
-		// TODO Get from mapping
-		int householdFieldNumber = 3;
-		int sexFieldNumber = 6;
-		String message = censusTable.createHouseholds(householdFieldNumber);
-		LOGGER.log(Level.INFO, message);
-
-		for (Household household : censusTable.getHouseholds()) {
-			message = household.identifyFamilies(sexFieldNumber);
-			LOGGER.log(Level.FINE, message + " " + household.getFamilies().get(0).toString());
-		}
-
-		HouseholdJDialog householdJDialog = new HouseholdJDialog(censusTable);
-		householdJDialog.setVisible(true);
-	}
-
-	/**
-	 * Map census fields into person attributes and event attributes
-	 */
-	protected void mapCensusFields() {
-		CensusFieldMapJDialog mapDialog = new CensusFieldMapJDialog();
-		mapDialog.setCensusTable(censusTable);
-		mapDialog.setVisible(true);
-		// TODO Test if saved or cancelled
-		btnAnalysr.setEnabled(true);
 	}
 
 	/**
 	 * Choose and open a KIP file, remove empty columns and display i a tabbed
 	 * pane.
+	 * 
+	 * @param vejbyGedcom
 	 */
-	protected void openKipFile() {
+	protected void openKipFile(VejbyGedcom vejbyGedcom) {
 		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
 		JFileChooser kipChooser = new JFileChooser("C://Users//michael//git//VejbyGedcom//Documentation");
 
@@ -187,10 +152,10 @@ public class CensusJPanel extends JPanel {
 
 				String kipFileName = kipFile.getAbsolutePath();
 				String message;
-				censusTable = new Table(year, kipFileName);
-				message = censusTable.readKipfile();
+				setCensusTable(new Table(year, kipFileName));
+				message = getCensusTable().readKipfile();
 				LOGGER.log(Level.INFO, message);
-				message = censusTable.removeEmptyColumns();
+				message = getCensusTable().removeEmptyColumns();
 				LOGGER.log(Level.INFO, message);
 				sc.close();
 				fis.close();
@@ -200,8 +165,9 @@ public class CensusJPanel extends JPanel {
 				LOGGER.log(Level.SEVERE, e.getMessage());
 			}
 
-			String[][] censusArray = new String[censusTable.getPersons().size()][censusTable.getHeaders().size()];
-			List<List<String>> lls = censusTable.getPersons();
+			String[][] censusArray = new String[getCensusTable().getPersons().size()][getCensusTable().getHeaders()
+					.size()];
+			List<List<String>> lls = getCensusTable().getPersons();
 			List<String> list;
 
 			for (int i = 0; i < lls.size(); i++) {
@@ -213,16 +179,46 @@ public class CensusJPanel extends JPanel {
 				}
 			}
 
-			List<String> cth = censusTable.getHeaders();
+			List<String> cth = getCensusTable().getHeaders();
 			String[] headerArray = new String[cth.size()];
 			for (int i = 0; i < cth.size(); i++) {
 				headerArray[i] = cth.get(i);
 			}
 
-			DefaultTableModel defaultTableModel = new DefaultTableModel(censusArray, headerArray);
-			censusJtable.setModel(defaultTableModel);
+			setCensusModel(new DefaultTableModel(censusArray, headerArray));
+			censusJtable.setModel(getCensusModel());
 			btnMapningAfFelter.setEnabled(true);
 		}
+	}
+
+	/**
+	 * @return the censusModel
+	 */
+	public DefaultTableModel getCensusModel() {
+		return censusModel;
+	}
+
+	/**
+	 * @param censusModel
+	 *            the censusModel to set
+	 */
+	public void setCensusModel(DefaultTableModel censusModel) {
+		this.censusModel = censusModel;
+	}
+
+	/**
+	 * @return the censusTable
+	 */
+	public Table getCensusTable() {
+		return censusTable;
+	}
+
+	/**
+	 * @param censusTable
+	 *            the censusTable to set
+	 */
+	public void setCensusTable(Table censusTable) {
+		this.censusTable = censusTable;
 	}
 
 }

@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * A household as extracted from a census file
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 15. aug. 2020
  *
  */
 public class Household {
@@ -68,11 +68,11 @@ public class Household {
 	 * 
 	 * Currently only the first family is identified
 	 * 
-	 * @param sexFieldNumber
-	 *            The column in the table that contains the sex
+	 * @param individual
+	 *            The array of columns in the table
 	 * @return message
 	 */
-	public String identifyFamilies(int sexFieldNumber) {
+	public String identifyFamilies(int[] individual) {
 		String sex = "";
 		Person person;
 		boolean first = true;
@@ -88,21 +88,28 @@ public class Household {
 		for (List<String> row : rows) {
 			LOGGER.log(Level.FINE, row.get(2) + " " + row.get(3) + " " + row.get(5));
 
-			sex = row.get(sexFieldNumber);
+			sex = row.get(individual[4]);
 
 			// Create a person from the row
-			// TODO 1845 specific columns
-			person = new Person(Integer.parseInt(row.get(1)));
-			person.setName(row.get(5));
+			// Bruges_ikke, Personid, Husstandsnr, Navn, Køn, Fødselsår, Alder,
+			// Fødested, Civilstand
+			person = new Person(Integer.parseInt(row.get(individual[1])));
+			person.setName(row.get(individual[3]));
 			person.setSex(sex);
-			String trade = row.get(9);
-			person.setTrades(trade);
+			// String trade = row.get(9);
+			// person.setTrades(trade);
 
-			try {
-				int birthDate = (1845 - Integer.parseInt(row.get(7)));
-				person.setBirthDate("Abt. " + birthDate);
-			} catch (NumberFormatException e) {
-				person.setBirthDate(row.get(7));
+			if (individual[5] != 0) {
+				person.setBirthDate(row.get(individual[5]));
+			} else if (individual[6] != 0) {
+				try {
+					// Calculate difference between age and census year
+					int birthDate = (Integer.parseInt(row.get(individual[10]))
+							- Integer.parseInt(row.get(individual[6])));
+					person.setBirthDate("Abt. " + birthDate);
+				} catch (NumberFormatException e) {
+					person.setBirthDate(row.get(individual[6]));
+				}
 			}
 
 			person.setBirthPlace(row.get(11));
@@ -115,7 +122,7 @@ public class Household {
 				}
 				first = false;
 			} else {
-				setFamilyRole(family, trade, person);
+				setFamilyRole(family, row.get(individual[8]), person);
 			}
 
 			// TODO Add an event for census including a source. Add first person
@@ -134,7 +141,7 @@ public class Household {
 
 		families.add(family);
 
-		return "Familie udskilt (under udvikling)";
+		return "Familie udskilt";
 	}
 
 	/**

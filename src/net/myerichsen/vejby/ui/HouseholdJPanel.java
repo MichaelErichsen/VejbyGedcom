@@ -1,131 +1,94 @@
 package net.myerichsen.vejby.ui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import net.myerichsen.vejby.census.Family;
 import net.myerichsen.vejby.census.Household;
+import net.myerichsen.vejby.census.Mapping;
 import net.myerichsen.vejby.census.Person;
 import net.myerichsen.vejby.census.Table;
 
 /**
- * The Household dialog displays a tree structure of households and families and
- * a table of persons in that entity.
+ * Panel to display and define families in houesholds. It displays a tree
+ * structure of households and families and a table of persons in that entity.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 15. aug. 2020
  *
  */
-public class HouseholdJDialog extends JDialog {
-	// private final static Logger LOGGER =
-	// Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-	private static final long serialVersionUID = -324334468367664714L;
-	private final JPanel contentPanel = new JPanel();
+public class HouseholdJPanel extends JPanel {
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private static final long serialVersionUID = -4694127991314617939L;
+	private JTable table;
+	private JButton saveButton;
+	private JButton defineButton;
 	private Table censusTable;
 	private JTree tree;
 	private DefaultTreeModel treeModel;
-	private JTable table;
-	private JButton btnNewButton;
-	private JButton okButton;
+	private VejbyGedcom vejbyGedcom;
 
 	/**
-	 * Create the dialog.
+	 * Create the panel.
 	 * 
-	 * @param censusTable2
+	 * @param vejbyGedcom
 	 */
-	public HouseholdJDialog(Table censusTable) {
-		if (censusTable != null) {
-			this.censusTable = censusTable;
-		}
-		setTitle("Husholdninger og familier i folket\u00E6llingen");
-		setBounds(100, 100, 949, 565);
-		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new BorderLayout(0, 0));
-		{
-			tree = new JTree();
-			tree.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					populateTable(table);
-				}
-			});
-			contentPanel.add(new JScrollPane(tree), BorderLayout.WEST);
-			populateTree(tree);
-		}
-		{
-			table = new JTable();
-			table.setRowSelectionAllowed(false);
-			contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+	public HouseholdJPanel(VejbyGedcom vejbyGedcom) {
+		this.vejbyGedcom = vejbyGedcom;
 
-		}
-		{
-			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			{
-				okButton = new JButton("Defin\u00E9r en ny familie");
-				okButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Define a new family
-					}
-				});
-				okButton.setEnabled(false);
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+		setLayout(new BorderLayout(0, 0));
+
+		tree = new JTree();
+		tree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				populateTable(table);
 			}
-			{
+		});
+		add(new JScrollPane(tree), BorderLayout.WEST);
+		// populateTree(tree);
 
-				btnNewButton = new JButton("Gem \u00E6ndringer");
-				btnNewButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Save changes to household
-					}
-				});
-				btnNewButton.setEnabled(false);
-				buttonPane.add(btnNewButton);
+		table = new JTable();
+		add(new JScrollPane(table), BorderLayout.CENTER);
+
+		JPanel buttonPanel = new JPanel();
+		add(buttonPanel, BorderLayout.SOUTH);
+
+		defineButton = new JButton("Defin\u00E9r en ny familie");
+		defineButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Define a new family from cell editor inputs and update
+				// tree and table
 			}
-			{
-				JButton cancelButton = new JButton("Luk");
-				cancelButton.addActionListener(new ActionListener() {
+		});
+		buttonPanel.add(defineButton);
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						// TODO Drop any uncommitted changes, such as a new
-						// family
-						dispose();
-						setVisible(false);
-					}
-
-				});
-
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+		saveButton = new JButton("Gem \u00E6ndringer");
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Save changes to household
 			}
-		}
+		});
+		buttonPanel.add(saveButton);
 	}
 
 	/**
@@ -159,8 +122,8 @@ public class HouseholdJDialog extends JDialog {
 	 * children.
 	 */
 	private void populateFamilyTable(int householdId, int familyId) {
-		btnNewButton.setEnabled(false);
-		okButton.setEnabled(false);
+		defineButton.setEnabled(false);
+		saveButton.setEnabled(false);
 		Family family = censusTable.getFamily(householdId, familyId);
 
 		String[] columnNames = new String[] { "Navn", "Køn", "Født", "Rolle" };
@@ -185,8 +148,8 @@ public class HouseholdJDialog extends JDialog {
 	 * @param j
 	 */
 	private void populateHouseholdTable(int id) {
-		btnNewButton.setEnabled(true);
-		okButton.setEnabled(true);
+		defineButton.setEnabled(true);
+		saveButton.setEnabled(true);
 		Household household = censusTable.getHouseholds().get(id);
 		int size = household.getRows().size();
 		List<Family> families = household.getFamilies();
@@ -257,24 +220,44 @@ public class HouseholdJDialog extends JDialog {
 	}
 
 	/**
-	 * Populate tree structure with households and families.
+	 * @param censusModel
+	 * @param mappingModel
 	 */
-	private void populateTree(JTree tree) {
-		tree.setRootVisible(false);
-		DefaultMutableTreeNode rootTreeNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
-		if (rootTreeNode != null) {
-			rootTreeNode.removeAllChildren();
-		}
+	public void populateTree(Mapping mapping) {
+		String message;
 		DefaultMutableTreeNode householdNode;
 		DefaultMutableTreeNode familyNode;
 
-		for (Household household : censusTable.getHouseholds()) {
-			householdNode = new DefaultMutableTreeNode(household);
-			rootTreeNode.add(householdNode);
+		tree.setRootVisible(false);
+		DefaultMutableTreeNode rootTreeNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
 
-			for (Family family : household.getFamilies()) {
-				familyNode = new DefaultMutableTreeNode(family);
-				householdNode.add(familyNode);
+		if (rootTreeNode != null) {
+			rootTreeNode.removeAllChildren();
+		}
+
+		int[] individual = mapping.getIndividual();
+
+		censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
+
+		if (individual[2] != 0) {
+			message = censusTable.createHouseholds(individual[2]);
+			LOGGER.log(Level.INFO, message);
+
+			if (individual[4] != 0) {
+				for (Household household : censusTable.getHouseholds()) {
+					message = household.identifyFamilies(individual);
+					LOGGER.log(Level.INFO, message);
+				}
+			}
+
+			for (Household household : censusTable.getHouseholds()) {
+				householdNode = new DefaultMutableTreeNode(household);
+				rootTreeNode.add(householdNode);
+
+				for (Family family : household.getFamilies()) {
+					familyNode = new DefaultMutableTreeNode(family);
+					householdNode.add(familyNode);
+				}
 			}
 		}
 

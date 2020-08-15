@@ -1,57 +1,125 @@
 package net.myerichsen.vejby.census;
 
 /**
- * Mapping between census fields and individual, census event, birth event, and
- * trade event.
+ * Contains mapping pairs between census file, individuals, census events and
+ * birth events.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 15. aug. 2020
  *
  */
 public class Mapping {
-	private String[][] mappingMatrix;
+	int[] individual;
+	int[] census;
+	int[] birth;
+	int[] trade;
 
 	/**
-	 * 
+	 * Constructor
+	 *
 	 */
-	public Mapping(int i, int j) {
+	public Mapping() {
 		super();
-		mappingMatrix = new String[i][j];
+		// Bruges_ikke, Personid, Husstandsnr, Navn, Køn, Fødselsår, Alder,
+		// Civilstand, Erhverv, Fødested, FTÅr
+		individual = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		// Bruges_ikke, Alder, FTÅr, Sted
+		census = new int[] { 0, 0, 0, 0 };
+		// Bruges_ikke, Alder, Fødselsår, Fødested
+		birth = new int[] { 0, 0, 0, 0 };
+		// Bruges_ikke, FTÅr, Erhverv
+		trade = new int[] { 0, 0, 0 };
 	}
 
 	/**
-	 * @return the mappingMatrix
+	 * @return the birth
 	 */
-	public String[][] getMappingMatrix() {
-		return mappingMatrix;
-	}
-
-	public void setMappingMatrix(int i, int j, String string) {
-		mappingMatrix[i][j] = string;
+	public int[] getBirth() {
+		return birth;
 	}
 
 	/**
-	 * @param mappingMatrix
-	 *            the mappingMatrix to set
+	 * @return the census
 	 */
-	public void setMappingMatrix(String[][] mappingMatrix) {
-		this.mappingMatrix = mappingMatrix;
+	public int[] getCensus() {
+		return census;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
+	/**
+	 * @return the individual
 	 */
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < mappingMatrix.length; i++) {
-			sb.append(mappingMatrix[i][0] + ":\t" + mappingMatrix[i][1] + ",\t " + mappingMatrix[i][2] + ",\t "
-					+ mappingMatrix[i][3] + ",\t" + mappingMatrix[i][4] + ",\t" + mappingMatrix[i][5] + "\n");
-		}
-		return sb.toString();
+	public int[] getIndividual() {
+		return individual;
 	}
 
+	/**
+	 * @return the trade
+	 */
+	public int[] getTrade() {
+		return trade;
+	}
+
+	/**
+	 * @param index
+	 * @param value
+	 */
+	public void setBirth(int index, int value) {
+		birth[index] = value;
+	}
+
+	/**
+	 * @param birth
+	 *            the birth to set
+	 */
+	public void setBirth(int[] birth) {
+		this.birth = birth;
+	}
+
+	/**
+	 * @param index
+	 * @param value
+	 */
+	public void setCensus(int index, int value) {
+		census[index] = value;
+	}
+
+	/**
+	 * @param census
+	 *            the census to set
+	 */
+	public void setCensus(int[] census) {
+		this.census = census;
+	}
+
+	/**
+	 * @param index
+	 * @param value
+	 */
+	public void setIndividual(int index, int value) {
+		individual[index] = value;
+	}
+
+	/**
+	 * @param individual
+	 *            the individual to set
+	 */
+	public void setIndividual(int[] individual) {
+		this.individual = individual;
+	}
+
+	/**
+	 * @param index
+	 * @param value
+	 */
+	public void setTrade(int index, int value) {
+		trade[index] = value;
+	}
+
+	/**
+	 * @param trade
+	 *            the trade to set
+	 */
+	public void setTrade(int[] trade) {
+		this.trade = trade;
+	}
 }
