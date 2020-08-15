@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 14. aug. 2020
+ * @version 15. aug. 2020
  *
  */
 

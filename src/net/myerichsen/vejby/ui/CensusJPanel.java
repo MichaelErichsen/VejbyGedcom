@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -42,6 +43,7 @@ import net.myerichsen.vejby.census.Table;
 public class CensusJPanel extends JPanel {
 	private static final long serialVersionUID = -6638275102973476672L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private Preferences prefs;
 
 	private JTable censusJtable;
 	private JButton btnMapningAfFelter;
@@ -55,6 +57,8 @@ public class CensusJPanel extends JPanel {
 	 * @param vejbyGedcom
 	 */
 	public CensusJPanel(VejbyGedcom vejbyGedcom) {
+		prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };
@@ -114,7 +118,8 @@ public class CensusJPanel extends JPanel {
 	 */
 	protected void openKipFile(VejbyGedcom vejbyGedcom) {
 		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
-		JFileChooser kipChooser = new JFileChooser("C://Users//michael//git//VejbyGedcom//Documentation");
+		String kipFileName = prefs.get("KIPFILENAME", "C://Users//michael//git//VejbyGedcom//Documentation");
+		JFileChooser kipChooser = new JFileChooser(kipFileName);
 
 		kipChooser.setFileFilter(ff);
 
@@ -122,7 +127,8 @@ public class CensusJPanel extends JPanel {
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File kipFile = kipChooser.getSelectedFile();
-			LOGGER.log(Level.INFO, kipFile.getAbsolutePath());
+			LOGGER.log(Level.INFO, kipFile.getPath());
+			prefs.put("KIPFILENAME", kipFile.getPath());
 
 			String[] headers;
 			try {
@@ -149,8 +155,6 @@ public class CensusJPanel extends JPanel {
 				String ftYear = ftData[index].substring(3);
 				LOGGER.log(Level.INFO, ftYear);
 				int year = Integer.parseInt(ftYear);
-
-				String kipFileName = kipFile.getAbsolutePath();
 				String message;
 				setCensusTable(new Table(year, kipFileName));
 				message = getCensusTable().readKipfile();
