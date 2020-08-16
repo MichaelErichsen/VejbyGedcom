@@ -1,6 +1,7 @@
 package net.myerichsen.vejby.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -19,6 +21,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import net.myerichsen.vejby.census.Mapping;
+import net.myerichsen.vejby.util.CustomTableCellRenderer;
+import net.myerichsen.vejby.util.PrefKey;
 
 /**
  * Panel to map census fields for further analysis. It displays six columns.
@@ -28,15 +32,20 @@ import net.myerichsen.vejby.census.Mapping;
  * attributes for each type.
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 16. aug. 2020
  *
  */
 public class CensusMappingJPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static final long serialVersionUID = -2181211331271971240L;
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private JTable mappingTable;
 	private DefaultTableModel mappingModel;
+	private CustomTableCellRenderer renderer2;
+	private CustomTableCellRenderer renderer3;
+	private CustomTableCellRenderer renderer4;
+	private CustomTableCellRenderer renderer5;
 
 	/**
 	 * Create the panel.
@@ -106,7 +115,15 @@ public class CensusMappingJPanel extends JPanel {
 		}
 
 		mappingModel = new DefaultTableModel(mappingArray, columnNames);
+		renderer2 = new CustomTableCellRenderer();
+		renderer3 = new CustomTableCellRenderer();
+		renderer4 = new CustomTableCellRenderer();
+		renderer5 = new CustomTableCellRenderer();
 		mappingTable.setModel(mappingModel);
+		mappingTable.getColumnModel().getColumn(2).setCellRenderer(renderer2);
+		mappingTable.getColumnModel().getColumn(3).setCellRenderer(renderer3);
+		mappingTable.getColumnModel().getColumn(4).setCellRenderer(renderer4);
+		mappingTable.getColumnModel().getColumn(5).setCellRenderer(renderer5);
 
 		JComboBox<String> individualcomboBox = new JComboBox<String>();
 		individualcomboBox.addItem("Bruges ikke");
@@ -142,6 +159,122 @@ public class CensusMappingJPanel extends JPanel {
 		tradecomboBox.addItem("Erhverv");
 		mappingTable.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(tradecomboBox));
 
+		setValuesFromPreferences();
+	}
+
+	/**
+	 * Set field values and colours from preferences
+	 */
+	private void setValuesFromPreferences() {
+		int row;
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Personid", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_2, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Husstandsnr.", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_3, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Navn", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_4, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Køn", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_5, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Fødselsår", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Alder", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_7, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Civilstand", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_8, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Erhverv", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_9, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Fødested", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_10, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("FTÅr", row, 2);
+			renderer2.setRowColor(row, Color.ORANGE);
+		}
+
+		row = prefs.getInt(PrefKey.CENSUS_1, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Alder", row, 3);
+			renderer3.setRowColor(row, Color.GREEN);
+		}
+
+		row = prefs.getInt(PrefKey.CENSUS_2, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("FTÅr", row, 3);
+			renderer3.setRowColor(row, Color.GREEN);
+		}
+
+		row = prefs.getInt(PrefKey.CENSUS_3, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Sted", row, 3);
+			renderer3.setRowColor(row, Color.GREEN);
+		}
+
+		row = prefs.getInt(PrefKey.BIRTH_1, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Alder", row, 4);
+			renderer4.setRowColor(row, Color.YELLOW);
+		}
+
+		row = prefs.getInt(PrefKey.BIRTH_2, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Fødselsår", row, 4);
+			renderer4.setRowColor(row, Color.YELLOW);
+		}
+
+		row = prefs.getInt(PrefKey.BIRTH_3, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Fødested", row, 4);
+			renderer4.setRowColor(row, Color.YELLOW);
+		}
+
+		row = prefs.getInt(PrefKey.OCCUPATION_1, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("FTÅr", row, 5);
+			renderer5.setRowColor(row, Color.MAGENTA);
+		}
+
+		row = prefs.getInt(PrefKey.OCCUPATION_2, 0);
+		if (row > 0) {
+			mappingTable.setValueAt("Erhverv", row, 5);
+			renderer5.setRowColor(row, Color.MAGENTA);
+		}
 	}
 
 	/**
@@ -160,24 +293,34 @@ public class CensusMappingJPanel extends JPanel {
 
 			if (value.equals("Personid")) {
 				individual[1] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_1, i);
 			} else if (value.equals("Husstandsnr.")) {
 				individual[2] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_2, i);
 			} else if (value.equals("Navn")) {
 				individual[3] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_3, i);
 			} else if (value.equals("Køn")) {
 				individual[4] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_4, i);
 			} else if (value.equals("Fødselsår")) {
 				individual[5] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_5, i);
 			} else if (value.equals("Alder")) {
 				individual[6] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_6, i);
 			} else if (value.equals("Civilstand")) {
 				individual[7] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_7, i);
 			} else if (value.equals("Erhverv")) {
 				individual[8] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_8, i);
 			} else if (value.equals("Fødested")) {
 				individual[9] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_9, i);
 			} else if (value.equals("FTÅr")) {
 				individual[10] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_10, i);
 			}
 		}
 
@@ -193,10 +336,13 @@ public class CensusMappingJPanel extends JPanel {
 
 			if (value.equals("Alder")) {
 				census[1] = i;
+				prefs.putInt(PrefKey.CENSUS_1, i);
 			} else if (value.equals("FTÅr")) {
 				census[2] = i;
+				prefs.putInt(PrefKey.CENSUS_2, i);
 			} else if (value.equals("Sted")) {
 				census[3] = i;
+				prefs.putInt(PrefKey.CENSUS_3, i);
 			}
 		}
 
@@ -209,10 +355,13 @@ public class CensusMappingJPanel extends JPanel {
 
 			if (value.equals("Alder")) {
 				birth[1] = i;
+				prefs.putInt(PrefKey.BIRTH_1, i);
 			} else if (value.equals("Fødselsår")) {
 				birth[2] = i;
+				prefs.putInt(PrefKey.BIRTH_2, i);
 			} else if (value.equals("Fødested")) {
 				birth[3] = i;
+				prefs.putInt(PrefKey.BIRTH_3, i);
 			}
 		}
 
@@ -225,8 +374,10 @@ public class CensusMappingJPanel extends JPanel {
 
 			if (value.equals("FTÅr")) {
 				trade[1] = i;
+				prefs.putInt(PrefKey.OCCUPATION_1, i);
 			} else if (value.equals("Erhverv")) {
 				trade[2] = i;
+				prefs.putInt(PrefKey.OCCUPATION_2, i);
 			}
 		}
 

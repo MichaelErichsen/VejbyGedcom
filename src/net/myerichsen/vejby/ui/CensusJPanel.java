@@ -37,13 +37,13 @@ import net.myerichsen.vejby.census.Table;
  * census table object, but only populates it with census rows.
  * 
  * @author Michael Erichsen
- * @version 14. aug. 2020
+ * @version 15. aug. 2020
  *
  */
 public class CensusJPanel extends JPanel {
 	private static final long serialVersionUID = -6638275102973476672L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private Preferences prefs;
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private JTable censusJtable;
 	private JButton btnMapningAfFelter;
@@ -57,8 +57,6 @@ public class CensusJPanel extends JPanel {
 	 * @param vejbyGedcom
 	 */
 	public CensusJPanel(VejbyGedcom vejbyGedcom) {
-		prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
-
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };

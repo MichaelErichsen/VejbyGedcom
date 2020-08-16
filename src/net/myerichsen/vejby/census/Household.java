@@ -91,8 +91,6 @@ public class Household {
 			sex = row.get(individual[4]);
 
 			// Create a person from the row
-			// Bruges_ikke, Personid, Husstandsnr, Navn, Køn, Fødselsår, Alder,
-			// Fødested, Civilstand
 			person = new Person(Integer.parseInt(row.get(individual[1])));
 			person.setName(row.get(individual[3]));
 			person.setSex(sex);
@@ -127,6 +125,16 @@ public class Household {
 
 			// TODO Add an event for census including a source. Add first person
 			// as principal, all others at witnesses
+
+			// Create a FT Event
+			// Create a FT source
+			// Add to each person of household
+
+			// Create a birth event for each person
+			// Add to person
+
+			// Create a trade event for each person
+			// Add to person
 
 			// TODO Should test next row for family membership
 

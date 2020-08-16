@@ -13,19 +13,11 @@ import java.util.List;
  * Class representing a GEDCOM file.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 15. aug. 2020
  */
 public class GedcomFile {
 	// static variable single_instance of type Singleton
 	private static GedcomFile single_instance = null;
-
-	/**
-	 * @return
-	 */
-	public static GedcomFile getFile() {
-		return null;
-		// TODO Auto-generated method stub
-	}
 
 	// static method to create instance of Singleton class
 	public static GedcomFile getInstance() {

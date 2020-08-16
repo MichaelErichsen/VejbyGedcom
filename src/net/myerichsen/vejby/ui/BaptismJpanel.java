@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.myerichsen.vejby.ui;
 
 import java.awt.FlowLayout;
@@ -14,6 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -26,16 +24,18 @@ import com.toedter.calendar.JDateChooser;
 import net.myerichsen.vejby.gedcom.Family;
 import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
+import net.myerichsen.vejby.util.PrefKey;
 
 /**
  * Data entry panel for church registry baptism entries.
  * 
  * @author Michael Erichsen
- * @version 14. aug. 2020
+ * @version 16. aug. 2020
  *
  */
 public class BaptismJpanel extends JPanel {
 	private static final long serialVersionUID = 2704936588696233694L;
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private JTextField nametextField;
 	private JTextField fatherNametextField;
@@ -319,9 +319,11 @@ public class BaptismJpanel extends JPanel {
 		}
 
 		try {
-			file.print(new File("c://temp//vejby.txt"));
+			// TODO Use a FileChooser to select output GEDCOM file location
+			String gedcomFileName = prefs.get(PrefKey.GEDCOMFILENAME, "c:/temp/vejby.ged");
+
+			file.print(new File(gedcomFileName));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

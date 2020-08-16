@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Implement a census table as loaded from a KIP file
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 15. aug. 2020
  *
  */
 public class Table {
@@ -74,6 +74,12 @@ public class Table {
 			currentHousehold.getRows().add(currentRow);
 		}
 		return getHouseholds().size() + " husholdninger udskilt";
+	}
+
+	public Event createCensusEvent(Household household) {
+		Event censusEvent = new Event();
+
+		return censusEvent;
 	}
 
 	/**
