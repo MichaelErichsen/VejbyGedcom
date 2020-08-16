@@ -12,11 +12,14 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.myerichsen.vejby.gedcom.Event;
+import net.myerichsen.vejby.gedcom.Family;
+
 /**
  * Implement a census table as loaded from a KIP file
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 16. aug. 2020
  *
  */
 public class Table {
@@ -285,6 +288,23 @@ public class Table {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * @return
+	 */
+	public List<Family> getFamilies() {
+		List<Family> lf = new ArrayList<Family>();
+
+		for (int i = 0; i < households.size(); i++) {
+			List<Family> families = households.get(i).getFamilies();
+
+			for (int j = 0; j < families.size(); j++) {
+				lf.add(families.get(j));
+			}
+		}
+
+		return lf;
 	}
 
 }

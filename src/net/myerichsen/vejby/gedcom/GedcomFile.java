@@ -8,6 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.prefs.Preferences;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import net.myerichsen.vejby.census.Table;
 
 /**
  * Class representing a GEDCOM file.
@@ -16,6 +23,8 @@ import java.util.List;
  * @version 15. aug. 2020
  */
 public class GedcomFile {
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+
 	// static variable single_instance of type Singleton
 	private static GedcomFile single_instance = null;
 
@@ -113,5 +122,46 @@ public class GedcomFile {
 
 		// Trailer
 		fw.write("0 TRLR\n");
+	}
+
+	/**
+	 * Save a census table as GEDCOM
+	 * 
+	 * @param censusTable
+	 */
+	public void save(Table censusTable) {
+		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
+		String gedcomFileName = prefs.get("GEDCOMFILENAME", ".");
+		JFileChooser gedcomChooser = new JFileChooser(gedcomFileName);
+
+		gedcomChooser.setFileFilter(ff);
+
+		int returnValue = gedcomChooser.showSaveDialog(null);
+
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File gedcomFile = gedcomChooser.getSelectedFile();
+			String fileName = gedcomFile.getName();
+			if (!fileName.endsWith(".ged")) {
+				gedcomFile = new File(fileName + ".ged");
+			}
+			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
+
+			OutputStreamWriter fw = null;
+			try {
+				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+
+				writeHeader(fw);
+
+				for (Family family : censusTable.getFamilies()) {
+					fw.write(family.toGedcom());
+					System.out.print(family.toString());
+				}
+
+				writeTrailer(fw);
+				fw.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

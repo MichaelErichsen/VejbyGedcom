@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.myerichsen.vejby.gedcom.Family;
+import net.myerichsen.vejby.gedcom.Individual;
+
 /**
  * A household as extracted from a census file
  * 
@@ -16,7 +19,7 @@ public class Household {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private List<List<String>> rows;
 	private List<Family> families;
-	private List<Person> singles;
+	private List<Individual> singles;
 	private int id;
 
 	/**
@@ -29,7 +32,7 @@ public class Household {
 		super();
 		rows = new ArrayList<List<String>>();
 		families = new ArrayList<Family>();
-		singles = new ArrayList<Person>();
+		singles = new ArrayList<Individual>();
 		this.id = id;
 	}
 
@@ -57,7 +60,7 @@ public class Household {
 	/**
 	 * @return the singles
 	 */
-	public List<Person> getSingles() {
+	public List<Individual> getSingles() {
 		return singles;
 	}
 
@@ -74,7 +77,7 @@ public class Household {
 	 */
 	public String identifyFamilies(int[] individual) {
 		String sex = "";
-		Person person;
+		Individual person;
 		boolean first = true;
 
 		// The first person is the primary person, father or mother according to
@@ -91,7 +94,7 @@ public class Household {
 			sex = row.get(individual[4]);
 
 			// Create a person from the row
-			person = new Person(Integer.parseInt(row.get(individual[1])));
+			person = new Individual(Integer.parseInt(row.get(individual[1])));
 			person.setName(row.get(individual[3]));
 			person.setSex(sex);
 			// String trade = row.get(9);
@@ -165,7 +168,7 @@ public class Household {
 	 * @param position
 	 * @return
 	 */
-	private void setFamilyRole(Family family, String position, Person person) {
+	private void setFamilyRole(Family family, String position, Individual person) {
 		position = position.toLowerCase();
 
 		if ((position.contains("broder")) || (position.contains("broderdatter")) || (position.contains("brodersøn"))
@@ -207,7 +210,7 @@ public class Household {
 	 * @param singles
 	 *            the singles to set
 	 */
-	public void setSingles(List<Person> singles) {
+	public void setSingles(List<Individual> singles) {
 		this.singles = singles;
 	}
 

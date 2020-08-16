@@ -291,7 +291,7 @@ public class BaptismJpanel extends JPanel {
 	 * Save button was pressed
 	 */
 	protected void saveFamily() {
-		Family family = new Family();
+		Family family = new Family(1, 1);
 		Individual father = new Individual();
 		Individual mother = new Individual();
 		Individual child = new Individual();
@@ -311,7 +311,7 @@ public class BaptismJpanel extends JPanel {
 		String s : gpArray) {
 			gp = new Individual();
 			// TODO Set name to s
-			family = new Family();
+			family = new Family(1, 1);
 			// TODO Check if male or female
 			// TODO Also add room for address for godparent
 			family.setFather(gp);

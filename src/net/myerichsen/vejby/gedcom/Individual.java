@@ -6,15 +6,12 @@ import java.util.Date;
  * Class representing an individual in GEDCOM.
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 16. aug. 2020
  *
  */
 public class Individual {
 	private final static String tag = "INDI";
 
-	/**
-	 * @return the tag
-	 */
 	public static String getTag() {
 		return tag;
 	}
@@ -24,11 +21,28 @@ public class Individual {
 	private String sex;
 	private String trades;
 	private String address;
-	private Date birthDate;
+	private String birthDate;
 	private Date deathDate;
 	private String birthPlace;
-
 	private String deathPlace;
+
+	/**
+	 * Constructor
+	 *
+	 */
+	public Individual() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * Constructor
+	 *
+	 * @param id
+	 */
+	public Individual(int id) {
+		super();
+		this.id = id;
+	}
 
 	/**
 	 * @return the address
@@ -40,7 +54,7 @@ public class Individual {
 	/**
 	 * @return the birthDate
 	 */
-	public Date getBirthDate() {
+	public String getBirthDate() {
 		return birthDate;
 	}
 
@@ -102,11 +116,11 @@ public class Individual {
 	}
 
 	/**
-	 * @param birthDate
-	 *            the birthDate to set
+	 * @param string
 	 */
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
+	public void setBirthDate(String string) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -172,6 +186,15 @@ public class Individual {
 	 */
 	@Override
 	public String toString() {
+		return name;
+	}
+
+	/**
+	 * Return a GEDCOM output.
+	 * 
+	 * @return
+	 */
+	public String toGedcom() {
 		final StringBuffer sb = new StringBuffer();
 
 		sb.append("0 @I" + getId() + "@ " + getTag() + "\n");

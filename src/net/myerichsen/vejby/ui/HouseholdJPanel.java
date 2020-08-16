@@ -20,11 +20,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import net.myerichsen.vejby.census.Family;
 import net.myerichsen.vejby.census.Household;
 import net.myerichsen.vejby.census.Mapping;
-import net.myerichsen.vejby.census.Person;
 import net.myerichsen.vejby.census.Table;
+import net.myerichsen.vejby.gedcom.Family;
+import net.myerichsen.vejby.gedcom.GedcomFile;
+import net.myerichsen.vejby.gedcom.Individual;
 
 /**
  * Panel to display and define families in houesholds. It displays a tree
@@ -81,11 +82,12 @@ public class HouseholdJPanel extends JPanel {
 		});
 		buttonPanel.add(defineButton);
 
-		saveButton = new JButton("Gem \u00E6ndringer");
+		saveButton = new JButton("Gem som GEDCOM");
 		saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Save changes to household
+				GedcomFile gedcomFile = GedcomFile.getInstance();
+				gedcomFile.save(censusTable);
 			}
 		});
 		buttonPanel.add(saveButton);
@@ -94,20 +96,20 @@ public class HouseholdJPanel extends JPanel {
 	/**
 	 * 
 	 * @param id
-	 *            Person id in the census file
+	 *            Individual id in the census file
 	 * @param families
 	 *            A list of families in the household
 	 * @return String A string in the format "Familie" nr rolle
 	 */
-	private String listFamiliesForPerson(int id, List<Family> families) {
+	private String listFamiliesForIndividual(int id, List<Family> families) {
 		StringBuilder sb = new StringBuilder();
-		for (Family family : families) {
+		for (net.myerichsen.vejby.gedcom.Family family : families) {
 			if ((family.getFather() != null) && (family.getFather().getId() == id)) {
 				sb.append("Fader i familie " + family.getFamilyId() + ". ");
 			} else if ((family.getMother() != null) && (family.getMother().getId() == id)) {
 				sb.append("Moder i familie " + family.getFamilyId() + ". ");
 			} else {
-				for (Person child : family.getChildren()) {
+				for (Individual child : family.getChildren()) {
 					if (child.getId() == id) {
 						sb.append("Barn i familie " + family.getFamilyId() + ". ");
 					}
@@ -167,7 +169,7 @@ public class HouseholdJPanel extends JPanel {
 
 			data[i][0] = row.get(5);
 			data[i][1] = row.get(9);
-			data[i][2] = listFamiliesForPerson(personId, families);
+			data[i][2] = listFamiliesForIndividual(personId, families);
 			data[i][3] = "";
 		}
 
