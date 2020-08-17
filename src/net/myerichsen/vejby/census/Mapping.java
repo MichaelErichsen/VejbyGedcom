@@ -1,125 +1,42 @@
 package net.myerichsen.vejby.census;
 
 /**
- * Contains mapping pairs between census file, individuals, census events and
+ * Contains mapping pairs between census file, mappingKeyss, census events and
  * birth events.
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class Mapping {
-	int[] individual;
-	int[] census;
-	int[] birth;
-	int[] trade;
+	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	/**
-	 * Constructor
-	 *
+	 * @return mappingKeys An array of mapping keys
 	 */
-	public Mapping() {
-		super();
-		// Bruges_ikke, Personid, Husstandsnr, Navn, Køn, Fødselsår, Alder,
-		// Civilstand, Erhverv, Fødested, FTÅr
-		individual = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		// Bruges_ikke, Alder, FTÅr, Sted
-		census = new int[] { 0, 0, 0, 0 };
-		// Bruges_ikke, Alder, Fødselsår, Fødested
-		birth = new int[] { 0, 0, 0, 0 };
-		// Bruges_ikke, FTÅr, Erhverv
-		trade = new int[] { 0, 0, 0 };
+	public int[] getMappingKeys() {
+		return mappingKeys;
 	}
 
 	/**
-	 * @return the birth
+	 * @param mappingKeys
+	 *            the mappingKeys to set
 	 */
-	public int[] getBirth() {
-		return birth;
+	public void setMappingKeys(int[] mappingKeys) {
+		this.mappingKeys = mappingKeys;
 	}
 
-	/**
-	 * @return the census
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
 	 */
-	public int[] getCensus() {
-		return census;
+	@Override
+	public String toString() {
+		return "Mapping keys: " + getMappingKeys()[0] + " " + getMappingKeys()[1] + " " + getMappingKeys()[2] + " "
+				+ getMappingKeys()[3] + " " + getMappingKeys()[4] + " " + getMappingKeys()[5] + " "
+				+ getMappingKeys()[6] + " " + getMappingKeys()[7] + " " + getMappingKeys()[8] + " "
+				+ getMappingKeys()[9] + " " + getMappingKeys()[10] + " " + getMappingKeys()[11];
 	}
 
-	/**
-	 * @return the individual
-	 */
-	public int[] getIndividual() {
-		return individual;
-	}
-
-	/**
-	 * @return the trade
-	 */
-	public int[] getTrade() {
-		return trade;
-	}
-
-	/**
-	 * @param index
-	 * @param value
-	 */
-	public void setBirth(int index, int value) {
-		birth[index] = value;
-	}
-
-	/**
-	 * @param birth
-	 *            the birth to set
-	 */
-	public void setBirth(int[] birth) {
-		this.birth = birth;
-	}
-
-	/**
-	 * @param index
-	 * @param value
-	 */
-	public void setCensus(int index, int value) {
-		census[index] = value;
-	}
-
-	/**
-	 * @param census
-	 *            the census to set
-	 */
-	public void setCensus(int[] census) {
-		this.census = census;
-	}
-
-	/**
-	 * @param index
-	 * @param value
-	 */
-	public void setIndividual(int index, int value) {
-		individual[index] = value;
-	}
-
-	/**
-	 * @param individual
-	 *            the individual to set
-	 */
-	public void setIndividual(int[] individual) {
-		this.individual = individual;
-	}
-
-	/**
-	 * @param index
-	 * @param value
-	 */
-	public void setTrade(int index, int value) {
-		trade[index] = value;
-	}
-
-	/**
-	 * @param trade
-	 *            the trade to set
-	 */
-	public void setTrade(int[] trade) {
-		this.trade = trade;
-	}
 }

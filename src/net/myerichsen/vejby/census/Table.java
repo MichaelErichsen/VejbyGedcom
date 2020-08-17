@@ -12,7 +12,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.myerichsen.vejby.gedcom.Event;
 import net.myerichsen.vejby.gedcom.Family;
 
 /**
@@ -77,12 +76,6 @@ public class Table {
 			currentHousehold.getRows().add(currentRow);
 		}
 		return getHouseholds().size() + " husholdninger udskilt";
-	}
-
-	public Event createCensusEvent(Household household) {
-		Event censusEvent = new Event();
-
-		return censusEvent;
 	}
 
 	/**

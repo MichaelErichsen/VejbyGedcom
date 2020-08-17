@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.myerichsen.vejby.gedcom.CensusEvent;
 import net.myerichsen.vejby.gedcom.Family;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * A household as extracted from a census file
+ * A household as extracted from a census file.
  * 
  * @author Michael Erichsen
  * @version 17. aug. 2020
@@ -21,6 +22,7 @@ public class Household {
 	private List<Family> families;
 	private List<Individual> singles;
 	private int id;
+	private CensusEvent censusEvent;
 
 	/**
 	 * Constructor
@@ -71,14 +73,18 @@ public class Household {
 	 * 
 	 * Currently only the first family is identified
 	 * 
-	 * @param individual
+	 * @param mappingKeys
 	 *            The array of columns in the table
 	 * @return message
 	 */
-	public String identifyFamilies(int[] individual) {
+	public String identifyFamilies(int[] mappingKeys) {
 		String sex = "";
 		Individual person;
 		boolean first = true;
+
+		String sYear = rows.get(0).get(mappingKeys[11]);
+		int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
+		censusEvent = new CensusEvent(iYear, rows.get(0).get(mappingKeys[2]), this);
 
 		// The first person is the primary person, father or mother according to
 		// sex
@@ -89,35 +95,31 @@ public class Household {
 		Family family = new Family(id, 1);
 
 		for (List<String> row : rows) {
-			LOGGER.log(Level.FINE, row.get(2) + " " + row.get(3) + " " + row.get(5));
+			LOGGER.log(Level.FINE,
+					row.get(mappingKeys[1]) + " " + row.get(mappingKeys[4]) + " " + row.get(mappingKeys[5]));
 
-			sex = row.get(individual[4]);
+			sex = row.get(mappingKeys[5]);
 
 			// Create a person from the row
-			person = new Individual(Integer.parseInt(row.get(individual[1])));
-			person.setName(row.get(individual[3]));
+			person = new Individual(Integer.parseInt(row.get(mappingKeys[1])));
+			person.setName(row.get(mappingKeys[4]));
 			person.setSex(sex);
-			String trade = row.get(individual[8]);
+			String trade = row.get(mappingKeys[9]);
 			person.setTrades(trade);
 
-			if (individual[5] != 0) {
-				person.setBirthDate(row.get(individual[5]));
-			} else if (individual[6] != 0) {
+			if (mappingKeys[6] != 0) {
+				person.setBirthDate(row.get(mappingKeys[6]));
+			} else if (mappingKeys[7] != 0) {
 				try {
 					// Calculate difference between age and census year
-					LOGGER.log(Level.FINE, "FTÅr: " + row.get(individual[10]) + ", Alder: "
-							+ Integer.parseInt(row.get(individual[6])));
-					String sYear = row.get(individual[10]);
-					int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
-					int birthDate = (iYear - Integer.parseInt(row.get(individual[6])));
+					int birthDate = (iYear - Integer.parseInt(row.get(mappingKeys[7])));
 					person.setBirthDate("Abt. " + birthDate);
 				} catch (NumberFormatException e) {
-					LOGGER.log(Level.FINE, "Felt: " + individual[6] + ", " + row.get(individual[6]));
-					person.setBirthDate(row.get(individual[6]));
+					person.setBirthDate(row.get(mappingKeys[6]) + "??");
 				}
 			}
 
-			person.setBirthPlace(row.get(11));
+			person.setBirthPlace(row.get(mappingKeys[10]));
 
 			if (first) {
 				if (sex.startsWith("M")) {
@@ -127,21 +129,10 @@ public class Household {
 				}
 				first = false;
 			} else {
-				setFamilyRole(family, row.get(individual[8]), person);
+				setFamilyRole(family, row.get(mappingKeys[9]), person);
 			}
 
-			// TODO Add an event for census including a source. Add first person
-			// as principal, all others at witnesses
-
-			// Create a FT Event
-			// Create a FT source
-			// Add to each person of household
-
-			// Create a birth event for each person
-			// Add to person
-
-			// Create a trade event for each person
-			// Add to person
+			person.setCensusEvent(censusEvent);
 
 			// TODO Should test next row for family membership
 

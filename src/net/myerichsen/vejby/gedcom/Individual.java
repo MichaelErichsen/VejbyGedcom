@@ -2,20 +2,16 @@ package net.myerichsen.vejby.gedcom;
 
 import java.util.Date;
 
+import net.myerichsen.vejby.census.Household;
+
 /**
- * Class representing an individual in GEDCOM.
+ * Class representing an mappingKeys in GEDCOM.
  * 
  * @author Michael Erichsen
  * @version 17. aug. 2020
  *
  */
 public class Individual {
-	private final static String tag = "INDI";
-
-	public static String getTag() {
-		return tag;
-	}
-
 	private int id;
 	private String name;
 	private String sex;
@@ -25,6 +21,10 @@ public class Individual {
 	private Date deathDate;
 	private String birthPlace;
 	private String deathPlace;
+	private int year;
+	private String place;
+	private Household household;
+	private CensusEvent censusEvent;
 
 	/**
 	 * Constructor
@@ -55,6 +55,66 @@ public class Individual {
 	 */
 	public String getBirthPlace() {
 		return birthPlace;
+	}
+
+	/**
+	 * @return the year
+	 */
+	public int getYear() {
+		return year;
+	}
+
+	/**
+	 * @param year
+	 *            the year to set
+	 */
+	public void setYear(int year) {
+		this.year = year;
+	}
+
+	/**
+	 * @return the place
+	 */
+	public String getPlace() {
+		return place;
+	}
+
+	/**
+	 * @param place
+	 *            the place to set
+	 */
+	public void setPlace(String place) {
+		this.place = place;
+	}
+
+	/**
+	 * @return the household
+	 */
+	public Household getHousehold() {
+		return household;
+	}
+
+	/**
+	 * @param household
+	 *            the household to set
+	 */
+	public void setHousehold(Household household) {
+		this.household = household;
+	}
+
+	/**
+	 * @return the censusEvent
+	 */
+	public CensusEvent getCensusEvent() {
+		return censusEvent;
+	}
+
+	/**
+	 * @param censusEvent
+	 *            the censusEvent to set
+	 */
+	public void setCensusEvent(CensusEvent censusEvent) {
+		this.censusEvent = censusEvent;
 	}
 
 	/**
@@ -190,7 +250,7 @@ public class Individual {
 	public String toGedcom() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append("0 @I" + getId() + "@ " + getTag() + "\n");
+		sb.append("0 @I" + getId() + "@ INDI\n");
 		sb.append("1 NAME " + getName() + "\n");
 		if (getSex() == Sex.M) {
 			sb.append("1 SEX M\n");
@@ -214,11 +274,7 @@ public class Individual {
 			sb.append("1 OCCU " + getTrades() + "\n");
 		}
 
-		// final Iterator<String> itr = getFamilieListe().iterator();
-		//
-		// while (itr.hasNext()) {
-		// sb.append("1 " + itr.next() + "\n");
-		// }
+		sb.append(censusEvent.toGedcom());
 
 		return sb.toString();
 	}

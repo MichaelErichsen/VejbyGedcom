@@ -125,8 +125,8 @@ public class HouseholdJPanel extends JPanel {
 	 * children.
 	 */
 	private void populateFamilyTable(int householdId, int familyId) {
-		defineButton.setEnabled(false);
-		saveButton.setEnabled(false);
+		defineButton.setEnabled(true);
+		saveButton.setEnabled(true);
 		Family family = censusTable.getFamily(householdId, familyId);
 
 		String[] columnNames = new String[] { "Navn", "Køn", "Født", "Rolle" };
@@ -158,7 +158,7 @@ public class HouseholdJPanel extends JPanel {
 		Household household = censusTable.getHouseholds().get(id);
 		int size = household.getRows().size();
 		List<Family> families = household.getFamilies();
-		int[] individual = mapping.getIndividual();
+		int[] mappingKeys = mapping.getMappingKeys();
 
 		String[] columnNames = new String[] { "Navn", "Rolle", "Rolle i familie", "Ny rolle" };
 		String[][] data = new String[size][columnNames.length];
@@ -166,10 +166,10 @@ public class HouseholdJPanel extends JPanel {
 		for (int i = 0; i < size; i++) {
 			row = household.getRows().get(i);
 
-			personId = Integer.parseInt(row.get(individual[1]));
+			personId = Integer.parseInt(row.get(mappingKeys[1]));
 
-			data[i][0] = row.get(individual[3]);
-			data[i][1] = row.get(individual[7]);
+			data[i][0] = row.get(mappingKeys[4]);
+			data[i][1] = row.get(mappingKeys[8]);
 			data[i][2] = listFamiliesForIndividual(personId, families);
 			data[i][3] = "";
 		}
@@ -239,25 +239,29 @@ public class HouseholdJPanel extends JPanel {
 			rootTreeNode.removeAllChildren();
 		}
 
-		int[] individual = mapping.getIndividual();
+		int[] mappingKeys = mapping.getMappingKeys();
 
 		censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
 
-		if (individual[2] != 0) {
-			message = censusTable.createHouseholds(individual[2]);
+		// Create households
+		if (mappingKeys[3] != 0) {
+			message = censusTable.createHouseholds(mappingKeys[3]);
 			LOGGER.log(Level.FINE, message);
 
-			if (individual[4] != 0) {
+			// Create a family for each household
+			if (mappingKeys[5] != 0) {
 				for (Household household : censusTable.getHouseholds()) {
-					message = household.identifyFamilies(individual);
+					message = household.identifyFamilies(mappingKeys);
 					LOGGER.log(Level.FINE, message);
 				}
 			}
 
+			// Add household to tree
 			for (Household household : censusTable.getHouseholds()) {
 				householdNode = new DefaultMutableTreeNode(household);
 				rootTreeNode.add(householdNode);
 
+				// Add family to tree
 				for (Family family : household.getFamilies()) {
 					familyNode = new DefaultMutableTreeNode(family);
 					householdNode.add(familyNode);

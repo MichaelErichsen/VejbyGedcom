@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Class representing a family in GEDCOM as extracted from a household in a
- * census file
+ * census file.
  * 
  * @author Michael Erichsen
  * @version 17. aug. 2020

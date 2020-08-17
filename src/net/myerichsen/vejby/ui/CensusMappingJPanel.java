@@ -28,11 +28,11 @@ import net.myerichsen.vejby.util.PrefKey;
  * Panel to map census fields for further analysis. It displays six columns.
  * 
  * The first one is field number. The second one is populated by the reduced
- * table headers. The others have a choice for each cell with the relevant
+ * table headers. The third one has choice for each cell with the relevant
  * attributes for each type.
  * 
  * @author Michael Erichsen
- * @version 16. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class CensusMappingJPanel extends JPanel {
@@ -42,10 +42,7 @@ public class CensusMappingJPanel extends JPanel {
 
 	private JTable mappingTable;
 	private DefaultTableModel mappingModel;
-	private CustomTableCellRenderer renderer2;
-	private CustomTableCellRenderer renderer3;
-	private CustomTableCellRenderer renderer4;
-	private CustomTableCellRenderer renderer5;
+	private CustomTableCellRenderer renderer;
 
 	/**
 	 * Create the panel.
@@ -90,12 +87,65 @@ public class CensusMappingJPanel extends JPanel {
 	}
 
 	/**
+	 * Get data from table and save into mapping arrays.
+	 * 
+	 * @return
+	 */
+	private Mapping map() {
+		Mapping mapping = new Mapping();
+		String value;
+
+		int[] mappingKeys = mapping.getMappingKeys();
+
+		for (int i = 0; i < mappingTable.getRowCount(); i++) {
+			value = (String) mappingTable.getValueAt(i, 2);
+
+			if (value.equals(PrefKey.INDIVIDUAL_1)) {
+				mappingKeys[1] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_1, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_2)) {
+				mappingKeys[2] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_2, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_3)) {
+				mappingKeys[3] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_3, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_4)) {
+				mappingKeys[4] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_4, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_5)) {
+				mappingKeys[5] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_5, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_6)) {
+				mappingKeys[6] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_6, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_7)) {
+				mappingKeys[7] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_7, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_8)) {
+				mappingKeys[8] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_8, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_9)) {
+				mappingKeys[9] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_9, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_10)) {
+				mappingKeys[10] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_10, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_11)) {
+				mappingKeys[11] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_11, i);
+			}
+		}
+
+		LOGGER.log(Level.INFO, mapping.toString());
+		return mapping;
+	}
+
+	/**
 	 * @param defaultTableModel
 	 * 
 	 */
 	public void populateMappingTable(DefaultTableModel censusModel) {
-		String[] columnNames = new String[] { "Nr.", "FT kolonne", "Individ", "Folket\u00E6llingsh\u00E6ndelse",
-				"F\u00F8dselsh\u00E6ndelse", "Erhvervsh\u00E6ndelse" };
+		String[] columnNames = new String[] { "Nr.", "FT kolonne", "GEDCOM kolonne" };
 
 		List<String> headers = new ArrayList<String>();
 
@@ -110,54 +160,29 @@ public class CensusMappingJPanel extends JPanel {
 			mappingArray[i][0] = Integer.toString(i + 1);
 			mappingArray[i][1] = headers.get(i);
 			for (int j = 2; j < columnNames.length; j++) {
-				mappingArray[i][j] = "Bruges ikke";
+				mappingArray[i][j] = PrefKey.INDIVIDUAL_0;
 			}
 		}
 
 		mappingModel = new DefaultTableModel(mappingArray, columnNames);
-		renderer2 = new CustomTableCellRenderer();
-		renderer3 = new CustomTableCellRenderer();
-		renderer4 = new CustomTableCellRenderer();
-		renderer5 = new CustomTableCellRenderer();
+		renderer = new CustomTableCellRenderer();
 		mappingTable.setModel(mappingModel);
-		mappingTable.getColumnModel().getColumn(2).setCellRenderer(renderer2);
-		mappingTable.getColumnModel().getColumn(3).setCellRenderer(renderer3);
-		mappingTable.getColumnModel().getColumn(4).setCellRenderer(renderer4);
-		mappingTable.getColumnModel().getColumn(5).setCellRenderer(renderer5);
+		mappingTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
 
 		JComboBox<String> individualcomboBox = new JComboBox<String>();
-		individualcomboBox.addItem("Bruges ikke");
-		individualcomboBox.addItem("Personid");
-		individualcomboBox.addItem("Husstandsnr.");
-		individualcomboBox.addItem("Navn");
-		individualcomboBox.addItem("Køn");
-		individualcomboBox.addItem("Fødselsår");
-		individualcomboBox.addItem("Alder");
-		individualcomboBox.addItem("Civilstand");
-		individualcomboBox.addItem("Erhverv");
-		individualcomboBox.addItem("Fødested");
-		individualcomboBox.addItem("FTÅr");
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_0);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_1);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_2);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_3);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_4);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_5);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_6);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_7);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_8);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_9);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_10);
+		individualcomboBox.addItem(PrefKey.INDIVIDUAL_11);
 		mappingTable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(individualcomboBox));
-
-		JComboBox<String> censuscombobox = new JComboBox<String>();
-		censuscombobox.addItem("Bruges ikke");
-		censuscombobox.addItem("Alder");
-		censuscombobox.addItem("FTÅr");
-		censuscombobox.addItem("Sted");
-		mappingTable.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(censuscombobox));
-
-		JComboBox<String> birthcomboBox = new JComboBox<String>();
-		birthcomboBox.addItem("Bruges ikke");
-		birthcomboBox.addItem("Alder");
-		birthcomboBox.addItem("Fødselsår");
-		birthcomboBox.addItem("Fødested");
-		mappingTable.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(birthcomboBox));
-
-		JComboBox<String> tradecomboBox = new JComboBox<String>();
-		tradecomboBox.addItem("Bruges ikke");
-		tradecomboBox.addItem("FTÅr");
-		tradecomboBox.addItem("Erhverv");
-		mappingTable.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(tradecomboBox));
 
 		setValuesFromPreferences();
 	}
@@ -170,218 +195,69 @@ public class CensusMappingJPanel extends JPanel {
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Personid", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_1, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_2, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Husstandsnr.", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_2, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_3, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Navn", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_3, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_4, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Køn", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_4, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_5, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Fødselsår", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_5, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Alder", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_6, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_7, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Civilstand", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_7, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_8, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Erhverv", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_8, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_9, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Fødested", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_9, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_10, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("FTÅr", row, 2);
-			renderer2.setRowColor(row, Color.ORANGE);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_10, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
-		row = prefs.getInt(PrefKey.CENSUS_1, 0);
+		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
 		if (row > 0) {
-			mappingTable.setValueAt("Alder", row, 3);
-			renderer3.setRowColor(row, Color.GREEN);
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
+			renderer.setRowColor(row, Color.ORANGE);
 		}
 
-		row = prefs.getInt(PrefKey.CENSUS_2, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("FTÅr", row, 3);
-			renderer3.setRowColor(row, Color.GREEN);
-		}
-
-		row = prefs.getInt(PrefKey.CENSUS_3, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("Sted", row, 3);
-			renderer3.setRowColor(row, Color.GREEN);
-		}
-
-		row = prefs.getInt(PrefKey.BIRTH_1, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("Alder", row, 4);
-			renderer4.setRowColor(row, Color.YELLOW);
-		}
-
-		row = prefs.getInt(PrefKey.BIRTH_2, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("Fødselsår", row, 4);
-			renderer4.setRowColor(row, Color.YELLOW);
-		}
-
-		row = prefs.getInt(PrefKey.BIRTH_3, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("Fødested", row, 4);
-			renderer4.setRowColor(row, Color.YELLOW);
-		}
-
-		row = prefs.getInt(PrefKey.OCCUPATION_1, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("FTÅr", row, 5);
-			renderer5.setRowColor(row, Color.MAGENTA);
-		}
-
-		row = prefs.getInt(PrefKey.OCCUPATION_2, 0);
-		if (row > 0) {
-			mappingTable.setValueAt("Erhverv", row, 5);
-			renderer5.setRowColor(row, Color.MAGENTA);
-		}
-	}
-
-	/**
-	 * Get data from table and save into mapping arrays.
-	 * 
-	 * @return
-	 */
-	private Mapping map() {
-		Mapping mapping = new Mapping();
-		String value;
-
-		int[] individual = mapping.getIndividual();
-
-		for (int i = 0; i < mappingTable.getRowCount(); i++) {
-			value = (String) mappingTable.getValueAt(i, 2);
-
-			if (value.equals("Personid")) {
-				individual[1] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_1, i);
-			} else if (value.equals("Husstandsnr.")) {
-				individual[2] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_2, i);
-			} else if (value.equals("Navn")) {
-				individual[3] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_3, i);
-			} else if (value.equals("Køn")) {
-				individual[4] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_4, i);
-			} else if (value.equals("Fødselsår")) {
-				individual[5] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_5, i);
-			} else if (value.equals("Alder")) {
-				individual[6] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_6, i);
-			} else if (value.equals("Civilstand")) {
-				individual[7] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_7, i);
-			} else if (value.equals("Erhverv")) {
-				individual[8] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_8, i);
-			} else if (value.equals("Fødested")) {
-				individual[9] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_9, i);
-			} else if (value.equals("FTÅr")) {
-				individual[10] = i;
-				prefs.putInt(PrefKey.INDIVIDUAL_10, i);
-			}
-		}
-
-		LOGGER.log(Level.INFO,
-				"Individual: " + individual[0] + " " + individual[1] + " " + individual[2] + " " + individual[3] + " "
-						+ individual[4] + " " + individual[5] + " " + individual[6] + " " + individual[7] + " "
-						+ individual[8] + " " + individual[9] + " " + individual[10]);
-
-		int[] census = mapping.getCensus();
-
-		for (int i = 0; i < mappingTable.getRowCount(); i++) {
-			value = (String) mappingTable.getValueAt(i, 3);
-
-			if (value.equals("Alder")) {
-				census[1] = i;
-				prefs.putInt(PrefKey.CENSUS_1, i);
-			} else if (value.equals("FTÅr")) {
-				census[2] = i;
-				prefs.putInt(PrefKey.CENSUS_2, i);
-			} else if (value.equals("Sted")) {
-				census[3] = i;
-				prefs.putInt(PrefKey.CENSUS_3, i);
-			}
-		}
-
-		LOGGER.log(Level.INFO, "Census: " + census[0] + " " + census[1] + " " + census[2] + " " + census[3]);
-
-		int[] birth = mapping.getBirth();
-
-		for (int i = 0; i < mappingTable.getRowCount(); i++) {
-			value = (String) mappingTable.getValueAt(i, 4);
-
-			if (value.equals("Alder")) {
-				birth[1] = i;
-				prefs.putInt(PrefKey.BIRTH_1, i);
-			} else if (value.equals("Fødselsår")) {
-				birth[2] = i;
-				prefs.putInt(PrefKey.BIRTH_2, i);
-			} else if (value.equals("Fødested")) {
-				birth[3] = i;
-				prefs.putInt(PrefKey.BIRTH_3, i);
-			}
-		}
-
-		LOGGER.log(Level.INFO, "Birth: " + birth[0] + " " + birth[1] + " " + birth[2] + " " + birth[3]);
-
-		int[] trade = mapping.getTrade();
-
-		for (int i = 0; i < mappingTable.getRowCount(); i++) {
-			value = (String) mappingTable.getValueAt(i, 5);
-
-			if (value.equals("FTÅr")) {
-				trade[1] = i;
-				prefs.putInt(PrefKey.OCCUPATION_1, i);
-			} else if (value.equals("Erhverv")) {
-				trade[2] = i;
-				prefs.putInt(PrefKey.OCCUPATION_2, i);
-			}
-		}
-
-		LOGGER.log(Level.INFO, "Trade: " + trade[0] + " " + trade[1] + " " + trade[2]);
-		return mapping;
 	}
 }
