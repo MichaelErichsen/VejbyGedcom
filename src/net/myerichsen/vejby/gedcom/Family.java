@@ -8,7 +8,7 @@ import java.util.List;
  * census file
  * 
  * @author Michael Erichsen
- * @version 16. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class Family {
@@ -178,19 +178,37 @@ public class Family {
 	/**
 	 * @return
 	 */
-	public String toGedcom() {
+	public String toGedcom(int familyId) {
 		StringBuilder sb = new StringBuilder();
+
 		if (father != null) {
 			sb.append(father.toGedcom());
-
+			sb.append("1 FAMS @F" + familyId + "@\n");
 		}
 
 		if (mother != null) {
 			sb.append(mother.toGedcom());
+			sb.append("1 FAMS @F" + familyId + "@\n");
 		}
 
 		for (Individual child : children) {
 			sb.append(child.toGedcom());
+			sb.append("1 FAMC @F" + familyId + "@\n");
+		}
+
+		sb.append("0 @F" + familyId + "@ FAM\n");
+
+		if (father != null) {
+			sb.append("1 HUSB @I" + father.getId() + "@\n");
+		}
+
+		if (mother != null) {
+			sb.append("1 WIFE @I" + mother.getId() + "@\n");
+
+		}
+
+		for (Individual child : children) {
+			sb.append("1 CHIL @I" + child.getId() + "@\n");
 		}
 
 		return sb.toString();

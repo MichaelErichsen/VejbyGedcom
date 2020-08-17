@@ -6,7 +6,7 @@ import java.util.Date;
  * Class representing an individual in GEDCOM.
  * 
  * @author Michael Erichsen
- * @version 16. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class Individual {
@@ -25,14 +25,6 @@ public class Individual {
 	private Date deathDate;
 	private String birthPlace;
 	private String deathPlace;
-
-	/**
-	 * Constructor
-	 *
-	 */
-	public Individual() {
-		// TODO Auto-generated constructor stub
-	}
 
 	/**
 	 * Constructor
@@ -116,10 +108,11 @@ public class Individual {
 	}
 
 	/**
-	 * @param string
+	 * @param birthDate
+	 *            the birthDate to set
 	 */
-	public void setBirthDate(String string) {
-		// TODO Auto-generated method stub
+	public void setBirthDate(String birthDate) {
+		this.birthDate = birthDate;
 
 	}
 

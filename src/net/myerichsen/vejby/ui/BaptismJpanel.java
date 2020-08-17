@@ -30,7 +30,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * Data entry panel for church registry baptism entries.
  * 
  * @author Michael Erichsen
- * @version 16. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class BaptismJpanel extends JPanel {
@@ -291,10 +291,11 @@ public class BaptismJpanel extends JPanel {
 	 * Save button was pressed
 	 */
 	protected void saveFamily() {
+		int individualId = 1;
 		Family family = new Family(1, 1);
-		Individual father = new Individual();
-		Individual mother = new Individual();
-		Individual child = new Individual();
+		Individual father = new Individual(individualId++);
+		Individual mother = new Individual(individualId++);
+		Individual child = new Individual(individualId++);
 
 		family.setFather(father);
 		family.setMother(mother);
@@ -309,7 +310,7 @@ public class BaptismJpanel extends JPanel {
 		Individual gp;
 		for (@SuppressWarnings("unused")
 		String s : gpArray) {
-			gp = new Individual();
+			gp = new Individual(individualId++);
 			// TODO Set name to s
 			family = new Family(1, 1);
 			// TODO Check if male or female
@@ -319,9 +320,10 @@ public class BaptismJpanel extends JPanel {
 		}
 
 		try {
-			// TODO Use a FileChooser to select output GEDCOM file location
+			// TODO Use GedcomFile for output
 			String gedcomFileName = prefs.get(PrefKey.GEDCOMFILENAME, "c:/temp/vejby.ged");
 
+			// FIXME Null pointer exception
 			file.print(new File(gedcomFileName));
 		} catch (Exception e) {
 			e.printStackTrace();

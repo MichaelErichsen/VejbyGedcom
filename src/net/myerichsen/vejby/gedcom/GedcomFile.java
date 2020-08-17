@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
@@ -23,6 +25,7 @@ import net.myerichsen.vejby.census.Table;
  * @version 15. aug. 2020
  */
 public class GedcomFile {
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	// static variable single_instance of type Singleton
@@ -64,7 +67,7 @@ public class GedcomFile {
 
 			for (Family family : families) {
 				fw.write(family.toString());
-				System.out.print(family.toString());
+				LOGGER.log(Level.INFO, family.toString());
 			}
 
 			writeTrailer(fw);
@@ -131,8 +134,7 @@ public class GedcomFile {
 	 */
 	public void save(Table censusTable) {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
-		String gedcomFileName = prefs.get("GEDCOMFILENAME", ".");
-		JFileChooser gedcomChooser = new JFileChooser(gedcomFileName);
+		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
 
 		gedcomChooser.setFileFilter(ff);
 
@@ -152,13 +154,15 @@ public class GedcomFile {
 
 				writeHeader(fw);
 
+				int familyId = 1;
 				for (Family family : censusTable.getFamilies()) {
-					fw.write(family.toGedcom());
-					System.out.print(family.toString());
+					fw.write(family.toGedcom(familyId++));
+					LOGGER.log(Level.FINE, family.toString());
 				}
 
 				writeTrailer(fw);
 				fw.close();
+				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

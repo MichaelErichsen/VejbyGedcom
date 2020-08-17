@@ -28,11 +28,11 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * Panel to display and define families in houesholds. It displays a tree
- * structure of households and families and a table of persons in that entity.
+ * Panel to display and define families in households. It displays a tree
+ * structure of households and families and a table of persons.
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class HouseholdJPanel extends JPanel {
@@ -45,6 +45,7 @@ public class HouseholdJPanel extends JPanel {
 	private JTree tree;
 	private DefaultTreeModel treeModel;
 	private VejbyGedcom vejbyGedcom;
+	private Mapping mapping;
 
 	/**
 	 * Create the panel.
@@ -152,11 +153,12 @@ public class HouseholdJPanel extends JPanel {
 	private void populateHouseholdTable(int id) {
 		defineButton.setEnabled(true);
 		saveButton.setEnabled(true);
+		List<String> row;
+		int personId;
 		Household household = censusTable.getHouseholds().get(id);
 		int size = household.getRows().size();
 		List<Family> families = household.getFamilies();
-		List<String> row;
-		int personId;
+		int[] individual = mapping.getIndividual();
 
 		String[] columnNames = new String[] { "Navn", "Rolle", "Rolle i familie", "Ny rolle" };
 		String[][] data = new String[size][columnNames.length];
@@ -164,11 +166,10 @@ public class HouseholdJPanel extends JPanel {
 		for (int i = 0; i < size; i++) {
 			row = household.getRows().get(i);
 
-			// Second column is id in census file 1845
-			personId = Integer.parseInt(row.get(1));
+			personId = Integer.parseInt(row.get(individual[1]));
 
-			data[i][0] = row.get(5);
-			data[i][1] = row.get(9);
+			data[i][0] = row.get(individual[3]);
+			data[i][1] = row.get(individual[7]);
 			data[i][2] = listFamiliesForIndividual(personId, families);
 			data[i][3] = "";
 		}
@@ -226,6 +227,7 @@ public class HouseholdJPanel extends JPanel {
 	 * @param mappingModel
 	 */
 	public void populateTree(Mapping mapping) {
+		this.mapping = mapping;
 		String message;
 		DefaultMutableTreeNode householdNode;
 		DefaultMutableTreeNode familyNode;
@@ -243,12 +245,12 @@ public class HouseholdJPanel extends JPanel {
 
 		if (individual[2] != 0) {
 			message = censusTable.createHouseholds(individual[2]);
-			LOGGER.log(Level.INFO, message);
+			LOGGER.log(Level.FINE, message);
 
 			if (individual[4] != 0) {
 				for (Household household : censusTable.getHouseholds()) {
 					message = household.identifyFamilies(individual);
-					LOGGER.log(Level.INFO, message);
+					LOGGER.log(Level.FINE, message);
 				}
 			}
 

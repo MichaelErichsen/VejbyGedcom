@@ -12,7 +12,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * A household as extracted from a census file
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 17. aug. 2020
  *
  */
 public class Household {
@@ -97,18 +97,22 @@ public class Household {
 			person = new Individual(Integer.parseInt(row.get(individual[1])));
 			person.setName(row.get(individual[3]));
 			person.setSex(sex);
-			// String trade = row.get(9);
-			// person.setTrades(trade);
+			String trade = row.get(individual[8]);
+			person.setTrades(trade);
 
 			if (individual[5] != 0) {
 				person.setBirthDate(row.get(individual[5]));
 			} else if (individual[6] != 0) {
 				try {
 					// Calculate difference between age and census year
-					int birthDate = (Integer.parseInt(row.get(individual[10]))
-							- Integer.parseInt(row.get(individual[6])));
+					LOGGER.log(Level.FINE, "FTÅr: " + row.get(individual[10]) + ", Alder: "
+							+ Integer.parseInt(row.get(individual[6])));
+					String sYear = row.get(individual[10]);
+					int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
+					int birthDate = (iYear - Integer.parseInt(row.get(individual[6])));
 					person.setBirthDate("Abt. " + birthDate);
 				} catch (NumberFormatException e) {
+					LOGGER.log(Level.FINE, "Felt: " + individual[6] + ", " + row.get(individual[6]));
 					person.setBirthDate(row.get(individual[6]));
 				}
 			}
