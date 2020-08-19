@@ -48,8 +48,6 @@ public class CensusJPanel extends JPanel {
 	private JButton btnbenKipFil;
 	private DefaultTableModel censusModel;
 
-	// FIXME C3872 missing FT year
-
 	/**
 	 * Create the panel.
 	 * 
@@ -108,8 +106,7 @@ public class CensusJPanel extends JPanel {
 	}
 
 	/**
-	 * Choose and open a KIP file, remove empty columns and display i a tabbed
-	 * pane.
+	 * Choose and open a KIP file, remove empty columns and display i a tabbed pane.
 	 * 
 	 * @param vejbyGedcom
 	 */
@@ -203,8 +200,7 @@ public class CensusJPanel extends JPanel {
 	}
 
 	/**
-	 * @param censusModel
-	 *            the censusModel to set
+	 * @param censusModel the censusModel to set
 	 */
 	public void setCensusModel(DefaultTableModel censusModel) {
 		this.censusModel = censusModel;
@@ -218,8 +214,7 @@ public class CensusJPanel extends JPanel {
 	}
 
 	/**
-	 * @param censusTable
-	 *            the censusTable to set
+	 * @param censusTable the censusTable to set
 	 */
 	public void setCensusTable(Table censusTable) {
 		this.censusTable = censusTable;

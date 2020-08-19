@@ -118,40 +118,35 @@ public class Family {
 	}
 
 	/**
-	 * @param children
-	 *            the children to set
+	 * @param children the children to set
 	 */
 	public void setChildren(List<Individual> children) {
 		this.children = children;
 	}
 
 	/**
-	 * @param familyId
-	 *            the familyId to set
+	 * @param familyId the familyId to set
 	 */
 	public void setFamilyId(int familyId) {
 		this.familyId = familyId;
 	}
 
 	/**
-	 * @param father
-	 *            the father to set
+	 * @param father the father to set
 	 */
 	public void setFather(Individual father) {
 		this.father = father;
 	}
 
 	/**
-	 * @param householdId
-	 *            the householdId to set
+	 * @param householdId the householdId to set
 	 */
 	public void setHouseholdId(int householdId) {
 		this.householdId = householdId;
 	}
 
 	/**
-	 * @param mother
-	 *            the mother to set
+	 * @param mother the mother to set
 	 */
 	public void setMother(Individual mother) {
 		this.mother = mother;
@@ -181,6 +176,9 @@ public class Family {
 	public String toGedcom(int familyId) {
 		StringBuilder sb = new StringBuilder();
 
+		// FIXME Only creates an individual record for each family
+
+		// Individual tags
 		if (father != null) {
 			sb.append(father.toGedcom());
 			sb.append("1 FAMS @F" + familyId + "@\n");
@@ -196,6 +194,7 @@ public class Family {
 			sb.append("1 FAMC @F" + familyId + "@\n");
 		}
 
+		// Family tag
 		sb.append("0 @F" + familyId + "@ FAM\n");
 
 		if (father != null) {
@@ -210,6 +209,8 @@ public class Family {
 		for (Individual child : children) {
 			sb.append("1 CHIL @I" + child.getId() + "@\n");
 		}
+
+		sb.append("1 MARR\n");
 
 		return sb.toString();
 	}
