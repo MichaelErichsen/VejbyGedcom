@@ -8,7 +8,7 @@ import java.util.List;
  * census file.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class Family {

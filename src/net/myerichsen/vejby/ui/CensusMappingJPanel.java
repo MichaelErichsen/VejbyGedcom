@@ -68,8 +68,7 @@ public class CensusMappingJPanel extends JPanel {
 			/*
 			 * (non-Javadoc)
 			 * 
-			 * @see
-			 * java.awt.event.ActionListener#actionPerformed(java.awt.event.
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
 			 * ActionEvent)
 			 */
 			@Override
@@ -193,79 +192,71 @@ public class CensusMappingJPanel extends JPanel {
 	private void setValuesFromPreferences() {
 		int row;
 
+		int maxSize = mappingTable.getModel().getRowCount();
+		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
+
 		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_1, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_2, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_2, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_3, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_3, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_4, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_4, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_5, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_5, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
-		// FIXME Exception in thread "AWT-EventQueue-0"
-		// java.lang.ArrayIndexOutOfBoundsException: 15 >= 14
 		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_6, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_7, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_7, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_8, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_8, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_9, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_9, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_10, 0);
-		if (row > 0) {
+		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_10, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
-		if (row > 0) {
-			// FIXME Exception in thread "AWT-EventQueue-0"
-			// java.lang.ArrayIndexOutOfBoundsException: 14 >= 14
-			// When mapping 1801
-			// FIXME Exception in thread "AWT-EventQueue-0"
-			// java.lang.ArrayIndexOutOfBoundsException: 14 >= 13
-			// when mapping 1787 and 1840 and 1834
-			// FIXME Exception in thread "AWT-EventQueue-0"
-			// java.lang.ArrayIndexOutOfBoundsException: 17 >= 16
-			// 1880
+		if ((row > 0) && (row < maxSize)) {
 			LOGGER.log(Level.INFO, "Row: " + row);
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);

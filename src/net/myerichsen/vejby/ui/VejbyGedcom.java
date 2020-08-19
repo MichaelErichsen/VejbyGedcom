@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 
@@ -87,7 +87,7 @@ public class VejbyGedcom {
 	private void initialize() {
 		frmVejbyGedcomIndtastning = new JFrame();
 		frmVejbyGedcomIndtastning.setTitle("Vejby GEDCOM indtastning");
-		frmVejbyGedcomIndtastning.setBounds(100, 100, 1080, 720);
+		frmVejbyGedcomIndtastning.setBounds(100, 100, 1080, 500);
 		frmVejbyGedcomIndtastning.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -135,8 +135,7 @@ public class VejbyGedcom {
 	}
 
 	/**
-	 * @param tabbedPane
-	 *            the tabbedPane to set
+	 * @param tabbedPane the tabbedPane to set
 	 */
 	public void setTabbedPane(JTabbedPane tabbedPane) {
 		this.tabbedPane = tabbedPane;
