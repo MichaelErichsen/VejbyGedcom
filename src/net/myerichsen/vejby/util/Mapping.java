@@ -1,4 +1,4 @@
-package net.myerichsen.vejby.census;
+package net.myerichsen.vejby.util;
 
 /**
  * Contains mapping pairs between census file, mappingKeyss, census events and

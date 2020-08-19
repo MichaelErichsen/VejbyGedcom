@@ -156,6 +156,9 @@ public class GedcomFile {
 
 				int familyId = 1;
 				for (Family family : censusTable.getFamilies()) {
+					// FIXME java.lang.NullPointerException at
+					// net.myerichsen.vejby.gedcom.Individual.toGedcom(Individual.java:277)
+					// sb.append(censusEvent.toGedcom());
 					fw.write(family.toGedcom(familyId++));
 					LOGGER.log(Level.FINE, family.toString());
 				}

@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,18 +22,18 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import net.myerichsen.vejby.census.Household;
-import net.myerichsen.vejby.census.Mapping;
 import net.myerichsen.vejby.census.Table;
 import net.myerichsen.vejby.gedcom.Family;
 import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
+import net.myerichsen.vejby.util.Mapping;
 
 /**
  * Panel to display and define families in households. It displays a tree
  * structure of households and families and a table of persons.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class HouseholdJPanel extends JPanel {
@@ -46,6 +47,9 @@ public class HouseholdJPanel extends JPanel {
 	private DefaultTreeModel treeModel;
 	private VejbyGedcom vejbyGedcom;
 	private Mapping mapping;
+	private JButton updateButton;
+	private Household selectedHousehold;
+	private DefaultMutableTreeNode rootTreeNode;
 
 	/**
 	 * Create the panel.
@@ -65,7 +69,6 @@ public class HouseholdJPanel extends JPanel {
 			}
 		});
 		add(new JScrollPane(tree), BorderLayout.WEST);
-		// populateTree(tree);
 
 		table = new JTable();
 		add(new JScrollPane(table), BorderLayout.CENTER);
@@ -73,12 +76,20 @@ public class HouseholdJPanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		add(buttonPanel, BorderLayout.SOUTH);
 
+		updateButton = new JButton("Opdat\u00E9r f\u00F8rste familie");
+		updateButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				redefineFirstFamily();
+			}
+		});
+		buttonPanel.add(updateButton);
+
 		defineButton = new JButton("Defin\u00E9r en ny familie");
 		defineButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Define a new family from cell editor inputs and update
-				// tree and table
+				defineNewFamily();
 			}
 		});
 		buttonPanel.add(defineButton);
@@ -92,6 +103,51 @@ public class HouseholdJPanel extends JPanel {
 			}
 		});
 		buttonPanel.add(saveButton);
+	}
+
+	/**
+	 * 
+	 */
+	protected void defineNewFamily() {
+		Family newFamily = new Family(selectedHousehold.getId(), 1);
+
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+		@SuppressWarnings("unchecked")
+		Vector<Vector<String>> dataVector = model.getDataVector();
+		Vector<String> vector2;
+		Individual ind;
+
+		for (int i = 0; i < dataVector.size(); i++) {
+			vector2 = dataVector.get(i);
+			String newRole = vector2.get(4);
+			LOGGER.log(Level.FINE, "New role " + i + ": " + newRole);
+
+			ind = new Individual(Integer.parseInt(vector2.get(0)));
+			LOGGER.log(Level.INFO, "Løbenr. " + vector2.get(0) + ", " + vector2.get(1) + ", " + vector2.get(2) + ", "
+					+ vector2.get(3) + ", " + vector2.get(4) + ", " + vector2.get(5));
+			if (newRole.startsWith("F")) {
+				newFamily.setFather(ind);
+			} else if (newRole.startsWith("M")) {
+				newFamily.setMother(ind);
+			} else {
+				newFamily.getChildren().add(ind);
+			}
+		}
+		selectedHousehold.getFamilies().add(newFamily);
+
+		// FIXME After this, both are listed in col 4 as family 1:
+		// 59 Inger Peders Datter Enke Lever af Haandarbeide
+		// 60 Margrethe Svends Dat Ugift hendes Børn Barn i familie 1. Barn i
+		// familie 1.
+		// 61 Peder Svendsen Ugift hendes Børn Barn i familie 1. Barn i familie
+		// 1.
+		// 62 Rasmus Andersen Gift Arbeidsmand Barn i familie 1. Barn i familie
+		// 1.
+		// 63 Sidse Ols Datter Gift hans Kone Barn i familie 1. Barn i familie
+		// 1.
+		// 64 Rasmus Rasmussen Gift deres Søn Barn i familie 1. Barn i familie
+		// 1.
 	}
 
 	/**
@@ -155,23 +211,25 @@ public class HouseholdJPanel extends JPanel {
 		saveButton.setEnabled(true);
 		List<String> row;
 		int personId;
-		Household household = censusTable.getHouseholds().get(id);
-		int size = household.getRows().size();
-		List<Family> families = household.getFamilies();
+		selectedHousehold = censusTable.getHouseholds().get(id);
+		int size = selectedHousehold.getRows().size();
+		List<Family> families = selectedHousehold.getFamilies();
 		int[] mappingKeys = mapping.getMappingKeys();
 
-		String[] columnNames = new String[] { "Navn", "Rolle", "Rolle i familie", "Ny rolle" };
+		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Rolle", "Rolle i familie", "Ny rolle" };
 		String[][] data = new String[size][columnNames.length];
 
 		for (int i = 0; i < size; i++) {
-			row = household.getRows().get(i);
+			row = selectedHousehold.getRows().get(i);
 
 			personId = Integer.parseInt(row.get(mappingKeys[1]));
 
-			data[i][0] = row.get(mappingKeys[4]);
-			data[i][1] = row.get(mappingKeys[8]);
-			data[i][2] = listFamiliesForIndividual(personId, families);
-			data[i][3] = "";
+			data[i][0] = row.get(mappingKeys[1]);
+			data[i][1] = row.get(mappingKeys[4]);
+			data[i][2] = row.get(mappingKeys[8]);
+			data[i][3] = row.get(mappingKeys[9]);
+			data[i][4] = listFamiliesForIndividual(personId, families);
+			data[i][5] = "";
 		}
 
 		DefaultTableModel model = new DefaultTableModel(data, columnNames);
@@ -182,31 +240,19 @@ public class HouseholdJPanel extends JPanel {
 		currentRoleComboBox.addItem("Fader i familie 1");
 		currentRoleComboBox.addItem("Moder i familie 1");
 		currentRoleComboBox.addItem("Barn i familie 1");
-		currentRoleComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Change families
-			}
-		});
-		table.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(currentRoleComboBox));
+		table.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(currentRoleComboBox));
 
 		JComboBox<String> newRoleComboBox = new JComboBox<String>();
 		newRoleComboBox.addItem("");
 		newRoleComboBox.addItem("Fader");
 		newRoleComboBox.addItem("Moder");
 		newRoleComboBox.addItem("Barn");
-		newRoleComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Change families
-			}
-		});
-		table.getColumnModel().getColumn(3).setCellEditor(new DefaultCellEditor(newRoleComboBox));
+		table.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(newRoleComboBox));
 	}
 
 	/**
 	 * Populate the table with either a household or a family, depending on
-	 * selecxtion the tree.
+	 * selection the tree.
 	 * 
 	 * @param table
 	 */
@@ -219,7 +265,6 @@ public class HouseholdJPanel extends JPanel {
 		} else if (userObject instanceof Family) {
 			populateFamilyTable(((Family) userObject).getHouseholdId(), ((Family) userObject).getFamilyId());
 		}
-
 	}
 
 	/**
@@ -233,7 +278,7 @@ public class HouseholdJPanel extends JPanel {
 		DefaultMutableTreeNode familyNode;
 
 		tree.setRootVisible(false);
-		DefaultMutableTreeNode rootTreeNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
+		rootTreeNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
 
 		if (rootTreeNode != null) {
 			rootTreeNode.removeAllChildren();
@@ -273,4 +318,41 @@ public class HouseholdJPanel extends JPanel {
 		treeModel.reload(rootTreeNode);
 	}
 
+	/**
+	 * Delete and redefine the first family.
+	 */
+	private void redefineFirstFamily() {
+		Family firstFamily = new Family(selectedHousehold.getId(), 1);
+
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+		@SuppressWarnings("unchecked")
+		Vector<Vector<String>> dataVector = model.getDataVector();
+		Vector<String> vector2;
+		Individual ind;
+
+		for (int i = 0; i < dataVector.size(); i++) {
+			vector2 = dataVector.get(i);
+			String newRole = vector2.get(3);
+			LOGGER.log(Level.FINE, "New role " + i + ": " + newRole);
+
+			ind = new Individual(Integer.parseInt(vector2.get(0)));
+			LOGGER.log(Level.FINE, "Løbenr. " + vector2.get(0) + ", " + vector2.get(1) + ", " + vector2.get(2) + ", "
+					+ vector2.get(3) + ", " + vector2.get(4));
+			if (newRole.startsWith("F")) {
+				firstFamily.setFather(ind);
+			} else if (newRole.startsWith("M")) {
+				firstFamily.setMother(ind);
+			} else {
+				firstFamily.getChildren().add(ind);
+			}
+		}
+		selectedHousehold.getFamilies().clear();
+		selectedHousehold.getFamilies().add(firstFamily);
+
+		// FIXME Gets overwritten next time populateHouseholdTable is called on
+		// this household
+
+		// FIXME After changes this household is not saved as GEDCOM
+	}
 }

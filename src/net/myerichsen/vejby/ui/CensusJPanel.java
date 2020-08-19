@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.myerichsen.vejby.ui;
 
 import java.awt.Component;
@@ -37,7 +34,7 @@ import net.myerichsen.vejby.census.Table;
  * census table object, but only populates it with census rows.
  * 
  * @author Michael Erichsen
- * @version 15. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class CensusJPanel extends JPanel {
@@ -50,6 +47,8 @@ public class CensusJPanel extends JPanel {
 	private Table censusTable;
 	private JButton btnbenKipFil;
 	private DefaultTableModel censusModel;
+
+	// FIXME C3872 missing FT year
 
 	/**
 	 * Create the panel.
@@ -150,6 +149,9 @@ public class CensusJPanel extends JPanel {
 
 				// Second line is data
 				String[] ftData = sc.nextLine().split(";");
+				// FIXME Exception in thread "AWT-EventQueue-0"
+				// java.lang.StringIndexOutOfBoundsException: String index out
+				// of range: 3
 				String ftYear = ftData[index].substring(3);
 				LOGGER.log(Level.INFO, ftYear);
 				int year = Integer.parseInt(ftYear);

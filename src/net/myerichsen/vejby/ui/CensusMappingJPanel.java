@@ -20,8 +20,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import net.myerichsen.vejby.census.Mapping;
 import net.myerichsen.vejby.util.CustomTableCellRenderer;
+import net.myerichsen.vejby.util.Mapping;
 import net.myerichsen.vejby.util.PrefKey;
 
 /**
@@ -32,7 +32,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * attributes for each type.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class CensusMappingJPanel extends JPanel {
@@ -223,6 +223,8 @@ public class CensusMappingJPanel extends JPanel {
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
+		// FIXME Exception in thread "AWT-EventQueue-0"
+		// java.lang.ArrayIndexOutOfBoundsException: 15 >= 14
 		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
 		if (row > 0) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_6, row, 2);
@@ -255,6 +257,16 @@ public class CensusMappingJPanel extends JPanel {
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
 		if (row > 0) {
+			// FIXME Exception in thread "AWT-EventQueue-0"
+			// java.lang.ArrayIndexOutOfBoundsException: 14 >= 14
+			// When mapping 1801
+			// FIXME Exception in thread "AWT-EventQueue-0"
+			// java.lang.ArrayIndexOutOfBoundsException: 14 >= 13
+			// when mapping 1787 and 1840 and 1834
+			// FIXME Exception in thread "AWT-EventQueue-0"
+			// java.lang.ArrayIndexOutOfBoundsException: 17 >= 16
+			// 1880
+			LOGGER.log(Level.INFO, "Row: " + row);
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
