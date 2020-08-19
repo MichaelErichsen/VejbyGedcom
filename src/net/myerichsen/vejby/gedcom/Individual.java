@@ -65,8 +65,7 @@ public class Individual {
 	}
 
 	/**
-	 * @param year
-	 *            the year to set
+	 * @param year the year to set
 	 */
 	public void setYear(int year) {
 		this.year = year;
@@ -80,8 +79,7 @@ public class Individual {
 	}
 
 	/**
-	 * @param place
-	 *            the place to set
+	 * @param place the place to set
 	 */
 	public void setPlace(String place) {
 		this.place = place;
@@ -95,8 +93,7 @@ public class Individual {
 	}
 
 	/**
-	 * @param household
-	 *            the household to set
+	 * @param household the household to set
 	 */
 	public void setHousehold(Household household) {
 		this.household = household;
@@ -110,8 +107,7 @@ public class Individual {
 	}
 
 	/**
-	 * @param censusEvent
-	 *            the censusEvent to set
+	 * @param censusEvent the censusEvent to set
 	 */
 	public void setCensusEvent(CensusEvent censusEvent) {
 		this.censusEvent = censusEvent;
@@ -160,16 +156,14 @@ public class Individual {
 	}
 
 	/**
-	 * @param address
-	 *            the address to set
+	 * @param address the address to set
 	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
 	/**
-	 * @param birthDate
-	 *            the birthDate to set
+	 * @param birthDate the birthDate to set
 	 */
 	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
@@ -177,56 +171,49 @@ public class Individual {
 	}
 
 	/**
-	 * @param birthPlace
-	 *            the birthPlace to set
+	 * @param birthPlace the birthPlace to set
 	 */
 	public void setBirthPlace(String birthPlace) {
 		this.birthPlace = birthPlace;
 	}
 
 	/**
-	 * @param deathDate
-	 *            the deathDate to set
+	 * @param deathDate the deathDate to set
 	 */
 	public void setDeathDate(Date deathDate) {
 		this.deathDate = deathDate;
 	}
 
 	/**
-	 * @param deathPlace
-	 *            the deathPlace to set
+	 * @param deathPlace the deathPlace to set
 	 */
 	public void setDeathPlace(String deathPlace) {
 		this.deathPlace = deathPlace;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * @param sex
-	 *            the sex to set
+	 * @param sex the sex to set
 	 */
 	public void setSex(String sex) {
 		this.sex = sex;
 	}
 
 	/**
-	 * @param trades
-	 *            the trades to set
+	 * @param trades the trades to set
 	 */
 	public void setTrades(String trades) {
 		this.trades = trades;
@@ -251,7 +238,18 @@ public class Individual {
 		final StringBuffer sb = new StringBuffer();
 
 		sb.append("0 @I" + getId() + "@ INDI\n");
-		sb.append("1 NAME " + getName() + "\n");
+
+		String[] nameParts = getName().split(" ");
+		String a = "/" + nameParts[nameParts.length - 1] + "/";
+
+		sb.append("1 NAME ");
+
+		for (int i = 0; i < nameParts.length - 1; i++) {
+			sb.append(nameParts[i] + " ");
+		}
+
+		sb.append("/" + nameParts[nameParts.length - 1] + "/\n");
+
 		if (getSex() == Sex.M) {
 			sb.append("1 SEX M\n");
 		} else if (getSex() == Sex.F) {
