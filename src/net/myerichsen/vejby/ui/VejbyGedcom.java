@@ -23,19 +23,6 @@ import javax.swing.SwingConstants;
  */
 
 public class VejbyGedcom {
-	private JFrame frmVejbyGedcomIndtastning;
-	private JTabbedPane tabbedPane;
-	private CensusMappingJPanel censusMappingJPanel;
-	private HouseholdJPanel householdJPanel;
-	private CensusJPanel censusJPanel;
-
-	/**
-	 * @return the censusJPanel
-	 */
-	public CensusJPanel getCensusJPanel() {
-		return censusJPanel;
-	}
-
 	/**
 	 * Launch the application.
 	 */
@@ -52,12 +39,25 @@ public class VejbyGedcom {
 			}
 		});
 	}
+	private JFrame frmVejbyGedcomIndtastning;
+	private JTabbedPane tabbedPane;
+	private CensusMappingJPanel censusMappingJPanel;
+	private HouseholdJPanel householdJPanel;
+
+	private CensusJPanel censusJPanel;
 
 	/**
 	 * Create the application.
 	 */
 	public VejbyGedcom() {
 		initialize();
+	}
+
+	/**
+	 * @return the censusJPanel
+	 */
+	public CensusJPanel getCensusJPanel() {
+		return censusJPanel;
 	}
 
 	/**

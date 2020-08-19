@@ -21,10 +21,6 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 		mapColors = new HashMap<Integer, Color>();
 	}
 
-	public void setRowColor(int row, Color color) {
-		mapColors.put(row, color);
-	}
-
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus,
 			int row, int column) {
@@ -37,5 +33,9 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 			cell.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
 		}
 		return cell;
+	}
+
+	public void setRowColor(int row, Color color) {
+		mapColors.put(row, color);
 	}
 }

@@ -152,24 +152,6 @@ public class Family {
 		this.mother = mother;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		if (father != null) {
-			return father.toString();
-		}
-
-		if (mother != null) {
-			return mother.toString();
-		}
-
-		return "";
-	}
-
 	/**
 	 * @return
 	 */
@@ -213,5 +195,23 @@ public class Family {
 		sb.append("1 MARR\n");
 
 		return sb.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		if (father != null) {
+			return father.toString();
+		}
+
+		if (mother != null) {
+			return mother.toString();
+		}
+
+		return "";
 	}
 }

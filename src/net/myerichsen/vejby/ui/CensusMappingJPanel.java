@@ -1,7 +1,6 @@
 package net.myerichsen.vejby.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -183,84 +182,85 @@ public class CensusMappingJPanel extends JPanel {
 		individualcomboBox.addItem(PrefKey.INDIVIDUAL_11);
 		mappingTable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(individualcomboBox));
 
-		setValuesFromPreferences();
+		// TODO Might need to be removed
+		// setValuesFromPreferences();
 	}
 
-	/**
-	 * Set field values and colours from preferences
-	 */
-	private void setValuesFromPreferences() {
-		int row;
-
-		int maxSize = mappingTable.getModel().getRowCount();
-		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_1, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_2, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_2, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_3, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_3, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_4, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_4, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_5, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_5, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_6, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_7, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_7, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_8, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_8, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_9, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_9, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_10, 0);
-		if ((row > 0) && (row < maxSize)) {
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_10, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
-		if ((row > 0) && (row < maxSize)) {
-			LOGGER.log(Level.INFO, "Row: " + row);
-			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
-			renderer.setRowColor(row, Color.ORANGE);
-		}
-
-	}
+//	/**
+//	 * Set field values and colours from preferences
+//	 */
+//	private void setValuesFromPreferences() {
+//		int row;
+//
+//		int maxSize = mappingTable.getModel().getRowCount();
+//		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_1, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_2, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_2, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_3, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_3, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_4, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_4, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_5, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_5, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_6, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_7, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_7, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_8, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_8, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_9, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_9, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_10, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_10, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
+//		if ((row > 0) && (row < maxSize)) {
+//			LOGGER.log(Level.INFO, "Row: " + row);
+//			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
+//			renderer.setRowColor(row, Color.ORANGE);
+//		}
+//
+//	}
 }

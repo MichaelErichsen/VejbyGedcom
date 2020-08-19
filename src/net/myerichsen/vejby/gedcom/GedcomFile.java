@@ -26,8 +26,6 @@ import net.myerichsen.vejby.census.Table;
  */
 public class GedcomFile {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
-
 	// static variable single_instance of type Singleton
 	private static GedcomFile single_instance = null;
 
@@ -38,6 +36,8 @@ public class GedcomFile {
 
 		return single_instance;
 	}
+
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private List<Family> families;
 
@@ -76,6 +76,51 @@ public class GedcomFile {
 			throw new Exception(e);
 		}
 
+	}
+
+	/**
+	 * Save a census table as GEDCOM
+	 * 
+	 * @param censusTable
+	 */
+	public void save(Table censusTable) {
+		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
+		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+
+		gedcomChooser.setFileFilter(ff);
+
+		int returnValue = gedcomChooser.showSaveDialog(null);
+
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File gedcomFile = gedcomChooser.getSelectedFile();
+			String fileName = gedcomFile.getName();
+			if (!fileName.endsWith(".ged")) {
+				gedcomFile = new File(fileName + ".ged");
+			}
+			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
+
+			OutputStreamWriter fw = null;
+			try {
+				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+
+				writeHeader(fw);
+
+				int familyId = 1;
+				for (Family family : censusTable.getFamilies()) {
+					// FIXME java.lang.NullPointerException at
+					// net.myerichsen.vejby.gedcom.Individual.toGedcom(Individual.java:277)
+					// sb.append(censusEvent.toGedcom());
+					fw.write(family.toGedcom(familyId++));
+					LOGGER.log(Level.FINE, family.toString());
+				}
+
+				writeTrailer(fw);
+				fw.close();
+				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -125,50 +170,5 @@ public class GedcomFile {
 
 		// Trailer
 		fw.write("0 TRLR\n");
-	}
-
-	/**
-	 * Save a census table as GEDCOM
-	 * 
-	 * @param censusTable
-	 */
-	public void save(Table censusTable) {
-		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
-		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
-
-		gedcomChooser.setFileFilter(ff);
-
-		int returnValue = gedcomChooser.showSaveDialog(null);
-
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File gedcomFile = gedcomChooser.getSelectedFile();
-			String fileName = gedcomFile.getName();
-			if (!fileName.endsWith(".ged")) {
-				gedcomFile = new File(fileName + ".ged");
-			}
-			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
-
-			OutputStreamWriter fw = null;
-			try {
-				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
-
-				writeHeader(fw);
-
-				int familyId = 1;
-				for (Family family : censusTable.getFamilies()) {
-					// FIXME java.lang.NullPointerException at
-					// net.myerichsen.vejby.gedcom.Individual.toGedcom(Individual.java:277)
-					// sb.append(censusEvent.toGedcom());
-					fw.write(family.toGedcom(familyId++));
-					LOGGER.log(Level.FINE, family.toString());
-				}
-
-				writeTrailer(fw);
-				fw.close();
-				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 }

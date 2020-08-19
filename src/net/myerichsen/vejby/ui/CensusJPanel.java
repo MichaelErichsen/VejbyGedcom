@@ -106,6 +106,20 @@ public class CensusJPanel extends JPanel {
 	}
 
 	/**
+	 * @return the censusModel
+	 */
+	public DefaultTableModel getCensusModel() {
+		return censusModel;
+	}
+
+	/**
+	 * @return the censusTable
+	 */
+	public Table getCensusTable() {
+		return censusTable;
+	}
+
+	/**
 	 * Choose and open a KIP file, remove empty columns and display i a tabbed pane.
 	 * 
 	 * @param vejbyGedcom
@@ -194,24 +208,10 @@ public class CensusJPanel extends JPanel {
 	}
 
 	/**
-	 * @return the censusModel
-	 */
-	public DefaultTableModel getCensusModel() {
-		return censusModel;
-	}
-
-	/**
 	 * @param censusModel the censusModel to set
 	 */
 	public void setCensusModel(DefaultTableModel censusModel) {
 		this.censusModel = censusModel;
-	}
-
-	/**
-	 * @return the censusTable
-	 */
-	public Table getCensusTable() {
-		return censusTable;
 	}
 
 	/**

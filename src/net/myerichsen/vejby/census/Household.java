@@ -13,7 +13,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * A household as extracted from a census file.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class Household {
@@ -27,8 +27,7 @@ public class Household {
 	/**
 	 * Constructor
 	 * 
-	 * @param id
-	 *            Id of this household in the census
+	 * @param id Id of this household in the census
 	 */
 	public Household(int id) {
 		super();
@@ -67,14 +66,13 @@ public class Household {
 	}
 
 	/**
-	 * Separate a household into families, defined as father, mother, and
-	 * children. Each household contains either a single or one or more families
-	 * and perhaps further singles (tenants, lodgers, servants, etc.)
+	 * Separate a household into families, defined as father, mother, and children.
+	 * Each household contains either a single or one or more families and perhaps
+	 * further singles (tenants, lodgers, servants, etc.)
 	 * 
 	 * Currently only the first family is identified
 	 * 
-	 * @param mappingKeys
-	 *            The array of columns in the table
+	 * @param mappingKeys The array of columns in the table
 	 * @return message
 	 */
 	public String identifyFamilies(int[] mappingKeys) {
@@ -151,8 +149,7 @@ public class Household {
 	}
 
 	/**
-	 * @param families
-	 *            the families to set
+	 * @param families the families to set
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;
@@ -186,24 +183,21 @@ public class Household {
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @param rows
-	 *            the rows to set
+	 * @param rows the rows to set
 	 */
 	public void setRows(List<List<String>> rows) {
 		this.rows = rows;
 	}
 
 	/**
-	 * @param singles
-	 *            the singles to set
+	 * @param singles the singles to set
 	 */
 	public void setSingles(List<Individual> singles) {
 		this.singles = singles;

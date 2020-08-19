@@ -1,15 +1,32 @@
 package net.myerichsen.vejby.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Contains mapping pairs between census file, mappingKeyss, census events and
  * birth events.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class Mapping {
 	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	private List<String> nameStubs = Arrays.asList("Dat", "Datter");
+//	private List<String> nameStubs = Arrays.asList("??", "!!", "Dat", "Datter");
+	private List<String> childMap = Arrays.asList("barn", "børn", "datter", "søn");
+	private List<String> wifeMap = Arrays.asList("hustru", "kone");
+	private List<String> othersMap = Arrays.asList("broder", "broderdatter", "brodersøn", "brødre", "datterdatter",
+			"forældre", "manden", "moder", "pleiebarn", "pleiebørn", "pleiedatter", "pleiesøn", "sønnesøn", "søster",
+			"søsterdatter", "stedfader", "svigerfader", "svigerfar", "svigerforældre", "svigermoder", "svigersøn");
+
+	/**
+	 * @return the childMap
+	 */
+	public List<String> getChildMap() {
+		return childMap;
+	}
 
 	/**
 	 * @return mappingKeys An array of mapping keys
@@ -19,11 +36,24 @@ public class Mapping {
 	}
 
 	/**
-	 * @param mappingKeys
-	 *            the mappingKeys to set
+	 * @return the nameStubs
 	 */
-	public void setMappingKeys(int[] mappingKeys) {
-		this.mappingKeys = mappingKeys;
+	public List<String> getNameStubs() {
+		return nameStubs;
+	}
+
+	/**
+	 * @return the othersMap
+	 */
+	public List<String> getOthersMap() {
+		return othersMap;
+	}
+
+	/**
+	 * @return the wifeMap
+	 */
+	public List<String> getWifeMap() {
+		return wifeMap;
 	}
 
 	/*

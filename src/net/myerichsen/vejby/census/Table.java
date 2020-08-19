@@ -79,6 +79,23 @@ public class Table {
 	}
 
 	/**
+	 * @return
+	 */
+	public List<Family> getFamilies() {
+		List<Family> lf = new ArrayList<Family>();
+
+		for (int i = 0; i < households.size(); i++) {
+			List<Family> families = households.get(i).getFamilies();
+
+			for (int j = 0; j < families.size(); j++) {
+				lf.add(families.get(j));
+			}
+		}
+
+		return lf;
+	}
+
+	/**
 	 * @param householdId
 	 * @param familyId
 	 * @return The family
@@ -281,23 +298,6 @@ public class Table {
 		}
 
 		return sb.toString();
-	}
-
-	/**
-	 * @return
-	 */
-	public List<Family> getFamilies() {
-		List<Family> lf = new ArrayList<Family>();
-
-		for (int i = 0; i < households.size(); i++) {
-			List<Family> families = households.get(i).getFamilies();
-
-			for (int j = 0; j < families.size(); j++) {
-				lf.add(families.get(j));
-			}
-		}
-
-		return lf;
 	}
 
 }

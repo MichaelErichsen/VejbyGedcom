@@ -12,10 +12,28 @@ public class Source {
 	private int censusYear;
 
 	/**
+	 * Constructor
+	 *
+	 * @param year
+	 */
+	private Source(int id, int censusYear) {
+		super();
+		this.setId(id);
+		this.censusYear = censusYear;
+	}
+
+	/**
 	 * @return the censusYear
 	 */
 	public int getCensusYear() {
 		return censusYear;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
 	}
 
 	/**
@@ -27,14 +45,11 @@ public class Source {
 	}
 
 	/**
-	 * Constructor
-	 *
-	 * @param year
+	 * @param id
+	 *            the id to set
 	 */
-	private Source(int id, int censusYear) {
-		super();
-		this.setId(id);
-		this.censusYear = censusYear;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	/*
@@ -50,21 +65,6 @@ public class Source {
 		sb.append("1 ABBR Folketælling " + censusYear + "\n");
 		sb.append("1 AUTH Dansk Demografisk Database\n");
 		return sb.toString();
-	}
-
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
 	}
 
 }

@@ -152,23 +152,26 @@ public class HouseholdJPanel extends JPanel {
 
 	/**
 	 * 
-	 * @param id
-	 *            Individual id in the census file
-	 * @param families
-	 *            A list of families in the household
+	 * @param id       Individual id in the census file
+	 * @param families A list of families in the household
 	 * @return String A string in the format "Familie" nr rolle
 	 */
 	private String listFamiliesForIndividual(int id, List<Family> families) {
+		// FIXME When two families, both are listed as no. 1
 		StringBuilder sb = new StringBuilder();
+
 		for (net.myerichsen.vejby.gedcom.Family family : families) {
 			if ((family.getFather() != null) && (family.getFather().getId() == id)) {
 				sb.append("Fader i familie " + family.getFamilyId() + ". ");
+				return sb.toString();
 			} else if ((family.getMother() != null) && (family.getMother().getId() == id)) {
 				sb.append("Moder i familie " + family.getFamilyId() + ". ");
+				return sb.toString();
 			} else {
 				for (Individual child : family.getChildren()) {
 					if (child.getId() == id) {
 						sb.append("Barn i familie " + family.getFamilyId() + ". ");
+						return sb.toString();
 					}
 				}
 			}
@@ -177,8 +180,7 @@ public class HouseholdJPanel extends JPanel {
 	}
 
 	/**
-	 * Populate table with family data. Rows contain father, mother and
-	 * children.
+	 * Populate table with family data. Rows contain father, mother and children.
 	 */
 	private void populateFamilyTable(int householdId, int familyId) {
 		defineButton.setEnabled(true);
@@ -201,8 +203,8 @@ public class HouseholdJPanel extends JPanel {
 	 * 
 	 * Second last column marks 0-n family roles
 	 * 
-	 * Last column contains a combobox to select a new family roles Family is
-	 * created when button is pressed It is saved by the save button
+	 * Last column contains a combobox to select a new family role. Family is
+	 * created when button is pressed. It is saved by the save button
 	 * 
 	 * @param j
 	 */

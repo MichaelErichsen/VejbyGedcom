@@ -1,17 +1,22 @@
 package net.myerichsen.vejby.gedcom;
 
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.myerichsen.vejby.census.Household;
+import net.myerichsen.vejby.util.Mapping;
 
 /**
  * Class representing an mappingKeys in GEDCOM.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 19. aug. 2020
  *
  */
 public class Individual {
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
 	private int id;
 	private String name;
 	private String sex;
@@ -58,63 +63,10 @@ public class Individual {
 	}
 
 	/**
-	 * @return the year
-	 */
-	public int getYear() {
-		return year;
-	}
-
-	/**
-	 * @param year
-	 *            the year to set
-	 */
-	public void setYear(int year) {
-		this.year = year;
-	}
-
-	/**
-	 * @return the place
-	 */
-	public String getPlace() {
-		return place;
-	}
-
-	/**
-	 * @param place
-	 *            the place to set
-	 */
-	public void setPlace(String place) {
-		this.place = place;
-	}
-
-	/**
-	 * @return the household
-	 */
-	public Household getHousehold() {
-		return household;
-	}
-
-	/**
-	 * @param household
-	 *            the household to set
-	 */
-	public void setHousehold(Household household) {
-		this.household = household;
-	}
-
-	/**
 	 * @return the censusEvent
 	 */
 	public CensusEvent getCensusEvent() {
 		return censusEvent;
-	}
-
-	/**
-	 * @param censusEvent
-	 *            the censusEvent to set
-	 */
-	public void setCensusEvent(CensusEvent censusEvent) {
-		this.censusEvent = censusEvent;
 	}
 
 	/**
@@ -132,6 +84,13 @@ public class Individual {
 	}
 
 	/**
+	 * @return the household
+	 */
+	public Household getHousehold() {
+		return household;
+	}
+
+	/**
 	 * @return the id
 	 */
 	public int getId() {
@@ -143,6 +102,13 @@ public class Individual {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return the place
+	 */
+	public String getPlace() {
+		return place;
 	}
 
 	/**
@@ -160,16 +126,21 @@ public class Individual {
 	}
 
 	/**
-	 * @param address
-	 *            the address to set
+	 * @return the year
+	 */
+	public int getYear() {
+		return year;
+	}
+
+	/**
+	 * @param address the address to set
 	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
 	/**
-	 * @param birthDate
-	 *            the birthDate to set
+	 * @param birthDate the birthDate to set
 	 */
 	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
@@ -177,69 +148,80 @@ public class Individual {
 	}
 
 	/**
-	 * @param birthPlace
-	 *            the birthPlace to set
+	 * @param birthPlace the birthPlace to set
 	 */
 	public void setBirthPlace(String birthPlace) {
 		this.birthPlace = birthPlace;
 	}
 
 	/**
-	 * @param deathDate
-	 *            the deathDate to set
+	 * @param censusEvent the censusEvent to set
+	 */
+	public void setCensusEvent(CensusEvent censusEvent) {
+		this.censusEvent = censusEvent;
+	}
+
+	/**
+	 * @param deathDate the deathDate to set
 	 */
 	public void setDeathDate(Date deathDate) {
 		this.deathDate = deathDate;
 	}
 
 	/**
-	 * @param deathPlace
-	 *            the deathPlace to set
+	 * @param deathPlace the deathPlace to set
 	 */
 	public void setDeathPlace(String deathPlace) {
 		this.deathPlace = deathPlace;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param household the household to set
+	 */
+	public void setHousehold(Household household) {
+		this.household = household;
+	}
+
+	/**
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * @param sex
-	 *            the sex to set
+	 * @param place the place to set
+	 */
+	public void setPlace(String place) {
+		this.place = place;
+	}
+
+	/**
+	 * @param sex the sex to set
 	 */
 	public void setSex(String sex) {
 		this.sex = sex;
 	}
 
 	/**
-	 * @param trades
-	 *            the trades to set
+	 * @param trades the trades to set
 	 */
 	public void setTrades(String trades) {
 		this.trades = trades;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
+	/**
+	 * @param year the year to set
 	 */
-	@Override
-	public String toString() {
-		return name;
+	public void setYear(int year) {
+		this.year = year;
 	}
 
 	/**
@@ -248,10 +230,34 @@ public class Individual {
 	 * @return
 	 */
 	public String toGedcom() {
+		Mapping mapping = new Mapping();
 		final StringBuffer sb = new StringBuffer();
 
 		sb.append("0 @I" + getId() + "@ INDI\n");
-		sb.append("1 NAME " + getName() + "\n");
+
+		sb.append("1 NAME ");
+
+		String[] nameParts = getName().split(" ");
+
+		// Handle stubs like dat and datter
+		String familyName = nameParts[nameParts.length - 1];
+		LOGGER.log(Level.FINE, "Family name: " + familyName);
+
+		if (mapping.getNameStubs().contains(familyName)) {
+			LOGGER.log(Level.INFO, "Invalid family name: " + familyName);
+			familyName = new String(nameParts[nameParts.length - 2] + familyName);
+
+			for (int i = 0; i < nameParts.length - 2; i++) {
+				sb.append(nameParts[i] + " ");
+			}
+		} else
+			for (int i = 0; i < nameParts.length - 1; i++) {
+				sb.append(nameParts[i] + " ");
+			}
+
+		// Surround with slashes
+		sb.append("/" + familyName + "/\n");
+
 		if (getSex() == Sex.M) {
 			sb.append("1 SEX M\n");
 		} else if (getSex() == Sex.F) {
@@ -277,6 +283,16 @@ public class Individual {
 		sb.append(censusEvent.toGedcom());
 
 		return sb.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }
