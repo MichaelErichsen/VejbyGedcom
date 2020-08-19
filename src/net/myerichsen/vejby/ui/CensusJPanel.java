@@ -146,9 +146,10 @@ public class CensusJPanel extends JPanel {
 
 				// Second line is data
 				String[] ftData = sc.nextLine().split(";");
-				// FIXME Exception in thread "AWT-EventQueue-0"
+				// FIXME for 3873: Exception in thread "AWT-EventQueue-0"
 				// java.lang.StringIndexOutOfBoundsException: String index out
 				// of range: 3
+				// FIXME Same error for D5558 (1860) , but not every time???
 				String ftYear = ftData[index].substring(3);
 				LOGGER.log(Level.INFO, ftYear);
 				int year = Integer.parseInt(ftYear);
