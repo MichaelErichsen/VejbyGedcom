@@ -13,8 +13,7 @@ import java.util.List;
  */
 public class Mapping {
 	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	private List<String> nameStubs = Arrays.asList("Dat", "Datter");
-//	private List<String> nameStubs = Arrays.asList("??", "!!", "Dat", "Datter");
+	private List<String> nameStubs = Arrays.asList("Dat", "Datter", "Dat.", "Dtr", "Dr");
 	private List<String> childMap = Arrays.asList("barn", "børn", "datter", "søn");
 	private List<String> wifeMap = Arrays.asList("hustru", "kone");
 	private List<String> othersMap = Arrays.asList("broder", "broderdatter", "brodersøn", "brødre", "datterdatter",

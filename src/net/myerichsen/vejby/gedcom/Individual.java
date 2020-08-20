@@ -258,9 +258,9 @@ public class Individual {
 		// Surround with slashes
 		sb.append("/" + familyName + "/\n");
 
-		if (getSex() == Sex.M) {
+		if (getSex().equals(Sex.M)) {
 			sb.append("1 SEX M\n");
-		} else if (getSex() == Sex.F) {
+		} else if (getSex().equals(Sex.F)) {
 			sb.append("1 SEX F\n");
 		}
 

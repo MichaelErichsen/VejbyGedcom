@@ -174,7 +174,7 @@ public class Household {
 				|| (position.contains("svigerforældre")) || (position.contains("svigermoder"))
 				|| (position.contains("svigersøn"))) {
 			return;
-		} else if ((position.contains("hustru")) || (position.contains("kone"))) {
+		} else if ((position.contains("husmoder")) || (position.contains("hustru")) || (position.contains("kone"))) {
 			family.setMother(person);
 		} else if ((position.contains("barn")) || (position.contains("børn")) || (position.contains("datter"))
 				|| (position.contains("søn"))) {

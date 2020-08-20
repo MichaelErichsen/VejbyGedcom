@@ -127,6 +127,9 @@ public class CensusJPanel extends JPanel {
 	protected void openKipFile(VejbyGedcom vejbyGedcom) {
 		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
 		String kipFileName = prefs.get("KIPFILENAME", ".");
+
+		// FIXME Reads previous file, even though another selected. But works the second
+		// time
 		JFileChooser kipChooser = new JFileChooser(kipFileName);
 
 		kipChooser.setFileFilter(ff);

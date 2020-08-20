@@ -8,7 +8,7 @@ import net.myerichsen.vejby.census.Household;
  * A census event as extracted from a KIP file.
  * 
  * @author Michael Erichsen
- * @version 17. aug. 2020
+ * @version 20. aug. 2020
  *
  */
 public class CensusEvent {
@@ -52,31 +52,28 @@ public class CensusEvent {
 	}
 
 	/**
-	 * @param censusYear
-	 *            the censusYear to set
+	 * @param censusYear the censusYear to set
 	 */
 	public void setCensusYear(int censusYear) {
 		this.censusYear = censusYear;
 	}
 
 	/**
-	 * @param household
-	 *            the household to set
+	 * @param household the household to set
 	 */
 	public void setHousehold(Household household) {
 		this.household = household;
 	}
 
 	/**
-	 * @param place
-	 *            the place to set
+	 * @param place the place to set
 	 */
 	public void setPlace(String place) {
 		this.place = place;
 	}
 
 	/**
-	 * @return
+	 * @return String A string containing GEDCOM output for a census event
 	 */
 	public String toGedcom() {
 		StringBuilder sb = new StringBuilder();
@@ -84,7 +81,7 @@ public class CensusEvent {
 		sb.append("2 DATE " + censusYear + "\n");
 		sb.append("2 PLAC " + place + "\n");
 		sb.append("2 SOUR @S1@\n");
-		sb.append("3 PAGE \n");
+		sb.append("3 PAGE Folketælling " + censusYear + "\n");
 
 		List<List<String>> rows = household.getRows();
 		for (List<String> list : rows) {
