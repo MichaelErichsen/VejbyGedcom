@@ -8,10 +8,10 @@ import net.myerichsen.vejby.census.Household;
 import net.myerichsen.vejby.util.Mapping;
 
 /**
- * Class representing an mappingKeys in GEDCOM.
+ * Class representing an individual in GEDCOM.
  * 
  * @author Michael Erichsen
- * @version 19. aug. 2020
+ * @version 20. aug. 2020
  *
  */
 public class Individual {
