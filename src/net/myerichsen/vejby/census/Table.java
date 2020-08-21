@@ -45,8 +45,8 @@ public class Table {
 	/**
 	 * Split the table into households
 	 * 
-	 * @param householdFieldNumber
-	 *            The column in the table that contains the household number
+	 * @param householdFieldNumber The column in the table that contains the
+	 *                             household number
 	 * @return message
 	 */
 	public String createHouseholds(int householdFieldNumber) {
@@ -82,10 +82,10 @@ public class Table {
 	 * @return
 	 */
 	public List<Family> getFamilies() {
-		List<Family> lf = new ArrayList<Family>();
+		List<Family> lf = new ArrayList<>();
 
-		for (int i = 0; i < households.size(); i++) {
-			List<Family> families = households.get(i).getFamilies();
+		for (Household household : households) {
+			List<Family> families = household.getFamilies();
 
 			for (int j = 0; j < families.size(); j++) {
 				lf.add(families.get(j));
@@ -122,8 +122,7 @@ public class Table {
 	}
 
 	/**
-	 * @param id
-	 *            Id of the household
+	 * @param id Id of the household
 	 * @return The household
 	 */
 	public Household getHousehold(int id) {
@@ -174,10 +173,10 @@ public class Table {
 			FileInputStream fis = new FileInputStream(new File(kipFileName));
 			Scanner sc = new Scanner(fis);
 			String headerLine = sc.nextLine();
-			headers = new LinkedList<String>(Arrays.asList(headerLine.split(";")));
+			headers = new LinkedList<>(Arrays.asList(headerLine.split(";")));
 
 			while (sc.hasNextLine()) {
-				List<String> fields = new LinkedList<String>(Arrays.asList(sc.nextLine().split(";")));
+				List<String> fields = new LinkedList<>(Arrays.asList(sc.nextLine().split(";")));
 				persons.add(fields);
 			}
 			sc.close();
@@ -205,8 +204,8 @@ public class Table {
 			found = false;
 
 			try {
-				for (int row = 0; row < persons.size(); row++) {
-					if (!persons.get(row).get(col).isEmpty()) {
+				for (List<String> person : persons) {
+					if (!person.get(col).isEmpty()) {
 						found = true;
 					}
 				}
@@ -237,40 +236,35 @@ public class Table {
 	}
 
 	/**
-	 * @param headers
-	 *            the headers to set
+	 * @param headers the headers to set
 	 */
 	public void setHeaders(List<String> headers) {
 		this.headers = headers;
 	}
 
 	/**
-	 * @param households
-	 *            the households to set
+	 * @param households the households to set
 	 */
 	public void setHouseholds(List<Household> households) {
 		this.households = households;
 	}
 
 	/**
-	 * @param kipFileName
-	 *            the kipFileName to set
+	 * @param kipFileName the kipFileName to set
 	 */
 	public void setKipFileName(String kipFileName) {
 		this.kipFileName = kipFileName;
 	}
 
 	/**
-	 * @param fields
-	 *            the fields to set
+	 * @param fields the fields to set
 	 */
 	public void setPersons(List<List<String>> persons) {
 		this.persons = persons;
 	}
 
 	/**
-	 * @param year
-	 *            the year to set
+	 * @param year the year to set
 	 */
 	public void setYear(int year) {
 		this.year = year;

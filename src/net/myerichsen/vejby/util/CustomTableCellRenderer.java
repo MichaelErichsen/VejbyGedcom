@@ -18,7 +18,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	private Map<Integer, Color> mapColors;
 
 	public CustomTableCellRenderer() {
-		mapColors = new HashMap<Integer, Color>();
+		mapColors = new HashMap<>();
 	}
 
 	@Override

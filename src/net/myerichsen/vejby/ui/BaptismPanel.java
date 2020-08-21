@@ -33,7 +33,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * @version 17. aug. 2020
  *
  */
-public class BaptismJpanel extends JPanel {
+public class BaptismPanel extends JPanel {
 	private static final long serialVersionUID = 2704936588696233694L;
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
@@ -52,7 +52,7 @@ public class BaptismJpanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public BaptismJpanel() {
+	public BaptismPanel() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };

@@ -86,8 +86,8 @@ public class CensusEvent {
 		List<List<String>> rows = household.getRows();
 		for (List<String> list : rows) {
 			sb.append("4 CONT ");
-			for (int i = 0; i < list.size(); i++) {
-				sb.append(list.get(i) + ", ");
+			for (String element : list) {
+				sb.append(element + ", ");
 			}
 			sb.append("\n");
 		}

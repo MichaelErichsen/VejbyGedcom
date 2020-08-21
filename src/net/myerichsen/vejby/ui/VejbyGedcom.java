@@ -39,12 +39,13 @@ public class VejbyGedcom {
 			}
 		});
 	}
+
 	private JFrame frmVejbyGedcomIndtastning;
 	private JTabbedPane tabbedPane;
-	private CensusMappingJPanel censusMappingJPanel;
-	private HouseholdJPanel householdJPanel;
+	private CensusMappingPanel censusMappingJPanel;
+	private HouseholdPanel householdJPanel;
 
-	private CensusJPanel censusJPanel;
+	private CensusPanel censusJPanel;
 
 	/**
 	 * Create the application.
@@ -56,21 +57,21 @@ public class VejbyGedcom {
 	/**
 	 * @return the censusJPanel
 	 */
-	public CensusJPanel getCensusJPanel() {
+	public CensusPanel getCensusJPanel() {
 		return censusJPanel;
 	}
 
 	/**
 	 * @return the censusMappingJPanel
 	 */
-	public CensusMappingJPanel getCensusMappingJPanel() {
+	public CensusMappingPanel getCensusMappingJPanel() {
 		return censusMappingJPanel;
 	}
 
 	/**
 	 * @return the householdJPanel
 	 */
-	public HouseholdJPanel getHouseholdJPanel() {
+	public HouseholdPanel getHouseholdJPanel() {
 		return householdJPanel;
 	}
 
@@ -119,18 +120,18 @@ public class VejbyGedcom {
 		gbc_tabbedPane.gridy = 0;
 		frmVejbyGedcomIndtastning.getContentPane().add(getTabbedPane(), gbc_tabbedPane);
 
-		censusJPanel = new CensusJPanel(VejbyGedcom.this);
+		censusJPanel = new CensusPanel(VejbyGedcom.this);
 		getTabbedPane().addTab("Folket\u00E6llinger", null, censusJPanel, null);
 
-		censusMappingJPanel = new CensusMappingJPanel(VejbyGedcom.this);
+		censusMappingJPanel = new CensusMappingPanel(VejbyGedcom.this);
 		getTabbedPane().addTab("Mapning af felter", null, censusMappingJPanel, null);
 		getTabbedPane().setEnabledAt(1, false);
 
-		householdJPanel = new HouseholdJPanel(VejbyGedcom.this);
+		householdJPanel = new HouseholdPanel(VejbyGedcom.this);
 		getTabbedPane().addTab("Husholdninger", null, householdJPanel, null);
 		getTabbedPane().setEnabledAt(2, false);
 
-		BaptismJpanel baptismJpanel = new BaptismJpanel();
+		BaptismPanel baptismJpanel = new BaptismPanel();
 		getTabbedPane().addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismJpanel, null);
 	}
 

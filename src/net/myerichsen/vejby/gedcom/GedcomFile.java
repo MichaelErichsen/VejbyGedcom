@@ -31,8 +31,9 @@ public class GedcomFile {
 
 	// static method to create instance of Singleton class
 	public static GedcomFile getInstance() {
-		if (single_instance == null)
+		if (single_instance == null) {
 			single_instance = new GedcomFile();
+		}
 
 		return single_instance;
 	}
@@ -124,8 +125,7 @@ public class GedcomFile {
 	}
 
 	/**
-	 * @param families
-	 *            the families to set
+	 * @param families the families to set
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;

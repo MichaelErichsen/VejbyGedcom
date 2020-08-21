@@ -21,6 +21,7 @@ public class Individual {
 	private String name;
 	private String sex;
 	private String trades;
+	private String position;
 	private String address;
 	private String birthDate;
 	private Date deathDate;
@@ -109,6 +110,13 @@ public class Individual {
 	 */
 	public String getPlace() {
 		return place;
+	}
+
+	/**
+	 * @return the position
+	 */
+	public String getPosition() {
+		return position;
 	}
 
 	/**
@@ -204,6 +212,13 @@ public class Individual {
 	}
 
 	/**
+	 * @param position the position to set
+	 */
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	/**
 	 * @param sex the sex to set
 	 */
 	public void setSex(String sex) {
@@ -239,21 +254,22 @@ public class Individual {
 
 		String[] nameParts = getName().split(" ");
 
-		// Handle stubs like dat and datter
+		// Handle stubs like dat, dr, dtr, and datter
 		String familyName = nameParts[nameParts.length - 1];
 		LOGGER.log(Level.FINE, "Family name: " + familyName);
 
 		if (mapping.getNameStubs().contains(familyName)) {
-			LOGGER.log(Level.INFO, "Invalid family name: " + familyName);
+			LOGGER.log(Level.FINE, "Invalid family name: " + familyName);
 			familyName = new String(nameParts[nameParts.length - 2] + familyName);
 
-			for (int i = 0; i < nameParts.length - 2; i++) {
+			for (int i = 0; i < (nameParts.length - 2); i++) {
 				sb.append(nameParts[i] + " ");
 			}
-		} else
-			for (int i = 0; i < nameParts.length - 1; i++) {
+		} else {
+			for (int i = 0; i < (nameParts.length - 1); i++) {
 				sb.append(nameParts[i] + " ");
 			}
+		}
 
 		// Surround with slashes
 		sb.append("/" + familyName + "/\n");

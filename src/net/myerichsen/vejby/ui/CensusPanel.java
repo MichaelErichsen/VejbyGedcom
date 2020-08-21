@@ -37,7 +37,7 @@ import net.myerichsen.vejby.census.Table;
  * @version 19. aug. 2020
  *
  */
-public class CensusJPanel extends JPanel {
+public class CensusPanel extends JPanel {
 	private static final long serialVersionUID = -6638275102973476672L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
@@ -53,7 +53,7 @@ public class CensusJPanel extends JPanel {
 	 * 
 	 * @param vejbyGedcom
 	 */
-	public CensusJPanel(VejbyGedcom vejbyGedcom) {
+	public CensusPanel(VejbyGedcom vejbyGedcom) {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };

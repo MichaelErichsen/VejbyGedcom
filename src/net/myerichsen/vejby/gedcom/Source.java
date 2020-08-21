@@ -37,16 +37,14 @@ public class Source {
 	}
 
 	/**
-	 * @param censusYear
-	 *            the censusYear to set
+	 * @param censusYear the censusYear to set
 	 */
 	public void setCensusYear(int censusYear) {
 		this.censusYear = censusYear;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;

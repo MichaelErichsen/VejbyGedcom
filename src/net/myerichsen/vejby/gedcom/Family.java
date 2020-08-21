@@ -14,7 +14,7 @@ import java.util.List;
 public class Family {
 	private Individual father;
 	private Individual mother;
-	private List<Individual> children = new ArrayList<Individual>();
+	private List<Individual> children = new ArrayList<>();
 	private int householdId;
 	private int familyId;
 

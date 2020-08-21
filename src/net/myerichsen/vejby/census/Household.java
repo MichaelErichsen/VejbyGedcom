@@ -10,10 +10,11 @@ import net.myerichsen.vejby.gedcom.Family;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * A household as extracted from a census file.
+ * A household as extracted from a census file. This object has no direct
+ * correspondence to GEDCOM.
  * 
  * @author Michael Erichsen
- * @version 19. aug. 2020
+ * @version 20. aug. 2020
  *
  */
 public class Household {
@@ -23,6 +24,7 @@ public class Household {
 	private List<Individual> singles;
 	private int id;
 	private CensusEvent censusEvent;
+	private List<String> familyRoles;
 
 	/**
 	 * Constructor
@@ -31,10 +33,69 @@ public class Household {
 	 */
 	public Household(int id) {
 		super();
-		rows = new ArrayList<List<String>>();
-		families = new ArrayList<Family>();
-		singles = new ArrayList<Individual>();
+		rows = new ArrayList<>();
+		families = new ArrayList<>();
+		singles = new ArrayList<>();
+		familyRoles = new ArrayList<String>();
 		this.id = id;
+	}
+
+	/**
+	 * Create an individual using fields from the census table row.
+	 * 
+	 * @param mappingKeys The mapping of columns
+	 * @param first       A flag to indicate whether this is the first person in the
+	 *                    family
+	 * @param iYear       Census year
+	 * @param family      The family to add the individual to
+	 * @param row         The row in the census table
+	 * @param newRole     Posiiton in family
+	 * @return A flag to indicate whether this is the first person in the family
+	 */
+	public Individual createIndividualFromRow(int[] mappingKeys, boolean first, int iYear, Family family,
+			List<String> row, String newRole) {
+		String sex;
+		Individual person;
+		LOGGER.log(Level.FINE, row.get(mappingKeys[1]) + " " + row.get(mappingKeys[4]) + " " + row.get(mappingKeys[5]));
+
+		person = new Individual(Integer.parseInt(row.get(mappingKeys[1])));
+		person.setName(row.get(mappingKeys[4]));
+
+		String trade = row.get(mappingKeys[9]);
+		person.setTrades(trade);
+
+		if (mappingKeys[6] != 0) {
+			person.setBirthDate(row.get(mappingKeys[6]));
+		} else if (mappingKeys[7] != 0) {
+			try {
+				// Calculate difference between age and census year
+				int birthDate = (iYear - Integer.parseInt(row.get(mappingKeys[7])));
+				person.setBirthDate("Abt. " + birthDate);
+			} catch (NumberFormatException e) {
+				person.setBirthDate(row.get(mappingKeys[6]) + "??");
+			}
+		}
+
+		person.setBirthPlace(row.get(mappingKeys[11]));
+
+		sex = row.get(mappingKeys[5]);
+		person.setSex(sex);
+
+		if (first) {
+			if (sex.startsWith("M")) {
+				family.setFather(person);
+			} else {
+				family.setMother(person);
+			}
+			first = false;
+		} else {
+			setFamilyRole(family, row.get(mappingKeys[9]), person);
+		}
+
+		person.setPosition(newRole);
+
+		person.setCensusEvent(censusEvent);
+		return person;
 	}
 
 	/**
@@ -66,21 +127,30 @@ public class Household {
 	}
 
 	/**
+	 * @return Boolean value signalling whether the household has families.
+	 */
+	public boolean hasFamilies() {
+		if (getFamilies().isEmpty()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Separate a household into families, defined as father, mother, and children.
 	 * Each household contains either a single or one or more families and perhaps
-	 * further singles (tenants, lodgers, servants, etc.)
-	 * 
-	 * Currently only the first family is identified
+	 * further singles (tenants, lodgers, servants, etc.).
+	 * <p>
+	 * Currently only the first family is identified.
 	 * 
 	 * @param mappingKeys The array of columns in the table
 	 * @return message
 	 */
 	public String identifyFamilies(int[] mappingKeys) {
-		String sex = "";
-		Individual person;
 		boolean first = true;
 
-		String sYear = rows.get(0).get(mappingKeys[11]);
+		String sYear = rows.get(0).get(mappingKeys[12]);
 		int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
 		censusEvent = new CensusEvent(iYear, rows.get(0).get(mappingKeys[2]), this);
 
@@ -93,44 +163,8 @@ public class Household {
 		Family family = new Family(id, 1);
 
 		for (List<String> row : rows) {
-			LOGGER.log(Level.FINE,
-					row.get(mappingKeys[1]) + " " + row.get(mappingKeys[4]) + " " + row.get(mappingKeys[5]));
-
-			sex = row.get(mappingKeys[5]);
-
-			// Create a person from the row
-			person = new Individual(Integer.parseInt(row.get(mappingKeys[1])));
-			person.setName(row.get(mappingKeys[4]));
-			person.setSex(sex);
-			String trade = row.get(mappingKeys[9]);
-			person.setTrades(trade);
-
-			if (mappingKeys[6] != 0) {
-				person.setBirthDate(row.get(mappingKeys[6]));
-			} else if (mappingKeys[7] != 0) {
-				try {
-					// Calculate difference between age and census year
-					int birthDate = (iYear - Integer.parseInt(row.get(mappingKeys[7])));
-					person.setBirthDate("Abt. " + birthDate);
-				} catch (NumberFormatException e) {
-					person.setBirthDate(row.get(mappingKeys[6]) + "??");
-				}
-			}
-
-			person.setBirthPlace(row.get(mappingKeys[10]));
-
-			if (first) {
-				if (sex.startsWith("M")) {
-					family.setFather(person);
-				} else {
-					family.setMother(person);
-				}
-				first = false;
-			} else {
-				setFamilyRole(family, row.get(mappingKeys[9]), person);
-			}
-
-			person.setCensusEvent(censusEvent);
+			createIndividualFromRow(mappingKeys, first, iYear, family, row, "");
+			first = false;
 
 			// TODO Should test next row for family membership
 
@@ -138,9 +172,6 @@ public class Household {
 			// Identify father, mother and children from the position in
 			// household
 			// column - or trade column
-
-			// Find other relations and add further families
-
 		}
 
 		families.add(family);
@@ -156,6 +187,8 @@ public class Household {
 	}
 
 	/**
+	 * Set the role of the person in the family
+	 * 
 	 * @param family
 	 * @param position
 	 * @return
@@ -201,6 +234,20 @@ public class Household {
 	 */
 	public void setSingles(List<Individual> singles) {
 		this.singles = singles;
+	}
+
+	/**
+	 * @return the familyRoles
+	 */
+	public List<String> getFamilyRoles() {
+		return familyRoles;
+	}
+
+	/**
+	 * @param familyRoles the familyRoles to set
+	 */
+	public void setFamilyRoles(List<String> familyRoles) {
+		this.familyRoles = familyRoles;
 	}
 
 	/*
