@@ -21,15 +21,22 @@ import net.myerichsen.vejby.census.Table;
 /**
  * Class representing a GEDCOM file.
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 15. aug. 2020
  */
 public class GedcomFile {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+
 	// static variable single_instance of type Singleton
 	private static GedcomFile single_instance = null;
+	private List<Family> families;
 
-	// static method to create instance of Singleton class
+	/**
+	 * Static method to create instance of Singleton class.
+	 * 
+	 * @return An instance of the class
+	 */
 	public static GedcomFile getInstance() {
 		if (single_instance == null) {
 			single_instance = new GedcomFile();
@@ -38,51 +45,72 @@ public class GedcomFile {
 		return single_instance;
 	}
 
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
-
-	private List<Family> families;
-
+	/**
+	 * Constructor
+	 *
+	 */
 	private GedcomFile() {
 		super();
 		setFamilies(new ArrayList<Family>());
 	}
 
+	/**
+	 * @param family The family to add to the GEDCOM file
+	 */
 	public void addFamily(Family family) {
 		families.add(family);
 	}
 
 	/**
-	 * @return the families
+	 * @return the families in the GEDCOM file
 	 */
 	public List<Family> getFamilies() {
 		return families;
 	}
 
-	public void print(File gedcomFile) throws Exception {
-		OutputStreamWriter fw = null;
-		try {
-			// Requires AnselCharset-1.0.jar on classpath
-			fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+	/**
+	 * Save a family as GEDCOM. Used by church registry birth.
+	 * 
+	 * @param family The family to save
+	 */
+	public void save(Family family) {
+		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
+		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
 
-			writeHeader(fw);
+		gedcomChooser.setFileFilter(ff);
 
-			for (Family family : families) {
-				fw.write(family.toString());
-				LOGGER.log(Level.INFO, family.toString());
+		int returnValue = gedcomChooser.showSaveDialog(null);
+
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File gedcomFile = gedcomChooser.getSelectedFile();
+			String fileName = gedcomFile.getName();
+			if (!fileName.endsWith(".ged")) {
+				gedcomFile = new File(fileName + ".ged");
 			}
+			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
 
-			writeTrailer(fw);
-			fw.close();
-		} catch (final IOException e) {
-			throw new Exception(e);
+			OutputStreamWriter fw = null;
+			try {
+				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+
+				writeHeader(fw);
+
+				fw.write(family.toGedcom(1));
+				LOGGER.log(Level.FINE, family.toString());
+
+				writeChurchRegistryTrailer(fw);
+				fw.close();
+				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-
 	}
 
 	/**
-	 * Save a census table as GEDCOM
+	 * Save a census table as GEDCOM. Used by census analysis.
 	 * 
-	 * @param censusTable
+	 * @param censusTable The census table loaded from a KIP file
 	 */
 	public void save(Table censusTable) {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
@@ -115,7 +143,7 @@ public class GedcomFile {
 					LOGGER.log(Level.FINE, family.toString());
 				}
 
-				writeTrailer(fw);
+				writeCensusTrailer(fw);
 				fw.close();
 				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
 			} catch (Exception e) {
@@ -132,7 +160,9 @@ public class GedcomFile {
 	}
 
 	/**
-	 * @param fw
+	 * Write a GEDCOM header.
+	 * 
+	 * @param fw Filewriter
 	 * @throws IOException
 	 */
 	private void writeHeader(final OutputStreamWriter fw) throws IOException {
@@ -159,10 +189,28 @@ public class GedcomFile {
 	}
 
 	/**
-	 * @param fw
+	 * Write a church registry GEDCOM trailer.
+	 * 
+	 * @param fw File writer
 	 * @throws IOException
 	 */
-	private void writeTrailer(final OutputStreamWriter fw) throws IOException {
+	private void writeChurchRegistryTrailer(final OutputStreamWriter fw) throws IOException {
+		// Source for places
+		fw.write("0 @S1@ SOUR\n");
+		fw.write("1 TITL Kirkebog\n");
+		fw.write("1 AUTH Arkivalier Online\n");
+
+		// Trailer
+		fw.write("0 TRLR\n");
+	}
+
+	/**
+	 * Write a census GEDCOM trailer.
+	 * 
+	 * @param fw File writer
+	 * @throws IOException
+	 */
+	private void writeCensusTrailer(final OutputStreamWriter fw) throws IOException {
 		// Source for places
 		fw.write("0 @S1@ SOUR\n");
 		fw.write("1 TITL DDD Folketællinger. " + "Kildeindtastningsprojektet.\n");

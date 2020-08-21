@@ -11,20 +11,26 @@ import net.myerichsen.vejby.gedcom.Individual;
 
 /**
  * A household as extracted from a census file. This object has no direct
- * correspondence to GEDCOM.
+ * counterpart in GEDCOM.
+ * <p>
+ * The family role structure contains a row for each person in the house hold.
+ * Each row contains one or more family roles, marked in the format:
+ * <ul>
+ * <li>[Fader|Moder|Barn] i familie [family id]</li>
+ * </ul>
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 20. aug. 2020
- *
+ * 
  */
 public class Household {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private List<List<String>> rows;
+	private List<List<String>> familyRoleList;
 	private List<Family> families;
-	private List<Individual> singles;
+//	private List<Individual> singles;
 	private int id;
 	private CensusEvent censusEvent;
-	private List<String> familyRoles;
 
 	/**
 	 * Constructor
@@ -35,8 +41,8 @@ public class Household {
 		super();
 		rows = new ArrayList<>();
 		families = new ArrayList<>();
-		singles = new ArrayList<>();
-		familyRoles = new ArrayList<String>();
+//		singles = new ArrayList<>();
+		familyRoleList = new ArrayList<>();
 		this.id = id;
 	}
 
@@ -119,12 +125,12 @@ public class Household {
 		return rows;
 	}
 
-	/**
-	 * @return the singles
-	 */
-	public List<Individual> getSingles() {
-		return singles;
-	}
+//	/**
+//	 * @return the singles
+//	 */
+//	public List<Individual> getSingles() {
+//		return singles;
+//	}
 
 	/**
 	 * @return Boolean value signalling whether the household has families.
@@ -229,25 +235,33 @@ public class Household {
 		this.rows = rows;
 	}
 
+//	/**
+//	 * @param singles the singles to set
+//	 */
+//	public void setSingles(List<Individual> singles) {
+//		this.singles = singles;
+//	}
+
 	/**
-	 * @param singles the singles to set
+	 * Populate and return a family role list
+	 * 
+	 * @param size Number of persons in the household
+	 * @return the familyRoleList
 	 */
-	public void setSingles(List<Individual> singles) {
-		this.singles = singles;
+	public List<List<String>> getFamilyRoleList(int size) {
+		List<String> personRole;
+		for (int i = 0; i < size; i++) {
+			personRole = new ArrayList<String>();
+			familyRoleList.add(personRole);
+		}
+		return familyRoleList;
 	}
 
 	/**
-	 * @return the familyRoles
+	 * @param familyRoleList the familyRoleList to set
 	 */
-	public List<String> getFamilyRoles() {
-		return familyRoles;
-	}
-
-	/**
-	 * @param familyRoles the familyRoles to set
-	 */
-	public void setFamilyRoles(List<String> familyRoles) {
-		this.familyRoles = familyRoles;
+	public void setFamilyRoleList(List<List<String>> familyRoleList) {
+		this.familyRoleList = familyRoleList;
 	}
 
 	/*

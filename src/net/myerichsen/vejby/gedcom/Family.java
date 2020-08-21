@@ -8,7 +8,7 @@ import java.util.List;
  * census file.
  * 
  * @author Michael Erichsen
- * @version 19. aug. 2020
+ * @version 21. aug. 2020
  *
  */
 public class Family {
@@ -157,8 +157,6 @@ public class Family {
 	 */
 	public String toGedcom(int familyId) {
 		StringBuilder sb = new StringBuilder();
-
-		// FIXME Only creates an individual record for each family
 
 		// Individual tags
 		if (father != null) {

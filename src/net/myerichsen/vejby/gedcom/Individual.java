@@ -296,7 +296,9 @@ public class Individual {
 			sb.append("1 OCCU " + getTrades() + "\n");
 		}
 
-		sb.append(censusEvent.toGedcom());
+		if (censusEvent != null) {
+			sb.append(censusEvent.toGedcom());
+		}
 
 		return sb.toString();
 	}

@@ -34,7 +34,7 @@ import net.myerichsen.vejby.census.Table;
  * census table object, but only populates it with census rows.
  * 
  * @author Michael Erichsen
- * @version 19. aug. 2020
+ * @version 21. aug. 2020
  *
  */
 public class CensusPanel extends JPanel {
@@ -163,10 +163,6 @@ public class CensusPanel extends JPanel {
 
 				// Second line is data
 				String[] ftData = sc.nextLine().split(";");
-				// FIXME for 3873: Exception in thread "AWT-EventQueue-0"
-				// java.lang.StringIndexOutOfBoundsException: String index out
-				// of range: 3
-				// FIXME Same error for D5558 (1860) , but not every time???
 				String ftYear = ftData[index].substring(3);
 				LOGGER.log(Level.INFO, ftYear);
 				int year = Integer.parseInt(ftYear);

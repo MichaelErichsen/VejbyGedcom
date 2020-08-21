@@ -33,9 +33,9 @@ import net.myerichsen.vejby.util.Mapping;
  * structure of households and families and a table of persons in the selected
  * entity.
  * <p>
- * It supports manual changes to the generated family structure.
+ * The panel supports manual changes to the generated family structure.
  * 
- * @version 20. aug. 2020
+ * @version 21. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -53,6 +53,8 @@ public class HouseholdPanel extends JPanel {
 	private JButton updateButton;
 	private Household selectedHousehold;
 	private DefaultMutableTreeNode rootTreeNode;
+	private List<List<String>> familyRoleList;
+	private DefaultTableModel householdTableModel;
 
 	/**
 	 * Create the panel.
@@ -114,10 +116,10 @@ public class HouseholdPanel extends JPanel {
 	protected void defineNewFamily() {
 		Family newFamily = new Family(selectedHousehold.getId(), 1);
 
-		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		householdTableModel = (DefaultTableModel) table.getModel();
 
 		@SuppressWarnings("unchecked")
-		Vector<Vector<String>> dataVector = model.getDataVector();
+		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
 		Vector<String> vector2;
 		Individual ind;
 
@@ -138,19 +140,6 @@ public class HouseholdPanel extends JPanel {
 			}
 		}
 		selectedHousehold.getFamilies().add(newFamily);
-
-		// FIXME After this, both are listed in col 4 as family 1:
-		// 59 Inger Peders Datter Enke Lever af Haandarbeide
-		// 60 Margrethe Svends Dat Ugift hendes Børn Barn i familie 1. Barn i
-		// familie 1.
-		// 61 Peder Svendsen Ugift hendes Børn Barn i familie 1. Barn i familie
-		// 1.
-		// 62 Rasmus Andersen Gift Arbeidsmand Barn i familie 1. Barn i familie
-		// 1.
-		// 63 Sidse Ols Datter Gift hans Kone Barn i familie 1. Barn i familie
-		// 1.
-		// 64 Rasmus Rasmussen Gift deres Søn Barn i familie 1. Barn i familie
-		// 1.
 	}
 
 	/**
@@ -161,7 +150,6 @@ public class HouseholdPanel extends JPanel {
 	 * @return A string listing family number and role therein
 	 */
 	private String listFamiliesForIndividual(int id, List<Family> families) {
-		// FIXME When having two families, both are listed as no. 1
 		StringBuilder sb = new StringBuilder();
 
 		for (net.myerichsen.vejby.gedcom.Family family : families) {
@@ -199,27 +187,26 @@ public class HouseholdPanel extends JPanel {
 		String[] columnNames = new String[] { "Navn", "Køn", "Født", "Rolle" };
 		String[][] data = family.getMembers();
 
-		DefaultTableModel model = new DefaultTableModel(data, columnNames);
-		table.setModel(model);
+		DefaultTableModel familyTableModel = new DefaultTableModel(data, columnNames);
+		table.setModel(familyTableModel);
 	}
 
 	/**
 	 * Populate table with household data. Rows contains families and singles.
-	 * 
+	 * <p>
 	 * If a household is selected in the tree then display all persons in the
-	 * household
-	 * 
-	 * Second last column marks 0-n family roles
-	 * 
+	 * household.
+	 * <p>
+	 * Second last column marks 0-n family roles and can be edited.
+	 * <p>
 	 * Last column contains a combobox to select a new family role. Family is
-	 * created when button is pressed. It is saved by the save button
+	 * created when button is pressed. It is saved using the update button.
 	 * 
 	 * @param id The id of the household
 	 */
 	private void populateHouseholdTable(int id) {
 		List<String> row;
 		int personId;
-//		List<String> familyRoles = selectedHousehold.getFamilyRoles();
 
 		// Enable push buttons
 		defineButton.setEnabled(true);
@@ -227,11 +214,15 @@ public class HouseholdPanel extends JPanel {
 
 		// Get the household from the census table
 		selectedHousehold = censusTable.getHouseholds().get(id);
-		int size = selectedHousehold.getRows().size();
+		List<List<String>> rows = selectedHousehold.getRows();
+		int size = rows.size();
 
 		// Get all families in the household
 		List<Family> families = selectedHousehold.getFamilies();
 		int[] mappingKeys = mapping.getMappingKeys();
+
+		// Get all manually entered family roles in the household
+		familyRoleList = selectedHousehold.getFamilyRoleList(size);
 
 		// Populate table
 		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Rolle i familie",
@@ -240,7 +231,7 @@ public class HouseholdPanel extends JPanel {
 		String fr;
 
 		for (int i = 0; i < size; i++) {
-			row = selectedHousehold.getRows().get(i);
+			row = rows.get(i);
 
 			personId = Integer.parseInt(row.get(mappingKeys[1]));
 
@@ -249,15 +240,21 @@ public class HouseholdPanel extends JPanel {
 			data[i][2] = row.get(mappingKeys[8]);
 			data[i][3] = row.get(mappingKeys[9]);
 
-			fr = listFamiliesForIndividual(personId, families);
-			data[i][4] = fr;
-			selectedHousehold.getFamilyRoles().add(fr);
+			// Use manual entry if existing, otherwise insert rows data i role list
+			if (familyRoleList.get(i).isEmpty()) {
+				fr = listFamiliesForIndividual(personId, families);
+				data[i][4] = fr;
+				familyRoleList.get(i).add(fr);
+			} else {
+				// TODO This does not handle more roles for person yet
+				data[i][4] = familyRoleList.get(i).get(0);
+			}
 
 			data[i][5] = "";
 		}
 
-		DefaultTableModel model = new DefaultTableModel(data, columnNames);
-		table.setModel(model);
+		householdTableModel = new DefaultTableModel(data, columnNames);
+		table.setModel(householdTableModel);
 
 		// Populate combo boxes for cell editors
 		JComboBox<String> currentRoleComboBox = new JComboBox<>();
@@ -360,10 +357,10 @@ public class HouseholdPanel extends JPanel {
 		// Create a new family
 		Family firstFamily = new Family(selectedHousehold.getId(), 1);
 
-		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		householdTableModel = (DefaultTableModel) table.getModel();
 
 		@SuppressWarnings("unchecked")
-		Vector<Vector<String>> dataVector = model.getDataVector();
+		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
 		Vector<String> vector2;
 
 		List<List<String>> rows = selectedHousehold.getRows();
@@ -391,6 +388,10 @@ public class HouseholdPanel extends JPanel {
 			} else {
 				firstFamily.getChildren().add(ind);
 			}
+
+			familyRoleList.get(i).add(newRole);
+			treeModel.reload(rootTreeNode);
+			table.setModel(householdTableModel);
 		}
 
 		selectedHousehold.getFamilies().add(firstFamily);

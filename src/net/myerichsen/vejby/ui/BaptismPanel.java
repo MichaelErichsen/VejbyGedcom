@@ -9,11 +9,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.Date;
-import java.util.prefs.Preferences;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,20 +24,20 @@ import com.toedter.calendar.JDateChooser;
 import net.myerichsen.vejby.gedcom.Family;
 import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
-import net.myerichsen.vejby.util.PrefKey;
+import net.myerichsen.vejby.gedcom.Sex;
 
 /**
  * Data entry panel for church registry baptism entries.
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 17. aug. 2020
  *
  */
 public class BaptismPanel extends JPanel {
 	private static final long serialVersionUID = 2704936588696233694L;
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private JTextField nametextField;
+	private JComboBox<String> sexComboBox;
 	private JTextField fatherNametextField;
 	private JTextField fatherTradetextField;
 	private JTextField fatherAddresstextField;
@@ -46,7 +46,6 @@ public class BaptismPanel extends JPanel {
 	private JDateChooser birthdateChooser;
 	private JDateChooser homeBaptismdateChooser;
 	private JDateChooser baptismdateChooser;
-
 	private JEditorPane godParentseditorPane;
 
 	/**
@@ -55,9 +54,9 @@ public class BaptismPanel extends JPanel {
 	public BaptismPanel() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0, 0 };
-		gridBagLayout.rowHeights = new int[] { 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 0, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, 0.0 };
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0 };
 		setLayout(gridBagLayout);
 
 		JLabel lblFdselsdato = new JLabel("F\u00F8dselsdato");
@@ -97,11 +96,27 @@ public class BaptismPanel extends JPanel {
 		add(nametextField, gbc_nametextField);
 		nametextField.setColumns(10);
 
+		JLabel lblSex = new JLabel("K\u00F8n");
+		GridBagConstraints gbc_lblSex = new GridBagConstraints();
+		gbc_lblSex.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSex.gridx = 0;
+		gbc_lblSex.gridy = 2;
+		add(lblSex, gbc_lblSex);
+
+		sexComboBox = new JComboBox<String>();
+		sexComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Mand", "Kvinde" }));
+		GridBagConstraints gbc_sexComboBox = new GridBagConstraints();
+		gbc_sexComboBox.insets = new Insets(0, 0, 5, 0);
+		gbc_sexComboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sexComboBox.gridx = 1;
+		gbc_sexComboBox.gridy = 2;
+		add(sexComboBox, gbc_sexComboBox);
+
 		JLabel lblHjemmedbsdato = new JLabel("Hjemmed\u00E5bsdato");
 		GridBagConstraints gbc_lblHjemmedbsdato = new GridBagConstraints();
 		gbc_lblHjemmedbsdato.insets = new Insets(0, 0, 5, 5);
 		gbc_lblHjemmedbsdato.gridx = 0;
-		gbc_lblHjemmedbsdato.gridy = 2;
+		gbc_lblHjemmedbsdato.gridy = 3;
 		add(lblHjemmedbsdato, gbc_lblHjemmedbsdato);
 
 		homeBaptismdateChooser = new JDateChooser();
@@ -109,14 +124,14 @@ public class BaptismPanel extends JPanel {
 		gbc_homeBaptismdateChooser.insets = new Insets(0, 0, 5, 0);
 		gbc_homeBaptismdateChooser.fill = GridBagConstraints.BOTH;
 		gbc_homeBaptismdateChooser.gridx = 1;
-		gbc_homeBaptismdateChooser.gridy = 2;
+		gbc_homeBaptismdateChooser.gridy = 3;
 		add(homeBaptismdateChooser, gbc_homeBaptismdateChooser);
 
 		JLabel lblDbsdato = new JLabel("D\u00E5bsdato");
 		GridBagConstraints gbc_lblDbsdato = new GridBagConstraints();
 		gbc_lblDbsdato.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDbsdato.gridx = 0;
-		gbc_lblDbsdato.gridy = 3;
+		gbc_lblDbsdato.gridy = 4;
 		add(lblDbsdato, gbc_lblDbsdato);
 
 		baptismdateChooser = new JDateChooser();
@@ -124,7 +139,7 @@ public class BaptismPanel extends JPanel {
 		gbc_baptismdateChooser.insets = new Insets(0, 0, 5, 0);
 		gbc_baptismdateChooser.fill = GridBagConstraints.BOTH;
 		gbc_baptismdateChooser.gridx = 1;
-		gbc_baptismdateChooser.gridy = 3;
+		gbc_baptismdateChooser.gridy = 4;
 		add(baptismdateChooser, gbc_baptismdateChooser);
 
 		JLabel lblFadersNavn = new JLabel("Faders navn");
@@ -132,7 +147,7 @@ public class BaptismPanel extends JPanel {
 		gbc_lblFadersNavn.anchor = GridBagConstraints.EAST;
 		gbc_lblFadersNavn.insets = new Insets(0, 0, 5, 5);
 		gbc_lblFadersNavn.gridx = 0;
-		gbc_lblFadersNavn.gridy = 4;
+		gbc_lblFadersNavn.gridy = 5;
 		add(lblFadersNavn, gbc_lblFadersNavn);
 
 		fatherNametextField = new JTextField();
@@ -140,7 +155,7 @@ public class BaptismPanel extends JPanel {
 		gbc_fatherNametextField.insets = new Insets(0, 0, 5, 0);
 		gbc_fatherNametextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_fatherNametextField.gridx = 1;
-		gbc_fatherNametextField.gridy = 4;
+		gbc_fatherNametextField.gridy = 5;
 		add(fatherNametextField, gbc_fatherNametextField);
 		fatherNametextField.setColumns(10);
 
@@ -149,7 +164,7 @@ public class BaptismPanel extends JPanel {
 		gbc_lblFadersHndtering.anchor = GridBagConstraints.EAST;
 		gbc_lblFadersHndtering.insets = new Insets(0, 0, 5, 5);
 		gbc_lblFadersHndtering.gridx = 0;
-		gbc_lblFadersHndtering.gridy = 5;
+		gbc_lblFadersHndtering.gridy = 6;
 		add(lblFadersHndtering, gbc_lblFadersHndtering);
 
 		fatherTradetextField = new JTextField();
@@ -157,7 +172,7 @@ public class BaptismPanel extends JPanel {
 		gbc_fatherTradetextField.insets = new Insets(0, 0, 5, 0);
 		gbc_fatherTradetextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_fatherTradetextField.gridx = 1;
-		gbc_fatherTradetextField.gridy = 5;
+		gbc_fatherTradetextField.gridy = 6;
 		add(fatherTradetextField, gbc_fatherTradetextField);
 		fatherTradetextField.setColumns(10);
 
@@ -166,7 +181,7 @@ public class BaptismPanel extends JPanel {
 		gbc_lblFadersBopl.anchor = GridBagConstraints.EAST;
 		gbc_lblFadersBopl.insets = new Insets(0, 0, 5, 5);
 		gbc_lblFadersBopl.gridx = 0;
-		gbc_lblFadersBopl.gridy = 6;
+		gbc_lblFadersBopl.gridy = 7;
 		add(lblFadersBopl, gbc_lblFadersBopl);
 
 		fatherAddresstextField = new JTextField();
@@ -174,7 +189,7 @@ public class BaptismPanel extends JPanel {
 		gbc_fatherAddresstextField.insets = new Insets(0, 0, 5, 0);
 		gbc_fatherAddresstextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_fatherAddresstextField.gridx = 1;
-		gbc_fatherAddresstextField.gridy = 6;
+		gbc_fatherAddresstextField.gridy = 7;
 		add(fatherAddresstextField, gbc_fatherAddresstextField);
 		fatherAddresstextField.setColumns(10);
 
@@ -183,7 +198,7 @@ public class BaptismPanel extends JPanel {
 		gbc_lblModersNavn.anchor = GridBagConstraints.EAST;
 		gbc_lblModersNavn.insets = new Insets(0, 0, 5, 5);
 		gbc_lblModersNavn.gridx = 0;
-		gbc_lblModersNavn.gridy = 7;
+		gbc_lblModersNavn.gridy = 8;
 		add(lblModersNavn, gbc_lblModersNavn);
 
 		motherNametextField = new JTextField();
@@ -191,7 +206,7 @@ public class BaptismPanel extends JPanel {
 		gbc_motherNametextField.insets = new Insets(0, 0, 5, 0);
 		gbc_motherNametextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_motherNametextField.gridx = 1;
-		gbc_motherNametextField.gridy = 7;
+		gbc_motherNametextField.gridy = 8;
 		add(motherNametextField, gbc_motherNametextField);
 		motherNametextField.setColumns(10);
 
@@ -200,7 +215,7 @@ public class BaptismPanel extends JPanel {
 		gbc_lblModersBopl.anchor = GridBagConstraints.EAST;
 		gbc_lblModersBopl.insets = new Insets(0, 0, 5, 5);
 		gbc_lblModersBopl.gridx = 0;
-		gbc_lblModersBopl.gridy = 8;
+		gbc_lblModersBopl.gridy = 9;
 		add(lblModersBopl, gbc_lblModersBopl);
 
 		motherAddresstextField = new JTextField();
@@ -208,7 +223,7 @@ public class BaptismPanel extends JPanel {
 		gbc_motherAddresstextField.insets = new Insets(0, 0, 5, 0);
 		gbc_motherAddresstextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_motherAddresstextField.gridx = 1;
-		gbc_motherAddresstextField.gridy = 8;
+		gbc_motherAddresstextField.gridy = 9;
 		add(motherAddresstextField, gbc_motherAddresstextField);
 		motherAddresstextField.setColumns(10);
 
@@ -216,7 +231,7 @@ public class BaptismPanel extends JPanel {
 		GridBagConstraints gbc_lblFaddere = new GridBagConstraints();
 		gbc_lblFaddere.insets = new Insets(0, 0, 5, 5);
 		gbc_lblFaddere.gridx = 0;
-		gbc_lblFaddere.gridy = 9;
+		gbc_lblFaddere.gridy = 10;
 		add(lblFaddere, gbc_lblFaddere);
 
 		godParentseditorPane = new JEditorPane();
@@ -225,14 +240,14 @@ public class BaptismPanel extends JPanel {
 		gbc_godParentseditorPane.insets = new Insets(0, 0, 5, 0);
 		gbc_godParentseditorPane.fill = GridBagConstraints.BOTH;
 		gbc_godParentseditorPane.gridx = 1;
-		gbc_godParentseditorPane.gridy = 9;
+		gbc_godParentseditorPane.gridy = 10;
 		add(godParentseditorPane, gbc_godParentseditorPane);
 
 		Panel panel = new Panel();
 		GridBagConstraints gbc_panel = new GridBagConstraints();
 		gbc_panel.gridwidth = 2;
 		gbc_panel.gridx = 0;
-		gbc_panel.gridy = 10;
+		gbc_panel.gridy = 11;
 		add(panel, gbc_panel);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		JButton savebutton = new JButton("Gem");
@@ -301,8 +316,8 @@ public class BaptismPanel extends JPanel {
 		family.setMother(mother);
 		family.setChild(child);
 
-		GedcomFile file = GedcomFile.getInstance();
-		file.addFamily(family);
+		GedcomFile gedcomFile = GedcomFile.getInstance();
+		gedcomFile.addFamily(family);
 
 		String string = godParentseditorPane.getText();
 		String[] gpArray = string.split("\n");
@@ -311,20 +326,23 @@ public class BaptismPanel extends JPanel {
 		for (@SuppressWarnings("unused")
 		String s : gpArray) {
 			gp = new Individual(individualId++);
-			// TODO Set name to s
+
+			gp.setName(s);
+			String sSex = (String) sexComboBox.getSelectedItem();
+			if (sSex.startsWith("M")) {
+				gp.setSex(Sex.M);
+			} else {
+				gp.setSex(Sex.F);
+			}
+
 			family = new Family(1, 1);
-			// TODO Check if male or female
 			// TODO Also add room for address for godparent
 			family.setFather(gp);
-			file.addFamily(family);
+			gedcomFile.addFamily(family);
 		}
 
 		try {
-			// TODO Use GedcomFile for output
-			String gedcomFileName = prefs.get(PrefKey.GEDCOMFILENAME, "c:/temp/vejby.ged");
-
-			// FIXME Null pointer exception
-			file.print(new File(gedcomFileName));
+			gedcomFile.save(family);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
