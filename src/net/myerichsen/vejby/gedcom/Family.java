@@ -7,14 +7,16 @@ import java.util.List;
  * Class representing a family in GEDCOM as extracted from a household in a
  * census file.
  * 
- * @author Michael Erichsen
  * @version 21. aug. 2020
- *
+ * @author Michael Erichsen
  */
 public class Family {
 	private Individual father;
 	private Individual mother;
+	// Used by real failies
 	private List<Individual> children = new ArrayList<>();
+	// Used by dummy family 0
+	private List<Individual> singles = new ArrayList<>();
 	private int householdId;
 	private int familyId;
 
@@ -94,6 +96,13 @@ public class Family {
 	}
 
 	/**
+	 * @return the singles
+	 */
+	public List<Individual> getSingles() {
+		return singles;
+	}
+
+	/**
 	 * @return int The size of the family
 	 */
 	public int getSize() {
@@ -150,6 +159,13 @@ public class Family {
 	 */
 	public void setMother(Individual mother) {
 		this.mother = mother;
+	}
+
+	/**
+	 * @param singles the singles to set
+	 */
+	public void setSingles(List<Individual> singles) {
+		this.singles = singles;
 	}
 
 	/**

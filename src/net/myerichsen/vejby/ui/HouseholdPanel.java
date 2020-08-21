@@ -297,8 +297,8 @@ public class HouseholdPanel extends JPanel {
 	 * @param mapping The mapping definition as created in CensusMappingPanel
 	 * @see net.myerichsen.vejby.ui.CensusMappingPanel.Class
 	 */
-	public void populateTree(Mapping mapping) {
-		this.mapping = mapping;
+	public void populateTree() {
+		mapping = Mapping.getInstance();
 		String message;
 		DefaultMutableTreeNode householdNode;
 		DefaultMutableTreeNode familyNode;
@@ -322,7 +322,7 @@ public class HouseholdPanel extends JPanel {
 			// Create a family for each household
 			if (mappingKeys[5] != 0) {
 				for (Household household : censusTable.getHouseholds()) {
-					message = household.identifyFamilies(mappingKeys);
+					message = household.identifyFamilies();
 					LOGGER.log(Level.FINE, message);
 				}
 			}
@@ -365,10 +365,10 @@ public class HouseholdPanel extends JPanel {
 
 		List<List<String>> rows = selectedHousehold.getRows();
 
-		boolean first = true;
-		int[] mappingKeys = mapping.getMappingKeys();
-		String sYear = rows.get(0).get(mappingKeys[12]);
-		int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
+//		boolean first = true;
+//		int[] mappingKeys = mapping.getMappingKeys();
+//		String sYear = rows.get(0).get(mappingKeys[12]);
+//		int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
 
 		for (int i = 0; i < dataVector.size(); i++) {
 			vector2 = dataVector.get(i);
@@ -377,7 +377,7 @@ public class HouseholdPanel extends JPanel {
 
 			row = rows.get(i);
 
-			ind = selectedHousehold.createIndividualFromRow(mappingKeys, first, iYear, firstFamily, row, newRole);
+			ind = selectedHousehold.createIndividual(row);
 
 			LOGGER.log(Level.INFO, "Løbenr. " + vector2.get(0) + ", " + vector2.get(1) + ", " + vector2.get(2) + ", "
 					+ vector2.get(3) + ", " + vector2.get(4) + ", " + vector2.get(5));

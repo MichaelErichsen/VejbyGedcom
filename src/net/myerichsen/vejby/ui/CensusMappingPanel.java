@@ -26,14 +26,13 @@ import net.myerichsen.vejby.util.PrefKey;
 
 /**
  * Panel to map census fields for further analysis. It displays six columns.
- * 
+ * <p>
  * The first one is field number. The second one is populated by the reduced
  * table headers. The third one has choice for each cell with the relevant
  * attributes for each type.
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 20. aug. 2020
- *
  */
 public class CensusMappingPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -73,9 +72,9 @@ public class CensusMappingPanel extends JPanel {
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Mapping mapping = map();
+				map();
 
-				vejbyGedcom.getHouseholdJPanel().populateTree(mapping);
+				vejbyGedcom.getHouseholdJPanel().populateTree();
 
 				JTabbedPane pane = vejbyGedcom.getTabbedPane();
 				pane.setEnabledAt(2, true);
@@ -88,10 +87,9 @@ public class CensusMappingPanel extends JPanel {
 	/**
 	 * Get data from table and save into mapping arrays.
 	 * 
-	 * @return A mapping object
 	 */
-	private Mapping map() {
-		Mapping mapping = new Mapping();
+	private void map() {
+		Mapping mapping = Mapping.getInstance();
 		String value;
 
 		int[] mappingKeys = mapping.getMappingKeys();
@@ -139,7 +137,6 @@ public class CensusMappingPanel extends JPanel {
 		}
 
 		LOGGER.log(Level.INFO, mapping.toString());
-		return mapping;
 	}
 
 	/**

@@ -19,18 +19,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.myerichsen.vejby.census.Table;
 
 /**
- * Class representing a GEDCOM file.
+ * Singleton class representing a GEDCOM file.
  * 
  * @version 21. aug. 2020
  * @author Michael Erichsen
  */
 public class GedcomFile {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
-
-	// static variable single_instance of type Singleton
 	private static GedcomFile single_instance = null;
-	private List<Family> families;
 
 	/**
 	 * Static method to create instance of Singleton class.
@@ -44,6 +40,10 @@ public class GedcomFile {
 
 		return single_instance;
 	}
+
+	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+
+	private List<Family> families;
 
 	/**
 	 * Constructor
@@ -135,12 +135,16 @@ public class GedcomFile {
 				writeHeader(fw);
 
 				int familyId = 1;
+
 				for (Family family : censusTable.getFamilies()) {
-					// FIXME java.lang.NullPointerException at
-					// net.myerichsen.vejby.gedcom.Individual.toGedcom(Individual.java:277)
-					// sb.append(censusEvent.toGedcom());
-					fw.write(family.toGedcom(familyId++));
-					LOGGER.log(Level.FINE, family.toString());
+					if (family.getFamilyId() == 0) {
+						for (Individual person : family.getSingles()) {
+							person.toGedcom();
+						}
+					} else {
+						fw.write(family.toGedcom(familyId++));
+						LOGGER.log(Level.FINE, family.toString());
+					}
 				}
 
 				writeCensusTrailer(fw);
@@ -157,6 +161,38 @@ public class GedcomFile {
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;
+	}
+
+	/**
+	 * Write a census GEDCOM trailer.
+	 * 
+	 * @param fw File writer
+	 * @throws IOException
+	 */
+	private void writeCensusTrailer(final OutputStreamWriter fw) throws IOException {
+		// Source for places
+		fw.write("0 @S1@ SOUR\n");
+		fw.write("1 TITL DDD Folketællinger. " + "Kildeindtastningsprojektet.\n");
+		fw.write("1 AUTH Statens Arkiver\n");
+
+		// Trailer
+		fw.write("0 TRLR\n");
+	}
+
+	/**
+	 * Write a church registry GEDCOM trailer.
+	 * 
+	 * @param fw File writer
+	 * @throws IOException
+	 */
+	private void writeChurchRegistryTrailer(final OutputStreamWriter fw) throws IOException {
+		// Source for places
+		fw.write("0 @S1@ SOUR\n");
+		fw.write("1 TITL Kirkebog\n");
+		fw.write("1 AUTH Arkivalier Online\n");
+
+		// Trailer
+		fw.write("0 TRLR\n");
 	}
 
 	/**
@@ -186,37 +222,5 @@ public class GedcomFile {
 		fw.write("0 @SUB1@ SUBM\n");
 		fw.write("1 NAME Dansk Demografisk Database\n");
 		fw.write("1 ADDR Rigsarkivet, Jernbanegade 36, 5000 Odense C\n");
-	}
-
-	/**
-	 * Write a church registry GEDCOM trailer.
-	 * 
-	 * @param fw File writer
-	 * @throws IOException
-	 */
-	private void writeChurchRegistryTrailer(final OutputStreamWriter fw) throws IOException {
-		// Source for places
-		fw.write("0 @S1@ SOUR\n");
-		fw.write("1 TITL Kirkebog\n");
-		fw.write("1 AUTH Arkivalier Online\n");
-
-		// Trailer
-		fw.write("0 TRLR\n");
-	}
-
-	/**
-	 * Write a census GEDCOM trailer.
-	 * 
-	 * @param fw File writer
-	 * @throws IOException
-	 */
-	private void writeCensusTrailer(final OutputStreamWriter fw) throws IOException {
-		// Source for places
-		fw.write("0 @S1@ SOUR\n");
-		fw.write("1 TITL DDD Folketællinger. " + "Kildeindtastningsprojektet.\n");
-		fw.write("1 AUTH Statens Arkiver\n");
-
-		// Trailer
-		fw.write("0 TRLR\n");
 	}
 }

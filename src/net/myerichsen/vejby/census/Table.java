@@ -15,14 +15,15 @@ import java.util.logging.Logger;
 import net.myerichsen.vejby.gedcom.Family;
 
 /**
- * Implement a census table as loaded from a KIP file
+ * Implement a census table as loaded from a KIP file.
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 16. aug. 2020
- *
  */
 public class Table {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+//	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+
 	private int year;
 	private String kipFileName;
 	private List<String> headers;
@@ -68,6 +69,10 @@ public class Table {
 			if ((!currentHouseholdNumber.equals(newHouseholdNumber))
 					|| (!currentSourceLocation.equals(newSourceLocation))) {
 				currentHousehold = new Household(id++);
+
+				// Split household into families. Family 0 contains singles
+				currentHousehold.identifyFamilies();
+
 				getHouseholds().add(currentHousehold);
 				currentHouseholdNumber = newHouseholdNumber;
 			}
@@ -75,6 +80,11 @@ public class Table {
 			// Add current person to household
 			currentHousehold.getRows().add(currentRow);
 		}
+
+		for (Household household : households) {
+			household.createCensusEvent();
+		}
+
 		return getHouseholds().size() + " husholdninger udskilt";
 	}
 
@@ -96,6 +106,8 @@ public class Table {
 	}
 
 	/**
+	 * Get a family in a household.
+	 * 
 	 * @param householdId
 	 * @param familyId
 	 * @return The family
@@ -122,6 +134,8 @@ public class Table {
 	}
 
 	/**
+	 * Get a household.
+	 * 
 	 * @param id Id of the household
 	 * @return The household
 	 */
@@ -163,7 +177,7 @@ public class Table {
 	}
 
 	/**
-	 * Read a KIP file into the table
+	 * Read a KIP file into the table.
 	 * 
 	 * @param kipFileName
 	 * @return message
@@ -192,7 +206,7 @@ public class Table {
 
 	/**
 	 * Remove all empty columns from both lists by checking each field in each
-	 * column
+	 * column.
 	 * 
 	 * @return message
 	 */
@@ -294,4 +308,22 @@ public class Table {
 		return sb.toString();
 	}
 
+//	/**
+//	 * List all individuals in each household who are not family members.
+//	 * 
+//	 * @return list of person ids
+//	 */
+//	public List<Integer> getSinglesList() {
+//		int idKey = Integer.parseInt(prefs.get(PrefKey.INDIVIDUAL_1, "0"));
+//		// Get role in family
+//		int posKey = Integer.parseInt(prefs.get(PrefKey.INDIVIDUAL_10, "0"));
+//		List<Integer> idList = new ArrayList<>();
+//
+//		for (List<String> list : persons) {
+//			if (list.get(posKey).equals("")) {
+//				idList.add(Integer.parseInt(list.get(idKey)));
+//			}
+//		}
+//		return idList;
+//	}
 }

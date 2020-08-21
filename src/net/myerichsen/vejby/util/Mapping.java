@@ -4,16 +4,38 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Contains mapping pairs between census file, mappingKeyss, census events and
- * birth events.
+ * Singleton class containing census mapping pairs and name stubs.
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 20. aug. 2020
  *
  */
 public class Mapping {
+	private static Mapping single_instance = null;
+
+	/**
+	 * Static method to create instance of Singleton class.
+	 * 
+	 * @return An instance of the class
+	 */
+	public static Mapping getInstance() {
+		if (single_instance == null) {
+			single_instance = new Mapping();
+		}
+
+		return single_instance;
+	}
 	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
 	private List<String> nameStubs = Arrays.asList("Dat", "Datter", "Dat.", "Dtr", "Dr");
+
+	/**
+	 * Constructor
+	 *
+	 */
+	private Mapping() {
+		super();
+	}
 
 	/**
 	 * @return mappingKeys An array of mapping keys

@@ -10,9 +10,8 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
+ * @version 21. aug. 2020
  * @author Michael Erichsen
- * @version 20. aug. 2020
- *
  */
 public class Individual {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -20,7 +19,7 @@ public class Individual {
 	private int id;
 	private String name;
 	private String sex;
-	private String trades;
+	private String trade;
 	private String position;
 	private String address;
 	private String birthDate;
@@ -127,10 +126,10 @@ public class Individual {
 	}
 
 	/**
-	 * @return the trades
+	 * @return the trade
 	 */
-	public String getTrades() {
-		return trades;
+	public String getTrade() {
+		return trade;
 	}
 
 	/**
@@ -226,10 +225,10 @@ public class Individual {
 	}
 
 	/**
-	 * @param trades the trades to set
+	 * @param trade the trade to set
 	 */
-	public void setTrades(String trades) {
-		this.trades = trades;
+	public void setTrade(String trade) {
+		this.trade = trade;
 	}
 
 	/**
@@ -245,7 +244,7 @@ public class Individual {
 	 * @return
 	 */
 	public String toGedcom() {
-		Mapping mapping = new Mapping();
+		Mapping mapping = Mapping.getInstance();
 		final StringBuffer sb = new StringBuffer();
 
 		sb.append("0 @I" + getId() + "@ INDI\n");
@@ -292,8 +291,8 @@ public class Individual {
 
 		}
 
-		if (getTrades() != null) {
-			sb.append("1 OCCU " + getTrades() + "\n");
+		if (getTrade() != null) {
+			sb.append("1 OCCU " + getTrade() + "\n");
 		}
 
 		if (censusEvent != null) {

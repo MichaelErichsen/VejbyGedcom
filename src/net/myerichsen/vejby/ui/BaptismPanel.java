@@ -323,8 +323,7 @@ public class BaptismPanel extends JPanel {
 		String[] gpArray = string.split("\n");
 
 		Individual gp;
-		for (@SuppressWarnings("unused")
-		String s : gpArray) {
+		for (String s : gpArray) {
 			gp = new Individual(individualId++);
 
 			gp.setName(s);
