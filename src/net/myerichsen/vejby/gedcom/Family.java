@@ -73,18 +73,28 @@ public class Family {
 			members[index][2] = father.getBirthDate();
 			members[index++][3] = "Fader";
 		}
+
 		if (mother != null) {
 			members[index][0] = mother.getName();
 			members[index][1] = mother.getSex();
 			members[index][2] = mother.getBirthDate();
 			members[index++][3] = "Moder";
 		}
+
 		for (Individual child : children) {
 			members[index][0] = child.getName();
 			members[index][1] = child.getSex();
 			members[index][2] = child.getBirthDate();
 			members[index++][3] = "Barn";
 		}
+
+		for (Individual single : singles) {
+			members[index][0] = single.getName();
+			members[index][1] = single.getSex();
+			members[index][2] = single.getBirthDate();
+			members[index++][3] = "";
+		}
+
 		return members;
 	}
 
@@ -115,6 +125,7 @@ public class Family {
 			size++;
 		}
 		size += children.size();
+		size += singles.size();
 		return size;
 	}
 
@@ -218,6 +229,9 @@ public class Family {
 	 */
 	@Override
 	public String toString() {
+		if (familyId == 0) {
+			return "Uden for familien";
+		}
 		if (father != null) {
 			return father.toString();
 		}

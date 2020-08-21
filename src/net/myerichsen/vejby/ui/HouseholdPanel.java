@@ -317,7 +317,7 @@ public class HouseholdPanel extends JPanel {
 		// Create households
 		if (mappingKeys[3] != 0) {
 			message = censusTable.createHouseholds(mappingKeys[3]);
-			LOGGER.log(Level.FINE, message);
+			LOGGER.log(Level.INFO, message);
 
 			// Create a family for each household
 			if (mappingKeys[5] != 0) {

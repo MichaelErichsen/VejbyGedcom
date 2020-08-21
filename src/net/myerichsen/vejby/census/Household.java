@@ -81,8 +81,13 @@ public class Household {
 
 		person.setSex(row.get(mappingKeys[5]));
 
-		// Position F, M, B or 0
-		person.setPosition(getFamilyRole(row.get(mappingKeys[10])));
+		// Position (F, M, B or 0)
+		if (mappingKeys[10] > 0) {
+			person.setPosition(getFamilyRole(row.get(mappingKeys[10])));
+		} else {
+			// Trade
+			person.setPosition(getFamilyRole(row.get(mappingKeys[9])));
+		}
 
 		return person;
 	}
@@ -189,8 +194,6 @@ public class Household {
 		Individual person;
 
 		boolean first = true;
-//		createCensusEvent();
-
 		// The first person is the primary person, father or mother according to
 		// sex
 
@@ -227,10 +230,11 @@ public class Household {
 			}
 		}
 
+		families.clear();
 		families.add(family0);
 		families.add(family1);
 
-		return "Familier udskilt";
+		return "Familie udskilt";
 	}
 
 	/**
