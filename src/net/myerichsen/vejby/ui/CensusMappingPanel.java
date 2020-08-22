@@ -28,10 +28,10 @@ import net.myerichsen.vejby.util.PrefKey;
  * Panel to map census fields for further analysis. It displays six columns.
  * <p>
  * The first one is field number. The second one is populated by the reduced
- * table headers. The third one has choice for each cell with the relevant
+ * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
@@ -97,7 +97,10 @@ public class CensusMappingPanel extends JPanel {
 		for (int i = 0; i < mappingTable.getRowCount(); i++) {
 			value = (String) mappingTable.getValueAt(i, 2);
 
-			if (value.equals(PrefKey.INDIVIDUAL_1)) {
+			if (value.equals(PrefKey.INDIVIDUAL_0)) {
+				mappingKeys[0] = i;
+				prefs.putInt(PrefKey.INDIVIDUAL_0, i);
+			} else if (value.equals(PrefKey.INDIVIDUAL_1)) {
 				mappingKeys[1] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_1, i);
 			} else if (value.equals(PrefKey.INDIVIDUAL_2)) {
@@ -197,6 +200,12 @@ public class CensusMappingPanel extends JPanel {
 
 		int maxSize = mappingTable.getModel().getRowCount();
 		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
+
+		row = prefs.getInt(PrefKey.INDIVIDUAL_0, 0);
+		if ((row > 0) && (row < maxSize)) {
+			mappingTable.setValueAt(PrefKey.INDIVIDUAL_0, row, 2);
+			renderer.setRowColor(row, Color.WHITE);
+		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
 		if ((row > 0) && (row < maxSize)) {

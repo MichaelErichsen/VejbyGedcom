@@ -103,8 +103,8 @@ public class BaptismPanel extends JPanel {
 		gbc_lblSex.gridy = 2;
 		add(lblSex, gbc_lblSex);
 
-		sexComboBox = new JComboBox<String>();
-		sexComboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Mand", "Kvinde" }));
+		sexComboBox = new JComboBox<>();
+		sexComboBox.setModel(new DefaultComboBoxModel<>(new String[] { "Mand", "Kvinde" }));
 		GridBagConstraints gbc_sexComboBox = new GridBagConstraints();
 		gbc_sexComboBox.insets = new Insets(0, 0, 5, 0);
 		gbc_sexComboBox.fill = GridBagConstraints.HORIZONTAL;

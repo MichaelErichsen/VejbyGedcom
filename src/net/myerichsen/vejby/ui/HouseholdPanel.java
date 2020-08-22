@@ -33,7 +33,8 @@ import net.myerichsen.vejby.util.Mapping;
  * structure of households and families and a table of persons in the selected
  * entity.
  * <p>
- * The panel supports manual changes to the generated family structure.
+ * The panel supports manual changes to the generated family structure by
+ * definitions of up to three families.
  * 
  * @version 22. aug. 2020
  * @author Michael Erichsen
@@ -42,21 +43,21 @@ import net.myerichsen.vejby.util.Mapping;
 public class HouseholdPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static final long serialVersionUID = -4694127991314617939L;
+
 	private JTable table;
-	private JButton saveButton;
-	private JButton defineButton;
 	private Table censusTable;
 	private JTree tree;
 	private DefaultTreeModel treeModel;
 	private VejbyGedcom vejbyGedcom;
 	private Mapping mapping;
-	private JButton updateButton;
 	private Household selectedHousehold;
 	private DefaultMutableTreeNode rootTreeNode;
 	private List<List<String>> familyRoleList;
 	private DefaultTableModel householdTableModel;
-
-	// TODO Add specific columns for fam 1, 2, and 3
+	private JButton family1Button;
+	private JButton family2Button;
+	private JButton family3Button;
+	private JButton saveButton;
 
 	/**
 	 * Create the panel.
@@ -83,23 +84,33 @@ public class HouseholdPanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		add(buttonPanel, BorderLayout.SOUTH);
 
-		updateButton = new JButton("Opdat\u00E9r f\u00F8rste familie");
-		updateButton.addActionListener(new ActionListener() {
+		family1Button = new JButton("Opdat\u00E9r familie 1");
+		family1Button.setEnabled(false);
+		family1Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				redefineFirstFamily();
 			}
 		});
-		buttonPanel.add(updateButton);
+		buttonPanel.add(family1Button);
 
-		defineButton = new JButton("Defin\u00E9r en ny familie");
-		defineButton.addActionListener(new ActionListener() {
+		family2Button = new JButton("Opdat\u00E9r familie 2");
+		family2Button.setEnabled(false);
+		family2Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				defineNewFamily();
 			}
 		});
-		buttonPanel.add(defineButton);
+		buttonPanel.add(family2Button);
+
+		family3Button = new JButton("Opdat\u00E9r familie 3");
+		family3Button.setEnabled(false);
+		family3Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		buttonPanel.add(family3Button);
 
 		saveButton = new JButton("Gem som GEDCOM");
 		saveButton.addActionListener(new ActionListener() {
@@ -110,38 +121,6 @@ public class HouseholdPanel extends JPanel {
 			}
 		});
 		buttonPanel.add(saveButton);
-	}
-
-	/**
-	 * Define a new family.
-	 */
-	protected void defineNewFamily() {
-		Family newFamily = new Family(selectedHousehold.getId(), 1);
-
-		householdTableModel = (DefaultTableModel) table.getModel();
-
-		@SuppressWarnings("unchecked")
-		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
-		Vector<String> vector2;
-		Individual ind;
-
-		for (int i = 0; i < dataVector.size(); i++) {
-			vector2 = dataVector.get(i);
-			String newRole = vector2.get(4);
-			LOGGER.log(Level.FINE, "New role " + i + ": " + newRole);
-
-			ind = new Individual(Integer.parseInt(vector2.get(0)));
-			LOGGER.log(Level.INFO, "Løbenr. " + vector2.get(0) + ", " + vector2.get(1) + ", " + vector2.get(2) + ", "
-					+ vector2.get(3) + ", " + vector2.get(4) + ", " + vector2.get(5));
-			if (newRole.startsWith("F")) {
-				newFamily.setFather(ind);
-			} else if (newRole.startsWith("M")) {
-				newFamily.setMother(ind);
-			} else {
-				newFamily.getChildren().add(ind);
-			}
-		}
-		selectedHousehold.getFamilies().add(newFamily);
 	}
 
 	/**
@@ -156,17 +135,17 @@ public class HouseholdPanel extends JPanel {
 
 		for (net.myerichsen.vejby.gedcom.Family family : families) {
 			if ((family.getFather() != null) && (family.getFather().getId() == id)) {
-				sb.append("Fader i familie " + family.getFamilyId() + ". ");
+				sb.append("Fader");
 				return sb.toString();
 
 			} else if ((family.getMother() != null) && (family.getMother().getId() == id)) {
-				sb.append("Moder i familie " + family.getFamilyId() + ". ");
+				sb.append("Moder");
 				return sb.toString();
 
 			} else {
 				for (Individual child : family.getChildren()) {
 					if (child.getId() == id) {
-						sb.append("Barn i familie " + family.getFamilyId() + ". ");
+						sb.append("Barn");
 						return sb.toString();
 					}
 				}
@@ -182,8 +161,6 @@ public class HouseholdPanel extends JPanel {
 	 * @param familyId    The id of the family in the household
 	 */
 	private void populateFamilyTable(int householdId, int familyId) {
-		defineButton.setEnabled(true);
-		saveButton.setEnabled(true);
 		Family family = censusTable.getFamily(householdId, familyId);
 
 		String[] columnNames = new String[] { "Navn", "Køn", "Født", "Rolle" };
@@ -199,20 +176,15 @@ public class HouseholdPanel extends JPanel {
 	 * If a household is selected in the tree then display all persons in the
 	 * household.
 	 * <p>
-	 * Second last column marks 0-n family roles and can be edited.
-	 * <p>
-	 * Last column contains a combobox to select a new family role. Family is
-	 * created when button is pressed. It is saved using the update button.
+	 * Next columns marks up to three family roles and can be edited. Each contains
+	 * a combobox to select a new family role. A second and a third Family is
+	 * created when button is pressed.
 	 * 
 	 * @param id The id of the household
 	 */
 	private void populateHouseholdTable(int id) {
 		List<String> row;
 		int personId;
-
-		// Enable push buttons
-		defineButton.setEnabled(true);
-		saveButton.setEnabled(true);
 
 		// Get the household from the census table
 		selectedHousehold = censusTable.getHouseholds().get(id);
@@ -227,8 +199,8 @@ public class HouseholdPanel extends JPanel {
 		familyRoleList = selectedHousehold.getFamilyRoleList(size);
 
 		// Populate table
-		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Rolle i familie",
-				"Ny rolle" };
+		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Familie 1", "Familie 2",
+				"Familie 3" };
 		String[][] data = new String[size][columnNames.length];
 		String fr;
 
@@ -242,13 +214,12 @@ public class HouseholdPanel extends JPanel {
 			data[i][2] = row.get(mappingKeys[8]);
 			data[i][3] = row.get(mappingKeys[9]);
 
-			// Use manual entry if existing, otherwise insert rows data i role list
+			// Use manual entry if existing, otherwise insert rows data in family 1 column
 			if (familyRoleList.get(i).isEmpty()) {
 				fr = listFamiliesForIndividual(personId, families);
 				data[i][4] = fr;
 				familyRoleList.get(i).add(fr);
 			} else {
-				// TODO This does not handle more roles for person yet
 				data[i][4] = familyRoleList.get(i).get(0);
 			}
 
@@ -259,19 +230,14 @@ public class HouseholdPanel extends JPanel {
 		table.setModel(householdTableModel);
 
 		// Populate combo boxes for cell editors
-		JComboBox<String> currentRoleComboBox = new JComboBox<>();
-		currentRoleComboBox.addItem("");
-		currentRoleComboBox.addItem("Fader i familie 1. ");
-		currentRoleComboBox.addItem("Moder i familie 1. ");
-		currentRoleComboBox.addItem("Barn i familie 1. ");
-		table.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(currentRoleComboBox));
-
-		JComboBox<String> newRoleComboBox = new JComboBox<>();
-		newRoleComboBox.addItem("");
-		newRoleComboBox.addItem("Fader");
-		newRoleComboBox.addItem("Moder");
-		newRoleComboBox.addItem("Barn");
-		table.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(newRoleComboBox));
+		JComboBox<String> familyRoleComboBox = new JComboBox<>();
+		familyRoleComboBox.addItem("");
+		familyRoleComboBox.addItem("Fader");
+		familyRoleComboBox.addItem("Moder");
+		familyRoleComboBox.addItem("Barn");
+		table.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
+		table.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
+		table.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 	}
 
 	/**
@@ -290,6 +256,10 @@ public class HouseholdPanel extends JPanel {
 		} else if (userObject instanceof Family) {
 			populateFamilyTable(((Family) userObject).getHouseholdId(), ((Family) userObject).getFamilyId());
 		}
+
+		family1Button.setEnabled(true);
+		family2Button.setEnabled(true);
+		family3Button.setEnabled(true);
 	}
 
 	/**
@@ -366,11 +336,6 @@ public class HouseholdPanel extends JPanel {
 		Vector<String> vector2;
 
 		List<List<String>> rows = selectedHousehold.getRows();
-
-//		boolean first = true;
-//		int[] mappingKeys = mapping.getMappingKeys();
-//		String sYear = rows.get(0).get(mappingKeys[12]);
-//		int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
 
 		for (int i = 0; i < dataVector.size(); i++) {
 			vector2 = dataVector.get(i);

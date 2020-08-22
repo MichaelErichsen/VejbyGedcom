@@ -142,7 +142,7 @@ public class Household {
 	public List<List<String>> getFamilyRoleList(int size) {
 		List<String> personRole;
 		for (int i = 0; i < size; i++) {
-			personRole = new ArrayList<String>();
+			personRole = new ArrayList<>();
 			familyRoleList.add(personRole);
 		}
 		return familyRoleList;

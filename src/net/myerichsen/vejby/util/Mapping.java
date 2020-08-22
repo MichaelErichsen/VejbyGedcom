@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Singleton class containing census mapping pairs and name stubs.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  *
  */
@@ -25,6 +25,7 @@ public class Mapping {
 
 		return single_instance;
 	}
+
 	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	private List<String> nameStubs = Arrays.asList("Dat", "Datter", "Dat.", "Dtr", "Dr");
@@ -50,20 +51,6 @@ public class Mapping {
 	public List<String> getNameStubs() {
 		return nameStubs;
 	}
-
-//	/**
-//	 * @return the othersMap
-//	 */
-//	public List<String> getOthersMap() {
-//		return othersMap;
-//	}
-//
-//	/**
-//	 * @return the wifeMap
-//	 */
-//	public List<String> getWifeMap() {
-//		return wifeMap;
-//	}
 
 	/*
 	 * (non-Javadoc)

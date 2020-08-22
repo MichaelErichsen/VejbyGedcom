@@ -25,23 +25,20 @@ public class Table {
 //	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private int year;
-	private String kipFileName;
+//	private String kipFileName;
 	private List<String> headers;
 	private List<List<String>> persons;
 	private List<Household> households;
-
-	// TODO Make singleton
 
 	/**
 	 * Constructor
 	 * 
 	 * @param year
-	 * @param kipFileName
 	 */
-	public Table(int year, String kipFileName) {
+	public Table(int year) {
 		super();
 		this.year = year;
-		this.kipFileName = kipFileName;
+//		this.kipFileName = kipFileName;
 		persons = new ArrayList<>();
 	}
 
@@ -157,12 +154,12 @@ public class Table {
 		return households;
 	}
 
-	/**
-	 * @return the kipFileName
-	 */
-	public String getKipFileName() {
-		return kipFileName;
-	}
+//	/**
+//	 * @return the kipFileName
+//	 */
+//	public String getKipFileName() {
+//		return kipFileName;
+//	}
 
 	/**
 	 * @return the fields
@@ -181,12 +178,13 @@ public class Table {
 	/**
 	 * Read a KIP file into the table.
 	 * 
-	 * @param kipFileName
+	 * @param kipFile
 	 * @return message
 	 */
-	public String readKipfile() {
+	public String readKipfile(File kipFile) {
+
 		try {
-			FileInputStream fis = new FileInputStream(new File(kipFileName));
+			FileInputStream fis = new FileInputStream(kipFile);
 			Scanner sc = new Scanner(fis);
 			String headerLine = sc.nextLine();
 			headers = new LinkedList<>(Arrays.asList(headerLine.split(";")));
@@ -197,11 +195,11 @@ public class Table {
 			}
 			sc.close();
 			fis.close();
-			return "Filen " + kipFileName + " er indlæst";
+			return "Filen " + kipFile + " er indlæst";
 		} catch (FileNotFoundException e) {
-			return "Filen " + kipFileName + " kunne ikke findes";
+			return "Filen " + kipFile + " kunne ikke findes";
 		} catch (IOException e) {
-			return "Filen " + kipFileName + " kunne ikke læses";
+			return "Filen " + kipFile + " kunne ikke læses";
 		}
 
 	}
@@ -265,12 +263,12 @@ public class Table {
 		this.households = households;
 	}
 
-	/**
-	 * @param kipFileName the kipFileName to set
-	 */
-	public void setKipFileName(String kipFileName) {
-		this.kipFileName = kipFileName;
-	}
+//	/**
+//	 * @param kipFileName the kipFileName to set
+//	 */
+//	public void setKipFileName(String kipFileName) {
+//		this.kipFileName = kipFileName;
+//	}
 
 	/**
 	 * @param fields the fields to set
