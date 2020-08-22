@@ -35,7 +35,7 @@ import net.myerichsen.vejby.util.Mapping;
  * <p>
  * The panel supports manual changes to the generated family structure.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -55,6 +55,8 @@ public class HouseholdPanel extends JPanel {
 	private DefaultMutableTreeNode rootTreeNode;
 	private List<List<String>> familyRoleList;
 	private DefaultTableModel householdTableModel;
+
+	// TODO Add specific columns for fam 1, 2, and 3
 
 	/**
 	 * Create the panel.

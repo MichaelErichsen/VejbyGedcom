@@ -17,7 +17,7 @@ import net.myerichsen.vejby.gedcom.Family;
 /**
  * Implement a census table as loaded from a KIP file.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  */
 public class Table {
@@ -29,6 +29,8 @@ public class Table {
 	private List<String> headers;
 	private List<List<String>> persons;
 	private List<Household> households;
+
+	// TODO Make singleton
 
 	/**
 	 * Constructor

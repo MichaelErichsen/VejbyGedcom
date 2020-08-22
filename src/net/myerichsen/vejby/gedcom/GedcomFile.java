@@ -21,7 +21,7 @@ import net.myerichsen.vejby.census.Table;
 /**
  * Singleton class representing a GEDCOM file.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  */
 public class GedcomFile {
@@ -139,7 +139,8 @@ public class GedcomFile {
 				for (Family family : censusTable.getFamilies()) {
 					if (family.getFamilyId() == 0) {
 						for (Individual person : family.getSingles()) {
-							person.toGedcom();
+							fw.write(person.toGedcom());
+							LOGGER.log(Level.FINE, person.toString());
 						}
 					} else {
 						fw.write(family.toGedcom(familyId++));
