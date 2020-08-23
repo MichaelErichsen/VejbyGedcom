@@ -69,45 +69,6 @@ public class GedcomFile {
 	}
 
 	/**
-	 * Save a family as GEDCOM. Used by church registry birth.
-	 * 
-	 * @param family The family to save
-	 */
-	public void save(Family family) {
-		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
-		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
-
-		gedcomChooser.setFileFilter(ff);
-
-		int returnValue = gedcomChooser.showSaveDialog(null);
-
-		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File gedcomFile = gedcomChooser.getSelectedFile();
-			String fileName = gedcomFile.getName();
-			if (!fileName.endsWith(".ged")) {
-				gedcomFile = new File(fileName + ".ged");
-			}
-			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
-
-			OutputStreamWriter fw = null;
-			try {
-				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
-
-				writeHeader(fw);
-
-				fw.write(family.toGedcom(1));
-				LOGGER.log(Level.FINE, family.toString());
-
-				writeChurchRegistryTrailer(fw);
-				fw.close();
-				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
 	 * Save a census table as GEDCOM. Used by census analysis.
 	 * 
 	 * @param censusTable The census table loaded from a KIP file
@@ -149,6 +110,45 @@ public class GedcomFile {
 				}
 
 				writeCensusTrailer(fw);
+				fw.close();
+				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Save a family as GEDCOM. Used by church registry birth.
+	 * 
+	 * @param family The family to save
+	 */
+	public void save(Family family) {
+		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
+		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+
+		gedcomChooser.setFileFilter(ff);
+
+		int returnValue = gedcomChooser.showSaveDialog(null);
+
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			File gedcomFile = gedcomChooser.getSelectedFile();
+			String fileName = gedcomFile.getName();
+			if (!fileName.endsWith(".ged")) {
+				gedcomFile = new File(fileName + ".ged");
+			}
+			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
+
+			OutputStreamWriter fw = null;
+			try {
+				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+
+				writeHeader(fw);
+
+				fw.write(family.toGedcom(1));
+				LOGGER.log(Level.FINE, family.toString());
+
+				writeChurchRegistryTrailer(fw);
 				fw.close();
 				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
 			} catch (Exception e) {

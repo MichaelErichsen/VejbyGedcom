@@ -148,13 +148,11 @@ public class HouseholdPanel extends JPanel {
 	 * <p>
 	 * Next columns marks up to three family roles and can be edited. Each contains
 	 * a combobox to select a new family role. A second and a third Family is
-	 * created when button is pressed.
+	 * created, when button is pressed.
 	 * 
 	 * @param id The id of the household
 	 */
 	private void populateHouseholdTable(int id) {
-// FIXME family role overwritten, when called second time
-		int size;
 		Individual person;
 
 		selectedHousehold = censusTable.getHouseholds().get(id);
@@ -162,18 +160,12 @@ public class HouseholdPanel extends JPanel {
 		// Create table
 		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Familie 1", "Familie 2",
 				"Familie 3" };
-		size = selectedHousehold.getMemberCount();
+		int size = selectedHousehold.getPersonCount();
 		String[][] data = new String[size][columnNames.length];
 
 		for (int i = 0; i < size; i++) {
-			// FIXME Null pointer exception after update of family 1
 			person = selectedHousehold.getPerson(i);
 			data[i][0] = String.valueOf(person.getId());
-
-			if (person.getId() == 63) {
-				LOGGER.log(Level.INFO, "Person " + person.getId());
-			}
-
 			data[i][1] = person.getName();
 			data[i][2] = person.getMaritalStatus();
 			data[i][3] = person.getTrade();
@@ -256,41 +248,39 @@ public class HouseholdPanel extends JPanel {
 	 * Update the singles list (family 0) and the first family.
 	 */
 	private void updateFamily1() {
-		Individual ind;
+		Individual individual;
 
-		Family family0 = selectedHousehold.getFamilies().get(0);
-		Family family1 = selectedHousehold.getFamilies().get(1);
+		selectedHousehold.getFamilies().clear();
+
+//		Family family0 = selectedHousehold.getFamilies().get(0);
+//		Family family1 = selectedHousehold.getFamilies().get(1);
+
+		Family family0 = new Family(selectedHousehold.getId(), 0);
+		Family family1 = new Family(selectedHousehold.getId(), 1);
 
 		@SuppressWarnings("unchecked")
 		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
-		// For each person in the household
 		for (int i = 0; i < dataVector.size(); i++) {
 			tableRowVector = dataVector.get(i);
 
-			ind = new Individual(Integer.parseInt(tableRowVector.get(0)));
-			LOGGER.log(Level.INFO, "Individual " + ind.getId());
+			individual = selectedHousehold.getPerson(i);
 
+			// Set new role
 			String newRole = tableRowVector.get(4);
-			ind.setPosition(newRole);
-			ind.setFamilyRole1(newRole);
-
-			LOGGER.log(Level.INFO,
-					"Løbenr. " + tableRowVector.get(0) + ", " + tableRowVector.get(1) + ", " + tableRowVector.get(2)
-							+ ", " + tableRowVector.get(3) + ", " + tableRowVector.get(4) + ", "
-							+ tableRowVector.get(5));
 
 			if (newRole.startsWith("F")) {
-				family1.setFather(ind);
+				family1.setFather(individual);
 			} else if (newRole.startsWith("M")) {
-				family1.setMother(ind);
+				family1.setMother(individual);
 			} else if (newRole.startsWith("B")) {
-				family1.getChildren().add(ind);
+				family1.getChildren().add(individual);
 			} else {
-				family0.getSingles().add(ind);
+				family0.getSingles().add(individual);
 			}
 
+			individual.setFamilyRole1(newRole);
 		}
 
 		selectedHousehold.getFamilies().add(family0);

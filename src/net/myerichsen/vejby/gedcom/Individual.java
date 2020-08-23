@@ -1,6 +1,5 @@
 package net.myerichsen.vejby.gedcom;
 
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,23 +16,23 @@ public class Individual {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 	private int id;
-	private String name;
-	private String sex;
-	private String trade;
-	private String position;
-	private String address;
-	private String birthDate;
-	private Date deathDate;
-	private String birthPlace;
-	private String deathPlace;
+	private String name = "";
+	private String sex = "";
+	private String trade = "";
+	private String position = "";
+	private String address = "";
+	private String birthDate = "";
+	private String deathDate = "";
+	private String birthPlace = "";
+	private String deathPlace = "";
+	private String place = "";
+	private String maritalStatus = "";
+	private String familyRole1 = "";
+	private String familyRole2 = "";
+	private String familyRole3 = "";
 	private int year;
-	private String place;
 	private Household household;
 	private CensusEvent censusEvent;
-	private String maritalStatus;
-	private String familyRole1 = "";
-	private String familyRole2 = "";;
-	private String familyRole3 = "";;
 
 	/**
 	 * Constructor
@@ -76,7 +75,7 @@ public class Individual {
 	/**
 	 * @return the deathDate
 	 */
-	public Date getDeathDate() {
+	public String getDeathDate() {
 		return deathDate;
 	}
 
@@ -203,7 +202,7 @@ public class Individual {
 	/**
 	 * @param deathDate the deathDate to set
 	 */
-	public void setDeathDate(Date deathDate) {
+	public void setDeathDate(String deathDate) {
 		this.deathDate = deathDate;
 	}
 

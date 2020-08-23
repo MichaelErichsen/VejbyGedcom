@@ -134,6 +134,33 @@ public class Family {
 	}
 
 	/**
+	 * Remove an indvidual from a family
+	 * 
+	 * @param individual The individual to be removed
+	 */
+	public void removeIndividual(Individual individual) {
+		if ((getFather() != null) && getFather().equals(individual)) {
+			setFather(null);
+		}
+
+		if ((getMother() != null) && getMother().equals(individual)) {
+			setMother(null);
+		}
+
+		for (Individual child : children) {
+			if (child.equals(individual)) {
+				children.remove(individual);
+			}
+		}
+
+		for (Individual single : singles) {
+			if (single.equals(individual)) {
+				singles.remove(individual);
+			}
+		}
+	}
+
+	/**
 	 * @param child
 	 */
 	public void setChild(Individual child) {

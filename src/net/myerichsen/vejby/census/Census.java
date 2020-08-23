@@ -25,11 +25,6 @@ public class Census {
 //	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 	private static Census single_instance = null;
 
-	private int year;
-	private List<String> headers;
-	private List<List<String>> persons;
-	private List<Household> households;
-
 	/**
 	 * Static method to create instance of Singleton class.
 	 * 
@@ -42,6 +37,12 @@ public class Census {
 
 		return single_instance;
 	}
+
+	private int year;
+	private List<String> headers;
+	private List<List<String>> persons;
+
+	private List<Household> households;
 
 	/**
 	 * Constructor
