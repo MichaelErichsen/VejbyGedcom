@@ -7,7 +7,7 @@ import java.util.List;
  * Class representing a family in GEDCOM as extracted from a household in a
  * census file.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  */
 public class Family {
@@ -19,6 +19,7 @@ public class Family {
 	private List<Individual> singles = new ArrayList<>();
 	private int householdId;
 	private int familyId;
+	private boolean edited = false;
 
 	/**
 	 * Constructor
@@ -241,5 +242,21 @@ public class Family {
 		}
 
 		return "";
+	}
+
+	/**
+	 * Has this family been manually edited?
+	 * 
+	 * @return the edited
+	 */
+	public boolean isEdited() {
+		return edited;
+	}
+
+	/**
+	 * @param edited the edited to set
+	 */
+	public void setEdited(boolean edited) {
+		this.edited = edited;
 	}
 }

@@ -27,7 +27,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-import net.myerichsen.vejby.census.Table;
+import net.myerichsen.vejby.census.Census;
 
 /**
  * This panel displays a census table as loaded from a KIP file. It creates a
@@ -44,7 +44,7 @@ public class CensusPanel extends JPanel {
 
 	private JTable censusJtable;
 	private JButton btnMapningAfFelter;
-	private Table censusTable;
+	private Census censusTable;
 	private JButton btnbenKipFil;
 	private DefaultTableModel censusModel;
 
@@ -115,7 +115,7 @@ public class CensusPanel extends JPanel {
 	/**
 	 * @return the censusTable
 	 */
-	public Table getCensusTable() {
+	public Census getCensusTable() {
 		return censusTable;
 	}
 
@@ -128,10 +128,7 @@ public class CensusPanel extends JPanel {
 		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
 		String kipFileName = prefs.get("KIPFILENAME", ".");
 
-		// FIXME Reads previous file, even though another selected. But works the second
-		// time
 		JFileChooser kipChooser = new JFileChooser(kipFileName);
-
 		kipChooser.setFileFilter(ff);
 
 		int returnValue = kipChooser.showOpenDialog(null);
@@ -167,7 +164,7 @@ public class CensusPanel extends JPanel {
 				LOGGER.log(Level.INFO, ftYear);
 				int year = Integer.parseInt(ftYear);
 				String message;
-				setCensusTable(new Table(year));
+				setCensusTable(new Census(year));
 				message = getCensusTable().readKipfile(kipFile);
 				LOGGER.log(Level.INFO, message);
 				message = getCensusTable().removeEmptyColumns();
@@ -216,7 +213,7 @@ public class CensusPanel extends JPanel {
 	/**
 	 * @param censusTable the censusTable to set
 	 */
-	public void setCensusTable(Table censusTable) {
+	public void setCensusTable(Census censusTable) {
 		this.censusTable = censusTable;
 	}
 

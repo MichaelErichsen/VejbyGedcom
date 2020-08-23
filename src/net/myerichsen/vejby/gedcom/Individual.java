@@ -10,7 +10,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 21. aug. 2020
+ * @version 22. aug. 2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -30,6 +30,7 @@ public class Individual {
 	private String place;
 	private Household household;
 	private CensusEvent censusEvent;
+	private String maritalStatus;
 
 	/**
 	 * Constructor
@@ -310,6 +311,20 @@ public class Individual {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	/**
+	 * @return the maritalStatus
+	 */
+	public String getMaritalStatus() {
+		return maritalStatus;
+	}
+
+	/**
+	 * @param maritalStatus the maritalStatus to set
+	 */
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
 	}
 
 }

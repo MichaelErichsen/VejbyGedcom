@@ -16,7 +16,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import net.myerichsen.vejby.census.Table;
+import net.myerichsen.vejby.census.Census;
 
 /**
  * Singleton class representing a GEDCOM file.
@@ -112,7 +112,7 @@ public class GedcomFile {
 	 * 
 	 * @param censusTable The census table loaded from a KIP file
 	 */
-	public void save(Table censusTable) {
+	public void save(Census censusTable) {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
 		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
 

@@ -12,16 +12,16 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 21. aug. 2020
+ * @version 23. aug. 2020
  * @author Michael Erichsen
  * 
  */
 public class Household {
 //	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private List<List<String>> rows;
-	private List<List<String>> familyRoleList;
 	private List<Family> families;
 	private List<Individual> singles;
+	private List<Individual> persons;
 	private int id;
 	private CensusEvent censusEvent;
 	private int[] mappingKeys;
@@ -36,7 +36,7 @@ public class Household {
 		super();
 		rows = new ArrayList<>();
 		families = new ArrayList<>();
-		familyRoleList = new ArrayList<>();
+		setPersons(new ArrayList<Individual>());
 		this.id = id;
 		mappingKeys = Mapping.getInstance().getMappingKeys();
 	}
@@ -100,52 +100,35 @@ public class Household {
 	}
 
 	/**
-	 * Get the role of the person in the family
+	 * Get the role of the person in the family from contents of the trade field
 	 * 
-	 * @param position
-	 * @return F, M, B or 0 flag
+	 * @param trade
+	 * @return Position string
 	 */
-	private String getFamilyRole(String position) {
-		position = position.toLowerCase();
+	private String getFamilyRole(String trade) {
+		trade = trade.toLowerCase();
 
-		if ((position.contains("broder")) || (position.contains("broderdatter")) || (position.contains("brodersøn"))
-				|| (position.contains("brødre")) || (position.contains("datterdatter"))
-				|| (position.contains("forældre")) || (position.contains("manden")) || (position.contains("moder"))
-				|| (position.contains("pleiebarn")) || (position.contains("pleiebørn"))
-				|| (position.contains("pleiedatter")) || (position.contains("pleiesøn"))
-				|| (position.contains("sønnesøn")) || (position.contains("søster"))
-				|| (position.contains("søsterdatter")) || (position.contains("stedfader"))
-				|| (position.contains("svigerfader")) || (position.contains("svigerfar"))
-				|| (position.contains("svigerforældre")) || (position.contains("svigermoder"))
-				|| (position.contains("svigersøn"))) {
-			return "0";
+		if ((trade.contains("broder")) || (trade.contains("broderdatter")) || (trade.contains("brodersøn"))
+				|| (trade.contains("brødre")) || (trade.contains("datterdatter")) || (trade.contains("forældre"))
+				|| (trade.contains("manden")) || (trade.contains("moder")) || (trade.contains("pleiebarn"))
+				|| (trade.contains("pleiebørn")) || (trade.contains("pleiedatter")) || (trade.contains("pleiesøn"))
+				|| (trade.contains("sønnesøn")) || (trade.contains("søster")) || (trade.contains("søsterdatter"))
+				|| (trade.contains("stedfader")) || (trade.contains("svigerfader")) || (trade.contains("svigerfar"))
+				|| (trade.contains("svigerforældre")) || (trade.contains("svigermoder"))
+				|| (trade.contains("svigersøn"))) {
+			return "";
 		}
 
-		if ((position.contains("husmoder")) || (position.contains("hustru")) || (position.contains("kone"))) {
-			return "M";
+		if ((trade.contains("husmoder")) || (trade.contains("hustru")) || (trade.contains("kone"))) {
+			return "Moder";
 		}
 
-		if ((position.contains("barn")) || (position.contains("børn")) || (position.contains("datter"))
-				|| (position.contains("søn"))) {
-			return "B";
+		if ((trade.contains("barn")) || (trade.contains("børn")) || (trade.contains("datter"))
+				|| (trade.contains("søn"))) {
+			return "Barn";
 		}
 
-		return "0";
-	}
-
-	/**
-	 * Populate and return a family role list
-	 * 
-	 * @param size Number of persons in the household
-	 * @return the familyRoleList
-	 */
-	public List<List<String>> getFamilyRoleList(int size) {
-		List<String> personRole;
-		for (int i = 0; i < size; i++) {
-			personRole = new ArrayList<>();
-			familyRoleList.add(personRole);
-		}
-		return familyRoleList;
+		return "";
 	}
 
 	/**
@@ -217,17 +200,19 @@ public class Household {
 				first = false;
 
 			} else {
-				if (person.getPosition().equals("M")) {
-					person.setPosition("Moder");
+				if (person.getPosition().equals("Moder")) {
+//					person.setPosition("Moder");
 					family1.setMother(person);
-				} else if (person.getPosition().equals("B")) {
-					person.setPosition("Barn");
+				} else if (person.getPosition().equals("Barn")) {
+//					person.setPosition("Barn");
 					family1.getChildren().add(person);
-				} else if (person.getPosition().equals("0")) {
-					person.setPosition("");
+				} else if (person.getPosition().equals("")) {
+//					person.setPosition("");
 					family0.getSingles().add(person);
 				}
 			}
+
+			getPersons().add(person);
 		}
 
 		families.clear();
@@ -242,13 +227,6 @@ public class Household {
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;
-	}
-
-	/**
-	 * @param familyRoleList the familyRoleList to set
-	 */
-	public void setFamilyRoleList(List<List<String>> familyRoleList) {
-		this.familyRoleList = familyRoleList;
 	}
 
 	/**
@@ -280,5 +258,46 @@ public class Household {
 	@Override
 	public String toString() {
 		return getRows().get(0).get(2) + " " + getRows().get(0).get(3);
+	}
+
+	/**
+	 * Get the number of persons in this household
+	 * 
+	 * @return Member count
+	 */
+	public int getMemberCount() {
+		int size = 0;
+
+		if (hasFamilies()) {
+			for (Family family : families) {
+				size += family.getSize();
+			}
+		} else {
+			size = getRows().size();
+		}
+
+		return size;
+	}
+
+	/**
+	 * @param i
+	 * @return
+	 */
+	public Individual getPerson(int i) {
+		return persons.get(i);
+	}
+
+	/**
+	 * @return the persons
+	 */
+	public List<Individual> getPersons() {
+		return persons;
+	}
+
+	/**
+	 * @param persons the persons to set
+	 */
+	public void setPersons(List<Individual> persons) {
+		this.persons = persons;
 	}
 }

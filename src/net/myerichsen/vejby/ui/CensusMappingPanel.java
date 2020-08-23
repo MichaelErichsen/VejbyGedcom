@@ -14,12 +14,16 @@ import java.util.prefs.Preferences;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import net.myerichsen.vejby.census.Census;
+import net.myerichsen.vejby.census.Household;
 import net.myerichsen.vejby.util.CustomTableCellRenderer;
 import net.myerichsen.vejby.util.Mapping;
 import net.myerichsen.vejby.util.PrefKey;
@@ -31,7 +35,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 22. aug. 2020
+ * @version 23. aug. 2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
@@ -39,9 +43,14 @@ public class CensusMappingPanel extends JPanel {
 	private static final long serialVersionUID = -2181211331271971240L;
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
+	private Mapping mapping;
+	private int[] mappingKeys;
+//	private Census censusTable;
+
 	private JTable mappingTable;
 	private DefaultTableModel mappingModel;
 	private CustomTableCellRenderer renderer;
+	private VejbyGedcom vejbyGedcom;
 
 	/**
 	 * Create the panel.
@@ -49,6 +58,10 @@ public class CensusMappingPanel extends JPanel {
 	 * @param vejbyGedcom The root panel
 	 */
 	public CensusMappingPanel(VejbyGedcom vejbyGedcom) {
+		this.vejbyGedcom = vejbyGedcom;
+		mapping = Mapping.getInstance();
+		mappingKeys = mapping.getMappingKeys();
+
 		setLayout(new BorderLayout(0, 0));
 
 		JScrollPane mappingScrollPane = new JScrollPane();
@@ -72,27 +85,51 @@ public class CensusMappingPanel extends JPanel {
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				map();
+				populateMappingFromTable();
+				if (identifyHouseholds()) {
+					vejbyGedcom.getHouseholdJPanel().populateTree();
 
-				vejbyGedcom.getHouseholdJPanel().populateTree();
-
-				JTabbedPane pane = vejbyGedcom.getTabbedPane();
-				pane.setEnabledAt(2, true);
-				pane.setSelectedIndex(2);
+					JTabbedPane pane = vejbyGedcom.getTabbedPane();
+					pane.setEnabledAt(2, true);
+					pane.setSelectedIndex(2);
+				}
 			}
 		});
 		buttonPanel.add(btnAnalysr);
 	}
 
 	/**
-	 * Get data from table and save into mapping arrays.
+	 * Identify and create households and families from census table
+	 * 
+	 * @return Flag to mark if identifcation succeeded
+	 */
+	protected boolean identifyHouseholds() {
+		if (mappingKeys[3] == 0) {
+			JOptionPane.showMessageDialog(new JFrame(), "Husstandsnummer kan ikke mappes", "Vejby Gedcom",
+					JOptionPane.WARNING_MESSAGE);
+			return false;
+		}
+
+		Census censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
+		String message = censusTable.createHouseholds(mappingKeys[3]);
+		LOGGER.log(Level.INFO, message);
+
+		// Create a family for each household
+		if (mappingKeys[5] != 0) {
+			for (Household household : censusTable.getHouseholds()) {
+				message = household.identifyFamilies();
+				LOGGER.log(Level.FINE, message);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Get data from table and save into mapping array.
 	 * 
 	 */
-	private void map() {
-		Mapping mapping = Mapping.getInstance();
+	private void populateMappingFromTable() {
 		String value;
-
-		int[] mappingKeys = mapping.getMappingKeys();
 
 		for (int i = 0; i < mappingTable.getRowCount(); i++) {
 			value = (String) mappingTable.getValueAt(i, 2);
@@ -188,7 +225,6 @@ public class CensusMappingPanel extends JPanel {
 		individualcomboBox.addItem(PrefKey.INDIVIDUAL_12);
 		mappingTable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(individualcomboBox));
 
-		// TODO Might need to be removed
 		setValuesFromPreferences();
 	}
 
@@ -201,6 +237,7 @@ public class CensusMappingPanel extends JPanel {
 		int maxSize = mappingTable.getModel().getRowCount();
 		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
 
+		// FIXME Does not handle multiple "not in use" properly
 		row = prefs.getInt(PrefKey.INDIVIDUAL_0, 0);
 		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_0, row, 2);

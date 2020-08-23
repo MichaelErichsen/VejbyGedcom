@@ -20,7 +20,7 @@ import net.myerichsen.vejby.gedcom.Family;
  * @version 22. aug. 2020
  * @author Michael Erichsen
  */
-public class Table {
+public class Census {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 //	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
@@ -35,7 +35,7 @@ public class Table {
 	 * 
 	 * @param year
 	 */
-	public Table(int year) {
+	public Census(int year) {
 		super();
 		this.year = year;
 //		this.kipFileName = kipFileName;
