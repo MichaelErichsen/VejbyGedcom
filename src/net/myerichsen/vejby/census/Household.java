@@ -49,6 +49,71 @@ public class Household {
 	}
 
 	/**
+	 * Separate a household into families, defined as father, mother, and children.
+	 * Each household contains either a single or one or more families and perhaps
+	 * further singles (tenants, lodgers, servants, etc.).
+	 * <p>
+	 * Currently only the first family is identified.
+	 * 
+	 * @return message The return message
+	 */
+	public String createFamilies() {
+		Individual person;
+
+		boolean first = true;
+		// The first person is the primary person, either father or mother according to
+		// sex
+
+		// Create a dummy family 0 for singles and a first family from trade or position
+		// fields
+		Family family0 = new Family(id, 0);
+		Family family1 = new Family(id, 1);
+
+		for (List<String> row : rows) {
+			person = createIndividual(row);
+			person.setCensusEvent(censusEvent);
+
+			if (first) {
+				if (person.getSex().startsWith("M")) {
+					person.setPosition("Fader");
+					person.setFamilyRole1("Fader");
+					family1.setFather(person);
+				} else {
+					person.setPosition("Moder");
+					person.setFamilyRole1("Moder");
+					family1.setMother(person);
+				}
+				first = false;
+
+			} else {
+				if (person.getPosition().equals("Fader")) {
+					person.setFamilyRole1("Fader");
+					family1.setFather(person);
+				} else if (person.getPosition().equals("Moder")) {
+					person.setFamilyRole1("Moder");
+					family1.setMother(person);
+				} else if (person.getPosition().equals("Barn")) {
+					person.setPosition("Barn");
+					person.setFamilyRole1("Barn");
+					family1.getChildren().add(person);
+				} else if (person.getPosition().equals("")) {
+//					person.setPosition("");
+					person.setFamilyRole1("");
+					family0.getSingles().add(person);
+				}
+			}
+
+			getPersons().add(person);
+		}
+
+		families.clear();
+		families.add(family0);
+		families.add(family1);
+
+		return "Familie udskilt";
+	}
+
+	/**
 	 * Create an individual from a row in the census table.
 	 * 
 	 * @param row A row in the census table
@@ -66,7 +131,7 @@ public class Household {
 		if (mappingKeys[6] != 0) {
 			person.setBirthDate(row.get(mappingKeys[6]));
 
-			// Age
+			// Or age
 		} else if (mappingKeys[7] != 0) {
 			try {
 				// Calculate difference between age and census year
@@ -77,17 +142,10 @@ public class Household {
 			}
 		}
 
-		person.setBirthPlace(row.get(mappingKeys[11]));
-
 		person.setSex(row.get(mappingKeys[5]));
-
-		// Position (F, M, B or 0)
-		if (mappingKeys[10] > 0) {
-			person.setPosition(getFamilyRole(row.get(mappingKeys[10])));
-		} else {
-			// Trade
-			person.setPosition(getFamilyRole(row.get(mappingKeys[9])));
-		}
+		person.setMaritalStatus(row.get(mappingKeys[8]));
+		person.setPosition(getFamilyRole(row.get(mappingKeys[10])));
+		person.setBirthPlace(row.get(mappingKeys[11]));
 
 		return person;
 	}
@@ -102,29 +160,29 @@ public class Household {
 	/**
 	 * Get the role of the person in the family from contents of the trade field
 	 * 
-	 * @param trade
+	 * @param position
 	 * @return Position string
 	 */
-	private String getFamilyRole(String trade) {
-		trade = trade.toLowerCase();
+	private String getFamilyRole(String position) {
+		position = position.toLowerCase();
 
-		if ((trade.contains("broder")) || (trade.contains("broderdatter")) || (trade.contains("brodersøn"))
-				|| (trade.contains("brødre")) || (trade.contains("datterdatter")) || (trade.contains("forældre"))
-				|| (trade.contains("manden")) || (trade.contains("moder")) || (trade.contains("pleiebarn"))
-				|| (trade.contains("pleiebørn")) || (trade.contains("pleiedatter")) || (trade.contains("pleiesøn"))
-				|| (trade.contains("sønnesøn")) || (trade.contains("søster")) || (trade.contains("søsterdatter"))
-				|| (trade.contains("stedfader")) || (trade.contains("svigerfader")) || (trade.contains("svigerfar"))
-				|| (trade.contains("svigerforældre")) || (trade.contains("svigermoder"))
-				|| (trade.contains("svigersøn"))) {
+		if ((position.contains("broder")) || (position.contains("broderdatter")) || (position.contains("brodersøn"))
+				|| (position.contains("brødre")) || (position.contains("datterdatter")) || (position.contains("forældre"))
+				|| (position.contains("manden")) || (position.contains("moder")) || (position.contains("pleiebarn"))
+				|| (position.contains("pleiebørn")) || (position.contains("pleiedatter")) || (position.contains("pleiesøn"))
+				|| (position.contains("sønnesøn")) || (position.contains("søster")) || (position.contains("søsterdatter"))
+				|| (position.contains("stedfader")) || (position.contains("svigerfader")) || (position.contains("svigerfar"))
+				|| (position.contains("svigerforældre")) || (position.contains("svigermoder"))
+				|| (position.contains("svigersøn"))) {
 			return "";
 		}
 
-		if ((trade.contains("husmoder")) || (trade.contains("hustru")) || (trade.contains("kone"))) {
+		if ((position.contains("husmoder")) || (position.contains("hustru")) || (position.contains("kone"))) {
 			return "Moder";
 		}
 
-		if ((trade.contains("barn")) || (trade.contains("børn")) || (trade.contains("datter"))
-				|| (trade.contains("søn"))) {
+		if ((position.contains("barn")) || (position.contains("børn")) || (position.contains("datter"))
+				|| (position.contains("søn"))) {
 			return "Barn";
 		}
 
@@ -136,6 +194,41 @@ public class Household {
 	 */
 	public int getId() {
 		return id;
+	}
+
+	/**
+	 * Get the number of persons in this household
+	 * 
+	 * @return Member count
+	 */
+	public int getMemberCount() {
+		int size = 0;
+
+		if (hasFamilies()) {
+			for (Family family : families) {
+				size += family.getSize();
+			}
+		} else {
+			// FIXME Not used
+			size = getRows().size();
+		}
+
+		return size;
+	}
+
+	/**
+	 * @param i
+	 * @return
+	 */
+	public Individual getPerson(int i) {
+		return persons.get(i);
+	}
+
+	/**
+	 * @return the persons
+	 */
+	public List<Individual> getPersons() {
+		return persons;
 	}
 
 	/**
@@ -164,65 +257,6 @@ public class Household {
 	}
 
 	/**
-	 * Separate a household into families, defined as father, mother, and children.
-	 * Each household contains either a single or one or more families and perhaps
-	 * further singles (tenants, lodgers, servants, etc.).
-	 * <p>
-	 * Currently only the first family is identified.
-	 * 
-	 * @param mappingKeys The array of columns in the table
-	 * @return message
-	 */
-	public String identifyFamilies() {
-		Individual person;
-
-		boolean first = true;
-		// The first person is the primary person, father or mother according to
-		// sex
-
-		// Create a dummy family 0 for singles and a first family from trade or position
-		// fields
-		Family family0 = new Family(id, 0);
-		Family family1 = new Family(id, 1);
-
-		for (List<String> row : rows) {
-			person = createIndividual(row);
-			person.setCensusEvent(censusEvent);
-
-			if (first) {
-				if (person.getSex().startsWith("M")) {
-					person.setPosition("Fader");
-					family1.setFather(person);
-				} else {
-					person.setPosition("Moder");
-					family1.setMother(person);
-				}
-				first = false;
-
-			} else {
-				if (person.getPosition().equals("Moder")) {
-//					person.setPosition("Moder");
-					family1.setMother(person);
-				} else if (person.getPosition().equals("Barn")) {
-//					person.setPosition("Barn");
-					family1.getChildren().add(person);
-				} else if (person.getPosition().equals("")) {
-//					person.setPosition("");
-					family0.getSingles().add(person);
-				}
-			}
-
-			getPersons().add(person);
-		}
-
-		families.clear();
-		families.add(family0);
-		families.add(family1);
-
-		return "Familie udskilt";
-	}
-
-	/**
 	 * @param families the families to set
 	 */
 	public void setFamilies(List<Family> families) {
@@ -234,6 +268,13 @@ public class Household {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	/**
+	 * @param persons the persons to set
+	 */
+	public void setPersons(List<Individual> persons) {
+		this.persons = persons;
 	}
 
 	/**
@@ -258,46 +299,5 @@ public class Household {
 	@Override
 	public String toString() {
 		return getRows().get(0).get(2) + " " + getRows().get(0).get(3);
-	}
-
-	/**
-	 * Get the number of persons in this household
-	 * 
-	 * @return Member count
-	 */
-	public int getMemberCount() {
-		int size = 0;
-
-		if (hasFamilies()) {
-			for (Family family : families) {
-				size += family.getSize();
-			}
-		} else {
-			size = getRows().size();
-		}
-
-		return size;
-	}
-
-	/**
-	 * @param i
-	 * @return
-	 */
-	public Individual getPerson(int i) {
-		return persons.get(i);
-	}
-
-	/**
-	 * @return the persons
-	 */
-	public List<Individual> getPersons() {
-		return persons;
-	}
-
-	/**
-	 * @param persons the persons to set
-	 */
-	public void setPersons(List<Individual> persons) {
-		this.persons = persons;
 	}
 }

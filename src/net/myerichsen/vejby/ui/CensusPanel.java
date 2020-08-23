@@ -33,7 +33,7 @@ import net.myerichsen.vejby.census.Census;
  * This panel displays a census table as loaded from a KIP file. It creates a
  * census table object, but only populates it with census rows.
  * 
- * @version 22. aug. 2020
+ * @version 23. aug. 2020
  * @author Michael Erichsen
  *
  */
@@ -164,7 +164,7 @@ public class CensusPanel extends JPanel {
 				LOGGER.log(Level.INFO, ftYear);
 				int year = Integer.parseInt(ftYear);
 				String message;
-				setCensusTable(new Census(year));
+				setCensusTable(Census.getInstance(year));
 				message = getCensusTable().readKipfile(kipFile);
 				LOGGER.log(Level.INFO, message);
 				message = getCensusTable().removeEmptyColumns();

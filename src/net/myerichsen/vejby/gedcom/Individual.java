@@ -10,7 +10,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 22. aug. 2020
+ * @version 23. aug. 2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -31,6 +31,9 @@ public class Individual {
 	private Household household;
 	private CensusEvent censusEvent;
 	private String maritalStatus;
+	private String familyRole1 = "";
+	private String familyRole2 = "";;
+	private String familyRole3 = "";;
 
 	/**
 	 * Constructor
@@ -85,6 +88,27 @@ public class Individual {
 	}
 
 	/**
+	 * @return the familyRole1
+	 */
+	public String getFamilyRole1() {
+		return familyRole1;
+	}
+
+	/**
+	 * @return the familyRole2
+	 */
+	public String getFamilyRole2() {
+		return familyRole2;
+	}
+
+	/**
+	 * @return the familyRole3
+	 */
+	public String getFamilyRole3() {
+		return familyRole3;
+	}
+
+	/**
 	 * @return the household
 	 */
 	public Household getHousehold() {
@@ -96,6 +120,13 @@ public class Individual {
 	 */
 	public int getId() {
 		return id;
+	}
+
+	/**
+	 * @return the maritalStatus
+	 */
+	public String getMaritalStatus() {
+		return maritalStatus;
 	}
 
 	/**
@@ -184,6 +215,27 @@ public class Individual {
 	}
 
 	/**
+	 * @param familyRole1 the familyRole1 to set
+	 */
+	public void setFamilyRole1(String familyRole1) {
+		this.familyRole1 = familyRole1;
+	}
+
+	/**
+	 * @param familyRole2 the familyRole2 to set
+	 */
+	public void setFamilyRole2(String familyRole2) {
+		this.familyRole2 = familyRole2;
+	}
+
+	/**
+	 * @param familyRole3 the familyRole3 to set
+	 */
+	public void setFamilyRole3(String familyRole3) {
+		this.familyRole3 = familyRole3;
+	}
+
+	/**
 	 * @param household the household to set
 	 */
 	public void setHousehold(Household household) {
@@ -195,6 +247,13 @@ public class Individual {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	/**
+	 * @param maritalStatus the maritalStatus to set
+	 */
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
 	}
 
 	/**
@@ -252,6 +311,7 @@ public class Individual {
 
 		sb.append("1 NAME ");
 
+		// Null pointer exception
 		String[] nameParts = getName().split(" ");
 
 		// Handle stubs like dat, dr, dtr, and datter
@@ -271,7 +331,7 @@ public class Individual {
 			}
 		}
 
-		// Surround with slashes
+		// Surround with slashes to mark as family name
 		sb.append("/" + familyName + "/\n");
 
 		if (getSex().equals(Sex.M)) {
@@ -311,20 +371,6 @@ public class Individual {
 	@Override
 	public String toString() {
 		return name;
-	}
-
-	/**
-	 * @return the maritalStatus
-	 */
-	public String getMaritalStatus() {
-		return maritalStatus;
-	}
-
-	/**
-	 * @param maritalStatus the maritalStatus to set
-	 */
-	public void setMaritalStatus(String maritalStatus) {
-		this.maritalStatus = maritalStatus;
 	}
 
 }

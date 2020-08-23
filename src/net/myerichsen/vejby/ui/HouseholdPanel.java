@@ -86,7 +86,7 @@ public class HouseholdPanel extends JPanel {
 		family1Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				redefineFirstFamily();
+				updateFamily1();
 			}
 		});
 		buttonPanel.add(family1Button);
@@ -96,6 +96,7 @@ public class HouseholdPanel extends JPanel {
 		family2Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				updateFamily2();
 			}
 		});
 		buttonPanel.add(family2Button);
@@ -105,13 +106,13 @@ public class HouseholdPanel extends JPanel {
 		family3Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				updateFamily3();
 			}
 		});
 		buttonPanel.add(family3Button);
 
 		saveButton = new JButton("Gem som GEDCOM");
 		saveButton.addActionListener(new ActionListener() {
-			private Census censusTable;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -132,7 +133,7 @@ public class HouseholdPanel extends JPanel {
 	private void populateFamilyTable(int householdId, int familyId) {
 		Family family = censusTable.getFamily(householdId, familyId);
 
-		String[] columnNames = new String[] { "Navn", "Køn", "Født", "Rolle" };
+		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Rolle" };
 		String[][] data = family.getMembers();
 
 		DefaultTableModel familyTableModel = new DefaultTableModel(data, columnNames);
@@ -152,7 +153,7 @@ public class HouseholdPanel extends JPanel {
 	 * @param id The id of the household
 	 */
 	private void populateHouseholdTable(int id) {
-		// FIXME Loses first individual in each household
+// FIXME family role overwritten, when called second time
 		int size;
 		Individual person;
 
@@ -168,15 +169,18 @@ public class HouseholdPanel extends JPanel {
 			// FIXME Null pointer exception after update of family 1
 			person = selectedHousehold.getPerson(i);
 			data[i][0] = String.valueOf(person.getId());
+
+			if (person.getId() == 63) {
+				LOGGER.log(Level.INFO, "Person " + person.getId());
+			}
+
 			data[i][1] = person.getName();
 			data[i][2] = person.getMaritalStatus();
 			data[i][3] = person.getTrade();
-			data[i][4] = person.getPosition();
-			data[i][5] = "";
-			data[i][6] = "";
+			data[i][4] = person.getFamilyRole1();
+			data[i][5] = person.getFamilyRole2();
+			data[i][6] = person.getFamilyRole3();
 		}
-
-		// Get all families in the household
 
 		householdTableModel = new DefaultTableModel(data, columnNames);
 		table.setModel(householdTableModel);
@@ -218,11 +222,8 @@ public class HouseholdPanel extends JPanel {
 	 * Populate the tree structure with all households and all families in each
 	 * household.
 	 * 
-	 * @param mapping The mapping definition as created in CensusMappingPanel
-	 * @see net.myerichsen.vejby.ui.CensusMappingPanel.Class
 	 */
 	public void populateTree() {
-//		String message;
 		DefaultMutableTreeNode householdNode;
 		DefaultMutableTreeNode familyNode;
 
@@ -233,37 +234,32 @@ public class HouseholdPanel extends JPanel {
 			rootTreeNode.removeAllChildren();
 		}
 
-		// Add householda to tree
+		// Add households to tree
 		censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
 
 		for (Household household : censusTable.getHouseholds()) {
 			householdNode = new DefaultMutableTreeNode(household);
 			rootTreeNode.add(householdNode);
 
-			// Add familyies to tree
+			// Add families to tree
 			for (Family family : household.getFamilies()) {
 				familyNode = new DefaultMutableTreeNode(family);
 				householdNode.add(familyNode);
 			}
 		}
-//		}
 
 		treeModel = ((DefaultTreeModel) tree.getModel());
 		treeModel.reload(rootTreeNode);
 	}
 
 	/**
-	 * Delete and redefine the first family and the singles list.
+	 * Update the singles list (family 0) and the first family.
 	 */
-	private void redefineFirstFamily() {
+	private void updateFamily1() {
 		Individual ind;
 
 		Family family0 = selectedHousehold.getFamilies().get(0);
-		family0.setEdited(true);
 		Family family1 = selectedHousehold.getFamilies().get(1);
-		family1.setEdited(true);
-
-//		householdTableModel = (DefaultTableModel) table.getModel();
 
 		@SuppressWarnings("unchecked")
 		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
@@ -278,6 +274,7 @@ public class HouseholdPanel extends JPanel {
 
 			String newRole = tableRowVector.get(4);
 			ind.setPosition(newRole);
+			ind.setFamilyRole1(newRole);
 
 			LOGGER.log(Level.INFO,
 					"Løbenr. " + tableRowVector.get(0) + ", " + tableRowVector.get(1) + ", " + tableRowVector.get(2)
@@ -301,5 +298,21 @@ public class HouseholdPanel extends JPanel {
 
 		treeModel.reload(rootTreeNode);
 		table.setModel(householdTableModel);
+	}
+
+	/**
+	 * Update the singles list (family 0) and the second family.
+	 */
+	protected void updateFamily2() {
+		// TODO Auto-generated method stub
+		LOGGER.log(Level.INFO, "Ikke kodet endnu");
+	}
+
+	/**
+	 * Update the singles list (family 0) and the third family.
+	 */
+	protected void updateFamily3() {
+		// TODO Auto-generated method stub
+		LOGGER.log(Level.INFO, "Ikke kodet endnu");
 	}
 }

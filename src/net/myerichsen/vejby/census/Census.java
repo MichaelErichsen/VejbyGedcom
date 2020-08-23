@@ -15,30 +15,42 @@ import java.util.logging.Logger;
 import net.myerichsen.vejby.gedcom.Family;
 
 /**
- * Implement a census table as loaded from a KIP file.
+ * Singleton class implementing a census table as loaded from a KIP file.
  * 
- * @version 22. aug. 2020
+ * @version 23. aug. 2020
  * @author Michael Erichsen
  */
 public class Census {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 //	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+	private static Census single_instance = null;
 
 	private int year;
-//	private String kipFileName;
 	private List<String> headers;
 	private List<List<String>> persons;
 	private List<Household> households;
+
+	/**
+	 * Static method to create instance of Singleton class.
+	 * 
+	 * @return An instance of the class
+	 */
+	public static Census getInstance(int year) {
+		if (single_instance == null) {
+			single_instance = new Census(year);
+		}
+
+		return single_instance;
+	}
 
 	/**
 	 * Constructor
 	 * 
 	 * @param year
 	 */
-	public Census(int year) {
+	private Census(int year) {
 		super();
 		this.year = year;
-//		this.kipFileName = kipFileName;
 		persons = new ArrayList<>();
 	}
 
@@ -68,10 +80,6 @@ public class Census {
 			if ((!currentHouseholdNumber.equals(newHouseholdNumber))
 					|| (!currentSourceLocation.equals(newSourceLocation))) {
 				currentHousehold = new Household(id++);
-
-				// Split household into families. Family 0 contains singles
-				currentHousehold.identifyFamilies();
-
 				getHouseholds().add(currentHousehold);
 				currentHouseholdNumber = newHouseholdNumber;
 			}
@@ -153,13 +161,6 @@ public class Census {
 	public List<Household> getHouseholds() {
 		return households;
 	}
-
-//	/**
-//	 * @return the kipFileName
-//	 */
-//	public String getKipFileName() {
-//		return kipFileName;
-//	}
 
 	/**
 	 * @return the fields
@@ -263,13 +264,6 @@ public class Census {
 		this.households = households;
 	}
 
-//	/**
-//	 * @param kipFileName the kipFileName to set
-//	 */
-//	public void setKipFileName(String kipFileName) {
-//		this.kipFileName = kipFileName;
-//	}
-
 	/**
 	 * @param fields the fields to set
 	 */
@@ -307,23 +301,4 @@ public class Census {
 
 		return sb.toString();
 	}
-
-//	/**
-//	 * List all individuals in each household who are not family members.
-//	 * 
-//	 * @return list of person ids
-//	 */
-//	public List<Integer> getSinglesList() {
-//		int idKey = Integer.parseInt(prefs.get(PrefKey.INDIVIDUAL_1, "0"));
-//		// Get role in family
-//		int posKey = Integer.parseInt(prefs.get(PrefKey.INDIVIDUAL_10, "0"));
-//		List<Integer> idList = new ArrayList<>();
-//
-//		for (List<String> list : persons) {
-//			if (list.get(posKey).equals("")) {
-//				idList.add(Integer.parseInt(list.get(idKey)));
-//			}
-//		}
-//		return idList;
-//	}
 }

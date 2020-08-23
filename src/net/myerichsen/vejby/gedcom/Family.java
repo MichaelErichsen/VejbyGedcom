@@ -7,7 +7,7 @@ import java.util.List;
  * Class representing a family in GEDCOM as extracted from a household in a
  * census file.
  * 
- * @version 22. aug. 2020
+ * @version 23. aug. 2020
  * @author Michael Erichsen
  */
 public class Family {
@@ -19,7 +19,6 @@ public class Family {
 	private List<Individual> singles = new ArrayList<>();
 	private int householdId;
 	private int familyId;
-	private boolean edited = false;
 
 	/**
 	 * Constructor
@@ -65,35 +64,39 @@ public class Family {
 	 * @return A matrix of family member data
 	 */
 	public String[][] getMembers() {
-		String[][] members = new String[getSize()][4];
+		String[][] members = new String[getSize()][5];
 		int index = 0;
 
 		if (father != null) {
-			members[index][0] = father.getName();
-			members[index][1] = father.getSex();
-			members[index][2] = father.getBirthDate();
-			members[index++][3] = "Fader";
+			members[index][0] = String.valueOf(father.getId());
+			members[index][1] = father.getName();
+			members[index][2] = father.getMaritalStatus();
+			members[index][3] = father.getTrade();
+			members[index++][4] = "Fader";
 		}
 
 		if (mother != null) {
-			members[index][0] = mother.getName();
-			members[index][1] = mother.getSex();
-			members[index][2] = mother.getBirthDate();
-			members[index++][3] = "Moder";
+			members[index][0] = String.valueOf(mother.getId());
+			members[index][1] = mother.getName();
+			members[index][2] = mother.getMaritalStatus();
+			members[index][3] = mother.getTrade();
+			members[index++][4] = "Moder";
 		}
 
 		for (Individual child : children) {
-			members[index][0] = child.getName();
-			members[index][1] = child.getSex();
-			members[index][2] = child.getBirthDate();
-			members[index++][3] = "Barn";
+			members[index][0] = String.valueOf(child.getId());
+			members[index][1] = child.getName();
+			members[index][2] = child.getMaritalStatus();
+			members[index][3] = child.getTrade();
+			members[index++][4] = "Barn";
 		}
 
 		for (Individual single : singles) {
-			members[index][0] = single.getName();
-			members[index][1] = single.getSex();
-			members[index][2] = single.getBirthDate();
-			members[index++][3] = "";
+			members[index][0] = String.valueOf(single.getId());
+			members[index][1] = single.getName();
+			members[index][2] = single.getMaritalStatus();
+			members[index][3] = single.getTrade();
+			members[index++][4] = "";
 		}
 
 		return members;
@@ -242,21 +245,5 @@ public class Family {
 		}
 
 		return "";
-	}
-
-	/**
-	 * Has this family been manually edited?
-	 * 
-	 * @return the edited
-	 */
-	public boolean isEdited() {
-		return edited;
-	}
-
-	/**
-	 * @param edited the edited to set
-	 */
-	public void setEdited(boolean edited) {
-		this.edited = edited;
 	}
 }

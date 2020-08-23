@@ -45,7 +45,6 @@ public class CensusMappingPanel extends JPanel {
 
 	private Mapping mapping;
 	private int[] mappingKeys;
-//	private Census censusTable;
 
 	private JTable mappingTable;
 	private DefaultTableModel mappingModel;
@@ -99,9 +98,9 @@ public class CensusMappingPanel extends JPanel {
 	}
 
 	/**
-	 * Identify and create households and families from census table
+	 * Identify and create households and families from census table.
 	 * 
-	 * @return Flag to mark if identifcation succeeded
+	 * @return Flag to mark if identification succeeded
 	 */
 	protected boolean identifyHouseholds() {
 		if (mappingKeys[3] == 0) {
@@ -117,7 +116,7 @@ public class CensusMappingPanel extends JPanel {
 		// Create a family for each household
 		if (mappingKeys[5] != 0) {
 			for (Household household : censusTable.getHouseholds()) {
-				message = household.identifyFamilies();
+				message = household.createFamilies();
 				LOGGER.log(Level.FINE, message);
 			}
 		}
