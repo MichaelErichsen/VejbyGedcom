@@ -6,12 +6,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -34,12 +34,12 @@ import net.myerichsen.vejby.gedcom.Individual;
  * The panel supports manual changes to the generated family structure by
  * definitions of up to three families.
  * 
- * @version 23. aug. 2020
+ * @version 24. aug. 2020
  * @author Michael Erichsen
  * 
  */
 public class HouseholdPanel extends JPanel {
-	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+//	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static final long serialVersionUID = -4694127991314617939L;
 
 	private Household selectedHousehold;
@@ -118,7 +118,11 @@ public class HouseholdPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
 				GedcomFile gedcomFile = GedcomFile.getInstance();
-				gedcomFile.save(censusTable);
+				String path = gedcomFile.save(censusTable);
+
+				JOptionPane.showMessageDialog(new JFrame(),
+						"Folketælling for " + censusTable.getYear() + " er gemt som GEDCOM fil " + path, "Vejby Gedcom",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		buttonPanel.add(saveButton);
@@ -252,9 +256,6 @@ public class HouseholdPanel extends JPanel {
 
 		selectedHousehold.getFamilies().clear();
 
-//		Family family0 = selectedHousehold.getFamilies().get(0);
-//		Family family1 = selectedHousehold.getFamilies().get(1);
-
 		Family family0 = new Family(selectedHousehold.getId(), 0);
 		Family family1 = new Family(selectedHousehold.getId(), 1);
 
@@ -264,7 +265,6 @@ public class HouseholdPanel extends JPanel {
 
 		for (int i = 0; i < dataVector.size(); i++) {
 			tableRowVector = dataVector.get(i);
-
 			individual = selectedHousehold.getPerson(i);
 
 			// Set new role
@@ -292,17 +292,136 @@ public class HouseholdPanel extends JPanel {
 
 	/**
 	 * Update the singles list (family 0) and the second family.
+	 * <p>
+	 * The list starts empty. Each individual added must be removed from family 0,
+	 * but not from 1 or 3.
+	 * <p>
+	 * If this cannot be done concurrently, then family 0 must be deleted and then
+	 * populated by all individuals not in families 1-3.
 	 */
 	protected void updateFamily2() {
-		// TODO Auto-generated method stub
-		LOGGER.log(Level.INFO, "Ikke kodet endnu");
+		Individual individual;
+
+		// Get existing list of singletons
+		Family oldFamily0 = selectedHousehold.getFamilies().get(0);
+
+		// Create a new family 2
+		Family family2 = new Family(selectedHousehold.getId(), 2);
+
+		// Read all rows and add to family 2
+		@SuppressWarnings("unchecked")
+		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		Vector<String> tableRowVector;
+
+		for (int i = 0; i < dataVector.size(); i++) {
+			tableRowVector = dataVector.get(i);
+			individual = selectedHousehold.getPerson(i);
+
+			// Set new role in family 2
+			String newRole = tableRowVector.get(5);
+
+			if (newRole.startsWith("F")) {
+				family2.setFather(individual);
+			} else if (newRole.startsWith("M")) {
+				family2.setMother(individual);
+			} else if (newRole.startsWith("B")) {
+				family2.getChildren().add(individual);
+			}
+
+			individual.setFamilyRole2(newRole);
+		}
+
+		selectedHousehold.getFamilies().add(family2);
+
+		// Create a new family 0 with all unassigned individuals
+		Family family0 = new Family(selectedHousehold.getId(), 0);
+
+		// Read all rows and add unassigned to singles list
+		for (int i = 0; i < dataVector.size(); i++) {
+			tableRowVector = dataVector.get(i);
+
+			individual = selectedHousehold.getPerson(i);
+
+			if ((individual.getFamilyRole1().equals("")) && (individual.getFamilyRole2().equals(""))
+					&& (individual.getFamilyRole3().equals(""))) {
+				family0.getSingles().add(individual);
+			}
+		}
+
+		// Replace old family 0 with new family 0
+		selectedHousehold.getFamilies().remove(oldFamily0);
+		selectedHousehold.getFamilies().add(0, family0);
+
+		// Update tree
+		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
+				.getChildAt(selectedHousehold.getId());
+		DefaultMutableTreeNode family2Node = new DefaultMutableTreeNode(family2);
+		householdNode.add(family2Node);
+		treeModel.reload(rootTreeNode);
 	}
 
 	/**
 	 * Update the singles list (family 0) and the third family.
 	 */
 	protected void updateFamily3() {
-		// TODO Auto-generated method stub
-		LOGGER.log(Level.INFO, "Ikke kodet endnu");
+		Individual individual;
+
+		// Get existing list of singletons
+		Family oldFamily0 = selectedHousehold.getFamilies().get(0);
+
+		// Create a new family 3
+		Family family3 = new Family(selectedHousehold.getId(), 3);
+
+		// Read all rows and add to family 3
+		@SuppressWarnings("unchecked")
+		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		Vector<String> tableRowVector;
+
+		for (int i = 0; i < dataVector.size(); i++) {
+			tableRowVector = dataVector.get(i);
+			individual = selectedHousehold.getPerson(i);
+
+			// Set new role in family 3
+			String newRole = tableRowVector.get(6);
+
+			if (newRole.startsWith("F")) {
+				family3.setFather(individual);
+			} else if (newRole.startsWith("M")) {
+				family3.setMother(individual);
+			} else if (newRole.startsWith("B")) {
+				family3.getChildren().add(individual);
+			}
+
+			individual.setFamilyRole3(newRole);
+		}
+
+		selectedHousehold.getFamilies().add(family3);
+
+		// Create a new family 0 with all unassigned individuals
+		Family family0 = new Family(selectedHousehold.getId(), 0);
+
+		// Read all rows and add unassigned to singles list
+		for (int i = 0; i < dataVector.size(); i++) {
+			tableRowVector = dataVector.get(i);
+
+			individual = selectedHousehold.getPerson(i);
+
+			if ((individual.getFamilyRole1().equals("")) && (individual.getFamilyRole2().equals(""))
+					&& (individual.getFamilyRole3().equals(""))) {
+				family0.getSingles().add(individual);
+			}
+		}
+
+		// Replace old family 0 with new family 0
+		selectedHousehold.getFamilies().remove(oldFamily0);
+		selectedHousehold.getFamilies().add(0, family0);
+
+		// Update tree
+		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
+				.getChildAt(selectedHousehold.getId());
+		DefaultMutableTreeNode family3Node = new DefaultMutableTreeNode(family3);
+		householdNode.add(family3Node);
+		treeModel.reload(rootTreeNode);
+		;
 	}
 }
