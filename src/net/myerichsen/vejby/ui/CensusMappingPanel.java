@@ -35,7 +35,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 23. aug. 2020
+ * @version 24. aug. 2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
@@ -305,14 +305,12 @@ public class CensusMappingPanel extends JPanel {
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
 		if ((row > 0) && (row < maxSize)) {
-			LOGGER.log(Level.INFO, "Row: " + row);
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_12, 0);
 		if ((row > 0) && (row < maxSize)) {
-			LOGGER.log(Level.INFO, "Row: " + row);
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_12, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}

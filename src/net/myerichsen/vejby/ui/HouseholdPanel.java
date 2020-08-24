@@ -55,6 +55,8 @@ public class HouseholdPanel extends JPanel {
 	private JButton family2Button;
 	private JButton family3Button;
 	private JButton saveButton;
+	private JButton delete2Button;
+	private JButton delete3Button;
 
 	/**
 	 * Create the panel.
@@ -101,6 +103,16 @@ public class HouseholdPanel extends JPanel {
 		});
 		buttonPanel.add(family2Button);
 
+		delete2Button = new JButton("Slet familie 2 og 3");
+		delete2Button.setEnabled(false);
+		delete2Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteFamily2();
+			}
+		});
+		buttonPanel.add(delete2Button);
+
 		family3Button = new JButton("Opdat\u00E9r familie 3");
 		family3Button.setEnabled(false);
 		family3Button.addActionListener(new ActionListener() {
@@ -110,6 +122,16 @@ public class HouseholdPanel extends JPanel {
 			}
 		});
 		buttonPanel.add(family3Button);
+
+		delete3Button = new JButton("Slet familie 3");
+		delete3Button.setEnabled(false);
+		delete3Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteFamily3();
+			}
+		});
+		buttonPanel.add(delete3Button);
 
 		saveButton = new JButton("Gem som GEDCOM");
 		saveButton.addActionListener(new ActionListener() {
@@ -126,6 +148,57 @@ public class HouseholdPanel extends JPanel {
 			}
 		});
 		buttonPanel.add(saveButton);
+	}
+
+	/**
+	 * For each individual in the household:
+	 * <p>
+	 * Set family role 2 to spaces
+	 * 
+	 * @param i Family number
+	 */
+	private void clearFamilyRoles(int i) {
+		for (Individual individual : selectedHousehold.getPersons()) {
+			if (i == 2) {
+				individual.setFamilyRole2("");
+			} else if (i == 3) {
+				individual.setFamilyRole3("");
+			}
+		}
+	}
+
+	/**
+	 * Delete family 2
+	 */
+	@SuppressWarnings("unchecked")
+	protected void deleteFamily2() {
+		Family family2 = selectedHousehold.getFamilies().get(2);
+		selectedHousehold.getFamilies().remove(family2);
+		DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) rootTreeNode
+				.getChildAt(selectedHousehold.getId());
+		try {
+			currentNode.remove(3);
+		} catch (Exception ignoredException) {
+		}
+		currentNode.remove(2);
+		treeModel.reload(rootTreeNode);
+		family2 = null;
+		clearFamilyRoles(2);
+		rebuildSinglesList(householdTableModel.getDataVector(), selectedHousehold.getFamilies().get(0));
+	}
+
+	/**
+	 * Delete family 3
+	 */
+	@SuppressWarnings("unchecked")
+	protected void deleteFamily3() {
+		Family family3 = selectedHousehold.getFamilies().get(3);
+		selectedHousehold.getFamilies().remove(family3);
+		rootTreeNode.remove(3);
+		treeModel.reload(rootTreeNode);
+		family3 = null;
+		clearFamilyRoles(3);
+		rebuildSinglesList(householdTableModel.getDataVector(), selectedHousehold.getFamilies().get(0));
 	}
 
 	/**
@@ -249,6 +322,24 @@ public class HouseholdPanel extends JPanel {
 	}
 
 	/**
+	 * @param dataVector
+	 * @param family0
+	 */
+	public void rebuildSinglesList(Vector<Vector<String>> dataVector, Family family0) {
+		Individual individual;
+
+		// Read all rows and add unassigned to singles list
+		for (int i = 0; i < dataVector.size(); i++) {
+			individual = selectedHousehold.getPerson(i);
+
+			if ((individual.getFamilyRole1().equals("")) && (individual.getFamilyRole2().equals(""))
+					&& (individual.getFamilyRole3().equals(""))) {
+				family0.getSingles().add(individual);
+			}
+		}
+	}
+
+	/**
 	 * Update the singles list (family 0) and the first family.
 	 */
 	private void updateFamily1() {
@@ -335,44 +426,20 @@ public class HouseholdPanel extends JPanel {
 
 		// Create a new family 0 with all unassigned individuals
 		Family family0 = new Family(selectedHousehold.getId(), 0);
-
-		// Read all rows and add unassigned to singles list
-		for (int i = 0; i < dataVector.size(); i++) {
-			tableRowVector = dataVector.get(i);
-
-			individual = selectedHousehold.getPerson(i);
-
-			if ((individual.getFamilyRole1().equals("")) && (individual.getFamilyRole2().equals(""))
-					&& (individual.getFamilyRole3().equals(""))) {
-				family0.getSingles().add(individual);
-			}
-		}
+		rebuildSinglesList(dataVector, family0);
 
 		// Replace old family 0 with new family 0
 		selectedHousehold.getFamilies().remove(oldFamily0);
 		selectedHousehold.getFamilies().add(0, family0);
 
-<<<<<<< HEAD
 		// Update tree
 		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
 				.getChildAt(selectedHousehold.getId());
 		DefaultMutableTreeNode family2Node = new DefaultMutableTreeNode(family2);
 		householdNode.add(family2Node);
 		treeModel.reload(rootTreeNode);
-=======
-		// Update label on family 1 (Not working)
-		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
-				.getChildAt(selectedHousehold.getId());
-//		DefaultMutableTreeNode family1Node = (DefaultMutableTreeNode) rootTreeNode.getChildAt(1);
-//		family1Node.setUserObject("Family 1");
-//		treeModel.nodeChanged(family1Node);
 
-		// Update tree
-		DefaultMutableTreeNode family2Node = new DefaultMutableTreeNode(family2);
-		householdNode.add(family2Node);
-		treeModel.reload(rootTreeNode);
-
->>>>>>> branch 'master' of https://github.com/MichaelErichsen/VejbyGedcom.git
+		delete2Button.setEnabled(true);
 	}
 
 	/**
@@ -414,18 +481,7 @@ public class HouseholdPanel extends JPanel {
 
 		// Create a new family 0 with all unassigned individuals
 		Family family0 = new Family(selectedHousehold.getId(), 0);
-
-		// Read all rows and add unassigned to singles list
-		for (int i = 0; i < dataVector.size(); i++) {
-			tableRowVector = dataVector.get(i);
-
-			individual = selectedHousehold.getPerson(i);
-
-			if ((individual.getFamilyRole1().equals("")) && (individual.getFamilyRole2().equals(""))
-					&& (individual.getFamilyRole3().equals(""))) {
-				family0.getSingles().add(individual);
-			}
-		}
+		rebuildSinglesList(dataVector, family0);
 
 		// Replace old family 0 with new family 0
 		selectedHousehold.getFamilies().remove(oldFamily0);
@@ -437,6 +493,7 @@ public class HouseholdPanel extends JPanel {
 		DefaultMutableTreeNode family3Node = new DefaultMutableTreeNode(family3);
 		householdNode.add(family3Node);
 		treeModel.reload(rootTreeNode);
-		;
+
+		delete3Button.setEnabled(true);
 	}
 }
