@@ -21,7 +21,7 @@ import net.myerichsen.vejby.census.Census;
 /**
  * Singleton class representing a GEDCOM file.
  * 
- * @version 22. aug. 2020
+ * @version 24. aug. 2020
  * @author Michael Erichsen
  */
 public class GedcomFile {
@@ -72,10 +72,12 @@ public class GedcomFile {
 	 * Save a census table as GEDCOM. Used by census analysis.
 	 * 
 	 * @param censusTable The census table loaded from a KIP file
+	 * @return
 	 */
-	public void save(Census censusTable) {
+	public String save(Census censusTable) {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
 		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+		String path = "";
 
 		gedcomChooser.setFileFilter(ff);
 
@@ -111,11 +113,14 @@ public class GedcomFile {
 
 				writeCensusTrailer(fw);
 				fw.close();
-				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
+				path = gedcomFile.getPath();
+				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + path);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+
+		return path;
 	}
 
 	/**
