@@ -352,12 +352,27 @@ public class HouseholdPanel extends JPanel {
 		selectedHousehold.getFamilies().remove(oldFamily0);
 		selectedHousehold.getFamilies().add(0, family0);
 
+<<<<<<< HEAD
 		// Update tree
 		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
 				.getChildAt(selectedHousehold.getId());
 		DefaultMutableTreeNode family2Node = new DefaultMutableTreeNode(family2);
 		householdNode.add(family2Node);
 		treeModel.reload(rootTreeNode);
+=======
+		// Update label on family 1 (Not working)
+		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
+				.getChildAt(selectedHousehold.getId());
+//		DefaultMutableTreeNode family1Node = (DefaultMutableTreeNode) rootTreeNode.getChildAt(1);
+//		family1Node.setUserObject("Family 1");
+//		treeModel.nodeChanged(family1Node);
+
+		// Update tree
+		DefaultMutableTreeNode family2Node = new DefaultMutableTreeNode(family2);
+		householdNode.add(family2Node);
+		treeModel.reload(rootTreeNode);
+
+>>>>>>> branch 'master' of https://github.com/MichaelErichsen/VejbyGedcom.git
 	}
 
 	/**
