@@ -313,7 +313,6 @@ public class Individual {
 		// Null pointer exception
 		String[] nameParts = getName().split(" ");
 
-		// FIXME lowercase, change to datter
 		// Handle stubs like dat, dr, dtr, and datter
 		String familyName = nameParts[nameParts.length - 1];
 		LOGGER.log(Level.FINE, "Family name: " + familyName);

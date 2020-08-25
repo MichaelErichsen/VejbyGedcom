@@ -24,6 +24,10 @@ public class Census {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 //	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 	private static Census single_instance = null;
+	private int year;
+	private List<String> headers;
+	private List<List<String>> persons;
+	private List<Household> households;
 
 	/**
 	 * Static method to create instance of Singleton class.
@@ -37,12 +41,6 @@ public class Census {
 
 		return single_instance;
 	}
-
-	private int year;
-	private List<String> headers;
-	private List<List<String>> persons;
-
-	private List<Household> households;
 
 	/**
 	 * Constructor
@@ -90,7 +88,7 @@ public class Census {
 		}
 
 		for (Household household : households) {
-			household.createCensusEvent();
+			household.createCensusEvent(year);
 		}
 
 		return getHouseholds().size() + " husholdninger udskilt";

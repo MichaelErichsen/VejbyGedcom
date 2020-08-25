@@ -12,7 +12,7 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 24. aug. 2020
+ * @version 25. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -43,9 +43,11 @@ public class Household {
 
 	/**
 	 * Create the census event matching this household.
+	 * 
+	 * @param year
 	 */
-	public void createCensusEvent() {
-		censusEvent = new CensusEvent(iYear, rows.get(0).get(mappingKeys[2]), this);
+	public void createCensusEvent(int year) {
+		censusEvent = new CensusEvent(year, rows.get(0).get(mappingKeys[2]), this);
 	}
 
 	/**
@@ -135,8 +137,8 @@ public class Household {
 				int birthDate = (iYear - Integer.parseInt(row.get(mappingKeys[7])));
 				individual.setBirthDate("Abt. " + birthDate);
 			} catch (NumberFormatException e) {
-				// Or just copy the inout string
-				individual.setBirthDate(row.get(mappingKeys[6]) + "??");
+				// Or just copy the input string
+				individual.setBirthDate(row.get(mappingKeys[7]) + "??");
 			}
 		}
 

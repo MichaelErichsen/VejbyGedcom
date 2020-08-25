@@ -34,7 +34,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * The panel supports manual changes to the generated family structure by
  * definitions of up to three families.
  * 
- * @version 24. aug. 2020
+ * @version 25. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -235,8 +235,8 @@ public class HouseholdPanel extends JPanel {
 		selectedHousehold = censusTable.getHouseholds().get(id);
 
 		// Create table
-		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Familie 1", "Familie 2",
-				"Familie 3" };
+		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Stilling", "Familie 1",
+				"Familie 2", "Familie 3" };
 		int size = selectedHousehold.getPersonCount();
 		String[][] data = new String[size][columnNames.length];
 
@@ -246,9 +246,10 @@ public class HouseholdPanel extends JPanel {
 			data[i][1] = person.getName();
 			data[i][2] = person.getMaritalStatus();
 			data[i][3] = person.getTrade();
-			data[i][4] = person.getFamilyRole1();
-			data[i][5] = person.getFamilyRole2();
-			data[i][6] = person.getFamilyRole3();
+			data[i][4] = person.getPosition();
+			data[i][5] = person.getFamilyRole1();
+			data[i][6] = person.getFamilyRole2();
+			data[i][7] = person.getFamilyRole3();
 		}
 
 		householdTableModel = new DefaultTableModel(data, columnNames);
@@ -260,9 +261,9 @@ public class HouseholdPanel extends JPanel {
 		familyRoleComboBox.addItem("Fader");
 		familyRoleComboBox.addItem("Moder");
 		familyRoleComboBox.addItem("Barn");
-		table.getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 		table.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 		table.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
+		table.getColumnModel().getColumn(7).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 	}
 
 	/**
@@ -359,7 +360,7 @@ public class HouseholdPanel extends JPanel {
 			individual = selectedHousehold.getPerson(i);
 
 			// Set new role
-			String newRole = tableRowVector.get(4);
+			String newRole = tableRowVector.get(5);
 
 			if (newRole.startsWith("F")) {
 				family1.setFather(individual);
@@ -409,7 +410,7 @@ public class HouseholdPanel extends JPanel {
 			individual = selectedHousehold.getPerson(i);
 
 			// Set new role in family 2
-			String newRole = tableRowVector.get(5);
+			String newRole = tableRowVector.get(6);
 
 			if (newRole.startsWith("F")) {
 				family2.setFather(individual);
@@ -464,7 +465,7 @@ public class HouseholdPanel extends JPanel {
 			individual = selectedHousehold.getPerson(i);
 
 			// Set new role in family 3
-			String newRole = tableRowVector.get(6);
+			String newRole = tableRowVector.get(7);
 
 			if (newRole.startsWith("F")) {
 				family3.setFather(individual);

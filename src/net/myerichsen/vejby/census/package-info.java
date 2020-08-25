@@ -7,10 +7,10 @@
  * 1860 d5558 1880 c6987 1890 c5799 1901 d7013 1906 s0178
  * 
  * Each specific inherited class must parse the field names and add attributes
- * to persons as apprpriate
+ * to persons as appropriate
  * 
  * @author Michael Erichsen
- * @version 13. aug. 2020
+ * @version 25. aug. 2020
  *
  */
 package net.myerichsen.vejby.census;

@@ -182,9 +182,10 @@ public class CensusMappingPanel extends JPanel {
 		String error = "";
 		for (int i = 0; i < mappingKeys.length; i++) {
 			for (int j = i + 1; j < mappingKeys.length; j++) {
-				if (mappingKeys[i] == mappingKeys[j]) {
+				if ((mappingKeys[i] != 0) && (mappingKeys[i] == mappingKeys[j])) {
 					found = true;
-					error = "Samme værdi er brugt både i " + (i + 1) + ". og " + (j + 1) + ". række";
+					error = "Samme værdi (" + mappingKeys[i] + ") er brugt både i " + (i + 1) + ". og " + (j + 1)
+							+ ". række";
 				}
 			}
 		}
@@ -255,7 +256,6 @@ public class CensusMappingPanel extends JPanel {
 		int maxSize = mappingTable.getModel().getRowCount();
 		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
 
-		// FIXME Does not handle multiple "not in use" properly
 		row = prefs.getInt(PrefKey.INDIVIDUAL_0, 0);
 		if ((row > 0) && (row < maxSize)) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_0, row, 2);
