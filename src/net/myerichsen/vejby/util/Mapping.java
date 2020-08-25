@@ -28,7 +28,8 @@ public class Mapping {
 
 	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	private List<String> nameStubs = Arrays.asList("Dat", "Datt", "Datter", "Dat.", "Dtr", "Dr");
+	private List<String> daughterNameStubs = Arrays.asList("d.", "dat", "dat.", "datt", "datt.", "datter", "dr", "dr.",
+			"dtr", "dtr.");
 
 	/**
 	 * Constructor
@@ -46,10 +47,10 @@ public class Mapping {
 	}
 
 	/**
-	 * @return the nameStubs
+	 * @return the daughterNameStubs
 	 */
 	public List<String> getNameStubs() {
-		return nameStubs;
+		return daughterNameStubs;
 	}
 
 	/*

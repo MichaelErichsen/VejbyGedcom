@@ -318,9 +318,29 @@ public class Individual {
 		String familyName = nameParts[nameParts.length - 1];
 		LOGGER.log(Level.FINE, "Family name: " + familyName);
 
-		if (mapping.getNameStubs().contains(familyName)) {
+		if (familyName.endsWith("d.")) {
+			familyName = familyName.replace("d.", "datter");
+		} else if (familyName.endsWith("dat.")) {
+			familyName = familyName.replace("dat.", "datter");
+		} else if (familyName.endsWith("dat")) {
+			familyName = familyName.replace("dat", "datter");
+		} else if (familyName.endsWith("datt.")) {
+			familyName = familyName.replace("datt.", "datter");
+		} else if (familyName.endsWith("datt")) {
+			familyName = familyName.replace("datt", "datter");
+		} else if (familyName.endsWith("datr.")) {
+			familyName = familyName.replace("datr.", "datter");
+		} else if (familyName.endsWith("datr")) {
+			familyName = familyName.replace("datr", "datter");
+		} else if (familyName.endsWith("dtr.")) {
+			familyName = familyName.replace("dtr.", "datter");
+		} else if (familyName.endsWith("dtr")) {
+			familyName = familyName.replace("dtr", "datter");
+		}
+
+		if (mapping.getNameStubs().contains(familyName.toLowerCase())) {
 			LOGGER.log(Level.FINE, "Invalid family name: " + familyName);
-			familyName = new String(nameParts[nameParts.length - 2] + familyName);
+			familyName = new String(nameParts[nameParts.length - 2] + "datter");
 
 			for (int i = 0; i < (nameParts.length - 2); i++) {
 				sb.append(nameParts[i] + " ");
