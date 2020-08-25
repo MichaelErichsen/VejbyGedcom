@@ -35,7 +35,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 24. aug. 2020
+ * @version 25. aug. 2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
@@ -84,13 +84,14 @@ public class CensusMappingPanel extends JPanel {
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				populateMappingFromTable();
-				if (identifyHouseholds()) {
-					vejbyGedcom.getHouseholdJPanel().populateTree();
+				if (populateMappingFromTable()) {
+					if (identifyHouseholds()) {
+						vejbyGedcom.getHouseholdJPanel().populateTree();
 
-					JTabbedPane pane = vejbyGedcom.getTabbedPane();
-					pane.setEnabledAt(2, true);
-					pane.setSelectedIndex(2);
+						JTabbedPane pane = vejbyGedcom.getTabbedPane();
+						pane.setEnabledAt(2, true);
+						pane.setSelectedIndex(2);
+					}
 				}
 			}
 		});
@@ -126,8 +127,10 @@ public class CensusMappingPanel extends JPanel {
 	/**
 	 * Get data from table and save into mapping array.
 	 * 
+	 * @return
+	 * 
 	 */
-	private void populateMappingFromTable() {
+	private boolean populateMappingFromTable() {
 		String value;
 
 		for (int i = 0; i < mappingTable.getRowCount(); i++) {
@@ -175,7 +178,23 @@ public class CensusMappingPanel extends JPanel {
 			}
 		}
 
+		boolean found = false;
+		String error = "";
+		for (int i = 0; i < mappingKeys.length; i++) {
+			for (int j = i + 1; j < mappingKeys.length; j++) {
+				if (mappingKeys[i] == mappingKeys[j]) {
+					found = true;
+					error = "Samme værdi er brugt både i " + (i + 1) + ". og " + (j + 1) + ". række";
+				}
+			}
+		}
+
+		if (found) {
+			JOptionPane.showMessageDialog(new JFrame(), error, "Vejby Gedcom", JOptionPane.ERROR_MESSAGE);
+		}
 		LOGGER.log(Level.INFO, mapping.toString());
+
+		return !found;
 	}
 
 	/**
