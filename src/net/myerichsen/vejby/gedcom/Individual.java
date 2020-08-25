@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 23. aug. 2020
+ * @version 25. aug. 2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -313,6 +313,7 @@ public class Individual {
 		// Null pointer exception
 		String[] nameParts = getName().split(" ");
 
+		// FIXME lowercase, change to datter
 		// Handle stubs like dat, dr, dtr, and datter
 		String familyName = nameParts[nameParts.length - 1];
 		LOGGER.log(Level.FINE, "Family name: " + familyName);
@@ -342,10 +343,10 @@ public class Individual {
 		sb.append("1 BIRT\n");
 		sb.append("2 DATE " + getBirthDate() + "\n");
 		if (getBirthPlace() != null) {
-			sb.append("2 PLAC " + getBirthPlace() + "\n");
+			sb.append("2 PLAC " + getBirthPlace() + ",\n");
 		}
 
-		if (getDeathDate() != null) {
+		if ((getDeathDate() != null) && (!getDeathDate().equals(""))) {
 			sb.append("1 DEAT\n");
 			sb.append("2 DATE " + getDeathDate() + "\n");
 

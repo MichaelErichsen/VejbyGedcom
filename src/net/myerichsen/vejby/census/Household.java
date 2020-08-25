@@ -12,7 +12,7 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 23. aug. 2020
+ * @version 24. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -173,16 +173,16 @@ public class Household {
 	private String getFamilyRole(String position) {
 		position = position.toLowerCase();
 
-		if ((position.contains("broder")) || (position.contains("broderdatter")) || (position.contains("brodersøn"))
-				|| (position.contains("brødre")) || (position.contains("datterdatter"))
-				|| (position.contains("forældre")) || (position.contains("manden")) || (position.contains("moder"))
-				|| (position.contains("pleiebarn")) || (position.contains("pleiebørn"))
-				|| (position.contains("pleiedatter")) || (position.contains("pleiesøn"))
-				|| (position.contains("sønnesøn")) || (position.contains("søster"))
+		if ((position.contains("aftægtskone")) || (position.contains("broder")) || (position.contains("broderdatter"))
+				|| (position.contains("brodersøn")) || (position.contains("brødre"))
+				|| (position.contains("datterdatter")) || (position.contains("forældre"))
+				|| (position.contains("manden")) || (position.contains("moder")) || (position.contains("pleiebarn"))
+				|| (position.contains("pleiebørn")) || (position.contains("pleiedatter"))
+				|| (position.contains("pleiesøn")) || (position.contains("sønnesøn")) || (position.contains("søster"))
 				|| (position.contains("søsterdatter")) || (position.contains("stedfader"))
 				|| (position.contains("svigerfader")) || (position.contains("svigerfar"))
 				|| (position.contains("svigerforældre")) || (position.contains("svigermoder"))
-				|| (position.contains("svigersøn"))) {
+				|| (position.contains("svigersøn")) || (position.contains("undertagskone"))) {
 			return "";
 		}
 
