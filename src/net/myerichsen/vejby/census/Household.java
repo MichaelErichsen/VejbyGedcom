@@ -57,9 +57,11 @@ public class Household {
 	 * identified by the application. The others (up to two more) must be done
 	 * manually.
 	 * 
+	 * @param sexMappingKey
+	 * 
 	 * @return message The return message
 	 */
-	public String createFamilies() {
+	public String createFamilies(int sexMappingKey) {
 		Individual individual;
 
 		boolean first = true;
@@ -73,7 +75,14 @@ public class Household {
 			individual = createIndividual(row);
 			individual.setCensusEvent(censusEvent);
 
+			// Handle that 1787 has no sex column
 			if (first) {
+				if (sexMappingKey == -1) {
+					if (individual.getFamilyRole1().equals("")) {
+						individual.setFamilyRole1("Fader");
+					}
+				} else
+
 				// The first person is the primary person, either father or mother according to
 				// sex
 				if (individual.getSex().startsWith("M")) {
@@ -196,7 +205,7 @@ public class Household {
 		}
 
 		if ((position.contains("husmoder")) || (position.contains("hustru")) || (position.contains("huusmoder"))
-				|| (position.contains("kone"))) {
+				|| (position.contains("kone")) || (position.contains("madmoder"))) {
 			return "Moder";
 		}
 

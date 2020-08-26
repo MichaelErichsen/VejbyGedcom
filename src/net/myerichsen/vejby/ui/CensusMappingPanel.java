@@ -35,7 +35,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 25. aug. 2020
+ * @version 26. aug. 2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
@@ -117,7 +117,13 @@ public class CensusMappingPanel extends JPanel {
 		// Create a family for each household
 		if (mappingKeys[5] != 0) {
 			for (Household household : censusTable.getHouseholds()) {
-				message = household.createFamilies();
+				message = household.createFamilies(mappingKeys[5]);
+				LOGGER.log(Level.FINE, message);
+			}
+		} else {
+			// Handle 1787 without a sex column
+			for (Household household : censusTable.getHouseholds()) {
+				message = household.createFamilies(-1);
 				LOGGER.log(Level.FINE, message);
 			}
 		}
