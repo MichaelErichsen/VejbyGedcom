@@ -19,6 +19,7 @@ import javax.swing.JTree;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import net.myerichsen.vejby.census.Census;
 import net.myerichsen.vejby.census.Household;
@@ -34,7 +35,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * The panel supports manual changes to the generated family structure by
  * definitions of up to three families.
  * 
- * @version 25. aug. 2020
+ * @version 27 aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -103,16 +104,6 @@ public class HouseholdPanel extends JPanel {
 		});
 		buttonPanel.add(family2Button);
 
-		delete2Button = new JButton("Slet familie 2 og 3");
-		delete2Button.setEnabled(false);
-		delete2Button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				deleteFamily2();
-			}
-		});
-		buttonPanel.add(delete2Button);
-
 		family3Button = new JButton("Opdat\u00E9r familie 3");
 		family3Button.setEnabled(false);
 		family3Button.addActionListener(new ActionListener() {
@@ -122,6 +113,16 @@ public class HouseholdPanel extends JPanel {
 			}
 		});
 		buttonPanel.add(family3Button);
+
+		delete2Button = new JButton("Slet familie 2 og 3");
+		delete2Button.setEnabled(false);
+		delete2Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteFamily2();
+			}
+		});
+		buttonPanel.add(delete2Button);
 
 		delete3Button = new JButton("Slet familie 3");
 		delete3Button.setEnabled(false);
@@ -346,6 +347,8 @@ public class HouseholdPanel extends JPanel {
 	private void updateFamily1() {
 		Individual individual;
 
+		TreePath selectedNode = tree.getSelectionPath();
+
 		selectedHousehold.getFamilies().clear();
 
 		Family family0 = new Family(selectedHousehold.getId(), 0);
@@ -379,6 +382,7 @@ public class HouseholdPanel extends JPanel {
 		selectedHousehold.getFamilies().add(family1);
 
 		treeModel.reload(rootTreeNode);
+		tree.setSelectionPath(selectedNode);
 		table.setModel(householdTableModel);
 	}
 
@@ -393,6 +397,8 @@ public class HouseholdPanel extends JPanel {
 	 */
 	protected void updateFamily2() {
 		Individual individual;
+
+		TreePath selectedNode = tree.getSelectionPath();
 
 		// Get existing list of singletons
 		Family oldFamily0 = selectedHousehold.getFamilies().get(0);
@@ -439,6 +445,7 @@ public class HouseholdPanel extends JPanel {
 		DefaultMutableTreeNode family2Node = new DefaultMutableTreeNode(family2);
 		householdNode.add(family2Node);
 		treeModel.reload(rootTreeNode);
+		tree.setSelectionPath(selectedNode);
 
 		delete2Button.setEnabled(true);
 	}
@@ -448,6 +455,8 @@ public class HouseholdPanel extends JPanel {
 	 */
 	protected void updateFamily3() {
 		Individual individual;
+
+		TreePath selectedNode = tree.getSelectionPath();
 
 		// Get existing list of singletons
 		Family oldFamily0 = selectedHousehold.getFamilies().get(0);
@@ -494,6 +503,7 @@ public class HouseholdPanel extends JPanel {
 		DefaultMutableTreeNode family3Node = new DefaultMutableTreeNode(family3);
 		householdNode.add(family3Node);
 		treeModel.reload(rootTreeNode);
+		tree.setSelectionPath(selectedNode);
 
 		delete3Button.setEnabled(true);
 	}

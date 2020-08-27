@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Singleton class containing census mapping pairs and name stubs.
  * 
- * @version 25. aug. 2020
+ * @version 26. aug. 2020
  * @author Michael Erichsen
  *
  */
@@ -49,7 +49,7 @@ public class Mapping {
 	/**
 	 * @return the daughterNameStubs
 	 */
-	public List<String> getNameStubs() {
+	public List<String> getDaughterNameStubs() {
 		return daughterNameStubs;
 	}
 

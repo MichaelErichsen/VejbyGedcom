@@ -310,6 +310,11 @@ public class Individual {
 
 		sb.append("1 NAME ");
 
+		// DEBUG TODO
+		if (getName().equals("Søren Larsen")) {
+			LOGGER.log(Level.INFO, "Family name: " + getName());
+
+		}
 		// Null pointer exception
 		String[] nameParts = getName().split(" ");
 
@@ -337,8 +342,8 @@ public class Individual {
 			familyName = familyName.replace("dtr", "datter");
 		}
 
-		if (mapping.getNameStubs().contains(familyName.toLowerCase())) {
-			LOGGER.log(Level.FINE, "Invalid family name: " + familyName);
+		if (mapping.getDaughterNameStubs().contains(familyName.toLowerCase())) {
+			LOGGER.log(Level.INFO, "Invalid family name: " + familyName);
 			familyName = new String(nameParts[nameParts.length - 2] + "datter");
 
 			for (int i = 0; i < (nameParts.length - 2); i++) {

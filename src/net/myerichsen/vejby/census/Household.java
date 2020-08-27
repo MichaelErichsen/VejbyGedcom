@@ -12,7 +12,7 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 26. aug. 2020
+ * @version 27. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -187,12 +187,11 @@ public class Household {
 		if ((position.contains("aftægtskone")) || (position.contains("barnepige")) || (position.contains("broder"))
 				|| (position.contains("broderdatter")) || (position.contains("brodersøn"))
 				|| (position.contains("brødre")) || (position.contains("datterdatter"))
-				|| (position.contains("forældre")) || (position.contains("manden")) || (position.contains("moder"))
-				|| (position.contains("pleiebarn")) || (position.contains("pleiebørn"))
-				|| (position.contains("pleiedatter")) || (position.contains("pleiesøn"))
-				|| (position.contains("plejebarn")) || (position.contains("plejebørn"))
-				|| (position.contains("plejedatter")) || (position.contains("plejesøn"))
-				|| (position.contains("sønnesøn")) || (position.contains("søster"))
+				|| (position.contains("forældre")) || (position.contains("manden")) || (position.contains("pleiebarn"))
+				|| (position.contains("pleiebørn")) || (position.contains("pleiedatter"))
+				|| (position.contains("pleiesøn")) || (position.contains("plejebarn"))
+				|| (position.contains("plejebørn")) || (position.contains("plejedatter"))
+				|| (position.contains("plejesøn")) || (position.contains("sønnesøn")) || (position.contains("søster"))
 				|| (position.contains("søsterdatter")) || (position.contains("stedfader"))
 				|| (position.contains("svigerfader")) || (position.contains("svigerfar"))
 				|| (position.contains("svigerforældre")) || (position.contains("svigermoder"))
