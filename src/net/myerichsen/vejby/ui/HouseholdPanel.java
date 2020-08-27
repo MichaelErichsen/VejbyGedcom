@@ -94,21 +94,24 @@ public class HouseholdPanel extends JPanel {
 		});
 		buttonPanel.add(family1Button);
 
-		family2Button = new JButton("Opdat\u00E9r familie 2");
+		family2Button = new JButton("Opdat\u00E9r familie 1 og 2");
 		family2Button.setEnabled(false);
 		family2Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				updateFamily1();
 				updateFamily2();
 			}
 		});
 		buttonPanel.add(family2Button);
 
-		family3Button = new JButton("Opdat\u00E9r familie 3");
+		family3Button = new JButton("Opdat\u00E9r familie 1, 2 og 3");
 		family3Button.setEnabled(false);
 		family3Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				updateFamily1();
+				updateFamily2();
 				updateFamily3();
 			}
 		});
