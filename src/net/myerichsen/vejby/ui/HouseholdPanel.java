@@ -201,7 +201,12 @@ public class HouseholdPanel extends JPanel {
 	 * Clear the family 1 column from the cursor and downwards
 	 */
 	protected void clearFamily1FromCursor() {
+<<<<<<< HEAD
 		for (int i = table.getSelectedRow(); i < table.getRowCount(); i++) {
+=======
+		int selectedRow = table.getSelectedRow();
+		for (int i = selectedRow - 1; i < table.getRowCount(); i++) {
+>>>>>>> branch 'master' of https://github.com/MichaelErichsen/VejbyGedcom.git
 			table.setValueAt("", i, 5);
 		}
 
