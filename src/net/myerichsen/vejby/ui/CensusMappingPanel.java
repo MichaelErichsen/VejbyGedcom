@@ -35,7 +35,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 26. aug. 2020
+ * @version 28. aug. 2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {

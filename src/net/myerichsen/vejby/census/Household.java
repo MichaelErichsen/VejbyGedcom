@@ -118,6 +118,7 @@ public class Household {
 			}
 
 			getPersons().add(individual);
+			LOGGER.log(Level.INFO, "Individual added to households.persons: " + individual.getId() + ", " + individual);
 		}
 
 		families.clear();
