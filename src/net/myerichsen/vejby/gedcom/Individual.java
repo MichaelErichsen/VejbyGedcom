@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 25. aug. 2020
+ * @version 28. aug. 2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -30,6 +30,7 @@ public class Individual {
 	private String familyRole1 = "";
 	private String familyRole2 = "";
 	private String familyRole3 = "";
+	private String familyRole4 = "";
 	private int year;
 	private Household household;
 	private CensusEvent censusEvent;
@@ -105,6 +106,13 @@ public class Individual {
 	 */
 	public String getFamilyRole3() {
 		return familyRole3;
+	}
+
+	/**
+	 * @return the familyRole4
+	 */
+	public String getFamilyRole4() {
+		return familyRole4;
 	}
 
 	/**
@@ -232,6 +240,13 @@ public class Individual {
 	 */
 	public void setFamilyRole3(String familyRole3) {
 		this.familyRole3 = familyRole3;
+	}
+
+	/**
+	 * @param familyRole4 the familyRole4 to set
+	 */
+	public void setFamilyRole4(String familyRole4) {
+		this.familyRole4 = familyRole4;
 	}
 
 	/**

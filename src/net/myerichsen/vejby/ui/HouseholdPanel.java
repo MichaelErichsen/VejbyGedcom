@@ -1,6 +1,7 @@
 package net.myerichsen.vejby.ui;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,9 +34,9 @@ import net.myerichsen.vejby.gedcom.Individual;
  * entity.
  * <p>
  * The panel supports manual changes to the generated family structure by
- * definitions of up to three families.
+ * definitions of up to four families.
  * 
- * @version 27 aug. 2020
+ * @version 28 aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -55,9 +56,11 @@ public class HouseholdPanel extends JPanel {
 	private JButton family1Button;
 	private JButton family2Button;
 	private JButton family3Button;
-	private JButton saveButton;
+	private JButton family4Button;
 	private JButton delete2Button;
 	private JButton delete3Button;
+	private JButton delete4Button;
+	private JButton saveButton;
 
 	/**
 	 * Create the panel.
@@ -92,6 +95,7 @@ public class HouseholdPanel extends JPanel {
 				updateFamily1();
 			}
 		});
+		buttonPanel.setLayout(new GridLayout(0, 4, 0, 0));
 		buttonPanel.add(family1Button);
 
 		family2Button = new JButton("Opdat\u00E9r familie 1 og 2");
@@ -117,25 +121,52 @@ public class HouseholdPanel extends JPanel {
 		});
 		buttonPanel.add(family3Button);
 
-		delete2Button = new JButton("Slet familie 2 og 3");
+		family4Button = new JButton("Opdat\u00E9r familie 1, 2, 3 og 4\r\n");
+		family4Button.setEnabled(false);
+		family4Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateFamily1();
+				updateFamily2();
+				updateFamily3();
+				updateFamily4();
+			}
+		});
+		buttonPanel.add(family4Button);
+
+		delete2Button = new JButton("Slet familie 2, 3 og 4\r\n");
 		delete2Button.setEnabled(false);
 		delete2Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				deleteFamily4();
+				deleteFamily3();
 				deleteFamily2();
 			}
 		});
+
 		buttonPanel.add(delete2Button);
 
-		delete3Button = new JButton("Slet familie 3");
+		delete3Button = new JButton("Slet familie 3 og 4");
 		delete3Button.setEnabled(false);
 		delete3Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				deleteFamily4();
 				deleteFamily3();
 			}
 		});
 		buttonPanel.add(delete3Button);
+
+		delete4Button = new JButton("Slet familie 4");
+		delete4Button.setEnabled(false);
+		delete4Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteFamily4();
+			}
+		});
+		buttonPanel.add(delete4Button);
 
 		saveButton = new JButton("Gem som GEDCOM");
 		saveButton.addActionListener(new ActionListener() {
@@ -151,13 +182,14 @@ public class HouseholdPanel extends JPanel {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
+
 		buttonPanel.add(saveButton);
 	}
 
 	/**
 	 * For each individual in the household:
 	 * <p>
-	 * Set family role 2 to spaces
+	 * Set requested family role to spaces
 	 * 
 	 * @param i Family number
 	 */
@@ -167,6 +199,8 @@ public class HouseholdPanel extends JPanel {
 				individual.setFamilyRole2("");
 			} else if (i == 3) {
 				individual.setFamilyRole3("");
+			} else if (i == 4) {
+				individual.setFamilyRole4("");
 			}
 		}
 	}
@@ -206,6 +240,20 @@ public class HouseholdPanel extends JPanel {
 	}
 
 	/**
+	 * Delete family 4
+	 */
+	@SuppressWarnings("unchecked")
+	protected void deleteFamily4() {
+		Family family4 = selectedHousehold.getFamilies().get(4);
+		selectedHousehold.getFamilies().remove(family4);
+		rootTreeNode.remove(4);
+		treeModel.reload(rootTreeNode);
+		family4 = null;
+		clearFamilyRoles(4);
+		rebuildSinglesList(householdTableModel.getDataVector(), selectedHousehold.getFamilies().get(0));
+	}
+
+	/**
 	 * Populate table with family data. Rows contain father, mother and children.
 	 * 
 	 * @param householdId The id of the household
@@ -240,7 +288,7 @@ public class HouseholdPanel extends JPanel {
 
 		// Create table
 		String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Stilling", "Familie 1",
-				"Familie 2", "Familie 3" };
+				"Familie 2", "Familie 3", "Familie 4" };
 		int size = selectedHousehold.getPersonCount();
 		String[][] data = new String[size][columnNames.length];
 
@@ -254,6 +302,7 @@ public class HouseholdPanel extends JPanel {
 			data[i][5] = person.getFamilyRole1();
 			data[i][6] = person.getFamilyRole2();
 			data[i][7] = person.getFamilyRole3();
+			data[i][8] = person.getFamilyRole4();
 		}
 
 		householdTableModel = new DefaultTableModel(data, columnNames);
@@ -268,6 +317,7 @@ public class HouseholdPanel extends JPanel {
 		table.getColumnModel().getColumn(5).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 		table.getColumnModel().getColumn(6).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 		table.getColumnModel().getColumn(7).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
+		table.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor(familyRoleComboBox));
 	}
 
 	/**
@@ -290,6 +340,7 @@ public class HouseholdPanel extends JPanel {
 		family1Button.setEnabled(true);
 		family2Button.setEnabled(true);
 		family3Button.setEnabled(true);
+		family4Button.setEnabled(true);
 	}
 
 	/**
@@ -509,5 +560,63 @@ public class HouseholdPanel extends JPanel {
 		tree.setSelectionPath(selectedNode);
 
 		delete3Button.setEnabled(true);
+	}
+
+	/**
+	 * Update the singles list (family 0) and the fourth family.
+	 */
+	protected void updateFamily4() {
+		Individual individual;
+
+		TreePath selectedNode = tree.getSelectionPath();
+
+		// Get existing list of singletons
+		Family oldFamily0 = selectedHousehold.getFamilies().get(0);
+
+		// Create a new family 3
+		Family family4 = new Family(selectedHousehold.getId(), 4);
+
+		// Read all rows and add to family 3
+		@SuppressWarnings("unchecked")
+		Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		Vector<String> tableRowVector;
+
+		for (int i = 0; i < dataVector.size(); i++) {
+			tableRowVector = dataVector.get(i);
+			individual = selectedHousehold.getPerson(i);
+
+			// Set new role in family 3
+			String newRole = tableRowVector.get(8);
+
+			if (newRole.startsWith("F")) {
+				family4.setFather(individual);
+			} else if (newRole.startsWith("M")) {
+				family4.setMother(individual);
+			} else if (newRole.startsWith("B")) {
+				family4.getChildren().add(individual);
+			}
+
+			individual.setFamilyRole4(newRole);
+		}
+
+		selectedHousehold.getFamilies().add(family4);
+
+		// Create a new family 0 with all unassigned individuals
+		Family family0 = new Family(selectedHousehold.getId(), 0);
+		rebuildSinglesList(dataVector, family0);
+
+		// Replace old family 0 with new family 0
+		selectedHousehold.getFamilies().remove(oldFamily0);
+		selectedHousehold.getFamilies().add(0, family0);
+
+		// Update tree
+		DefaultMutableTreeNode householdNode = (DefaultMutableTreeNode) rootTreeNode
+				.getChildAt(selectedHousehold.getId());
+		DefaultMutableTreeNode family4Node = new DefaultMutableTreeNode(family4);
+		householdNode.add(family4Node);
+		treeModel.reload(rootTreeNode);
+		tree.setSelectionPath(selectedNode);
+
+		delete4Button.setEnabled(true);
 	}
 }

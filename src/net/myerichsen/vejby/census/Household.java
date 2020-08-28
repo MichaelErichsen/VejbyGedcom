@@ -1,7 +1,12 @@
 package net.myerichsen.vejby.census;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.myerichsen.vejby.gedcom.CensusEvent;
 import net.myerichsen.vejby.gedcom.Family;
@@ -12,12 +17,12 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 27. aug. 2020
+ * @version 28. aug. 2020
  * @author Michael Erichsen
  * 
  */
 public class Household {
-//	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private List<List<String>> rows;
 	private List<Family> families;
 	private List<Individual> singles;
@@ -135,7 +140,22 @@ public class Household {
 
 		// Birth date
 		if (mappingKeys[6] != 0) {
-			individual.setBirthDate(row.get(mappingKeys[6]));
+			String bd = row.get(mappingKeys[6]);
+
+			// Test for 18540304 format
+			if (bd.matches("[0-9]{8}")) {
+				SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");
+
+				try {
+					Date date = inputFormat.parse(bd);
+					bd = outputFormat.format(date);
+				} catch (ParseException ignoredException) {
+				}
+
+				LOGGER.log(Level.FINE, "Birth date: " + bd);
+			}
+			individual.setBirthDate(bd);
 		} else if (mappingKeys[7] != 0) {
 			// Or age
 			try {
