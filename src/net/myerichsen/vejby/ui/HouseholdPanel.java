@@ -61,6 +61,7 @@ public class HouseholdPanel extends JPanel {
 	private JButton delete3Button;
 	private JButton delete4Button;
 	private JButton saveButton;
+	private JButton clear1Button;
 
 	/**
 	 * Create the panel.
@@ -95,7 +96,7 @@ public class HouseholdPanel extends JPanel {
 				updateFamily1();
 			}
 		});
-		buttonPanel.setLayout(new GridLayout(0, 4, 0, 0));
+		buttonPanel.setLayout(new GridLayout(0, 5, 0, 0));
 		buttonPanel.add(family1Button);
 
 		family2Button = new JButton("Opdat\u00E9r familie 1 og 2");
@@ -133,6 +134,16 @@ public class HouseholdPanel extends JPanel {
 			}
 		});
 		buttonPanel.add(family4Button);
+
+		clear1Button = new JButton("Ryd familie 1 herfra");
+		clear1Button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clearFamily1FromCursor();
+			}
+		});
+		clear1Button.setEnabled(false);
+		buttonPanel.add(clear1Button);
 
 		delete2Button = new JButton("Slet familie 2, 3 og 4\r\n");
 		delete2Button.setEnabled(false);
@@ -184,6 +195,17 @@ public class HouseholdPanel extends JPanel {
 		});
 
 		buttonPanel.add(saveButton);
+	}
+
+	/**
+	 * Clear the family 1 column from the cursor and downwards
+	 */
+	protected void clearFamily1FromCursor() {
+		int selectedRow = table.getSelectedRow();
+		for (int i = selectedRow - 1; i < table.getRowCount(); i++) {
+			table.setValueAt("", i, 5);
+		}
+
 	}
 
 	/**
@@ -341,6 +363,7 @@ public class HouseholdPanel extends JPanel {
 		family2Button.setEnabled(true);
 		family3Button.setEnabled(true);
 		family4Button.setEnabled(true);
+		clear1Button.setEnabled(true);
 	}
 
 	/**
