@@ -17,7 +17,7 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 28. aug. 2020
+ * @version 29. aug. 2020
  * @author Michael Erichsen
  * 
  */
@@ -184,7 +184,9 @@ public class Household {
 			individual.setFamilyRole1(getFamilyRole(trade));
 		}
 
-		individual.setBirthPlace(row.get(mappingKeys[11]));
+		if (mappingKeys[11] != 0) {
+			individual.setBirthPlace(row.get(mappingKeys[11]));
+		}
 
 		return individual;
 	}

@@ -21,7 +21,7 @@ import net.myerichsen.vejby.census.Census;
 /**
  * Singleton class representing a GEDCOM file.
  * 
- * @version 28. aug. 2020
+ * @version 29. aug. 2020
  * @author Michael Erichsen
  */
 public class GedcomFile {

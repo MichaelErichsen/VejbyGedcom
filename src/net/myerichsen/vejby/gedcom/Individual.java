@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 28. aug. 2020
+ * @version 29. aug. 2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -327,7 +327,7 @@ public class Individual {
 
 		// DEBUG TODO
 		if (getName().equals("Søren Larsen")) {
-			LOGGER.log(Level.INFO, "Family name: " + getName());
+			LOGGER.log(Level.INFO, "Person name: " + getId() + ", " + getName());
 
 		}
 		// Null pointer exception
@@ -373,15 +373,16 @@ public class Individual {
 		// Surround with slashes to mark as family name
 		sb.append("/" + familyName + "/\n");
 
-		if (getSex().equals(Sex.M)) {
-			sb.append("1 SEX M\n");
-		} else if (getSex().equals(Sex.F)) {
+		// Default to M rather than having to fix all entries with "?"
+		if (getSex().equals(Sex.F)) {
 			sb.append("1 SEX F\n");
+		} else {
+			sb.append("1 SEX M\n");
 		}
 
 		sb.append("1 BIRT\n");
 		sb.append("2 DATE " + getBirthDate() + "\n");
-		if (getBirthPlace() != null) {
+		if ((getBirthPlace() != null) && (!getBirthPlace().equals(""))) {
 			sb.append("2 PLAC " + getBirthPlace() + ",\n");
 		}
 
