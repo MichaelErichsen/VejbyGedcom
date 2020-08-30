@@ -325,12 +325,6 @@ public class Individual {
 
 		sb.append("1 NAME ");
 
-		// DEBUG TODO
-		if (getName().equals("Søren Larsen")) {
-			LOGGER.log(Level.INFO, "Person name: " + getId() + ", " + getName());
-
-		}
-		// Null pointer exception
 		String[] nameParts = getName().split(" ");
 
 		// Handle stubs like dat, dr, dtr, and datter

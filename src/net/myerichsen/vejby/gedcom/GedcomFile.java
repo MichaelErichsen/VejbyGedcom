@@ -102,7 +102,6 @@ public class GedcomFile {
 				for (Family family : censusTable.getFamilies()) {
 					if (family.getFamilyId() == 0) {
 						for (Individual person : family.getSingles()) {
-							// TODO Debug
 							LOGGER.log(Level.FINE, "Writing GEDCOM for person " + person.getId() + ", " + person);
 							fw.write(person.toGedcom());
 							LOGGER.log(Level.FINE, "Family " + family.getHouseholdId() + ", " + family.getFamilyId()
