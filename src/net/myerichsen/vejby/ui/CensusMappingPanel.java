@@ -35,7 +35,7 @@ import net.myerichsen.vejby.util.PrefKey;
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
  * 
- * @version 28. aug. 2020
+ * @version 04-09-2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
@@ -89,8 +89,8 @@ public class CensusMappingPanel extends JPanel {
 						vejbyGedcom.getHouseholdJPanel().populateTree();
 
 						JTabbedPane pane = vejbyGedcom.getTabbedPane();
-						pane.setEnabledAt(2, true);
-						pane.setSelectedIndex(2);
+						pane.setEnabledAt(3, true);
+						pane.setSelectedIndex(3);
 					}
 				}
 			}

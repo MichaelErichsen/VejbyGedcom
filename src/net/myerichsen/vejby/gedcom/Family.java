@@ -7,7 +7,7 @@ import java.util.List;
  * Class representing a family in GEDCOM as extracted from a household in a
  * census file.
  * 
- * @version 23. aug. 2020
+ * @version 04-09-2020
  * @author Michael Erichsen
  */
 public class Family {
@@ -19,6 +19,8 @@ public class Family {
 	private List<Individual> singles = new ArrayList<>();
 	private int householdId;
 	private int familyId;
+	private String marriageDate;
+	private String marriagePlace;
 
 	/**
 	 * Constructor
@@ -58,6 +60,20 @@ public class Family {
 	 */
 	public int getHouseholdId() {
 		return householdId;
+	}
+
+	/**
+	 * @return the marriageDate
+	 */
+	public String getMarriageDate() {
+		return marriageDate;
+	}
+
+	/**
+	 * @return the marriagePlace
+	 */
+	public String getMarriagePlace() {
+		return marriagePlace;
 	}
 
 	/**
@@ -197,6 +213,20 @@ public class Family {
 	}
 
 	/**
+	 * @param marriageDate the marriageDate to set
+	 */
+	public void setMarriageDate(String marriageDate) {
+		this.marriageDate = marriageDate;
+	}
+
+	/**
+	 * @param marriagePlace the marriagePlace to set
+	 */
+	public void setMarriagePlace(String marriagePlace) {
+		this.marriagePlace = marriagePlace;
+	}
+
+	/**
 	 * @param mother the mother to set
 	 */
 	public void setMother(Individual mother) {
@@ -249,6 +279,16 @@ public class Family {
 		}
 
 		sb.append("1 MARR\n");
+
+		if (!marriageDate.equals("")) {
+			sb.append("2 DATE " + marriageDate + "\n");
+		}
+
+		if (!marriagePlace.equals("")) {
+			sb.append("2 PLAC " + marriagePlace + "\n");
+		}
+
+		sb.append("2 SOUR @S1@\n");
 
 		return sb.toString();
 	}

@@ -186,7 +186,7 @@ public class HouseholdPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
 				GedcomFile gedcomFile = GedcomFile.getInstance();
-				String path = gedcomFile.save(censusTable);
+				String path = gedcomFile.saveCensus(censusTable);
 
 				JOptionPane.showMessageDialog(new JFrame(),
 						"Folketælling for " + censusTable.getYear() + " er gemt som GEDCOM fil " + path, "Vejby Gedcom",

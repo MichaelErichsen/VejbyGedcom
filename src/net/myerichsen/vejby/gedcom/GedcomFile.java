@@ -2,7 +2,6 @@ package net.myerichsen.vejby.gedcom;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import net.myerichsen.vejby.census.Census;
 /**
  * Singleton class representing a GEDCOM file.
  * 
- * @version 29. aug. 2020
+ * @version 04-09-20204
  * @author Michael Erichsen
  */
 public class GedcomFile {
@@ -74,7 +73,7 @@ public class GedcomFile {
 	 * @param censusTable The census table loaded from a KIP file
 	 * @return
 	 */
-	public String save(Census censusTable) {
+	public String saveCensus(Census censusTable) {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
 		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
 		String path = "";
@@ -95,7 +94,27 @@ public class GedcomFile {
 			try {
 				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
 
-				writeHeader(fw);
+//				writeHeader(fw);
+				fw.write("0 HEAD\n");
+				fw.write("1 SOUR VejbyGedcom\n");
+				fw.write("2 VERS v 0.1\n");
+				fw.write("1 SUBM @SUB1@\n");
+				fw.write("1 GEDC\n");
+				fw.write("2 VERS 5.5\n");
+				fw.write("2 FORM LINEAGE-LINKED\n");
+				fw.write("1 DEST GED55\n");
+
+				final Calendar cal = Calendar.getInstance();
+				SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+				fw.write("1 DATE " + sdf.format(cal.getTime()) + "\n");
+
+				sdf = new SimpleDateFormat("hh:mm");
+				fw.write("2 TIME " + sdf.format(cal.getTime()) + "\n");
+				fw.write("1 CHAR ANSEL\n");
+				fw.write("1 FILE " + fileName + "\n");
+				fw.write("0 @SUB1@ SUBM\n");
+				fw.write("1 NAME Dansk Demografisk Database\n");
+				fw.write("1 ADDR Rigsarkivet, Jernbanegade 36, 5000 Odense C\n");
 
 				int familyId = 1;
 
@@ -114,7 +133,14 @@ public class GedcomFile {
 					}
 				}
 
-				writeCensusTrailer(fw);
+//				writeCensusTrailer(fw);
+				// Source for places
+				fw.write("1 TITL DDD Folketællinger. " + "Kildeindtastningsprojektet.\n");
+				fw.write("1 AUTH Statens Arkiver\n");
+
+				// Trailer
+				fw.write("0 TRLR\n");
+
 				fw.close();
 				path = gedcomFile.getPath();
 				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + path);
@@ -127,13 +153,15 @@ public class GedcomFile {
 	}
 
 	/**
-	 * Save a family as GEDCOM. Used by church registry birth.
+	 * Save a marriage fileas GEDCOM. Used by FS analysis.
 	 * 
-	 * @param family The family to save
+	 * @param censusTable The census table loaded from an FS query export
+	 * @return Save path for GEDCOM file
 	 */
-	public void save(Family family) {
+	public String saveMarriage() {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
 		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+		String path = "";
 
 		gedcomChooser.setFileFilter(ff);
 
@@ -147,22 +175,62 @@ public class GedcomFile {
 			}
 			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
 
-			OutputStreamWriter fw = null;
 			try {
-				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+//				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
+				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gedcomFile));
 
-				writeHeader(fw);
+				writer.write("0 HEAD\n");
+				writer.write("1 SOUR VejbyGedcom\n");
+				writer.write("2 VERS v 0.1\n");
+				writer.write("1 SUBM @SUB1@\n");
+				writer.write("1 GEDC\n");
+				writer.write("2 VERS 5.5\n");
+				writer.write("2 FORM LINEAGE-LINKED\n");
+				writer.write("1 DEST GED55\n");
 
-				fw.write(family.toGedcom(1));
-				LOGGER.log(Level.FINE, family.toString());
+				final Calendar cal = Calendar.getInstance();
+				SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+				writer.write("1 DATE " + sdf.format(cal.getTime()) + "\n");
 
-				writeChurchRegistryTrailer(fw);
-				fw.close();
-				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + gedcomFile.getPath());
+				sdf = new SimpleDateFormat("hh:mm");
+				writer.write("2 TIME " + sdf.format(cal.getTime()) + "\n");
+				writer.write("1 CHAR ANSEL\n");
+				writer.write("1 FILE " + fileName + "\n");
+				writer.write("0 @SUB1@ SUBM\n");
+				writer.write("1 NAME Intellectual Reserve, Inc.\n");
+				writer.write("1 ADDR Salt Lake City, USA\n");
+
+				Family family;
+				String s = "";
+
+				for (int i = 0; i < families.size(); i++) {
+					family = families.get(i);
+					LOGGER.log(Level.INFO, "Family " + i);
+//					LOGGER.log(Level.INFO, "Size of string: " + family.toGedcom(i).length());
+					s = family.toGedcom(i);
+					writer.write(s);
+					LOGGER.log(Level.FINE, "Family " + family.getHouseholdId() + ", " + family.getFamilyId() + ", "
+							+ family.toString());
+				}
+
+				// Source for marriages
+				writer.write("0 @S1@ SOUR\n");
+				writer.write("1 TITL FamilySearch (https://familysearch.org/)\n");
+				writer.write("1 AUTH Intellectual Reserve, Inc.\n");
+
+				// Trailer
+				writer.write("0 TRLR\n");
+				writer.close();
+				path = gedcomFile.getPath();
+				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + path);
 			} catch (Exception e) {
+//				LOGGER.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
+				return "";
 			}
 		}
+
+		return path;
 	}
 
 	/**
@@ -172,64 +240,4 @@ public class GedcomFile {
 		this.families = families;
 	}
 
-	/**
-	 * Write a census GEDCOM trailer.
-	 * 
-	 * @param fw File writer
-	 * @throws IOException
-	 */
-	private void writeCensusTrailer(final OutputStreamWriter fw) throws IOException {
-		// Source for places
-		fw.write("0 @S1@ SOUR\n");
-		fw.write("1 TITL DDD Folketællinger. " + "Kildeindtastningsprojektet.\n");
-		fw.write("1 AUTH Statens Arkiver\n");
-
-		// Trailer
-		fw.write("0 TRLR\n");
-	}
-
-	/**
-	 * Write a church registry GEDCOM trailer.
-	 * 
-	 * @param fw File writer
-	 * @throws IOException
-	 */
-	private void writeChurchRegistryTrailer(final OutputStreamWriter fw) throws IOException {
-		// Source for places
-		fw.write("0 @S1@ SOUR\n");
-		fw.write("1 TITL Kirkebog\n");
-		fw.write("1 AUTH Arkivalier Online\n");
-
-		// Trailer
-		fw.write("0 TRLR\n");
-	}
-
-	/**
-	 * Write a GEDCOM header.
-	 * 
-	 * @param fw Filewriter
-	 * @throws IOException
-	 */
-	private void writeHeader(final OutputStreamWriter fw) throws IOException {
-		fw.write("0 HEAD\n");
-		fw.write("1 SOUR VejbyGedcom\n");
-		fw.write("2 VERS v 0.1\n");
-		fw.write("1 SUBM @SUB1@\n");
-		fw.write("1 GEDC\n");
-		fw.write("2 VERS 5.5\n");
-		fw.write("2 FORM LINEAGE-LINKED\n");
-		fw.write("1 DEST GED55\n");
-
-		final Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-		fw.write("1 DATE " + sdf.format(cal.getTime()) + "\n");
-
-		sdf = new SimpleDateFormat("hh:mm");
-		fw.write("2 TIME " + sdf.format(cal.getTime()) + "\n");
-		fw.write("1 CHAR ANSEL\n");
-		fw.write("1 FILE Folketaelling.ged\n");
-		fw.write("0 @SUB1@ SUBM\n");
-		fw.write("1 NAME Dansk Demografisk Database\n");
-		fw.write("1 ADDR Rigsarkivet, Jernbanegade 36, 5000 Odense C\n");
-	}
 }

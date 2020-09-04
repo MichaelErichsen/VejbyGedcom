@@ -17,7 +17,7 @@ import net.myerichsen.vejby.util.Mapping;
  * A household as extracted from a census file. This object has no direct
  * counterpart in GEDCOM.
  * 
- * @version 30. aug. 2020
+ * @version 04-09-2020
  * @author Michael Erichsen
  * 
  */
@@ -80,7 +80,6 @@ public class Household {
 			individual = createIndividual(row);
 			individual.setCensusEvent(censusEvent);
 
-			// TODO Handle that 1787 has no sex column
 			if (first) {
 				if (sexMappingKey == -1) {
 					if (individual.getFamilyRole1().equals("")) {
@@ -89,8 +88,6 @@ public class Household {
 						family1.setFather(individual);
 					}
 				} else
-
-				// FIXME Father is not set due to missing sex?
 
 				// The first person is the primary person, either father or mother according to
 				// sex

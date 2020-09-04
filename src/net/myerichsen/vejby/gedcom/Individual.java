@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 29. aug. 2020
+ * @version 04-09-2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -368,7 +368,7 @@ public class Individual {
 		sb.append("/" + familyName + "/\n");
 
 		// Default to M rather than having to fix all entries with "?"
-		if (getSex().equals(Sex.F)) {
+		if ((getSex().equals(Sex.F) || getSex().equals("F"))) {
 			sb.append("1 SEX F\n");
 		} else {
 			sb.append("1 SEX M\n");
@@ -386,7 +386,7 @@ public class Individual {
 
 		}
 
-		if (getTrade() != null) {
+		if ((getTrade() != null) && (!getTrade().equals(""))) {
 			sb.append("1 OCCU " + getTrade() + "\n");
 		}
 

@@ -33,7 +33,7 @@ import net.myerichsen.vejby.census.Census;
  * This panel displays a census table as loaded from a KIP file. It creates a
  * census table object, but only populates it with census rows.
  * 
- * @version 23. aug. 2020
+ * @version 04-09-2020
  * @author Michael Erichsen
  *
  */
@@ -89,8 +89,8 @@ public class CensusPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				JTabbedPane pane = vejbyGedcom.getTabbedPane();
 				vejbyGedcom.getCensusMappingJPanel().populateMappingTable(getCensusModel());
-				pane.setEnabledAt(1, true);
-				pane.setSelectedIndex(1);
+				pane.setEnabledAt(2, true);
+				pane.setSelectedIndex(2);
 			}
 		});
 

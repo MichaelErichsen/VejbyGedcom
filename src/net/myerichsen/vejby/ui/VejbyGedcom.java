@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 19. aug. 2020
+ * @version 04-09-2020
  *
  */
 
@@ -46,6 +46,8 @@ public class VejbyGedcom {
 	private HouseholdPanel householdJPanel;
 
 	private CensusPanel censusJPanel;
+	private MarriagePanel fsMarriagePanel;
+	private WelcomePanel welcomePanel;
 
 	/**
 	 * Create the application.
@@ -120,19 +122,23 @@ public class VejbyGedcom {
 		gbc_tabbedPane.gridy = 0;
 		frmVejbyGedcomIndtastning.getContentPane().add(getTabbedPane(), gbc_tabbedPane);
 
+		welcomePanel = new WelcomePanel();
+		getTabbedPane().addTab("Vejby GEDCOM", null, welcomePanel, null);
+
 		censusJPanel = new CensusPanel(VejbyGedcom.this);
 		getTabbedPane().addTab("Folket\u00E6llinger", null, censusJPanel, null);
 
 		censusMappingJPanel = new CensusMappingPanel(VejbyGedcom.this);
 		getTabbedPane().addTab("Mapning af felter", null, censusMappingJPanel, null);
-		getTabbedPane().setEnabledAt(1, false);
+		getTabbedPane().setEnabledAt(2, false);
 
 		householdJPanel = new HouseholdPanel(VejbyGedcom.this);
 		getTabbedPane().addTab("Husholdninger", null, householdJPanel, null);
-		getTabbedPane().setEnabledAt(2, false);
+		getTabbedPane().setEnabledAt(3, false);
 
-		BaptismPanel baptismJpanel = new BaptismPanel();
-		getTabbedPane().addTab("Kirkeb\u00F8ger (D\u00E5b)", null, baptismJpanel, null);
+		fsMarriagePanel = new MarriagePanel();
+		getTabbedPane().addTab("Vielser", null, fsMarriagePanel, null);
+
 	}
 
 	/**
