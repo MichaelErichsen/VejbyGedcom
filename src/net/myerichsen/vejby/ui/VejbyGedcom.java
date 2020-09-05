@@ -1,5 +1,6 @@
 package net.myerichsen.vejby.ui;
 
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,7 +19,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 04-09-2020
+ * @version 05-09-2020
  *
  */
 
@@ -48,6 +49,7 @@ public class VejbyGedcom {
 	private CensusPanel censusJPanel;
 	private MarriagePanel fsMarriagePanel;
 	private WelcomePanel welcomePanel;
+	private Component fsBirthPanel;
 
 	/**
 	 * Create the application.
@@ -139,6 +141,8 @@ public class VejbyGedcom {
 		fsMarriagePanel = new MarriagePanel();
 		getTabbedPane().addTab("Vielser", null, fsMarriagePanel, null);
 
+		fsBirthPanel = new BirthPanel();
+		getTabbedPane().addTab("Fødsler", null, fsBirthPanel, null);
 	}
 
 	/**

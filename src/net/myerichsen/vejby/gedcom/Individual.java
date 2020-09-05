@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 04-09-2020
+ * @version 05-09-2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -22,8 +22,10 @@ public class Individual {
 	private String position = "";
 	private String address = "";
 	private String birthDate = "";
-	private String deathDate = "";
 	private String birthPlace = "";
+	private String christeningDate = "";
+	private String christeningPlace = "";
+	private String deathDate = "";
 	private String deathPlace = "";
 	private String place = "";
 	private String maritalStatus = "";
@@ -71,6 +73,20 @@ public class Individual {
 	 */
 	public CensusEvent getCensusEvent() {
 		return censusEvent;
+	}
+
+	/**
+	 * @return the christeningDate
+	 */
+	public String getChristeningDate() {
+		return christeningDate;
+	}
+
+	/**
+	 * @return the christeningPlace
+	 */
+	public String getChristeningPlace() {
+		return christeningPlace;
 	}
 
 	/**
@@ -205,6 +221,20 @@ public class Individual {
 	 */
 	public void setCensusEvent(CensusEvent censusEvent) {
 		this.censusEvent = censusEvent;
+	}
+
+	/**
+	 * @param christeningDate the christeningDate to set
+	 */
+	public void setChristeningDate(String christeningDate) {
+		this.christeningDate = christeningDate;
+	}
+
+	/**
+	 * @param christeningPlace the christeningPlace to set
+	 */
+	public void setChristeningPlace(String christeningPlace) {
+		this.christeningPlace = christeningPlace;
 	}
 
 	/**
@@ -374,10 +404,21 @@ public class Individual {
 			sb.append("1 SEX M\n");
 		}
 
-		sb.append("1 BIRT\n");
-		sb.append("2 DATE " + getBirthDate() + "\n");
-		if ((getBirthPlace() != null) && (!getBirthPlace().equals(""))) {
-			sb.append("2 PLAC " + getBirthPlace() + ",\n");
+		if ((getBirthDate() != null) && (!getBirthDate().equals(""))) {
+			sb.append("1 BIRT\n");
+			sb.append("2 DATE " + getBirthDate() + "\n");
+			if ((getBirthPlace() != null) && (!getBirthPlace().equals(""))) {
+				sb.append("2 PLAC " + getBirthPlace() + ",\n");
+			}
+		}
+
+		if ((getChristeningDate() != null) && (!getChristeningDate().equals(""))) {
+			sb.append("1 CHR\n");
+			sb.append("2 DATE " + getChristeningDate() + "\n");
+			if ((getChristeningPlace() != null) && (!getChristeningPlace().equals(""))) {
+				sb.append("2 PLAC " + getChristeningPlace() + ",\n");
+			}
+			sb.append("2 SOUR @S1@\n");
 		}
 
 		if ((getDeathDate() != null) && (!getDeathDate().equals(""))) {

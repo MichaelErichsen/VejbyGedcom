@@ -18,28 +18,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.myerichsen.vejby.census.Census;
 
 /**
- * Singleton class representing a GEDCOM file.
+ * A class representing a GEDCOM file.
  * 
- * @version 04-09-20204
+ * @version 05-09-2020
  * @author Michael Erichsen
  */
 public class GedcomFile {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private static GedcomFile single_instance = null;
-
-	/**
-	 * Static method to create instance of Singleton class.
-	 * 
-	 * @return An instance of the class
-	 */
-	public static GedcomFile getInstance() {
-		if (single_instance == null) {
-			single_instance = new GedcomFile();
-		}
-
-		return single_instance;
-	}
-
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private List<Family> families;
@@ -48,7 +33,7 @@ public class GedcomFile {
 	 * Constructor
 	 *
 	 */
-	private GedcomFile() {
+	public GedcomFile() {
 		super();
 		setFamilies(new ArrayList<Family>());
 	}
@@ -94,7 +79,6 @@ public class GedcomFile {
 			try {
 				fw = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
 
-//				writeHeader(fw);
 				fw.write("0 HEAD\n");
 				fw.write("1 SOUR VejbyGedcom\n");
 				fw.write("2 VERS v 0.1\n");
@@ -133,7 +117,6 @@ public class GedcomFile {
 					}
 				}
 
-//				writeCensusTrailer(fw);
 				// Source for places
 				fw.write("1 TITL DDD Folketællinger. " + "Kildeindtastningsprojektet.\n");
 				fw.write("1 AUTH Statens Arkiver\n");
@@ -153,14 +136,15 @@ public class GedcomFile {
 	}
 
 	/**
-	 * Save a marriage fileas GEDCOM. Used by FS analysis.
+	 * Save a birth or marriage file as GEDCOM. Used by FS analysis.
 	 * 
-	 * @param censusTable The census table loaded from an FS query export
+	 * @param fileNameStub Name of input file without extension
 	 * @return Save path for GEDCOM file
 	 */
-	public String saveMarriage() {
+	public String saveFsExtract(String fileNameStub) {
 		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
 		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+		gedcomChooser.setSelectedFile(new File(fileNameStub + ".ged"));
 		String path = "";
 
 		gedcomChooser.setFileFilter(ff);
@@ -176,7 +160,6 @@ public class GedcomFile {
 			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
 
 			try {
-//				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gedcomFile), "ANSEL");
 				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gedcomFile));
 
 				writer.write("0 HEAD\n");
@@ -205,8 +188,7 @@ public class GedcomFile {
 
 				for (int i = 0; i < families.size(); i++) {
 					family = families.get(i);
-					LOGGER.log(Level.INFO, "Family " + i);
-//					LOGGER.log(Level.INFO, "Size of string: " + family.toGedcom(i).length());
+					LOGGER.log(Level.FINE, "Family " + i);
 					s = family.toGedcom(i);
 					writer.write(s);
 					LOGGER.log(Level.FINE, "Family " + family.getHouseholdId() + ", " + family.getFamilyId() + ", "
@@ -224,8 +206,7 @@ public class GedcomFile {
 				path = gedcomFile.getPath();
 				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + path);
 			} catch (Exception e) {
-//				LOGGER.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, e.getMessage());
 				return "";
 			}
 		}

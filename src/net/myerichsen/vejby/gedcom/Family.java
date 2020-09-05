@@ -7,20 +7,20 @@ import java.util.List;
  * Class representing a family in GEDCOM as extracted from a household in a
  * census file.
  * 
- * @version 04-09-2020
+ * @version 05-09-2020
  * @author Michael Erichsen
  */
 public class Family {
 	private Individual father;
 	private Individual mother;
-	// Used by real failies
+	// Used by real faailies
 	private List<Individual> children = new ArrayList<>();
 	// Used by dummy family 0
 	private List<Individual> singles = new ArrayList<>();
 	private int householdId;
 	private int familyId;
-	private String marriageDate;
-	private String marriagePlace;
+	private String marriageDate = "";
+	private String marriagePlace = "";
 
 	/**
 	 * Constructor

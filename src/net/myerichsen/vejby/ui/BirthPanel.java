@@ -29,19 +29,19 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * This panel reads a marriage query result from family Search and displays the
+ * This panel reads a birth query result from family Search and displays the
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
  * @version 05-09-2020
  *
  */
-public class MarriagePanel extends JPanel {
-	private static final long serialVersionUID = -4314220214428910383L;
+public class BirthPanel extends JPanel {
+	private static final long serialVersionUID = 3673964025732718748L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
-	private String[][] marriageArray = new String[100][6];
+	private String[][] birthArray = new String[100][7];
 
 	private JTable table;
 	private JButton saveButton;
@@ -50,7 +50,7 @@ public class MarriagePanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public MarriagePanel() {
+	public BirthPanel() {
 		setLayout(new BorderLayout(0, 0));
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -101,24 +101,15 @@ public class MarriagePanel extends JPanel {
 			prefs.put("KIPFILENAME", fsFile.getPath());
 
 			/**
-			 * These are the headers:
-			 * 
-			 * queryUrl, queryTime, score, arkId, sourceMediaType, batchNumber,
-			 * roleInRecord, relationshipToHead, fullName, sex, birthLikeDate,
-			 * birthLikePlaceText, chrDate, chrPlaceText, residenceDate, residencePlaceText,
-			 * marriageLikeDate, marriageLikePlaceText, deathLikeDate, deathLikePlaceText,
-			 * burialDate, burialPlaceText, fatherFullName, motherFullName, spouseFullName,
-			 * parentFullNames, childrenFullNames, otherFullNames, otherEvents
 			 * 
 			 * The interesting columns are:
 			 * 
-			 * 8 fullName, 9 sex ["male"|""], 10 birthLikeDate, 16 marriageLikeDate, 17
-			 * marriageLikePlaceText, 24 spouseFullName,
-			 * 
+			 * fullName 8 sex 9 birthLikeDate 10 chrDate 12 chrPlaceText 13 fatherFullName
+			 * 22 motherFullName 23
 			 */
 
 			String[] columns;
-			String[] headerArray = new String[6];
+			String[] headerArray = new String[7];
 
 			try {
 				FileInputStream fis = new FileInputStream(fsFile);
@@ -130,9 +121,10 @@ public class MarriagePanel extends JPanel {
 				headerArray[0] = columns[8];
 				headerArray[1] = columns[9];
 				headerArray[2] = columns[10];
-				headerArray[3] = columns[16];
-				headerArray[4] = columns[17];
-				headerArray[5] = columns[24];
+				headerArray[3] = columns[12];
+				headerArray[4] = columns[13];
+				headerArray[5] = columns[22];
+				headerArray[6] = columns[23];
 
 				// Ignore second line
 				sc.nextLine();
@@ -155,13 +147,13 @@ public class MarriagePanel extends JPanel {
 						e.printStackTrace();
 					}
 
-					marriageArray[i][0] = s;
-					marriageArray[i][1] = columns[9];
-					marriageArray[i][2] = columns[10];
-					marriageArray[i][3] = columns[16];
-					marriageArray[i][4] = columns[17];
+					birthArray[i][0] = s;
+					birthArray[i][1] = columns[9];
+					birthArray[i][2] = columns[10];
+					birthArray[i][3] = columns[12];
+					birthArray[i][4] = columns[13];
 
-					s = columns[24];
+					s = columns[22];
 					a = null;
 
 					try {
@@ -172,7 +164,25 @@ public class MarriagePanel extends JPanel {
 						e.printStackTrace();
 					}
 
-					marriageArray[i][5] = s;
+					birthArray[i][5] = s;
+
+					try {
+						s = columns[23];
+					} catch (Exception e1) {
+						s = "";
+					}
+
+					a = null;
+
+					try {
+						a = s.getBytes("ISO-8859-1");
+						s = new String(a, "UTF-8");
+
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+
+					birthArray[i][6] = s;
 					i++;
 				}
 
@@ -184,7 +194,7 @@ public class MarriagePanel extends JPanel {
 				LOGGER.log(Level.SEVERE, e.getMessage());
 			}
 
-			DefaultTableModel model = new DefaultTableModel(marriageArray, headerArray);
+			DefaultTableModel model = new DefaultTableModel(birthArray, headerArray);
 			table.setModel(model);
 			saveButton.setEnabled(true);
 		}
@@ -192,57 +202,44 @@ public class MarriagePanel extends JPanel {
 	}
 
 	/**
+	 * Instantiate a GedcomFile object and populate it with the birth data. Choose a
+	 * file name and save it.
 	 * 
-	 * Instantiate a GedcomFile object and populate it with the marriage data.
-	 * Choose a file name and save it.
 	 */
 	protected void saveAsGedcom() {
-//		GedcomFile gedcomFile = GedcomFile.getInstance();
 		GedcomFile gedcomFile = new GedcomFile();
 		Family family;
-		Individual groom = null;
-		Individual bride = null;
+		Individual child = null;
+		Individual father = null;
+		Individual mother = null;
 
 		int individualId = 1;
-		String[] line = new String[5];
+		String[] line = new String[7];
 
-		// Add a family object for each marriage in the array
-		for (int i = 0; i < marriageArray.length; i++) {
-			line = marriageArray[i];
-			LOGGER.log(Level.FINE, i + ", " + line[0] + ", " + line[1] + ", " + line[2] + ", " + line[3] + ", "
-					+ line[4] + ", " + line[5]);
+		// Add a family object for each birth in the array
+		for (int i = 0; i < birthArray.length; i++) {
+			line = birthArray[i];
 
 			family = new Family(0, i);
 
-			// Test for principal's sex
-			if (line[1].equals("male")) {
-				groom = new Individual(individualId++);
-				groom.setName(line[0]);
+			child = new Individual(individualId++);
+			child.setName(line[0] + " ?");
+			child.setSex(line[1].equals("male") ? "M" : "F");
+			child.setBirthDate(line[2]);
+			child.setChristeningDate(line[3]);
+			child.setChristeningPlace(line[4]);
 
-				if (!line[2].equals("")) {
-					groom.setBirthDate(line[2]);
-				}
+			father = new Individual(individualId++);
+			father.setName(line[5]);
+			father.setSex("M");
 
-				bride = new Individual(individualId++);
-				bride.setName(line[5]);
-			} else {
-				bride = new Individual(individualId++);
-				bride.setName(line[0]);
+			mother = new Individual(individualId++);
+			mother.setName(line[6]);
+			mother.setSex("F");
 
-				if (!line[2].equals("")) {
-					bride.setBirthDate(line[2]);
-				}
-
-				groom = new Individual(individualId++);
-				groom.setName(line[5]);
-			}
-
-			groom.setSex("M");
-			bride.setSex("F");
-			family.setFather(groom);
-			family.setMother(bride);
-			family.setMarriageDate(line[3]);
-			family.setMarriagePlace(line[4]);
+			family.setFather(father);
+			family.setMother(mother);
+			family.getChildren().add(child);
 
 			gedcomFile.addFamily(family);
 		}

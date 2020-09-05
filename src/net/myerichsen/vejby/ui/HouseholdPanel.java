@@ -36,7 +36,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * The panel supports manual changes to the generated family structure by
  * definitions of up to four families.
  * 
- * @version 28 aug. 2020
+ * @version 05-09-2020
  * @author Michael Erichsen
  * 
  */
@@ -185,7 +185,8 @@ public class HouseholdPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
-				GedcomFile gedcomFile = GedcomFile.getInstance();
+//				GedcomFile gedcomFile = GedcomFile.getInstance();
+				GedcomFile gedcomFile = new GedcomFile();
 				String path = gedcomFile.saveCensus(censusTable);
 
 				JOptionPane.showMessageDialog(new JFrame(),
