@@ -8,7 +8,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -33,7 +36,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
- * @version 05-09-2020
+ * @version 06-09-2020
  *
  */
 public class BirthPanel extends JPanel {
@@ -41,11 +44,12 @@ public class BirthPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
-	private String[][] birthArray = new String[100][7];
-
 	private JTable table;
 	private JButton saveButton;
 	private String fileNameStub;
+	private String[][] dataArray = new String[0][8];
+	private JButton eliminateButton;
+	private String[] headerArray;
 
 	/**
 	 * Create the panel.
@@ -71,6 +75,16 @@ public class BirthPanel extends JPanel {
 		});
 		buttonPanel.add(openButton);
 
+		eliminateButton = new JButton("Fjern dubletter");
+		eliminateButton.setEnabled(false);
+		eliminateButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				eliminateDuplicates();
+			}
+		});
+		buttonPanel.add(eliminateButton);
+
 		saveButton = new JButton("Gem som Gedcom");
 		saveButton.setEnabled(false);
 		saveButton.addActionListener(new ActionListener() {
@@ -83,128 +97,185 @@ public class BirthPanel extends JPanel {
 	}
 
 	/**
-	 * Open a tsv file from Family Search and reduce it to relevant columns
+	 * Concatenate two arrays. Copied from
+	 * https://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
+	 * 
+	 * @param <T>
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	private <T> T[] concatenate(T[] a, T[] b) {
+		int aLen = a.length;
+		int bLen = b.length;
+
+		@SuppressWarnings("unchecked")
+		T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+		System.arraycopy(a, 0, c, 0, aLen);
+		System.arraycopy(b, 0, c, aLen, bLen);
+
+		return c;
+	}
+
+	/**
+	 * Eliminate duplicates in the data array.
+	 * 
+	 * For each row in the data array:
+	 * 
+	 * Compare all fields with all subsequent rows. If identical, then remove
+	 * subsequent row.
+	 */
+	private void eliminateDuplicates() {
+		Set<String[]> ssa = new HashSet<>();
+
+		int deletions = 0;
+
+		for (int i = 0; i < dataArray.length; i++) {
+			if (ssa.add(dataArray[i]) == false) {
+				LOGGER.log(Level.INFO, "Dublet: " + i + "; " + dataArray[i][0]);
+				deletions++;
+			}
+		}
+
+		dataArray = new String[ssa.size()][8];
+
+		int i = 0;
+
+		for (String[] strings : ssa) {
+			dataArray[i++] = strings;
+		}
+
+		LOGGER.log(Level.INFO, "Data array efter sletning af " + deletions + " rækker: " + ssa.size());
+
+		DefaultTableModel model = new DefaultTableModel(dataArray, headerArray);
+		table.setModel(model);
+	}
+
+	/**
+	 * @param columns
+	 * @param col
+	 * @return
+	 */
+	private String fixCodePage(String[] columns, int col) {
+		String s;
+		byte[] a;
+		try {
+			s = columns[col];
+		} catch (Exception e1) {
+			s = "";
+		}
+
+		try {
+			a = s.getBytes("ISO-8859-1");
+			s = new String(a, "UTF-8");
+
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return s;
+	}
+
+	/**
+	 * Open one or more tsv files from Family Search and reduce them to the relevant
+	 * columns:
+	 * 
+	 * fullName 8, sex 9, birthLikeDate 10, birthLikePlaceText 11, chrDate 12,
+	 * chrPlaceText 13, fatherFullName 22, motherFullName 23
 	 */
 	protected void openTsvFile() {
+		Scanner sc;
+		String[] columns;
+		headerArray = new String[8];
+		FileInputStream fis;
 		FileFilter ff = new FileNameExtensionFilter("FS eksport fil (TSV)", "tsv");
 		String fsFileName = prefs.get("FSFILENAME", ".");
+		String[][] birthArray = new String[100][8];
 
 		JFileChooser fsChooser = new JFileChooser(fsFileName);
 		fsChooser.setFileFilter(ff);
+		fsChooser.setMultiSelectionEnabled(true);
 
 		int returnValue = fsChooser.showOpenDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File fsFile = fsChooser.getSelectedFile();
-			fileNameStub = fsFile.getName().replaceFirst("[.][^.]+$", "");
-			LOGGER.log(Level.INFO, fsFile.getPath());
-			prefs.put("KIPFILENAME", fsFile.getPath());
+			File[] fsFiles = fsChooser.getSelectedFiles();
 
-			/**
-			 * 
-			 * The interesting columns are:
-			 * 
-			 * fullName 8 sex 9 birthLikeDate 10 chrDate 12 chrPlaceText 13 fatherFullName
-			 * 22 motherFullName 23
-			 */
+			// Save the first or only file name
+			fileNameStub = fsFiles[0].getName().replaceFirst("[.][^.]+$", "");
+			LOGGER.log(Level.INFO, fsFiles[0].getPath());
+			prefs.put("KIPFILENAME", fsFiles[0].getPath());
 
-			String[] columns;
-			String[] headerArray = new String[7];
+			for (int fileNo = 0; fileNo < fsFiles.length; fileNo++) {
+				try {
+					birthArray = new String[100][8];
 
-			try {
-				FileInputStream fis = new FileInputStream(fsFile);
-				Scanner sc = new Scanner(fis);
+					fis = new FileInputStream(fsFiles[fileNo]);
+					sc = new Scanner(fis);
 
-				// First line contains headers
-				columns = sc.nextLine().split("\t");
-
-				headerArray[0] = columns[8];
-				headerArray[1] = columns[9];
-				headerArray[2] = columns[10];
-				headerArray[3] = columns[12];
-				headerArray[4] = columns[13];
-				headerArray[5] = columns[22];
-				headerArray[6] = columns[23];
-
-				// Ignore second line
-				sc.nextLine();
-
-				// The rest of the lines contain data
-
-				int i = 0;
-
-				while (sc.hasNext()) {
+					// First line contains headers. Neds only to be read for the first file
 					columns = sc.nextLine().split("\t");
 
-					String s = columns[8];
-					byte[] a = null;
-
-					try {
-						a = s.getBytes("ISO-8859-1");
-						s = new String(a, "UTF-8");
-
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+					if (fileNo == 0) {
+						headerArray[0] = columns[8];
+						headerArray[1] = columns[9];
+						headerArray[2] = columns[10];
+						headerArray[3] = columns[11];
+						headerArray[4] = columns[12];
+						headerArray[5] = columns[13];
+						headerArray[6] = columns[22];
+						headerArray[7] = columns[23];
 					}
 
-					birthArray[i][0] = s;
-					birthArray[i][1] = columns[9];
-					birthArray[i][2] = columns[10];
-					birthArray[i][3] = columns[12];
-					birthArray[i][4] = columns[13];
+					// Ignore second line
+					sc.nextLine();
 
-					s = columns[22];
-					a = null;
+					// The rest of the lines contain data
 
-					try {
-						a = s.getBytes("ISO-8859-1");
-						s = new String(a, "UTF-8");
+					int i = 0;
 
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
+					while (sc.hasNext()) {
+						columns = sc.nextLine().split("\t");
+
+						if (i == 0) {
+							LOGGER.log(Level.INFO, fixCodePage(columns, 8));
+						}
+
+						birthArray[i][0] = fixCodePage(columns, 8);
+						birthArray[i][1] = columns[9];
+						birthArray[i][2] = columns[10];
+						birthArray[i][3] = fixCodePage(columns, 11);
+						birthArray[i][4] = columns[12];
+						birthArray[i][5] = fixCodePage(columns, 13);
+						birthArray[i][6] = fixCodePage(columns, 22);
+						birthArray[i][7] = fixCodePage(columns, 23);
+						i++;
 					}
 
-					birthArray[i][5] = s;
-
-					try {
-						s = columns[23];
-					} catch (Exception e1) {
-						s = "";
-					}
-
-					a = null;
-
-					try {
-						a = s.getBytes("ISO-8859-1");
-						s = new String(a, "UTF-8");
-
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
-
-					birthArray[i][6] = s;
-					i++;
+					sc.close();
+					fis.close();
+				} catch (FileNotFoundException e) {
+					LOGGER.log(Level.SEVERE, e.getMessage());
+				} catch (IOException e) {
+					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
 
-				sc.close();
-				fis.close();
-			} catch (FileNotFoundException e) {
-				LOGGER.log(Level.SEVERE, e.getMessage());
-			} catch (IOException e) {
-				LOGGER.log(Level.SEVERE, e.getMessage());
+				dataArray = concatenate(dataArray, birthArray);
+
+				LOGGER.log(Level.FINE, "Data array length after concatenation: " + dataArray.length);
 			}
 
-			DefaultTableModel model = new DefaultTableModel(birthArray, headerArray);
-			table.setModel(model);
-			saveButton.setEnabled(true);
+			LOGGER.log(Level.INFO, "Data array length after concatenations: " + dataArray.length);
 		}
 
+		DefaultTableModel model = new DefaultTableModel(dataArray, headerArray);
+		table.setModel(model);
+		saveButton.setEnabled(true);
+		eliminateButton.setEnabled(true);
 	}
 
 	/**
 	 * Instantiate a GedcomFile object and populate it with the birth data. Choose a
 	 * file name and save it.
-	 * 
 	 */
 	protected void saveAsGedcom() {
 		GedcomFile gedcomFile = new GedcomFile();
@@ -214,32 +285,56 @@ public class BirthPanel extends JPanel {
 		Individual mother = null;
 
 		int individualId = 1;
-		String[] line = new String[7];
+		String[] line = new String[8];
 
 		// Add a family object for each birth in the array
-		for (int i = 0; i < birthArray.length; i++) {
-			line = birthArray[i];
+		for (int i = 0; i < dataArray.length; i++) {
+			line = dataArray[i];
 
 			family = new Family(0, i);
 
 			child = new Individual(individualId++);
-			child.setName(line[0] + " ?");
+
+			String childName = line[0];
+
+			if (childName == null) {
+				continue;
+			}
+
+			String[] childNamePart = childName.split(" ");
+
+			// Handle cases with and without child surnames
+			if (childNamePart.length == 1) {
+				child.setName(childName + " ?");
+			} else {
+				if ((childName.endsWith("sen")) || (childName.endsWith("datter")) || (childName.endsWith("dtr"))
+						|| (childName.endsWith("d")) || (childName.endsWith("D")) || (childName.endsWith("son"))) {
+					child.setName(childName);
+				} else {
+					child.setName(childName + " ?");
+				}
+			}
+
 			child.setSex(line[1].equals("male") ? "M" : "F");
 			child.setBirthDate(line[2]);
-			child.setChristeningDate(line[3]);
-			child.setChristeningPlace(line[4]);
-
-			father = new Individual(individualId++);
-			father.setName(line[5]);
-			father.setSex("M");
-
-			mother = new Individual(individualId++);
-			mother.setName(line[6]);
-			mother.setSex("F");
-
-			family.setFather(father);
-			family.setMother(mother);
+			child.setBirthPlace(line[3]);
+			child.setChristeningDate(line[4]);
+			child.setChristeningPlace(line[5]);
 			family.getChildren().add(child);
+
+			if (!line[6].equals("")) {
+				father = new Individual(individualId++);
+				father.setName(line[6]);
+				father.setSex("M");
+				family.setFather(father);
+			}
+
+			if (!line[7].equals("")) {
+				mother = new Individual(individualId++);
+				mother.setName(line[7]);
+				mother.setSex("F");
+				family.setMother(mother);
+			}
 
 			gedcomFile.addFamily(family);
 		}
@@ -247,7 +342,7 @@ public class BirthPanel extends JPanel {
 		String path = gedcomFile.saveFsExtract(fileNameStub);
 
 		if (!path.equals("")) {
-			JOptionPane.showMessageDialog(new JFrame(), "Vielser er gemt som GEDCOM fil " + path, "Vejby Gedcom",
+			JOptionPane.showMessageDialog(new JFrame(), "Fødsler er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 05-09-2020
+ * @version 06-09-2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -352,7 +352,6 @@ public class Individual {
 		final StringBuffer sb = new StringBuffer();
 
 		sb.append("0 @I" + getId() + "@ INDI\n");
-
 		sb.append("1 NAME ");
 
 		String[] nameParts = getName().split(" ");

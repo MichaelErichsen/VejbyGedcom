@@ -19,7 +19,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 05-09-2020
+ * @version 06-09-2020
  *
  */
 
@@ -138,11 +138,11 @@ public class VejbyGedcom {
 		getTabbedPane().addTab("Husholdninger", null, householdJPanel, null);
 		getTabbedPane().setEnabledAt(3, false);
 
-		fsMarriagePanel = new MarriagePanel();
-		getTabbedPane().addTab("Vielser", null, fsMarriagePanel, null);
-
 		fsBirthPanel = new BirthPanel();
 		getTabbedPane().addTab("Fødsler", null, fsBirthPanel, null);
+
+		fsMarriagePanel = new MarriagePanel();
+		getTabbedPane().addTab("Vielser", null, fsMarriagePanel, null);
 	}
 
 	/**
