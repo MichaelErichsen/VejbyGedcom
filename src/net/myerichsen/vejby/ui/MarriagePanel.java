@@ -329,7 +329,12 @@ public class MarriagePanel extends JPanel {
 		// Add a family object for each marriage in the array
 		for (int i = 0; i < dataArray.length; i++) {
 			line = dataArray[i];
-			LOGGER.log(Level.FINE, i + ", " + line[0] + ", " + line[1] + ", " + line[2] + ", " + line[3] + ", "
+
+			if (line[0] == null) {
+				continue;
+			}
+
+			LOGGER.log(Level.INFO, i + ", " + line[0] + ", " + line[1] + ", " + line[2] + ", " + line[3] + ", "
 					+ line[4] + ", " + line[5]);
 
 			family = new Family(0, i);
