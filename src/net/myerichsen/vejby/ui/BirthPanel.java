@@ -9,9 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -36,7 +34,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
- * @version 06-09-2020
+ * @version 08-09-2020
  *
  */
 public class BirthPanel extends JPanel {
@@ -97,6 +95,15 @@ public class BirthPanel extends JPanel {
 	}
 
 	/**
+	 * @param j
+	 */
+	private void clearRow(int i) {
+		for (int j = 0; j < dataArray[i].length; j++) {
+			dataArray[i][j] = "";
+		}
+	}
+
+	/**
 	 * Concatenate two arrays. Copied from
 	 * https://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
 	 * 
@@ -126,32 +133,55 @@ public class BirthPanel extends JPanel {
 	 * subsequent row.
 	 */
 	private void eliminateDuplicates() {
-		Set<String[]> ssa = new HashSet<>();
-
 		int deletions = 0;
+		String stringI = "";
+		String stringJ = "";
 
 		for (int i = 0; i < dataArray.length; i++) {
-			if (ssa.add(dataArray[i]) == false) {
-				LOGGER.log(Level.INFO, "Dublet: " + i + "; " + dataArray[i][0]);
-				deletions++;
+//			LOGGER.log(Level.INFO, "Række: " + i + "; " + dataArray[i][0]);
+
+			if ((dataArray[i][0] == null) || (dataArray[i][0].equals(""))) {
+				continue;
+			}
+			stringI = listDataArray(i);
+
+			for (int j = i + 1; j < dataArray.length; j++) {
+//				LOGGER.log(Level.INFO, "Række: " + j + "; " + dataArray[j][0]);
+				if ((dataArray[j][0] == null) || (dataArray[j][0].equals(""))) {
+					continue;
+				}
+				stringJ = listDataArray(j);
+
+				if (stringI.equals(stringJ)) {
+					LOGGER.log(Level.FINE, "Fundet " + i + ": " + stringI);
+					LOGGER.log(Level.FINE, "Fundet " + i + ": " + stringJ);
+					clearRow(j);
+					deletions++;
+				}
+			}
+
+		}
+
+		String[][] dataArray2 = new String[dataArray.length - deletions][8];
+
+		int i2 = 0;
+		for (String[] element : dataArray) {
+			if ((element[0] != null) && (!element[0].equals(""))) {
+				dataArray2[i2++] = element;
 			}
 		}
 
-		dataArray = new String[ssa.size()][8];
+		LOGGER.log(Level.INFO, "Data array efter sletning af " + deletions + " rækker: " + dataArray2.length);
 
-		int i = 0;
-
-		for (String[] strings : ssa) {
-			dataArray[i++] = strings;
-		}
-
-		LOGGER.log(Level.INFO, "Data array efter sletning af " + deletions + " rækker: " + ssa.size());
+		dataArray = dataArray2;
 
 		DefaultTableModel model = new DefaultTableModel(dataArray, headerArray);
 		table.setModel(model);
 	}
 
 	/**
+	 * Fix some of the code page problems.
+	 * 
 	 * @param columns
 	 * @param col
 	 * @return
@@ -159,6 +189,7 @@ public class BirthPanel extends JPanel {
 	private String fixCodePage(String[] columns, int col) {
 		String s;
 		byte[] a;
+
 		try {
 			s = columns[col];
 		} catch (Exception e1) {
@@ -172,7 +203,22 @@ public class BirthPanel extends JPanel {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+
 		return s;
+	}
+
+	/**
+	 * @param i
+	 * @return
+	 */
+	private String listDataArray(int i) {
+		StringBuilder sb = new StringBuilder();
+		for (int j = 0; j < dataArray[i].length; j++) {
+			sb.append(dataArray[i][j] + ", ");
+		}
+
+		LOGGER.log(Level.FINE, "[" + i + "]: " + sb.toString());
+		return sb.toString();
 	}
 
 	/**
@@ -202,7 +248,7 @@ public class BirthPanel extends JPanel {
 
 			// Save the first or only file name
 			fileNameStub = fsFiles[0].getName().replaceFirst("[.][^.]+$", "");
-			LOGGER.log(Level.INFO, fsFiles[0].getPath());
+			LOGGER.log(Level.FINE, fsFiles[0].getPath());
 			prefs.put("KIPFILENAME", fsFiles[0].getPath());
 
 			for (int fileNo = 0; fileNo < fsFiles.length; fileNo++) {
@@ -235,10 +281,6 @@ public class BirthPanel extends JPanel {
 
 					while (sc.hasNext()) {
 						columns = sc.nextLine().split("\t");
-
-						if (i == 0) {
-							LOGGER.log(Level.INFO, fixCodePage(columns, 8));
-						}
 
 						birthArray[i][0] = fixCodePage(columns, 8);
 						birthArray[i][1] = columns[9];
