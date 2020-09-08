@@ -42,12 +42,13 @@ public class BirthPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
+	private String[][] dataArray = new String[0][8];
+	private String[] headerArray;
+
 	private JTable table;
 	private JButton saveButton;
 	private String fileNameStub;
-	private String[][] dataArray = new String[0][8];
 	private JButton eliminateButton;
-	private String[] headerArray;
 
 	/**
 	 * Create the panel.
