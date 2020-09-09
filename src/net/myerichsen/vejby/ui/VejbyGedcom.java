@@ -1,6 +1,5 @@
 package net.myerichsen.vejby.ui;
 
-import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,7 +18,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 06-09-2020
+ * @version 09-09-2020
  *
  */
 
@@ -43,13 +42,14 @@ public class VejbyGedcom {
 
 	private JFrame frmVejbyGedcomIndtastning;
 	private JTabbedPane tabbedPane;
+
+	private WelcomePanel welcomePanel;
+	private CensusPanel censusJPanel;
 	private CensusMappingPanel censusMappingJPanel;
 	private HouseholdPanel householdJPanel;
-
-	private CensusPanel censusJPanel;
-	private MarriagePanel fsMarriagePanel;
-	private WelcomePanel welcomePanel;
-	private Component fsBirthPanel;
+	private BirthPanel birthPanel;
+	private MarriagePanel marriagePanel;
+	private BurialPanel burialPanel;
 
 	/**
 	 * Create the application.
@@ -138,11 +138,14 @@ public class VejbyGedcom {
 		getTabbedPane().addTab("Husholdninger", null, householdJPanel, null);
 		getTabbedPane().setEnabledAt(3, false);
 
-		fsBirthPanel = new BirthPanel();
-		getTabbedPane().addTab("Fødsler", null, fsBirthPanel, null);
+		birthPanel = new BirthPanel();
+		getTabbedPane().addTab("Fødsler", null, birthPanel, null);
 
-		fsMarriagePanel = new MarriagePanel();
-		getTabbedPane().addTab("Vielser", null, fsMarriagePanel, null);
+		marriagePanel = new MarriagePanel();
+		getTabbedPane().addTab("Vielser", null, marriagePanel, null);
+
+		burialPanel = new BurialPanel();
+		getTabbedPane().addTab("Dødsfald", null, burialPanel, null);
 	}
 
 	/**

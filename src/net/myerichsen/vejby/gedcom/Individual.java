@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 06-09-2020
+ * @version 09-09-2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -424,6 +424,10 @@ public class Individual {
 			sb.append("1 DEAT\n");
 			sb.append("2 DATE " + getDeathDate() + "\n");
 
+			if ((getDeathPlace() != null) && (!getDeathPlace().equals(""))) {
+				sb.append("2 PLAC " + getDeathPlace() + "\n");
+			}
+			sb.append("2 SOUR @S1@\n");
 		}
 
 		if ((getTrade() != null) && (!getTrade().equals(""))) {
