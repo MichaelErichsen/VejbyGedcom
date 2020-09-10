@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 09-09-2020
+ * @version 10-09-2020
  *
  */
 
@@ -50,6 +50,7 @@ public class VejbyGedcom {
 	private BirthPanel birthPanel;
 	private MarriagePanel marriagePanel;
 	private BurialPanel burialPanel;
+	private ConscriptsPanel conscriptsPanel;
 
 	/**
 	 * Create the application.
@@ -146,6 +147,9 @@ public class VejbyGedcom {
 
 		burialPanel = new BurialPanel();
 		getTabbedPane().addTab("Dødsfald", null, burialPanel, null);
+
+		conscriptsPanel = new ConscriptsPanel();
+		getTabbedPane().addTab("Lægdsruller", null, conscriptsPanel, null);
 	}
 
 	/**

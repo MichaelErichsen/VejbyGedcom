@@ -17,17 +17,12 @@ import net.myerichsen.vejby.gedcom.Family;
 /**
  * Singleton class implementing a census table as loaded from a KIP file.
  * 
- * @version 23. aug. 2020
+ * @version 10-09-2020
  * @author Michael Erichsen
  */
 public class Census {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-//	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 	private static Census single_instance = null;
-	private int year;
-	private List<String> headers;
-	private List<List<String>> persons;
-	private List<Household> households;
 
 	/**
 	 * Static method to create instance of Singleton class.
@@ -41,6 +36,12 @@ public class Census {
 
 		return single_instance;
 	}
+
+	private int year;
+	private List<String> headers;
+	private List<List<String>> persons;
+
+	private List<Household> households;
 
 	/**
 	 * Constructor

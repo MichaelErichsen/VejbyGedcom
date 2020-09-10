@@ -30,19 +30,19 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * This panel reads a birth query result from family Search and displays the
+ * This panel reads a conscript query result from family Search and displays the
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
- * @version 09-09-2020
+ * @version 10-09-2020
  *
  */
-public class BirthPanel extends JPanel {
+public class ConscriptsPanel extends JPanel {
 	private static final long serialVersionUID = 3673964025732718748L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
-	private String[][] dataArray = new String[0][8];
+	private String[][] dataArray = new String[0][6];
 	private String[] headerArray;
 
 	private JTable table;
@@ -53,7 +53,7 @@ public class BirthPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public BirthPanel() {
+	public ConscriptsPanel() {
 		setLayout(new BorderLayout(0, 0));
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -139,7 +139,6 @@ public class BirthPanel extends JPanel {
 		String stringJ = "";
 
 		for (int i = 0; i < dataArray.length; i++) {
-//			LOGGER.log(Level.INFO, "Række: " + i + "; " + dataArray[i][0]);
 
 			if ((dataArray[i][0] == null) || (dataArray[i][0].equals(""))) {
 				continue;
@@ -147,7 +146,6 @@ public class BirthPanel extends JPanel {
 			stringI = listDataArray(i);
 
 			for (int j = i + 1; j < dataArray.length; j++) {
-//				LOGGER.log(Level.INFO, "Række: " + j + "; " + dataArray[j][0]);
 				if ((dataArray[j][0] == null) || (dataArray[j][0].equals(""))) {
 					continue;
 				}
@@ -163,7 +161,7 @@ public class BirthPanel extends JPanel {
 
 		}
 
-		String[][] dataArray2 = new String[dataArray.length - deletions][8];
+		String[][] dataArray2 = new String[dataArray.length - deletions][6];
 
 		int i2 = 0;
 		for (String[] element : dataArray) {
@@ -172,7 +170,7 @@ public class BirthPanel extends JPanel {
 			}
 		}
 
-		LOGGER.log(Level.INFO, "Data array efter sletning af " + deletions + " rækker: " + dataArray2.length);
+		LOGGER.log(Level.INFO, "Antal efter sletning af " + deletions + " rækker: " + dataArray2.length);
 
 		dataArray = dataArray2;
 
@@ -226,17 +224,17 @@ public class BirthPanel extends JPanel {
 	 * Open one or more tsv files from Family Search and reduce them to the relevant
 	 * columns:
 	 * 
-	 * fullName 8, sex 9, birthLikeDate 10, birthLikePlaceText 11, chrDate 12,
-	 * chrPlaceText 13, fatherFullName 22, motherFullName 23
+	 * fullName 8 sex 9 birthLikeDate 10 birthLikePlaceText 11 otherFullNames 27
+	 * otherEvents 28
 	 */
 	protected void openTsvFile() {
 		Scanner sc;
 		String[] columns;
-		headerArray = new String[8];
+		headerArray = new String[6];
 		FileInputStream fis;
 		FileFilter ff = new FileNameExtensionFilter("FS eksport fil (TSV)", "tsv");
 		String fsFileName = prefs.get("FSFILENAME", ".");
-		String[][] birthArray = new String[100][8];
+		String[][] conscriptArray = new String[100][6];
 
 		JFileChooser fsChooser = new JFileChooser(fsFileName);
 		fsChooser.setFileFilter(ff);
@@ -254,7 +252,7 @@ public class BirthPanel extends JPanel {
 
 			for (int fileNo = 0; fileNo < fsFiles.length; fileNo++) {
 				try {
-					birthArray = new String[100][8];
+					conscriptArray = new String[100][6];
 
 					fis = new FileInputStream(fsFiles[fileNo]);
 					sc = new Scanner(fis);
@@ -267,10 +265,9 @@ public class BirthPanel extends JPanel {
 						headerArray[1] = columns[9];
 						headerArray[2] = columns[10];
 						headerArray[3] = columns[11];
-						headerArray[4] = columns[12];
-						headerArray[5] = columns[13];
-						headerArray[6] = columns[22];
-						headerArray[7] = columns[23];
+						headerArray[4] = columns[27];
+						headerArray[5] = columns[28];
+
 					}
 
 					// Ignore second line
@@ -283,14 +280,12 @@ public class BirthPanel extends JPanel {
 					while (sc.hasNext()) {
 						columns = sc.nextLine().split("\t");
 
-						birthArray[i][0] = fixCodePage(columns, 8);
-						birthArray[i][1] = columns[9];
-						birthArray[i][2] = columns[10];
-						birthArray[i][3] = fixCodePage(columns, 11);
-						birthArray[i][4] = columns[12];
-						birthArray[i][5] = fixCodePage(columns, 13);
-						birthArray[i][6] = fixCodePage(columns, 22);
-						birthArray[i][7] = fixCodePage(columns, 23);
+						conscriptArray[i][0] = fixCodePage(columns, 8);
+						conscriptArray[i][1] = columns[9];
+						conscriptArray[i][2] = columns[10];
+						conscriptArray[i][3] = fixCodePage(columns, 11);
+						conscriptArray[i][4] = fixCodePage(columns, 27);
+						conscriptArray[i][5] = fixCodePage(columns, 28);
 						i++;
 					}
 
@@ -302,7 +297,7 @@ public class BirthPanel extends JPanel {
 					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
 
-				dataArray = concatenate(dataArray, birthArray);
+				dataArray = concatenate(dataArray, conscriptArray);
 
 				LOGGER.log(Level.FINE, "Data array length after concatenation: " + dataArray.length);
 			}
@@ -317,20 +312,19 @@ public class BirthPanel extends JPanel {
 	}
 
 	/**
-	 * Instantiate a GedcomFile object and populate it with the birth data. Choose a
-	 * file name and save it.
+	 * Instantiate a GedcomFile object and populate it with the conscript data.
+	 * Choose a file name and save it.
 	 */
 	protected void saveAsGedcom() {
 		GedcomFile gedcomFile = new GedcomFile();
 		Family family;
 		Individual child = null;
 		Individual father = null;
-		Individual mother = null;
 
 		int individualId = 1;
-		String[] line = new String[8];
+		String[] line = new String[6];
 
-		// Add a family object for each birth in the array
+		// Add a family object for each conscript in the array
 		for (int i = 0; i < dataArray.length; i++) {
 			line = dataArray[i];
 
@@ -361,23 +355,16 @@ public class BirthPanel extends JPanel {
 			child.setSex(line[1].equals("male") ? "M" : "F");
 			child.setBirthDate(line[2]);
 			child.setBirthPlace(line[3]);
-			child.setChristeningDate(line[4]);
-			child.setChristeningPlace(line[5]);
 			family.getChildren().add(child);
 
-			if (!line[6].equals("")) {
+			if (!line[4].equals("")) {
 				father = new Individual(individualId++);
-				father.setName(line[6]);
+				father.setName(line[4]);
 				father.setSex("M");
 				family.setFather(father);
 			}
 
-			if (!line[7].equals("")) {
-				mother = new Individual(individualId++);
-				mother.setName(line[7]);
-				mother.setSex("F");
-				family.setMother(mother);
-			}
+			child.setSource(line[5]);
 
 			gedcomFile.addFamily(family);
 		}
@@ -385,7 +372,7 @@ public class BirthPanel extends JPanel {
 		String path = gedcomFile.saveFsExtract(fileNameStub);
 
 		if (!path.equals("")) {
-			JOptionPane.showMessageDialog(new JFrame(), "Fødsler er gemt som GEDCOM fil " + path, "Vejby Gedcom",
+			JOptionPane.showMessageDialog(new JFrame(), "Lægdsruller er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

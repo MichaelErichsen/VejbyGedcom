@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 09-09-2020
+ * @version 10-09-2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -33,6 +33,7 @@ public class Individual {
 	private String familyRole2 = "";
 	private String familyRole3 = "";
 	private String familyRole4 = "";
+	private String source = "";
 	private int year;
 	private Household household;
 	private CensusEvent censusEvent;
@@ -178,6 +179,13 @@ public class Individual {
 	 */
 	public String getSex() {
 		return sex;
+	}
+
+	/**
+	 * @return the source
+	 */
+	public String getSource() {
+		return source;
 	}
 
 	/**
@@ -329,6 +337,13 @@ public class Individual {
 	}
 
 	/**
+	 * @param source the source to set
+	 */
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	/**
 	 * @param trade the trade to set
 	 */
 	public void setTrade(String trade) {
@@ -395,6 +410,11 @@ public class Individual {
 
 		// Surround with slashes to mark as family name
 		sb.append("/" + familyName + "/\n");
+
+		if ((getSource() != null) && (!getSource().equals(""))) {
+			sb.append("2 SOUR @S1@\n");
+			sb.append("3 PAGE " + getSource() + "\n");
+		}
 
 		// Default to M rather than having to fix all entries with "?"
 		if ((getSex().equals(Sex.F) || getSex().equals("F"))) {
