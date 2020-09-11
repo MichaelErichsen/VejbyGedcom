@@ -26,7 +26,7 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * This panel reads a marriage query result from family Search and displays the
+ * This panel reads a marriage query result from Family Search and displays the
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
@@ -91,6 +91,7 @@ public class MarriagePanel extends FsPanel {
 	 * 8 fullName, 9 sex ["male"|""], 10 birthLikeDate, 16 marriageLikeDate, 17
 	 * marriageLikePlaceText, 24 spouseFullName,
 	 */
+	@Override
 	protected void openTsvFile() {
 		Scanner sc;
 		String[] columns;
@@ -177,6 +178,7 @@ public class MarriagePanel extends FsPanel {
 	 * Instantiate a GedcomFile object and populate it with the marriage data.
 	 * Choose a file name and save it.
 	 */
+	@Override
 	protected void saveAsGedcom() {
 //		GedcomFile gedcomFile = GedcomFile.getInstance();
 		GedcomFile gedcomFile = new GedcomFile();

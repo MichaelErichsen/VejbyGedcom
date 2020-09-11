@@ -14,7 +14,7 @@ import net.miginfocom.swing.MigLayout;
 
 /**
  * @author Michael Erichsen
- * @version 07-09-2020
+ * @version 11-09-2020
  *
  */
 public class WelcomePanel extends JPanel {
@@ -46,7 +46,7 @@ public class WelcomePanel extends JPanel {
 		scrollPane.setViewportView(panel);
 		panel.setLayout(new MigLayout("", "[685px]", "[80px][125px][70px][120px][70px]"));
 
-		JTextArea lblNewLabel = new JTextArea("Vejby Gedcom, \r\nVersion 0.1, september 2020");
+		JTextArea lblNewLabel = new JTextArea("Vejby Gedcom, \r\nVersion 1.0, september 2020");
 		lblNewLabel.setEditable(false);
 		lblNewLabel.setLineWrap(true);
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 24));
@@ -71,7 +71,7 @@ public class WelcomePanel extends JPanel {
 
 		JTextArea lblNewLabel_3 = new JTextArea(
 
-				"Family Search udtr\u00E6k laves ved f\u00F8rst at foretage en foresp\u00F8rgsel p\u00E5 https://www.familysearch.org/search/ og derefter eksportere resultatet som tsv (Tab Separated Values).\r\nProgrammet underst\u00F8tter lige nu f\u00F8dsler og vielser.\r\nProgrammet kan \u00E5bne flere tsv filer p\u00E5 \u00E9n gang for f\u00F8dsler.");
+				"Family Search udtr\u00E6k laves ved f\u00F8rst at foretage en foresp\u00F8rgsel p\u00E5 https://www.familysearch.org/search/ og derefter eksportere resultatet som tsv (Tab Separated Values).\r\nProgrammet underst\u00F8tter f\u00F8dsler, konfirmationer, l\u00E6gdsruller, vielser og d\u00F8dsfald.\r\nProgrammet kan \u00E5bne flere tsv filer p\u00E5 \u00E9n gang.");
 		lblNewLabel_3.setEditable(false);
 		lblNewLabel_3.setWrapStyleWord(true);
 		lblNewLabel_3.setLineWrap(true);

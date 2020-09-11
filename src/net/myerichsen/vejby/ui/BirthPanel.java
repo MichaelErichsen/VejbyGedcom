@@ -26,7 +26,7 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * This panel reads a birth query result from family Search and displays the
+ * This panel reads a birth query result from Family Search and displays the
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
@@ -90,6 +90,7 @@ public class BirthPanel extends FsPanel {
 	 * fullName 8, sex 9, birthLikeDate 10, birthLikePlaceText 11, chrDate 12,
 	 * chrPlaceText 13, fatherFullName 22, motherFullName 23
 	 */
+	@Override
 	protected void openTsvFile() {
 		Scanner sc;
 		String[] columns;
@@ -181,6 +182,7 @@ public class BirthPanel extends FsPanel {
 	 * Instantiate a GedcomFile object and populate it with the birth data. Choose a
 	 * file name and save it.
 	 */
+	@Override
 	protected void saveAsGedcom() {
 		GedcomFile gedcomFile = new GedcomFile();
 		Family family;

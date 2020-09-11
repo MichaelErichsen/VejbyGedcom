@@ -26,7 +26,7 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * This panel reads a burial query result from family Search and displays the
+ * This panel reads a burial query result from Family Search and displays the
  * reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
@@ -91,6 +91,7 @@ public class BurialPanel extends FsPanel {
 	 * burialDate 20 burialPlaceText 21 fatherFullName 22 motherFullName 23
 	 * spouseFullName 24
 	 */
+	@Override
 	protected void openTsvFile() {
 		Scanner sc;
 		String[] columnLabels;
@@ -178,6 +179,7 @@ public class BurialPanel extends FsPanel {
 	 * Instantiate a GedcomFile object and populate it with the burial data. Choose
 	 * a file name and save it.
 	 */
+	@Override
 	protected void saveAsGedcom() {
 		GedcomFile gedcomFile = new GedcomFile();
 		Family family;

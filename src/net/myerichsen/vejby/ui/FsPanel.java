@@ -13,16 +13,18 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Abstract superclass for Vejby Gedcom FS Extraction panels.
+ * 
  * @author Michael Erichsen
  * @version 11-09-2020
  *
  */
-public class FsPanel extends JPanel {
+public abstract class FsPanel extends JPanel {
+	private static final long serialVersionUID = -4008194513738386085L;
+	protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	protected String[][] dataArray;
 	protected String[] headerArray;
 	protected JTable table;
-	private static final long serialVersionUID = -4008194513738386085L;
-	protected static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	protected Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 	protected JButton saveButton;
 	protected String fileNameStub;
@@ -39,19 +41,19 @@ public class FsPanel extends JPanel {
 	/**
 	 * Constructor
 	 *
-	 * @param layout
+	 * @param isDoubleBuffered
 	 */
-	public FsPanel(LayoutManager layout) {
-		super(layout);
+	public FsPanel(boolean isDoubleBuffered) {
+		super(isDoubleBuffered);
 	}
 
 	/**
 	 * Constructor
 	 *
-	 * @param isDoubleBuffered
+	 * @param layout
 	 */
-	public FsPanel(boolean isDoubleBuffered) {
-		super(isDoubleBuffered);
+	public FsPanel(LayoutManager layout) {
+		super(layout);
 	}
 
 	/**
@@ -65,6 +67,8 @@ public class FsPanel extends JPanel {
 	}
 
 	/**
+	 * Clear a row in the data array.
+	 * 
 	 * @param j
 	 */
 	private void clearRow(int i) {
@@ -95,6 +99,22 @@ public class FsPanel extends JPanel {
 	}
 
 	/**
+	 * List a row in the data array as a string.
+	 * 
+	 * @param i
+	 * @return
+	 */
+	private String dataArrayToString(int i) {
+		StringBuilder sb = new StringBuilder();
+		for (int j = 0; j < dataArray[i].length; j++) {
+			sb.append(dataArray[i][j] + ", ");
+		}
+
+		LOGGER.log(Level.FINE, "[" + i + "]: " + sb.toString());
+		return sb.toString();
+	}
+
+	/**
 	 * Eliminate duplicates in the data array.
 	 * 
 	 * For each row in the data array:
@@ -113,14 +133,14 @@ public class FsPanel extends JPanel {
 			if ((dataArray[i][0] == null) || (dataArray[i][0].equals(""))) {
 				continue;
 			}
-			stringI = listDataArray(i);
+			stringI = dataArrayToString(i);
 
 			for (int j = i + 1; j < dataArray.length; j++) {
 				// LOGGER.log(Level.INFO, "Række: " + j + "; " + dataArray[j][0]);
 				if ((dataArray[j][0] == null) || (dataArray[j][0].equals(""))) {
 					continue;
 				}
-				stringJ = listDataArray(j);
+				stringJ = dataArrayToString(j);
 
 				if (stringI.equals(stringJ)) {
 					LOGGER.log(Level.FINE, "Fundet " + i + ": " + stringI);
@@ -178,17 +198,13 @@ public class FsPanel extends JPanel {
 	}
 
 	/**
-	 * @param i
-	 * @return
+	 * Open a Tab Separated Values file as exported from a Family Search query and
+	 * analyze it into a data array.
 	 */
-	private String listDataArray(int i) {
-		StringBuilder sb = new StringBuilder();
-		for (int j = 0; j < dataArray[i].length; j++) {
-			sb.append(dataArray[i][j] + ", ");
-		}
+	protected abstract void openTsvFile();
 
-		LOGGER.log(Level.FINE, "[" + i + "]: " + sb.toString());
-		return sb.toString();
-	}
-
+	/**
+	 * Save the data array as a GEDCOM file.
+	 */
+	protected abstract void saveAsGedcom();
 }

@@ -26,21 +26,21 @@ import net.myerichsen.vejby.gedcom.GedcomFile;
 import net.myerichsen.vejby.gedcom.Individual;
 
 /**
- * This panel reads a conscript query result from Family Search and displays the
- * reduced result. The result can be saved as a GEDCOM file.
+ * This panel reads a confirmation query result from Family Search and displays
+ * the reduced result. The result can be saved as a GEDCOM file.
  * 
  * @author Michael Erichsen
  * @version 11-09-2020
  *
  */
-public class ConscriptsPanel extends FsPanel {
+public class ConfirmationPanel extends FsPanel {
 	private static final long serialVersionUID = 3673964025732718748L;
 
 	/**
 	 * Create the panel.
 	 */
-	public ConscriptsPanel() {
-		dataArray = new String[0][6];
+	public ConfirmationPanel() {
+		dataArray = new String[0][7];
 
 		setLayout(new BorderLayout(0, 0));
 
@@ -87,18 +87,18 @@ public class ConscriptsPanel extends FsPanel {
 	 * Open one or more tsv files from Family Search and reduce them to the relevant
 	 * columns:
 	 * 
-	 * fullName 8 sex 9 birthLikeDate 10 birthLikePlaceText 11 otherFullNames 27
-	 * otherEvents 28
+	 * fullName 8, sex 9, birthLikeDate 10, birthLikePlaceText 11, fatherFullName
+	 * 22, motherFullName 23, otherEvents 28
 	 */
 	@Override
 	protected void openTsvFile() {
 		Scanner sc;
 		String[] columns;
-		headerArray = new String[6];
+		headerArray = new String[7];
 		FileInputStream fis;
 		FileFilter ff = new FileNameExtensionFilter("FS eksport fil (TSV)", "tsv");
 		String fsFileName = prefs.get("FSFILENAME", ".");
-		String[][] conscriptArray = new String[100][6];
+		String[][] confirmationArray = new String[100][7];
 
 		JFileChooser fsChooser = new JFileChooser(fsFileName);
 		fsChooser.setFileFilter(ff);
@@ -116,7 +116,7 @@ public class ConscriptsPanel extends FsPanel {
 
 			for (int fileNo = 0; fileNo < fsFiles.length; fileNo++) {
 				try {
-					conscriptArray = new String[100][6];
+					confirmationArray = new String[100][7];
 
 					fis = new FileInputStream(fsFiles[fileNo]);
 					sc = new Scanner(fis);
@@ -129,9 +129,9 @@ public class ConscriptsPanel extends FsPanel {
 						headerArray[1] = columns[9];
 						headerArray[2] = columns[10];
 						headerArray[3] = columns[11];
-						headerArray[4] = columns[27];
-						headerArray[5] = columns[28];
-
+						headerArray[4] = columns[22];
+						headerArray[5] = columns[23];
+						headerArray[6] = columns[28];
 					}
 
 					// Ignore second line
@@ -144,12 +144,21 @@ public class ConscriptsPanel extends FsPanel {
 					while (sc.hasNext()) {
 						columns = sc.nextLine().split("\t");
 
-						conscriptArray[i][0] = fixCodePage(columns, 8);
-						conscriptArray[i][1] = columns[9];
-						conscriptArray[i][2] = columns[10];
-						conscriptArray[i][3] = fixCodePage(columns, 11);
-						conscriptArray[i][4] = fixCodePage(columns, 27);
-						conscriptArray[i][5] = fixCodePage(columns, 28);
+//						fullName	8	Anders Johansen
+//						sex	9	male
+//						birthLikeDate	10	22 May 1864
+//						birthLikePlaceText	11	LangÃ¸
+//						fatherFullName	22	Hans Nielsen
+//						motherFullName	23	Karen Marie Johansen
+//						otherEvents	28	CONFIRMATION/14 Apr 1878//Vejby, Frederiksborg, Denmark
+
+						confirmationArray[i][0] = fixCodePage(columns, 8);
+						confirmationArray[i][1] = columns[9];
+						confirmationArray[i][2] = columns[10];
+						confirmationArray[i][3] = fixCodePage(columns, 11);
+						confirmationArray[i][4] = fixCodePage(columns, 22);
+						confirmationArray[i][5] = fixCodePage(columns, 23);
+						confirmationArray[i][6] = fixCodePage(columns, 28);
 						i++;
 					}
 
@@ -161,7 +170,7 @@ public class ConscriptsPanel extends FsPanel {
 					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
 
-				dataArray = concatenate(dataArray, conscriptArray);
+				dataArray = concatenate(dataArray, confirmationArray);
 
 				LOGGER.log(Level.FINE, "Data array length after concatenation: " + dataArray.length);
 			}
@@ -176,7 +185,7 @@ public class ConscriptsPanel extends FsPanel {
 	}
 
 	/**
-	 * Instantiate a GedcomFile object and populate it with the conscript data.
+	 * Instantiate a GedcomFile object and populate it with the confirmation data.
 	 * Choose a file name and save it.
 	 */
 	@Override
@@ -185,11 +194,12 @@ public class ConscriptsPanel extends FsPanel {
 		Family family;
 		Individual child = null;
 		Individual father = null;
+		Individual mother = null;
 
 		int individualId = 1;
-		String[] line = new String[6];
+		String[] line = new String[7];
 
-		// Add a family object for each conscript in the array
+		// Add a family object for each confirmation in the array
 		for (int i = 0; i < dataArray.length; i++) {
 			line = dataArray[i];
 
@@ -220,6 +230,17 @@ public class ConscriptsPanel extends FsPanel {
 			child.setSex(line[1].equals("male") ? "M" : "F");
 			child.setBirthDate(line[2]);
 			child.setBirthPlace(line[3]);
+
+			String[] otherEventParts = line[6].split("/");
+
+			if (!otherEventParts[0].equals("CONFIRMATION")) {
+				JOptionPane.showMessageDialog(new JFrame(), "Other events: " + line[6], "Vejby Gedcom",
+						JOptionPane.INFORMATION_MESSAGE);
+				continue;
+			}
+
+			child.setConfirmationDate(otherEventParts[1]);
+			child.setConfirmationPlace(otherEventParts[3]);
 			family.getChildren().add(child);
 
 			if (!line[4].equals("")) {
@@ -229,7 +250,12 @@ public class ConscriptsPanel extends FsPanel {
 				family.setFather(father);
 			}
 
-			child.setSource(line[5]);
+			if (!line[5].equals("")) {
+				mother = new Individual(individualId++);
+				mother.setName(line[5]);
+				mother.setSex("F");
+				family.setMother(mother);
+			}
 
 			gedcomFile.addFamily(family);
 		}
@@ -237,7 +263,7 @@ public class ConscriptsPanel extends FsPanel {
 		String path = gedcomFile.saveFsExtract(fileNameStub);
 
 		if (!path.equals("")) {
-			JOptionPane.showMessageDialog(new JFrame(), "Lægdsruller er gemt som GEDCOM fil " + path, "Vejby Gedcom",
+			JOptionPane.showMessageDialog(new JFrame(), "Konfirmationer er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

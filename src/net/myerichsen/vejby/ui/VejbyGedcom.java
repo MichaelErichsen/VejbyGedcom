@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
@@ -19,7 +18,7 @@ import javax.swing.SwingConstants;
  * panels to do the work.
  * 
  * @author Michael Erichsen
- * @version 10-09-2020
+ * @version 11-09-2020
  *
  */
 
@@ -48,10 +47,11 @@ public class VejbyGedcom {
 	private CensusPanel censusJPanel;
 	private CensusMappingPanel censusMappingJPanel;
 	private HouseholdPanel householdJPanel;
-	private FsPanel birthPanel;
-	private MarriagePanel marriagePanel;
-	private JPanel burialPanel;
+	private BirthPanel birthPanel;
+	private ConfirmationPanel confirmationPanel;
 	private ConscriptsPanel conscriptsPanel;
+	private MarriagePanel marriagePanel;
+	private BurialPanel burialPanel;
 
 	/**
 	 * Create the application.
@@ -94,7 +94,7 @@ public class VejbyGedcom {
 	private void initialize() {
 		frmVejbyGedcomIndtastning = new JFrame();
 		frmVejbyGedcomIndtastning.setTitle("Vejby GEDCOM indtastning");
-		frmVejbyGedcomIndtastning.setBounds(100, 100, 1080, 500);
+		frmVejbyGedcomIndtastning.setBounds(100, 100, 1080, 624);
 		frmVejbyGedcomIndtastning.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -143,14 +143,18 @@ public class VejbyGedcom {
 		birthPanel = new BirthPanel();
 		getTabbedPane().addTab("Fødsler", null, birthPanel, null);
 
+		confirmationPanel = new ConfirmationPanel();
+		getTabbedPane().addTab("Konfirmationer", null, confirmationPanel, null);
+
+		conscriptsPanel = new ConscriptsPanel();
+		getTabbedPane().addTab("Lægdsruller", null, conscriptsPanel, null);
+
 		marriagePanel = new MarriagePanel();
 		getTabbedPane().addTab("Vielser", null, marriagePanel, null);
 
 		burialPanel = new BurialPanel();
 		getTabbedPane().addTab("Dødsfald", null, burialPanel, null);
 
-		conscriptsPanel = new ConscriptsPanel();
-		getTabbedPane().addTab("Lægdsruller", null, conscriptsPanel, null);
 	}
 
 	/**

@@ -9,7 +9,7 @@ import net.myerichsen.vejby.util.Mapping;
 /**
  * Class representing an individual in GEDCOM.
  * 
- * @version 10-09-2020
+ * @version 11-09-2020
  * @author Michael Erichsen
  */
 public class Individual {
@@ -25,6 +25,8 @@ public class Individual {
 	private String birthPlace = "";
 	private String christeningDate = "";
 	private String christeningPlace = "";
+	private String confirmationDate = "";
+	private String confirmationPlace = "";
 	private String deathDate = "";
 	private String deathPlace = "";
 	private String place = "";
@@ -88,6 +90,20 @@ public class Individual {
 	 */
 	public String getChristeningPlace() {
 		return christeningPlace;
+	}
+
+	/**
+	 * @return the confirmationDate
+	 */
+	public String getConfirmationDate() {
+		return confirmationDate;
+	}
+
+	/**
+	 * @return the confirmationPlace
+	 */
+	public String getConfirmationPlace() {
+		return confirmationPlace;
 	}
 
 	/**
@@ -243,6 +259,20 @@ public class Individual {
 	 */
 	public void setChristeningPlace(String christeningPlace) {
 		this.christeningPlace = christeningPlace;
+	}
+
+	/**
+	 * @param confirmationDate the confirmationDate to set
+	 */
+	public void setConfirmationDate(String confirmationDate) {
+		this.confirmationDate = confirmationDate;
+	}
+
+	/**
+	 * @param confirmationPlace the confirmationPlace to set
+	 */
+	public void setConfirmationPlace(String confirmationPlace) {
+		this.confirmationPlace = confirmationPlace;
 	}
 
 	/**
@@ -436,6 +466,15 @@ public class Individual {
 			sb.append("2 DATE " + getChristeningDate() + "\n");
 			if ((getChristeningPlace() != null) && (!getChristeningPlace().equals(""))) {
 				sb.append("2 PLAC " + getChristeningPlace() + ",\n");
+			}
+			sb.append("2 SOUR @S1@\n");
+		}
+
+		if ((getConfirmationDate() != null) && (!getConfirmationDate().equals(""))) {
+			sb.append("1 CONF\n");
+			sb.append("2 DATE " + getConfirmationDate() + "\n");
+			if ((getConfirmationPlace() != null) && (!getConfirmationPlace().equals(""))) {
+				sb.append("2 PLAC " + getConfirmationPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
