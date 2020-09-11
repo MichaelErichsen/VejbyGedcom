@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
@@ -47,9 +48,9 @@ public class VejbyGedcom {
 	private CensusPanel censusJPanel;
 	private CensusMappingPanel censusMappingJPanel;
 	private HouseholdPanel householdJPanel;
-	private BirthPanel birthPanel;
+	private FsPanel birthPanel;
 	private MarriagePanel marriagePanel;
-	private BurialPanel burialPanel;
+	private JPanel burialPanel;
 	private ConscriptsPanel conscriptsPanel;
 
 	/**
