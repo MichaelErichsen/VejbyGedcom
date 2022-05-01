@@ -124,11 +124,11 @@ public class ParentFinder {
 			}
 
 			if (found) {
-				if (sb == null) {
-					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";"
+				if (sb.length() == 0) {
+					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
 							+ getParentsFromSource(value));
 				} else {
-					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";" + sb);
+					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb);
 				}
 
 			}
