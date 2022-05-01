@@ -4,4 +4,4 @@ The tool is designed to be so generic that it can be used for local history else
 
 The documentation folder contains .csv KIP files for Vejby from Dansk Demografisk Database.
 
-The result of loading Vejby censuses into Gedcom can be followed at https://www.myerichsen.net/vejby/, where a lot of data wash remains to be done.
+The result of loading Vejby censuses into Gedcom can be followed at https://www.myerichsen.net/vejby/.
