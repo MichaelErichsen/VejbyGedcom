@@ -1,4 +1,4 @@
-package net.merichse.gedcom.decendantcounter;
+package net.myerichsen.gedcom.decendantcounter;
 
 import org.gedcom4j.model.Individual;
 
