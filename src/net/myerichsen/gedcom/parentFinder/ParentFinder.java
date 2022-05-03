@@ -1,5 +1,7 @@
 package net.myerichsen.gedcom.parentFinder;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -31,24 +33,25 @@ import org.gedcom4j.parser.GedcomParser;
  * </ul>
  * 
  * @author Michael Erichsen
- * @version 01-05-2022
+ * @version 03-05-2022
  *
  */
+
 public class ParentFinder {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length < 2) {
-			System.out.println("Usage: ParentFinder location gedcomfile");
+		if (args.length < 3) {
+			System.out.println("Usage: ParentFinder location gedcomfile outputdirectory");
 			System.exit(4);
 		}
 
 		ParentFinder pf = new ParentFinder();
 
 		try {
-			pf.execute(args[0].toLowerCase(), args[1]);
+			pf.execute(args[0].toLowerCase(), args[1], args[2]);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
 		}
@@ -71,23 +74,34 @@ public class ParentFinder {
 	/**
 	 * @param location
 	 * @param filename
+	 * @param outputdirectory
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
-	private void execute(String location, String filename) throws IOException, GedcomParserException {
+	private void execute(String location, String filename, String outputdirectory)
+			throws IOException, GedcomParserException {
 		Gedcom gedcom = readGedcom(filename);
 		boolean found = false;
 		StringBuilder sb;
+
+		String outfile = outputdirectory + "\\" + location + ".csv";
+
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
 		for (Entry<String, Individual> individual : individuals.entrySet()) {
 			found = false;
 
+			if (!individual.getKey().equals("@I791@")) {
+				continue;
+			}
+
 			Individual value = individual.getValue();
 
-			found = testLocation(value, IndividualEventType.CHRISTENING, location);
-			found = testLocation(value, IndividualEventType.BIRTH, location);
+			boolean found1 = testLocation(value, IndividualEventType.CHRISTENING, location);
+			boolean found2 = testLocation(value, IndividualEventType.BIRTH, location);
+			found = found1 || found2;
 
 			if (!found) {
 				found = testSource(value, location);
@@ -127,13 +141,18 @@ public class ParentFinder {
 				if (sb.length() == 0) {
 					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
 							+ getParentsFromSource(value));
+					writer.write(individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
+							+ getParentsFromSource(value) + "\n");
 				} else {
 					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb);
+					writer.write(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb + "\n");
 				}
 
 			}
 
 		}
+
+		writer.close();
 
 	}
 
@@ -150,8 +169,8 @@ public class ParentFinder {
 
 			return string;
 		} catch (Exception e) {
-
 		}
+
 		return "";
 	}
 
