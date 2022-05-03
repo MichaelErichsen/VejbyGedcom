@@ -93,10 +93,6 @@ public class ParentFinder {
 		for (Entry<String, Individual> individual : individuals.entrySet()) {
 			found = false;
 
-			if (!individual.getKey().equals("@I791@")) {
-				continue;
-			}
-
 			Individual value = individual.getValue();
 
 			boolean found1 = testLocation(value, IndividualEventType.CHRISTENING, location);
