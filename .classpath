@@ -6,5 +6,14 @@
 	<classpathentry kind="lib" path="C:/Workspaces/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="C:/Workspaces/miglayout-4.0.jar"/>
 	<classpathentry kind="src" path="/gedcom4j"/>
+	<classpathentry kind="lib" path="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4.jar" sourcepath="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.apache.maven.doxia"/>
+			<attribute name="maven.artifactId" value="doxia-core"/>
+			<attribute name="maven.version" value="1.4"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

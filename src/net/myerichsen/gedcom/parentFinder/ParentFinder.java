@@ -19,21 +19,10 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 /**
- * Find all persons born or christened in a given location.
- * <p>
- * For each person
- * <ul>
- * <li>Get parents from GEDCOM
- * <p>
- * or
- * <p>
- * Get parents from christening source detail or family where the person is
- * child</li>
- * <li>List person, ID, parents name and possibly IDs in a CSV file</li>
- * </ul>
+ * Find parents for each person born or christened in a given location.
  * 
  * @author Michael Erichsen
- * @version 03-05-2022
+ * @version 04-05-2022
  *
  */
 
@@ -55,7 +44,6 @@ public class ParentFinder {
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -85,9 +73,7 @@ public class ParentFinder {
 		StringBuilder sb;
 
 		String outfile = outputdirectory + "\\" + location + ".csv";
-
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
 		for (Entry<String, Individual> individual : individuals.entrySet()) {
@@ -109,9 +95,7 @@ public class ParentFinder {
 				List<FamilyChild> familiesWhereChild = value.getFamiliesWhereChild(false);
 
 				for (FamilyChild familyChild : familiesWhereChild) {
-
 					Family family = familyChild.getFamily();
-
 					boolean husb = false;
 
 					try {
@@ -120,17 +104,17 @@ public class ParentFinder {
 					} catch (Exception e) {
 					}
 					try {
-
 						PersonalName w = family.getWife().getIndividual().getNames().get(0);
+
 						if (husb) {
 							sb.append(" og ");
 						}
+
 						sb.append(w);
 					} catch (Exception e) {
 					}
 				}
 			} catch (Exception e) {
-//				System.out.println(e.getMessage());
 			}
 
 			if (found) {
@@ -143,13 +127,11 @@ public class ParentFinder {
 					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb);
 					writer.write(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb + "\n");
 				}
-
 			}
-
 		}
 
+		writer.flush();
 		writer.close();
-
 	}
 
 	/**
@@ -159,10 +141,8 @@ public class ParentFinder {
 	private String getParentsFromSource(Individual value) {
 		try {
 			IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
-
 			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
 			String string = citation.getWhereInSource().toString();
-
 			return string;
 		} catch (Exception e) {
 		}

@@ -4,4 +4,4 @@
  * @author Michael Erichsen
  *
  */
-package net.myerichsen.gedcom.decendantcounter;
+package net.myerichsen.gedcom.descendantcounter;

@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.decendantcounter;
+package net.myerichsen.gedcom.descendantcounter;
 
 import java.io.IOException;
 import java.util.HashMap;

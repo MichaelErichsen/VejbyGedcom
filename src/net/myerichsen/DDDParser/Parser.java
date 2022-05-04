@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This program needs a kipdata.txt and a set of KIP csv files as inout.
+ * This program needs a kipdata.txt and a set of KIP csv files as input.
  * <p>
  * It uses a hardcoded list of villages within a parish to find all persons in
  * the csv files, who were born in one of these villages. You can update the
@@ -115,8 +115,7 @@ public class Parser {
 	}
 
 	/**
-	 * Parse all lines in the kipdata text file. Read each line into a String
-	 * list.
+	 * Parse all lines in the kipdata text file. Read each line into a String list.
 	 *
 	 * @return kipLines A List of Strings
 	 * @throws IOException
@@ -315,8 +314,7 @@ public class Parser {
 	}
 
 	/**
-	 * @param csvFileDirectory
-	 *            the csvFileDirectory to set
+	 * @param csvFileDirectory the csvFileDirectory to set
 	 */
 	public void setCsvFileDirectory(String csvFileDirectory) {
 		if (csvFileDirectory.endsWith("/") == false) {
@@ -327,24 +325,21 @@ public class Parser {
 	}
 
 	/**
-	 * @param csvFileName
-	 *            the csvFileName to set
+	 * @param csvFileName the csvFileName to set
 	 */
 	public void setCsvFileName(String csvFileName) {
 		this.csvFileName = csvFileName;
 	}
 
 	/**
-	 * @param kipLine
-	 *            the kipLine to set
+	 * @param kipLine the kipLine to set
 	 */
 	public void setKipLine(String kipLine) {
 		this.kipLine = kipLine;
 	}
 
 	/**
-	 * @param kipTextFileName
-	 *            the kipTextFileName to set
+	 * @param kipTextFileName the kipTextFileName to set
 	 */
 	public void setKipTextFileName(String kipTextFileName) {
 		this.kipTextFileName = kipTextFileName;
