@@ -27,6 +27,7 @@ import org.gedcom4j.parser.GedcomParser;
  */
 
 public class ParentFinder {
+	private String sted;
 
 	/**
 	 * @param args
@@ -71,6 +72,7 @@ public class ParentFinder {
 		Gedcom gedcom = readGedcom(filename);
 		boolean found = false;
 		StringBuilder sb;
+		String outline = "";
 
 		String outfile = outputdirectory + "\\" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
@@ -119,14 +121,15 @@ public class ParentFinder {
 
 			if (found) {
 				if (sb.length() == 0) {
-					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
-							+ getParentsFromSource(value));
-					writer.write(individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
-							+ getParentsFromSource(value) + "\n");
+					outline = individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
+							+ getParentsFromSource(value) + ";" + sted;
 				} else {
-					System.out.println(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb);
-					writer.write(individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb + "\n");
+					outline = individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb + ";" + sted;
+
 				}
+
+				System.out.println(outline);
+				writer.write(outline + "\n");
 			}
 		}
 
@@ -157,7 +160,7 @@ public class ParentFinder {
 	private boolean testLocation(Individual value, IndividualEventType type, String location) {
 		try {
 			IndividualEvent event = value.getEventsOfType(type).get(0);
-			String sted = event.getPlace().getPlaceName().toLowerCase();
+			sted = event.getPlace().getPlaceName().toLowerCase();
 
 			if (sted.contains(location)) {
 				return true;
@@ -178,9 +181,9 @@ public class ParentFinder {
 			IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
 
 			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
-			String string = citation.getWhereInSource().toString();
+			sted = citation.getWhereInSource().toString();
 
-			if (string.toLowerCase().contains(location)) {
+			if (sted.toLowerCase().contains(location)) {
 				return true;
 			}
 		} catch (Exception e) {
@@ -188,5 +191,4 @@ public class ParentFinder {
 		}
 		return false;
 	}
-
 }
