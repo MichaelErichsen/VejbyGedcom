@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.CitationWithSource;
@@ -20,9 +22,24 @@ import org.gedcom4j.parser.GedcomParser;
 
 /**
  * Find parents for each person born or christened in a given location.
+ * <p>
+ * Parameters:
+ * <ul>
+ * <li>Location name (e. g. village), where each character of [Ê¯Â∆ÿ≈] must be
+ * replaced with a "."</li>
+ * <li>Full path to GEDCOM file</li>
+ * <li>Path to an existing output directory</li>
+ * </ul>
+ * <p>
+ * The program produces a .csv file with a row for each person found.
+ * <p>
+ * Parents are either extracted from the GEDCOM family record or from the
+ * citation source detail for the Christening event. When not using the family
+ * record, the first line of the citation detail must contain the location and
+ * the names of one or both parents.
  * 
  * @author Michael Erichsen
- * @version 04-05-2022
+ * @version 06-05-2022
  *
  */
 
@@ -56,8 +73,7 @@ public class ParentFinder {
 	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
 		GedcomParser gp = new GedcomParser();
 		gp.load(filename);
-		Gedcom gedcom = gp.getGedcom();
-		return gedcom;
+		return gp.getGedcom();
 	}
 
 	/**
@@ -162,10 +178,9 @@ public class ParentFinder {
 			IndividualEvent event = value.getEventsOfType(type).get(0);
 			sted = event.getPlace().getPlaceName().toLowerCase();
 
-			if (sted.contains(location)) {
-				return true;
-
-			}
+			Pattern pattern = Pattern.compile(location);
+			Matcher matcher = pattern.matcher(sted);
+			return matcher.find();
 		} catch (Exception e) {
 		}
 		return false;
@@ -183,9 +198,9 @@ public class ParentFinder {
 			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
 			sted = citation.getWhereInSource().toString();
 
-			if (sted.toLowerCase().contains(location)) {
-				return true;
-			}
+			Pattern pattern = Pattern.compile(location);
+			Matcher matcher = pattern.matcher(sted);
+			return matcher.find();
 		} catch (Exception e) {
 
 		}
