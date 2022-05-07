@@ -1,7 +1,7 @@
 # VejbyGedcom
 This repository contains a number of GEDCOM-related Java tools.
 
-#GedcomFile
+## GedcomFile
 GedcomFile is a tool to create GEDCOM files for various online genealogical resources for Vejby, Holbo, Frederiksborg, Denmark, such as census files and church registries.
 The tool is designed to be so generic that it can be used for local history elsewhere in Denmark.
 
@@ -9,7 +9,7 @@ The documentation folder contains .csv KIP files for Vejby from Dansk Demografis
 
 The result of loading Vejby censuses into Gedcom can be followed at https://www.myerichsen.net/vejby/.
 
-#DDDParser
+## DDDParser
 DDDParser needs a kipdata.txt and a set of KIP csv files as input.
  
 It uses a hardcoded list of villages within a parish to find all persons in
@@ -18,10 +18,10 @@ list in the initVillages() method.
  
 The output is sent to a text file.
  
-#DescendantCounter
+## DescendantCounter
 DescendantCounter reads a GEDCOM file and finds the ancestors with most descendants.
 
-#ParentFinder 
+## ParentFinder 
 ParentFinder finds parents for each person born or christened in a given location.
 
 Parameters:
