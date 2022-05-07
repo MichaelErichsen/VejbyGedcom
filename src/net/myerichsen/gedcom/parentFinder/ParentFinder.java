@@ -25,8 +25,7 @@ import org.gedcom4j.parser.GedcomParser;
  * <p>
  * Parameters:
  * <ul>
- * <li>Location name (e. g. village), where each character of [æøåÆØÅ] must be
- * replaced with a "."</li>
+ * <li>Location name</li>
  * <li>Full path to GEDCOM file</li>
  * <li>Path to an existing output directory</li>
  * </ul>
@@ -39,7 +38,7 @@ import org.gedcom4j.parser.GedcomParser;
  * the names of one or both parents.
  * 
  * @author Michael Erichsen
- * @version 06-05-2022
+ * @version 07-05-2022
  *
  */
 
@@ -58,7 +57,7 @@ public class ParentFinder {
 		ParentFinder pf = new ParentFinder();
 
 		try {
-			pf.execute(args[0].toLowerCase(), args[1], args[2]);
+			pf.execute(args[0], args[1], args[2]);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
 		}
@@ -85,12 +84,20 @@ public class ParentFinder {
 	 */
 	private void execute(String location, String filename, String outputdirectory)
 			throws IOException, GedcomParserException {
+		String outfile = outputdirectory + "\\" + location + ".csv";
+
+		location = location.replace("æ", ".");
+		location = location.replace("ø", ".");
+		location = location.replace("å", ".");
+		location = location.replace("Æ", ".");
+		location = location.replace("Ø", ".");
+		location = location.replace("Å", ".").toLowerCase();
+
 		Gedcom gedcom = readGedcom(filename);
 		boolean found = false;
 		StringBuilder sb;
 		String outline = "";
 
-		String outfile = outputdirectory + "\\" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 

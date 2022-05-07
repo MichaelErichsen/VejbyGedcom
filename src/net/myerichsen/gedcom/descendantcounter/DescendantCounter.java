@@ -12,9 +12,11 @@ import org.gedcom4j.model.Individual;
 import org.gedcom4j.parser.GedcomParser;
 
 /**
- * Main class for a GEDCOM decendant counter
+ * Main class for a GEDCOM decendant counter. It reads a GEDCOM file and finds
+ * the ancestors with most descendants.
  * 
- * @author michael
+ * @author Michael Erichsen
+ * @version 07-05-2022
  *
  */
 public class DescendantCounter {
@@ -28,7 +30,7 @@ public class DescendantCounter {
 			IndividualWithChildCount iwcc = entry.getValue();
 			System.out.println(iwcc);
 		}
-		
+
 		System.out.println("Antal: " + sorted.size());
 	}
 
