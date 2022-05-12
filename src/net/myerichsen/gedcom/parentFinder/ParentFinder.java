@@ -38,12 +38,13 @@ import org.gedcom4j.parser.GedcomParser;
  * the names of one or both parents.
  * 
  * @author Michael Erichsen
- * @version 07-05-2022
+ * @version 12-05-2022
  *
  */
 
 public class ParentFinder {
 	private String sted;
+	private String year;
 
 	/**
 	 * @param args
@@ -85,6 +86,8 @@ public class ParentFinder {
 	private void execute(String location, String filename, String outputdirectory)
 			throws IOException, GedcomParserException {
 		String outfile = outputdirectory + "\\" + location + ".csv";
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		writer.write("ID;Navn;Type;Forældre;Sted\n");
 
 		location = location.replace("æ", ".");
 		location = location.replace("ø", ".");
@@ -98,11 +101,11 @@ public class ParentFinder {
 		StringBuilder sb;
 		String outline = "";
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
 		for (Entry<String, Individual> individual : individuals.entrySet()) {
 			found = false;
+			year = "????";
 
 			Individual value = individual.getValue();
 
@@ -143,13 +146,19 @@ public class ParentFinder {
 			}
 
 			if (found) {
+				if (year.length() > 4) {
+					year = year.substring(year.length() - 4);
+				}
+
 				if (sb.length() == 0) {
-					outline = individual.getKey() + ";" + value.getFormattedName().trim() + ";Source;"
+					outline = individual.getKey() + ";" + year + ";" + value.getFormattedName() + ";Source;"
 							+ getParentsFromSource(value) + ";" + sted;
 				} else {
-					outline = individual.getKey() + ";" + value.getFormattedName().trim() + ";Tree;" + sb + ";" + sted;
-
+					outline = individual.getKey() + ";" + year + ";" + value.getFormattedName() + ";Tree;" + sb + ";"
+							+ sted;
 				}
+
+				outline = outline.replace("/", "");
 
 				System.out.println(outline);
 				writer.write(outline + "\n");
@@ -167,6 +176,7 @@ public class ParentFinder {
 	private String getParentsFromSource(Individual value) {
 		try {
 			IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
+			year = event.getDate().getValue();
 			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
 			String string = citation.getWhereInSource().toString();
 			return string;
@@ -183,6 +193,7 @@ public class ParentFinder {
 	private boolean testLocation(Individual value, IndividualEventType type, String location) {
 		try {
 			IndividualEvent event = value.getEventsOfType(type).get(0);
+			year = event.getDate().getValue();
 			sted = event.getPlace().getPlaceName().toLowerCase();
 
 			Pattern pattern = Pattern.compile(location);
