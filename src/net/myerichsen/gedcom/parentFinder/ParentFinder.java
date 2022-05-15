@@ -87,7 +87,6 @@ public class ParentFinder {
 			throws IOException, GedcomParserException {
 		String outfile = outputdirectory + "\\" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		writer.write("ID;Navn;Type;Forældre;Sted\n");
 
 		location = location.replace("æ", ".");
 		location = location.replace("ø", ".");
