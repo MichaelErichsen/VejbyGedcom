@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +41,7 @@ import org.gedcom4j.parser.GedcomParser;
  * the names of one or both parents.
  * 
  * @author Michael Erichsen
- * @version 19-05-2022
+ * @version 21-05-2022
  *
  */
 
@@ -175,7 +176,7 @@ public class ParentFinder {
 				}
 
 				if ((pFlag == true) && (parents.length() > 0)) {
-					matchParentNames = matchParentNames(gedcom, parents, year);
+					matchParentNames = matchParentNames(individuals, parents, year);
 
 					if (matchParentNames.size() > 0) {
 						for (String string : matchParentNames) {
@@ -228,12 +229,13 @@ public class ParentFinder {
 	 * <li>birth place</li>
 	 * </ul>
 	 * 
-	 * @param gedcom
+	 * @param individuals2
 	 * @param parentName
 	 * @param childBirthYear
 	 * @return
 	 */
-	private List<String> findParentCandidates(Gedcom gedcom, String parentName, String childBirthYear) {
+	private List<String> findParentCandidates(Map<String, Individual> individuals, String parentName,
+			String childBirthYear) {
 		List<String> parentList = new ArrayList<>();
 		Individual value;
 		Matcher matcher;
@@ -243,8 +245,6 @@ public class ParentFinder {
 		String deathYear = "";
 		String birthPlace = "";
 		Pattern pattern = Pattern.compile(parentName.toLowerCase());
-
-		Map<String, Individual> individuals = gedcom.getIndividuals();
 
 		for (Entry<String, Individual> individual : individuals.entrySet()) {
 			value = individual.getValue();
@@ -284,8 +284,11 @@ public class ParentFinder {
 					deathYear = "";
 				}
 
+				String spouses = getSpouses(individuals, id);
+
 				if ((by < (Integer.parseInt(childBirthYear) - 15)) && (dy > (Integer.parseInt(childBirthYear)))) {
-					parentList.add(id + ";" + birthYear + ";" + deathYear + ";" + name + ";" + birthPlace);
+					parentList.add(
+							id + ";" + birthYear + ";" + deathYear + ";" + name + ";" + spouses + ";" + birthPlace);
 				}
 			}
 		}
@@ -331,21 +334,39 @@ public class ParentFinder {
 	}
 
 	/**
+	 * Return a string listing all spouses for a given individual
+	 * 
+	 * @param id
+	 * @return
+	 */
+	private String getSpouses(Map<String, Individual> individuals, String id) {
+		StringBuilder sb = new StringBuilder();
+		Individual individual = individuals.get(id);
+		Set<Individual> spouses = individual.getSpouses();
+
+		for (Individual spouse : spouses) {
+			sb.append(spouse.getFormattedName().replace("/", "") + " " + spouse.getXref() + " ");
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * Get a list of strings identifying possible matches for the parents
 	 * 
-	 * @param gedcom
+	 * @param individuals
 	 * @param parents
 	 * @param year
 	 * @return
 	 */
-	private List<String> matchParentNames(Gedcom gedcom, String parents, String year) {
+	private List<String> matchParentNames(Map<String, Individual> individuals, String parents, String year) {
 		List<String> parentList = new ArrayList<>();
 
 		String[] sComma = parents.split(",");
 		String[] sOg = sComma[0].split("og");
 
 		for (String element : sOg) {
-			parentList.addAll(findParentCandidates(gedcom, element.trim(), year));
+			parentList.addAll(findParentCandidates(individuals, element.trim(), year));
 		}
 
 		return parentList;
@@ -362,9 +383,9 @@ public class ParentFinder {
 		try {
 			IndividualEvent event = value.getEventsOfType(type).get(0);
 			year = event.getDate().getValue();
-			sted = event.getPlace().getPlaceName().toLowerCase();
 
 			Pattern pattern = Pattern.compile(location);
+			sted = event.getPlace().getPlaceName().toLowerCase();
 			Matcher matcher = pattern.matcher(sted);
 			return matcher.find();
 		} catch (Exception e) {
@@ -385,9 +406,9 @@ public class ParentFinder {
 			IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
 
 			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
-			sted = citation.getWhereInSource().toString();
 
 			Pattern pattern = Pattern.compile(location);
+			sted = citation.getWhereInSource().toString();
 			Matcher matcher = pattern.matcher(sted);
 			return matcher.find();
 		} catch (Exception e) {

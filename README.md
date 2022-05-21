@@ -29,6 +29,7 @@ Parameters:
 <li>Location name (e. g. village), where each character of [Ê¯Â∆ÿ≈] must be replaced with a "."</li>
 <li>Full path to GEDCOM file</li>
 <li>Path to an existing output directory</li>
+<li>[Optional]"P" to add parent candidates</li>
 </ul>
  
 The program produces a .csv file with a row for each person found.
