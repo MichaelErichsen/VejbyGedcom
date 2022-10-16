@@ -43,7 +43,8 @@ public class RelocationFinder {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 3) {
-			System.out.println("Usage: RelocationFinder location gedcomfile outputdirectory");
+			System.out.println("Usage: RelocationFinder location gedcomfile outputdirectory\n"
+					+ "\"all\" as location selects all");
 			System.exit(4);
 		}
 
@@ -117,22 +118,23 @@ public class RelocationFinder {
 							date = date + "-01-01";
 						}
 					}
-				}
 
-				if (ie.getPlace() != null)
-					placeName = ie.getPlace().getPlaceName();
-				else
-					placeName = "";
+					if (ie.getPlace() != null)
+						placeName = ie.getPlace().getPlaceName();
+					else
+						placeName = "";
 
-				if (ie.getNoteStructures() != null)
-					note = ie.getNoteStructures().get(0).getLines().get(0);
-				else
-					note = "";
+					if (ie.getNoteStructures() != null)
+						note = ie.getNoteStructures().get(0).getLines().get(0);
+					else
+						note = "";
 
-				if ((placeName.toLowerCase().indexOf(location) > 0) || (note.toLowerCase().indexOf(location) > 0)) {
-					outline = "\"" + entry.getKey() + "\";\"" + value.toString() + "\";\"" + date + "\";\"" + placeName
-							+ "\";\"" + note + "\";";
-					writer.write(outline + "\n");
+					if ((placeName.toLowerCase().indexOf(location) > 0) || (note.toLowerCase().indexOf(location) > 0)
+							|| (location.equals("all"))) {
+						outline = "\"" + entry.getKey() + "\";\"" + value.toString() + "\";\"" + date + "\";\""
+								+ placeName + "\";\"" + note + "\";";
+						writer.write(outline + "\n");
+					}
 				}
 			}
 
