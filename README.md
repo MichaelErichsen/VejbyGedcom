@@ -35,3 +35,15 @@ Parameters:
 The program produces a .csv file with a row for each person found.
  
 Parents are either extracted from the GEDCOM family record or from the citation source detail for the Christening event. When not using the family record, the first line of the citation detail must contain the location and the names of one or both parents.
+
+## RelocationFinder 
+RelocationFinder finds events with subtype "Flytning" for each person relocating to and from given location.
+
+Parameters:
+<ul>
+<li>Location name (e. g. village), where each character of [Ê¯Â∆ÿ≈] must be replaced with a "."</li>
+<li>Full path to GEDCOM file</li>
+<li>Path to an existing output directory</li>
+</ul>
+ 
+The program produces a .csv file with a row for each relocation found.
