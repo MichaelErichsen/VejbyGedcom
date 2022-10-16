@@ -1,0 +1,3 @@
+git config --get remote.origin.url
+git clone --no-checkout --depth 1 https://github.com/MichaelErichsen/VejbyGedcom.git
+

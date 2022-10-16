@@ -33,11 +33,18 @@ public class Parser {
 	 * Create a list of villages in the parish
 	 */
 	private static void initVillages() {
-		villages.add("HollÃ¸se");
-		villages.add("Ã˜rby");
-		villages.add("Unnerup");
-		villages.add("MÃ¸nge");
 		villages.add("Vejby");
+		villages.add("Veiby");
+		villages.add("Wejby");
+		villages.add("Weiby");
+		villages.add("Vejby sogn");
+		villages.add("Veiby sogn");
+		villages.add("Wejby sogn");
+		villages.add("Weiby sogn");
+		villages.add("Holløse");
+		villages.add("Unnerup");
+		villages.add("Mønge");
+		villages.add("Ørby");
 	}
 
 	/**
@@ -233,7 +240,7 @@ public class Parser {
 
 		fr.close();
 
-		// First find column with title "KildefÃ¸dested" in the header line
+		// First find column with title "Kildefødested" in the header line
 
 		final String header = csvLines.get(0);
 		String[] fields = header.split(";");
@@ -242,19 +249,19 @@ public class Parser {
 		int birthPlaceColumn = 0;
 
 		for (int i = 0; i < fields.length; i++) {
-			if (fields[i].equals("LÃ¸benr")) {
+			if (fields[i].equals("Løbenr")) {
 				personColumn = i;
 			}
 			if (fields[i].equals("Husstands/familienr.")) {
 				householdColumn = i;
 			}
 
-			if (fields[i].equals("KildefÃ¸dested")) {
+			if (fields[i].equals("Kildefødested")) {
 				birthPlaceColumn = i;
 			}
 		}
 		if (personColumn == 0) {
-			System.out.println("LÃ¸benr ikke fundet i " + header + " for " + getKipLine());
+			System.out.println("Løbenr ikke fundet i " + header + " for " + getKipLine());
 			return;
 		}
 		if (householdColumn == 0) {
@@ -285,7 +292,7 @@ public class Parser {
 	 * <p>
 	 * Each line has the format
 	 * <p>
-	 * Aabenraa;Lundtoft;AdsbÃ¸l;1803;B8351
+	 * Aabenraa;Lundtoft;Adsbøl;1803;B8351
 	 * <p>
 	 * If year < 1845 then ignore
 	 * <p>
