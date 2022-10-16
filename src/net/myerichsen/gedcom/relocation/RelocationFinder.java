@@ -3,8 +3,12 @@ package net.myerichsen.gedcom.relocation;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.gedcom4j.exception.GedcomParserException;
@@ -74,7 +78,7 @@ public class RelocationFinder {
 
 		String outfile = outputdirectory + "\\" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		String outline = "Person;Flyttedato;Til;Fra";
+		String outline = "\"ID\";\"Person\";\"Flyttedato\";\"Til\";\"Fra\";";
 		writer.write(outline + "\n");
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
@@ -86,6 +90,8 @@ public class RelocationFinder {
 			IndividualEvent ie = null;
 			String eventSubType = "";
 			String date = "";
+			DateTimeFormatter formatter = null;
+			LocalDate localDate = null;
 			String placeName = "";
 			String note = "";
 
@@ -96,20 +102,38 @@ public class RelocationFinder {
 				if (eventSubType.equals("Flytning")) {
 					date = ie.getDate().getValue();
 
-					if (ie.getPlace() != null)
-						placeName = ie.getPlace().getPlaceName();
-					else
-						placeName = "";
-
-					note = ie.getNoteStructures().get(0).getLines().get(0);
-
-					if ((placeName.toLowerCase().indexOf(location) > 0) || (note.toLowerCase().indexOf(location) > 0)) {
-						outline = value.toString() + ";" + date + ";" + placeName + ";" + note;
-						writer.write(outline + "\n");
-//						System.out.println(outline);
+					try {
+						formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMM yyyy")
+								.toFormatter(Locale.ENGLISH);
+						localDate = LocalDate.parse(date, formatter);
+						date = localDate.toString();
+					} catch (Exception e) {
+						try {
+							formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMM yyyy")
+									.toFormatter(Locale.ENGLISH);
+							localDate = LocalDate.parse(date, formatter);
+							date = localDate.toString();
+						} catch (Exception e1) {
+							date = date + "-01-01";
+						}
 					}
 				}
 
+				if (ie.getPlace() != null)
+					placeName = ie.getPlace().getPlaceName();
+				else
+					placeName = "";
+
+				if (ie.getNoteStructures() != null)
+					note = ie.getNoteStructures().get(0).getLines().get(0);
+				else
+					note = "";
+
+				if ((placeName.toLowerCase().indexOf(location) > 0) || (note.toLowerCase().indexOf(location) > 0)) {
+					outline = "\"" + entry.getKey() + "\";\"" + value.toString() + "\";\"" + date + "\";\"" + placeName
+							+ "\";\"" + note + "\";";
+					writer.write(outline + "\n");
+				}
 			}
 
 		}
