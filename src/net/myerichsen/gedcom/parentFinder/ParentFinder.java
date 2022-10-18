@@ -175,7 +175,7 @@ public class ParentFinder {
 					parents = getParentsFromSource(value);
 				}
 
-				if ((pFlag == true) && (parents.length() > 0)) {
+				if (pFlag && (parents.length() > 0)) {
 					matchParentNames = matchParentNames(individuals, parents, year);
 
 					if (matchParentNames.size() > 0) {

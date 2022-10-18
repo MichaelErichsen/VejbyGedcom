@@ -47,7 +47,7 @@ public class DescendantCounter {
 		try {
 			Gedcom gedcom = readGedcom(args[0]);
 			Map<String, IndividualWithChildCount> iwccMap = populateAncestors(gedcom);
-			TreeMap<String, IndividualWithChildCount> sorted = new TreeMap<String, IndividualWithChildCount>(iwccMap);
+			TreeMap<String, IndividualWithChildCount> sorted = new TreeMap<>(iwccMap);
 			listAncestors(sorted);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
@@ -61,7 +61,7 @@ public class DescendantCounter {
 	 */
 	private static Map<String, IndividualWithChildCount> populateAncestors(Gedcom gedcom) {
 		Map<String, Individual> individuals = gedcom.getIndividuals();
-		Map<String, IndividualWithChildCount> iwccMap = new HashMap<String, IndividualWithChildCount>();
+		Map<String, IndividualWithChildCount> iwccMap = new HashMap<>();
 
 		for (Entry<String, Individual> individual : individuals.entrySet()) {
 			String key = individual.getKey();

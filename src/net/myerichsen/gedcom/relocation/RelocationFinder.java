@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.gedcom4j.exception.GedcomParserException;
+import org.gedcom4j.model.CitationWithSource;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.model.Individual;
 import org.gedcom4j.model.IndividualEvent;
@@ -59,6 +60,22 @@ public class RelocationFinder {
 	}
 
 	/**
+	 * Read a GEDCOM file using org.gedcomj package
+	 * 
+	 * @param filename
+	 * @return
+	 * @throws GedcomParserException
+	 * @throws IOException
+	 */
+	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
+		GedcomParser gp = new GedcomParser();
+		gp.load(filename);
+		return gp.getGedcom();
+	}
+
+	private String wis = "";
+
+	/**
 	 * Worker method
 	 * 
 	 * @param string
@@ -79,7 +96,7 @@ public class RelocationFinder {
 
 		String outfile = outputdirectory + "\\" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		String outline = "\"ID\";\"Person\";\"Flyttedato\";\"Til\";\"Fra\";";
+		String outline = "\"ID\";\"Person\";\"Flyttedato\";\"Til\";\"Fra\";\"Kildereferencedetalje\"";
 		writer.write(outline + "\n");
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
@@ -104,6 +121,13 @@ public class RelocationFinder {
 					date = ie.getDate().getValue();
 
 					try {
+						CitationWithSource cit = (CitationWithSource) ie.getCitations().get(0);
+						wis = cit.getWhereInSource().getValue();
+					} catch (Exception e2) {
+						wis = "";
+					}
+
+					try {
 						formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMM yyyy")
 								.toFormatter(Locale.ENGLISH);
 						localDate = LocalDate.parse(date, formatter);
@@ -119,20 +143,22 @@ public class RelocationFinder {
 						}
 					}
 
-					if (ie.getPlace() != null)
+					if (ie.getPlace() != null) {
 						placeName = ie.getPlace().getPlaceName();
-					else
+					} else {
 						placeName = "";
+					}
 
-					if (ie.getNoteStructures() != null)
+					if (ie.getNoteStructures() != null) {
 						note = ie.getNoteStructures().get(0).getLines().get(0);
-					else
+					} else {
 						note = "";
+					}
 
 					if ((placeName.toLowerCase().indexOf(location) > 0) || (note.toLowerCase().indexOf(location) > 0)
 							|| (location.equals("all"))) {
 						outline = "\"" + entry.getKey() + "\";\"" + value.toString() + "\";\"" + date + "\";\""
-								+ placeName + "\";\"" + note + "\";";
+								+ placeName + "\";\"" + note + "\";\"" + wis + "\";";
 						writer.write(outline + "\n");
 					}
 				}
@@ -142,20 +168,6 @@ public class RelocationFinder {
 		writer.flush();
 		writer.close();
 
-	}
-
-	/**
-	 * Read a GEDCOM file using org.gedcomj package
-	 * 
-	 * @param filename
-	 * @return
-	 * @throws GedcomParserException
-	 * @throws IOException
-	 */
-	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
-		GedcomParser gp = new GedcomParser();
-		gp.load(filename);
-		return gp.getGedcom();
 	}
 
 }

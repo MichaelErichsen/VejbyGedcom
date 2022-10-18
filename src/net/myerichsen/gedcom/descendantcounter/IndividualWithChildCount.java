@@ -37,11 +37,13 @@ public class IndividualWithChildCount extends Individual implements Comparable<I
 	public int compareTo(IndividualWithChildCount iwcc) {
 		int c = iwcc.getDescendantCount();
 
-		if (descendantCount > c)
+		if (descendantCount > c) {
 			return 1;
+		}
 
-		if (descendantCount < c)
+		if (descendantCount < c) {
 			return -1;
+		}
 
 		return 0;
 	}

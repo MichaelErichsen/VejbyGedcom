@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class Parser {
 	private static List<String> kipLines;
-	private static List<String> villages = new ArrayList<String>();
+	private static List<String> villages = new ArrayList<>();
 	private static FileWriter fw;
 	private static BufferedWriter bw;
 
@@ -128,7 +128,7 @@ public class Parser {
 	 * @throws IOException
 	 */
 	private List<String> parseKipText() throws IOException {
-		final List<String> kipLines = new ArrayList<String>();
+		final List<String> kipLines = new ArrayList<>();
 		final File file = new File(kipTextFileName);
 		final FileReader fr = new FileReader(file);
 		final BufferedReader br = new BufferedReader(fr);
@@ -222,7 +222,7 @@ public class Parser {
 	 * @throws IOException
 	 */
 	private void processCsvFile(String csvFileName) throws IOException {
-		final List<String> csvLines = new ArrayList<String>();
+		final List<String> csvLines = new ArrayList<>();
 		final File file = new File(csvFileName);
 		FileReader fr;
 		try {
@@ -324,7 +324,7 @@ public class Parser {
 	 * @param csvFileDirectory the csvFileDirectory to set
 	 */
 	public void setCsvFileDirectory(String csvFileDirectory) {
-		if (csvFileDirectory.endsWith("/") == false) {
+		if (!csvFileDirectory.endsWith("/")) {
 			csvFileDirectory = csvFileDirectory + "/";
 		}
 
