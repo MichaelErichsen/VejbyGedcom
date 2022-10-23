@@ -52,7 +52,8 @@ public class RelocationFinder {
 		RelocationFinder rf = new RelocationFinder();
 
 		try {
-			rf.execute(args[0], args[1], args[2]);
+			String outfile = rf.execute(args[0], args[1], args[2]);
+			System.out.println("Saved to " + outfile);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
 		}
@@ -82,9 +83,8 @@ public class RelocationFinder {
 	 * @param string2
 	 * @param string3
 	 */
-	private void execute(String location, String filename, String outputdirectory)
+	private String execute(String location, String filename, String outputdirectory)
 			throws IOException, GedcomParserException {
-
 		location = location.replace("æ", ".");
 		location = location.replace("ø", ".");
 		location = location.replace("å", ".");
@@ -94,7 +94,7 @@ public class RelocationFinder {
 
 		Gedcom gedcom = readGedcom(filename);
 
-		String outfile = outputdirectory + "\\" + location + ".csv";
+		String outfile = outputdirectory + "\\flyt_" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		String outline = "\"ID\";\"Person\";\"Flyttedato\";\"Til\";\"Fra\";\"Kildereferencedetalje\"";
 		writer.write(outline + "\n");
@@ -168,6 +168,7 @@ public class RelocationFinder {
 		writer.flush();
 		writer.close();
 
+		return outfile;
 	}
 
 }

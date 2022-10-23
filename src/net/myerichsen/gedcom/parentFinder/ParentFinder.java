@@ -67,7 +67,8 @@ public class ParentFinder {
 		ParentFinder pf = new ParentFinder();
 
 		try {
-			pf.execute(args[0], args[1], args[2]);
+			String outfile = pf.execute(args[0], args[1], args[2]);
+			System.out.println("Saved to " + outfile);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
 		}
@@ -96,13 +97,14 @@ public class ParentFinder {
 	 * @param location
 	 * @param filename
 	 * @param outputdirectory
+	 * @return
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
-	private void execute(String location, String filename, String outputdirectory)
+	private String execute(String location, String filename, String outputdirectory)
 			throws IOException, GedcomParserException {
 		List<String> matchParentNames;
-		String outfile = outputdirectory + "\\" + location + ".csv";
+		String outfile = outputdirectory + "\\par_" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		String type = "";
 		String s = "";
@@ -183,8 +185,6 @@ public class ParentFinder {
 							outline = individual.getKey() + ";" + year + ";" + value.getFormattedName() + ";" + type
 									+ ";" + parents + ";" + sted + ";" + string;
 							outline = outline.replace("/", "");
-
-							System.out.println(outline);
 							writer.write(outline + "\n");
 						}
 					}
@@ -192,8 +192,6 @@ public class ParentFinder {
 					outline = individual.getKey() + ";" + year + ";" + value.getFormattedName() + ";" + type + ";"
 							+ parents + ";" + sted + ";" + s;
 					outline = outline.replace("/", "");
-
-					System.out.println(outline + ";" + s);
 					writer.write(outline + ";" + s + "\n");
 				}
 			}
@@ -201,6 +199,7 @@ public class ParentFinder {
 
 		writer.flush();
 		writer.close();
+		return outfile;
 	}
 
 	/**
