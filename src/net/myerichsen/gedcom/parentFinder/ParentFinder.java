@@ -56,7 +56,8 @@ public class ParentFinder {
 	public static void main(String[] args) {
 		if (args.length < 3) {
 			System.out.println(
-					"Usage: ParentFinder location gedcomfile outputdirectory [p], where p adds parent candidates");
+					"Usage: ParentFinder location gedcomfile outputdirectory [p], where p adds parent candidates\n"
+							+ "\"all\" as location selects all");
 			System.exit(4);
 		}
 
@@ -108,6 +109,10 @@ public class ParentFinder {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		String type = "";
 		String s = "";
+
+		if (location.equals("all")) {
+			location = "";
+		}
 
 		location = location.replace("æ", ".");
 		location = location.replace("ø", ".");
