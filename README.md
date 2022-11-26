@@ -47,3 +47,12 @@ Parameters:
 </ul>
  
 The program produces a .csv file with a row for each relocation found.
+
+##BirthdateMatcher
+BirthdateMatcher finds persons with the same birth date, requiring a full date, not just a year.
+
+Parameters:
+<ul>
+<li>Full path to GEDCOM file</li>
+<li>Path to an existing output directory</li>
+</ul>
