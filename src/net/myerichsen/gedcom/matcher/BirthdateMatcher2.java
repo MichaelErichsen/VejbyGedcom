@@ -11,27 +11,29 @@ import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.model.Individual;
 import org.gedcom4j.model.IndividualEvent;
+import org.gedcom4j.model.PersonalName;
 import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 /**
- * Find persons with the same birth date
+ * Find persons with the same phonetic name and birth year
  * 
  * @author Michael Erichsen
- * @version 26. nov. 2022
+ * @version 27. nov. 2022
  *
  */
-public class BirthdateMatcher {
+public class BirthdateMatcher2 {
+	private static Fonkod fonkod = new Fonkod();
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: BirthdateMatcher gedcomfile outputdirectory");
+			System.out.println("Usage: BirthdateMatcher2 gedcomfile outputdirectory");
 			System.exit(4);
 		}
-		BirthdateMatcher bm = new BirthdateMatcher();
+		BirthdateMatcher2 bm = new BirthdateMatcher2();
 
 		try {
 			String outfile = bm.execute(args[0], args[1]);
@@ -57,7 +59,8 @@ public class BirthdateMatcher {
 	}
 
 	/**
-	 * Read a GEDCOM file and find all persons with matching birthdates
+	 * Read a GEDCOM file and find all persons with matching phonetic names and
+	 * birth years
 	 * 
 	 * @param gedcomfile
 	 * @param outputdirectory
@@ -76,7 +79,10 @@ public class BirthdateMatcher {
 		Individual value2;
 		List<IndividualEvent> event2;
 		String birthDate2;
-		String pattern = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
+		List<PersonalName> name1;
+		String surName1;
+		List<PersonalName> name2;
+		String surName2;
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
@@ -87,30 +93,27 @@ public class BirthdateMatcher {
 		for (Entry<String, Individual> individual1 : individuals.entrySet()) {
 			ID1 = individual1.getKey();
 			value1 = individual1.getValue();
+			name1 = value1.getNames();
+			surName1 = fonkodSurname(name1.get(0));
+
 			event1 = value1.getEventsOfType(IndividualEventType.BIRTH);
 
 			if ((event1 != null) && (event1.size() > 0)) {
-				birthDate1 = event1.get(0).getDate().getValue();
-
-				if (!birthDate1.matches(pattern)) {
-					continue;
-				}
+				birthDate1 = getYear(event1.get(0).getDate().getValue());
 
 				for (Entry<String, Individual> individual2 : individuals.entrySet()) {
 					ID2 = individual2.getKey();
 					value2 = individual2.getValue();
+					name2 = value2.getNames();
+					surName2 = fonkodSurname(name2.get(0));
 					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
 
 					if ((event2 != null) && (event2.size() > 0)) {
-						birthDate2 = event2.get(0).getDate().getValue();
+						birthDate2 = getYear(event2.get(0).getDate().getValue());
 
-						if (!birthDate2.matches(pattern)) {
-							continue;
-						}
-
-						if (birthDate1.equals(birthDate2) && !ID1.equals(ID2)) {
-							writer.write(ID1 + ";" + value1 + ";" + birthDate1 + ";" + ID2 + ";" + value2 + ";"
-									+ birthDate2 + "\n");
+						if (birthDate1.equals(birthDate2) && !ID1.equals(ID2) && surName1.equals(surName2)) {
+							writer.write(ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2 + ";" + name2.get(0)
+									+ ";" + birthDate2 + "\n");
 							counter++;
 						}
 					}
@@ -123,6 +126,50 @@ public class BirthdateMatcher {
 		writer.close();
 		return outfile;
 
+	}
+
+	/**
+	 * Convert PersonalName object to fonkoded surname
+	 * 
+	 * @param name
+	 * @return Fonkoded name
+	 */
+	private String fonkodSurname(PersonalName name) {
+		String[] nameParts = name.getBasic().split("/");
+		String surName;
+
+		try {
+			surName = fonkod.generateKey(nameParts[1]);
+		} catch (Exception e) {
+			surName = "";
+		}
+
+		return surName;
+	}
+
+	/**
+	 * Return the year from the date string
+	 * 
+	 * @param date
+	 * @return year
+	 */
+	private String getYear(String date) {
+		String patternd = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
+		String patternm = "[A-Z]{3}\\s\\d{4}";
+		String patterny = "\\d{4}";
+
+		if (date.matches(patternd)) {
+			return date.substring(6);
+		}
+
+		if (date.matches(patternm)) {
+			return date.substring(4);
+		}
+
+		if (date.matches(patterny)) {
+			return date;
+		}
+		return "";
 	}
 
 }

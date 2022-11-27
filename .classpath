@@ -5,6 +5,8 @@
 	<classpathentry kind="lib" path="C:/Workspaces/AnselCharset-1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Workspaces/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="C:/Workspaces/miglayout-4.0.jar"/>
+	<classpathentry kind="lib" path="C:/Workspaces/log4j-api-2.19.0.jar"/>
+	<classpathentry kind="lib" path="C:/Workspaces/log4j-1.2-api-2.19.0.jar"/>
 	<classpathentry kind="src" path="/gedcom4j"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4.jar" sourcepath="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4-sources.jar">
 		<attributes>
