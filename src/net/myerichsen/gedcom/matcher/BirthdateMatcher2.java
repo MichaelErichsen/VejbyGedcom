@@ -16,10 +16,11 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 /**
- * Find persons with the same phonetic name and birth year
+ * Find persons with the same phonetized surname, first initial, sex, and birth
+ * year
  * 
  * @author Michael Erichsen
- * @version 27. nov. 2022
+ * @version 28. nov. 2022
  *
  */
 public class BirthdateMatcher2 {
@@ -71,6 +72,7 @@ public class BirthdateMatcher2 {
 	private String execute(String gedcomfile, String outputdirectory) throws IOException, GedcomParserException {
 		String outfile = outputdirectory + "\\BirthdatePairs.csv";
 		int counter = 0;
+		int person1 = 0;
 		String ID1;
 		Individual value1;
 		List<IndividualEvent> event1;
@@ -83,6 +85,8 @@ public class BirthdateMatcher2 {
 		String surName1;
 		List<PersonalName> name2;
 		String surName2;
+		String sex1;
+		String sex2;
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
@@ -90,13 +94,21 @@ public class BirthdateMatcher2 {
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
+		System.out.println("File " + gedcomfile + " read");
+
 		for (Entry<String, Individual> individual1 : individuals.entrySet()) {
+			person1++;
 			ID1 = individual1.getKey();
 			value1 = individual1.getValue();
 			name1 = value1.getNames();
-			surName1 = fonkodSurname(name1.get(0));
+			surName1 = fonkodName(name1.get(0));
 
 			event1 = value1.getEventsOfType(IndividualEventType.BIRTH);
+			try {
+				sex1 = value1.getSex().getValue();
+			} catch (Exception e) {
+				sex1 = "";
+			}
 
 			if ((event1 != null) && (event1.size() > 0)) {
 				birthDate1 = getYear(event1.get(0).getDate().getValue());
@@ -105,15 +117,23 @@ public class BirthdateMatcher2 {
 					ID2 = individual2.getKey();
 					value2 = individual2.getValue();
 					name2 = value2.getNames();
-					surName2 = fonkodSurname(name2.get(0));
+					surName2 = fonkodName(name2.get(0));
 					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
+					try {
+						sex2 = value2.getSex().getValue();
+					} catch (Exception e) {
+						sex2 = "";
+					}
 
 					if ((event2 != null) && (event2.size() > 0)) {
 						birthDate2 = getYear(event2.get(0).getDate().getValue());
 
-						if (birthDate1.equals(birthDate2) && !ID1.equals(ID2) && surName1.equals(surName2)) {
-							writer.write(ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2 + ";" + name2.get(0)
-									+ ";" + birthDate2 + "\n");
+						if (birthDate1.equals(birthDate2) && !ID1.equals(ID2) && surName1.equals(surName2)
+								&& sex1.equals(sex2)) {
+							writer.write(person1 + ";" + ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2 + ";"
+									+ name2.get(0) + ";" + birthDate2 + "\n");
+							System.out.print(person1 + ";" + ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2
+									+ ";" + name2.get(0) + ";" + birthDate2 + "\n");
 							counter++;
 						}
 					}
@@ -129,12 +149,12 @@ public class BirthdateMatcher2 {
 	}
 
 	/**
-	 * Convert PersonalName object to fonkoded surname
+	 * Convert PersonalName object to first character and fonkoded surname
 	 * 
 	 * @param name
 	 * @return Fonkoded name
 	 */
-	private String fonkodSurname(PersonalName name) {
+	private String fonkodName(PersonalName name) {
 		String[] nameParts = name.getBasic().split("/");
 		String surName;
 
@@ -144,7 +164,7 @@ public class BirthdateMatcher2 {
 			surName = "";
 		}
 
-		return surName;
+		return nameParts[0].substring(0, 1).toLowerCase() + " " + surName;
 	}
 
 	/**
