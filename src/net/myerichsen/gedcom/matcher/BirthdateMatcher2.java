@@ -87,6 +87,7 @@ public class BirthdateMatcher2 {
 		String surName2;
 		String sex1;
 		String sex2;
+		String birthYear1, birthYear2;
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
@@ -111,7 +112,8 @@ public class BirthdateMatcher2 {
 			}
 
 			if ((event1 != null) && (event1.size() > 0)) {
-				birthDate1 = getYear(event1.get(0).getDate().getValue());
+				birthDate1 = event1.get(0).getDate().getValue();
+				birthYear1 = getYear(birthDate1);
 
 				for (Entry<String, Individual> individual2 : individuals.entrySet()) {
 					ID2 = individual2.getKey();
@@ -119,6 +121,7 @@ public class BirthdateMatcher2 {
 					name2 = value2.getNames();
 					surName2 = fonkodName(name2.get(0));
 					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
+
 					try {
 						sex2 = value2.getSex().getValue();
 					} catch (Exception e) {
@@ -126,9 +129,10 @@ public class BirthdateMatcher2 {
 					}
 
 					if ((event2 != null) && (event2.size() > 0)) {
-						birthDate2 = getYear(event2.get(0).getDate().getValue());
+						birthDate2 = event2.get(0).getDate().getValue();
+						birthYear2 = getYear(birthDate2);
 
-						if (birthDate1.equals(birthDate2) && !ID1.equals(ID2) && surName1.equals(surName2)
+						if (birthYear1.equals(birthYear2) && !ID1.equals(ID2) && surName1.equals(surName2)
 								&& sex1.equals(sex2)) {
 							writer.write(person1 + ";" + ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2 + ";"
 									+ name2.get(0) + ";" + birthDate2 + "\n");
