@@ -3,16 +3,14 @@ package net.myerichsen.gedcom.matcher;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.model.Individual;
-import org.gedcom4j.model.IndividualEvent;
-import org.gedcom4j.model.PersonalName;
-import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 /**
@@ -20,11 +18,10 @@ import org.gedcom4j.parser.GedcomParser;
  * year
  * 
  * @author Michael Erichsen
- * @version 28. nov. 2022
+ * @version 29. nov. 2022
  *
  */
 public class BirthdateMatcher2 {
-	private static Fonkod fonkod = new Fonkod();
 
 	/**
 	 * @param args
@@ -70,77 +67,30 @@ public class BirthdateMatcher2 {
 	 * @throws GedcomParserException
 	 */
 	private String execute(String gedcomfile, String outputdirectory) throws IOException, GedcomParserException {
-		String outfile = outputdirectory + "\\BirthdatePairs.csv";
 		int counter = 0;
-		int person1 = 0;
-		String ID1;
-		Individual value1;
-		List<IndividualEvent> event1;
-		String birthDate1;
-		String ID2;
-		Individual value2;
-		List<IndividualEvent> event2;
-		String birthDate2;
-		List<PersonalName> name1;
-		String surName1;
-		List<PersonalName> name2;
-		String surName2;
-		String sex1;
-		String sex2;
-		String birthYear1, birthYear2;
 
+		String outfile = outputdirectory + "\\BirthdatePairs.csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
 		Gedcom gedcom = readGedcom(gedcomfile);
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
-		System.out.println("File " + gedcomfile + " read");
+		ArrayList<MatchPerson> listMp = new ArrayList<>();
 
 		for (Entry<String, Individual> individual1 : individuals.entrySet()) {
-			person1++;
-			ID1 = individual1.getKey();
-			value1 = individual1.getValue();
-			name1 = value1.getNames();
-			surName1 = fonkodName(name1.get(0));
+			listMp.add(new MatchPerson(individual1));
+		}
 
-			event1 = value1.getEventsOfType(IndividualEventType.BIRTH);
-			try {
-				sex1 = value1.getSex().getValue();
-			} catch (Exception e) {
-				sex1 = "";
-			}
+		SortByKey sortByKey = new SortByKey();
+		Collections.sort(listMp, sortByKey);
 
-			if ((event1 != null) && (event1.size() > 0)) {
-				birthDate1 = event1.get(0).getDate().getValue();
-				birthYear1 = getYear(birthDate1);
-
-				for (Entry<String, Individual> individual2 : individuals.entrySet()) {
-					ID2 = individual2.getKey();
-					value2 = individual2.getValue();
-					name2 = value2.getNames();
-					surName2 = fonkodName(name2.get(0));
-					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
-
-					try {
-						sex2 = value2.getSex().getValue();
-					} catch (Exception e) {
-						sex2 = "";
-					}
-
-					if ((event2 != null) && (event2.size() > 0)) {
-						birthDate2 = event2.get(0).getDate().getValue();
-						birthYear2 = getYear(birthDate2);
-
-						if (birthYear1.equals(birthYear2) && !ID1.equals(ID2) && surName1.equals(surName2)
-								&& sex1.equals(sex2)) {
-							writer.write(person1 + ";" + ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2 + ";"
-									+ name2.get(0) + ";" + birthDate2 + "\n");
-							System.out.print(person1 + ";" + ID1 + ";" + name1.get(0) + ";" + birthDate1 + ";" + ID2
-									+ ";" + name2.get(0) + ";" + birthDate2 + "\n");
-							counter++;
-						}
-					}
+		for (int i = 0; i < listMp.size(); i++) {
+			for (int j = i + 1; j < listMp.size(); j++) {
+				if (sortByKey.compare(listMp.get(i), listMp.get(j)) == 0) {
+					System.out.println(listMp.get(i) + ";" + listMp.get(j));
+					writer.write(listMp.get(i).toString() + ";" + listMp.get(j) + "\n");
+					counter++;
 				}
 			}
 		}
@@ -149,51 +99,5 @@ public class BirthdateMatcher2 {
 		writer.flush();
 		writer.close();
 		return outfile;
-
 	}
-
-	/**
-	 * Convert PersonalName object to first character and fonkoded surname
-	 * 
-	 * @param name
-	 * @return Fonkoded name
-	 */
-	private String fonkodName(PersonalName name) {
-		String[] nameParts = name.getBasic().split("/");
-		String surName;
-
-		try {
-			surName = fonkod.generateKey(nameParts[1]);
-		} catch (Exception e) {
-			surName = "";
-		}
-
-		return nameParts[0].substring(0, 1).toLowerCase() + " " + surName;
-	}
-
-	/**
-	 * Return the year from the date string
-	 * 
-	 * @param date
-	 * @return year
-	 */
-	private String getYear(String date) {
-		String patternd = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
-		String patternm = "[A-Z]{3}\\s\\d{4}";
-		String patterny = "\\d{4}";
-
-		if (date.matches(patternd)) {
-			return date.substring(6);
-		}
-
-		if (date.matches(patternm)) {
-			return date.substring(4);
-		}
-
-		if (date.matches(patterny)) {
-			return date;
-		}
-		return "";
-	}
-
 }
