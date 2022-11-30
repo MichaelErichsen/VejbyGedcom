@@ -82,8 +82,7 @@ public class BirthdateMatcher2 {
 			listMp.add(new MatchPerson(individual1));
 		}
 
-		BirthPhonNameComparator birthPhonNameComparator = new BirthPhonNameComparator();
-		Collections.sort(listMp, birthPhonNameComparator);
+		Collections.sort(listMp, new BirthPhonNameComparator());
 
 		for (int i = 0; i < listMp.size(); i++) {
 			for (int j = i + 1; j < listMp.size(); j++) {

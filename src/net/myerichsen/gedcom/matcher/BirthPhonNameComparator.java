@@ -12,7 +12,7 @@ import java.util.Comparator;
 public class BirthPhonNameComparator implements Comparator<MatchPerson> {
 
 	/**
-	 * Sort in ascending order of birth year, phonetized surname and sex
+	 * Sort in ascending order of birth year and phonetized surname
 	 */
 	@Override
 	public int compare(MatchPerson o1, MatchPerson o2) {

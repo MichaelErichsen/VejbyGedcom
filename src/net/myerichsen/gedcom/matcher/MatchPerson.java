@@ -52,17 +52,6 @@ public class MatchPerson {
 		return false;
 	}
 
-//	/**
-//	 * Two objects are equal, if they share birth year, phonetic name and sex
-//	 */
-//	public boolean equals(MatchPerson o) {
-//		if (birthYear.equals(o.getBirthYear()) && phoneticName.equals(o.getPhoneticName()) && sex.equals(o.getSex())) {
-//			return true;
-//		}
-//
-//		return false;
-//	}
-
 	/**
 	 * Convert PersonalName object to first character and fonkoded surname
 	 * 
@@ -156,18 +145,18 @@ public class MatchPerson {
 		String patterny = "\\d{4}";
 
 		if (date.matches(patternd)) {
-			return date.substring(6);
+			return date.substring(6).trim();
 		}
 
 		if (date.matches(patternm)) {
-			return date.substring(4).replace(" ", "-");
+			return date.substring(4).replace(" ", "-").trim();
 		}
 
 		if (date.matches(patterny)) {
-			return date.replace(" ", "-");
+			return date.replace(" ", "-").trim();
 		}
 
-		return date;
+		return date.trim();
 	}
 
 	/**
