@@ -18,7 +18,7 @@ import org.gedcom4j.parser.GedcomParser;
  * year
  * 
  * @author Michael Erichsen
- * @version 29. nov. 2022
+ * @version 30. nov. 2022
  *
  */
 public class BirthdateMatcher2 {
@@ -82,12 +82,12 @@ public class BirthdateMatcher2 {
 			listMp.add(new MatchPerson(individual1));
 		}
 
-		SortByKey sortByKey = new SortByKey();
-		Collections.sort(listMp, sortByKey);
+		BirthPhonNameComparator birthPhonNameComparator = new BirthPhonNameComparator();
+		Collections.sort(listMp, birthPhonNameComparator);
 
 		for (int i = 0; i < listMp.size(); i++) {
 			for (int j = i + 1; j < listMp.size(); j++) {
-				if (sortByKey.compare(listMp.get(i), listMp.get(j)) == 0) {
+				if (listMp.get(i).equals(listMp.get(j))) {
 					System.out.println(listMp.get(i) + ";" + listMp.get(j));
 					writer.write(listMp.get(i).toString() + ";" + listMp.get(j) + "\n");
 					counter++;

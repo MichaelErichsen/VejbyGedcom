@@ -12,7 +12,7 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
  * A class to represent a person to be matched
  * 
  * @author Michael Erichsen
- * @version 29. nov. 2022
+ * @version 30. nov. 2022
  *
  */
 public class MatchPerson {
@@ -23,6 +23,8 @@ public class MatchPerson {
 	private String birthDate = "";
 	private String birthYear = "";
 	private String sex = "?";
+	private String birtChrFlag = "?";
+
 	private Entry<String, Individual> individual;
 
 	/**
@@ -34,6 +36,20 @@ public class MatchPerson {
 		super();
 		populate(individual);
 
+	}
+
+	/**
+	 * Compare birth year, phonetic name, and sex for two persons
+	 * 
+	 * @param o
+	 * @return True if equal
+	 */
+	public boolean equals(MatchPerson o) {
+		if (birthYear.equals(o.getBirthYear()) && phoneticName.equals(o.getPhoneticName()) && sex.equals(o.getSex())) {
+			return true;
+		}
+
+		return false;
 	}
 
 //	/**
@@ -70,6 +86,13 @@ public class MatchPerson {
 		}
 
 		return givenName + " " + surName;
+	}
+
+	/**
+	 * @return the birtChrFlag
+	 */
+	public String getBirtChrFlag() {
+		return birtChrFlag;
 	}
 
 	/**
@@ -165,22 +188,16 @@ public class MatchPerson {
 		if ((event != null) && (event.size() > 0)) {
 			birthDate = event.get(0).getDate().getValue();
 			birthYear = getYear(birthDate);
+			birtChrFlag = "B";
 		} else {
-			event = value.getEventsOfType(IndividualEventType.ILLLEGAL);
+			event = value.getEventsOfType(IndividualEventType.CHRISTENING);
 
 			if ((event != null) && (event.size() > 0)) {
 				birthDate = event.get(0).getDate().getValue();
 				birthYear = getYear(birthDate);
-			} else {
-				event = value.getEventsOfType(IndividualEventType.CHRISTENING);
-
-				if ((event != null) && (event.size() > 0)) {
-					birthDate = event.get(0).getDate().getValue();
-					birthYear = getYear(birthDate);
-				}
+				birtChrFlag = "C";
 			}
 		}
-
 	}
 
 	/**
@@ -191,10 +208,10 @@ public class MatchPerson {
 	}
 
 	/**
-	 * String representaion of the object
+	 * String representation of the object
 	 */
 	@Override
 	public String toString() {
-		return ID + ";" + birthYear + ";" + birthDate + ";" + fullName;
+		return ID + ";" + birtChrFlag + ";" + birthYear + ";" + phoneticName + ";" + birthDate + ";" + fullName;
 	}
 }
