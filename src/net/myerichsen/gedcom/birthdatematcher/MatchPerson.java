@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.matcher;
+package net.myerichsen.gedcom.birthdatematcher;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -12,11 +12,15 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
  * A class to represent a person to be matched
  * 
  * @author Michael Erichsen
- * @version 30. nov. 2022
+ * @version 01. dec. 2022
  *
  */
 public class MatchPerson {
 	private static Fonkod fonkod = new Fonkod();
+	private String patternd = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
+	private String patternm = "[A-Z]{3}\\s\\d{4}";
+
+	private String patterny = "\\d{4}";
 	private String ID = "";
 	private String fullName = "";
 	private String phoneticName = "";
@@ -24,6 +28,7 @@ public class MatchPerson {
 	private String birthYear = "";
 	private String sex = "?";
 	private String birtChrFlag = "?";
+	private String fullDateFlag = "N";
 
 	private Entry<String, Individual> individual;
 
@@ -35,7 +40,6 @@ public class MatchPerson {
 	public MatchPerson(Entry<String, Individual> individual) {
 		super();
 		populate(individual);
-
 	}
 
 	/**
@@ -45,6 +49,19 @@ public class MatchPerson {
 	 * @return True if equal
 	 */
 	public boolean equals(MatchPerson o) {
+		if (birthDate.contains("BEF ")) {
+			return false;
+		}
+
+		if (o.getBirthDate().contains("BEF ")) {
+			return false;
+		}
+
+		if ((fullDateFlag.equals("F")) && (o.getFullDateFlag().equals("F")) && (!birthDate.equals(o.getFullDateFlag()))
+				&& (birtChrFlag.equals(o.getBirtChrFlag()))) {
+			return false;
+		}
+
 		if (birthYear.equals(o.getBirthYear()) && phoneticName.equals(o.getPhoneticName()) && sex.equals(o.getSex())) {
 			return true;
 		}
@@ -99,6 +116,20 @@ public class MatchPerson {
 	}
 
 	/**
+	 * @return the fullDateFlag
+	 */
+	public String getDateNameFlag() {
+		return fullDateFlag;
+	}
+
+	/**
+	 * @return the fullDateFlag
+	 */
+	public String getFullDateFlag() {
+		return fullDateFlag;
+	}
+
+	/**
 	 * @return the fullName
 	 */
 	public String getFullName() {
@@ -140,9 +171,6 @@ public class MatchPerson {
 	 * @return year
 	 */
 	private String getYear(String date) {
-		String patternd = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
-		String patternm = "[A-Z]{3}\\s\\d{4}";
-		String patterny = "\\d{4}";
 
 		if (date.matches(patternd)) {
 			return date.substring(6).trim();
@@ -186,6 +214,10 @@ public class MatchPerson {
 				birthYear = getYear(birthDate);
 				birtChrFlag = "C";
 			}
+		}
+
+		if (birthDate.matches(patternd)) {
+			fullDateFlag = "F";
 		}
 	}
 

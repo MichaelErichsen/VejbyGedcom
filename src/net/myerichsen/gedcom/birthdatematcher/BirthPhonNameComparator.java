@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.matcher;
+package net.myerichsen.gedcom.birthdatematcher;
 
 import java.util.Comparator;
 
