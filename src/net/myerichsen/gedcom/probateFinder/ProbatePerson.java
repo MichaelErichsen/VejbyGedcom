@@ -87,10 +87,63 @@ public class ProbatePerson {
 	}
 
 	/**
+	 * @param month
+	 * @return
+	 */
+	private String convertMonth(String month) {
+		if (month.equals("JAN")) {
+			return "01";
+		} else if (month.equals("FEB")) {
+			return "02";
+		} else if (month.equals("MAR")) {
+			return "03";
+		} else if (month.equals("APR")) {
+			return "04";
+		} else if (month.equals("MAY")) {
+			return "05";
+		} else if (month.equals("JUN")) {
+			return "06";
+		} else if (month.equals("JUL")) {
+			return "07";
+		} else if (month.equals("AUG")) {
+			return "08";
+		} else if (month.equals("SEP")) {
+			return "09";
+		} else if (month.equals("OCT")) {
+			return "10";
+		} else if (month.equals("NOV")) {
+			return "11";
+		} else if (month.equals("DEV")) {
+			return "12";
+		} else {
+			return "00";
+		}
+	}
+
+	/**
 	 * @return the birthDate
 	 */
 	public String getBirthDate() {
 		return birthDate;
+	}
+
+	/**
+	 * @return the birth date so it can be compared
+	 */
+	public String getIsoBirthDate() {
+		if (birthDate.length() == 4) {
+			System.out.println(birthDate + "-01-01");
+			return birthDate + "-01-01";
+		} else if (birthDate.length() == 8) {
+			System.out.println(birthDate.substring(4) + "-" + convertMonth(birthDate.substring(4)) + "-01");
+			return birthDate.substring(4) + "-" + convertMonth(birthDate.substring(4)) + "-01";
+		} else if (birthDate.length() == 11) {
+			System.out.println(birthDate.substring(7, 11) + "-" + convertMonth(birthDate.substring(3, 6)) + "-"
+					+ birthDate.substring(0, 2));
+			return birthDate.substring(7, 11) + "-" + convertMonth(birthDate.substring(3, 6)) + "-"
+					+ birthDate.substring(0, 2);
+		}
+		return "";
 	}
 
 	/**

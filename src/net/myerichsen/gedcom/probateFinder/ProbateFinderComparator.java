@@ -16,8 +16,8 @@ public class ProbateFinderComparator implements Comparator<ProbatePerson> {
 	 */
 	@Override
 	public int compare(ProbatePerson o1, ProbatePerson o2) {
-		String key1 = o1.getName() + " " + o1.getBirthDate();
-		String key2 = o2.getName() + " " + o2.getBirthDate();
+		String key1 = o1.getName() + " " + o1.getIsoBirthDate();
+		String key2 = o2.getName() + " " + o2.getIsoBirthDate();
 
 		return key1.compareToIgnoreCase(key2);
 	}
