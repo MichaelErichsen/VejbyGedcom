@@ -126,9 +126,12 @@ public class ProbateFinder {
 		Collections.sort(listPp, new ProbateFinderComparator());
 
 		for (ProbatePerson probatePerson : listPp) {
-			System.out.println(probatePerson);
+//			System.out.println(probatePerson);
 
-			writer.write(probatePerson.toString() + "\n");
+			if (!probatePerson.getLastPlace().equals("")) {
+				writer.write(probatePerson.toString() + "\n");
+			}
+			;
 		}
 
 		writer.flush();
