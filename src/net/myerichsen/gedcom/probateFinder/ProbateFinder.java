@@ -4,13 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.Year;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.gedcom4j.exception.GedcomParserException;
@@ -115,10 +111,9 @@ public class ProbateFinder {
 				continue;
 			}
 
-			localDate = parseProbateDate(births);
+			localDate = ProbateUtil.parseProbateDate(births);
 
 			if (localDate.isAfter(LocalDate.parse("1840-01-01"))) {
-				// System.err.println("Too late: " + entry.getKey() + ";" + individual);
 				continue;
 			}
 
@@ -136,7 +131,6 @@ public class ProbateFinder {
 		String pattern = ".*" + location + ".*";
 
 		for (ProbatePerson probatePerson : listPp) {
-
 			if (location.equalsIgnoreCase("all") || probatePerson.getLastPlace().toLowerCase().matches(pattern)) {
 				writer.write(probatePerson.toString() + "\n");
 				counter++;
@@ -147,38 +141,6 @@ public class ProbateFinder {
 		writer.close();
 		System.out.println(counter + " records for location " + location + " written");
 		return outfile;
-	}
-
-	/**
-	 * Parse a date in GEDCOM format into ISO
-	 * 
-	 * @param anEvent
-	 * @return The date of the event in ISO format
-	 */
-	protected LocalDate parseProbateDate(List<IndividualEvent> anEvent) {
-		DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMM yyyy")
-				.toFormatter(Locale.ENGLISH);
-		IndividualEvent birth = anEvent.get(0);
-		String date = birth.getDate().getValue();
-		LocalDate localDate = null;
-
-		try {
-			localDate = LocalDate.parse(date, formatter);
-		} catch (Exception e) {
-			try {
-				int l = date.length();
-				String d2 = date.substring(l - 4);
-
-				Year year = Year.parse(d2);
-				localDate = year.atDay(1);
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
-
-		}
-
-		return localDate;
-
 	}
 
 	/**

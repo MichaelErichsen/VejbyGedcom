@@ -1,11 +1,7 @@
 package net.myerichsen.gedcom.probateFinder;
 
 import java.time.LocalDate;
-import java.time.Year;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map.Entry;
 
 import org.gedcom4j.model.Individual;
@@ -21,8 +17,6 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
  *
  */
 public class ProbatePerson {
-	private static DateTimeFormatter formatter1 = new DateTimeFormatterBuilder().parseCaseInsensitive()
-			.appendPattern("dd MMM yyyy").toFormatter(Locale.ENGLISH);
 	private String key;
 	private String name;
 	private String birthDate;
@@ -74,7 +68,7 @@ public class ProbatePerson {
 		}
 
 		for (IndividualEvent individualEvent : evList) {
-			eventDate = parseProbateDate(individualEvent);
+			eventDate = ProbateUtil.parseProbateDate(individualEvent);
 
 			if ((eventDate != null) && eventDate.isAfter(lastDate) && (individualEvent.getPlace() != null)) {
 				lastDate = eventDate;
@@ -160,38 +154,6 @@ public class ProbatePerson {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Convert GEDCOM date to ISO date
-	 * 
-	 * @param anEvent
-	 * @return The date of the event in ISO format
-	 */
-	protected LocalDate parseProbateDate(IndividualEvent anEvent) {
-		if (anEvent.getDate() == null) {
-			return null;
-		}
-		String date = anEvent.getDate().getValue();
-		LocalDate localDate = null;
-
-		try {
-			localDate = LocalDate.parse(date, formatter1);
-		} catch (Exception e) {
-			try {
-				int l = date.length();
-				String d2 = date.substring(l - 4);
-
-				Year year = Year.parse(d2);
-				localDate = year.atDay(1);
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
-
-		}
-
-		return localDate;
-
 	}
 
 	@Override
