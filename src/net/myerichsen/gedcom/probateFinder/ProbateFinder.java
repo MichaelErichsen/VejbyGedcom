@@ -55,7 +55,7 @@ public class ProbateFinder {
 		String outfile = "";
 
 		try {
-			outfile = pf.execute(args[0], args[1], args[2]);
+			outfile = pf.execute(args[0].toLowerCase(), args[1], args[2]);
 			System.out.println("Saved to " + outfile);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
@@ -78,6 +78,7 @@ public class ProbateFinder {
 		Individual individual;
 		List<IndividualEvent> births;
 		LocalDate localDate = null;
+		int counter = 0;
 
 		ArrayList<ProbatePerson> listPp = new ArrayList<>();
 
@@ -116,17 +117,14 @@ public class ProbateFinder {
 
 			localDate = parseProbateDate(births);
 
-			if (localDate.isAfter(LocalDate.parse("1850-01-01"))) {
+			if (localDate.isAfter(LocalDate.parse("1840-01-01"))) {
 				// System.err.println("Too late: " + entry.getKey() + ";" + individual);
 				continue;
 			}
 
 			ProbatePerson pp = new ProbatePerson(entry);
 
-//			if (!pp.getLastPlace().contains("Vejby")) {
 			listPp.add(pp);
-//			}
-
 		}
 
 		System.out.println("Sorting GEDCOM");
@@ -135,15 +133,19 @@ public class ProbateFinder {
 
 		System.out.println("Creating .csv file");
 
+		String pattern = ".*" + location + ".*";
+
 		for (ProbatePerson probatePerson : listPp) {
 
-			if (!probatePerson.getLastPlace().equals("")) {
+			if (location.equalsIgnoreCase("all") || probatePerson.getLastPlace().toLowerCase().matches(pattern)) {
 				writer.write(probatePerson.toString() + "\n");
+				counter++;
 			}
 		}
 
 		writer.flush();
 		writer.close();
+		System.out.println(counter + " records for location " + location + " written");
 		return outfile;
 	}
 
