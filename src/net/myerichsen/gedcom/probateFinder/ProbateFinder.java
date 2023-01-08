@@ -34,20 +34,19 @@ import org.gedcom4j.parser.GedcomParser;
  * The program produces a .csv file with a row for each person found
  * 
  * @author Michael Erichsen
- * @version 7. jan. 2023
+ * @version 8. jan. 2023
  *
  */
 public class ProbateFinder {
-	private static DateTimeFormatter formatter1 = new DateTimeFormatterBuilder().parseCaseInsensitive()
-			.appendPattern("dd MMM yyyy").toFormatter(Locale.ENGLISH);
 
 	/**
+	 * Main method
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		if (args.length < 3) {
-			System.out.println(
-					"Usage: ProbateFinder location gedcomfile outputdirectory\n" + "\"all\" as location selects all");
+			System.out.println("Usage: ProbateFinder location gedcomfile outputdirectory\n");
 			System.exit(4);
 		}
 
@@ -65,10 +64,12 @@ public class ProbateFinder {
 	}
 
 	/**
+	 * Worker method
+	 * 
 	 * @param location
 	 * @param filename
 	 * @param outputdir
-	 * @return
+	 * @return Full path of the output file
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
@@ -87,14 +88,16 @@ public class ProbateFinder {
 		location = location.replace("Ø", ".");
 		location = location.replace("Å", ".").toLowerCase();
 
+		System.out.println("Reading file " + filename);
+
 		Gedcom gedcom = readGedcom(filename);
+
+		System.out.println("Parsing GEDCOM");
 
 		String outfile = outputdirectory + "\\prob_" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		String outline = "\"Person\";\"Fødselsår\";\"Sidste sted\";\"ID\"";
+		String outline = "\"Person\";\"Fødselsår\";\"ISO Fødselsår\";\"Sidste sted\";\"ID\"";
 		writer.write(outline + "\n");
-
-		LocalDate ld1860 = LocalDate.parse("1860-01-01");
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
@@ -113,25 +116,30 @@ public class ProbateFinder {
 
 			localDate = parseProbateDate(births);
 
-			if (localDate.isAfter(ld1860)) {
-				System.err.println("Too late: " + entry.getKey() + ";" + individual);
+			if (localDate.isAfter(LocalDate.parse("1850-01-01"))) {
+				// System.err.println("Too late: " + entry.getKey() + ";" + individual);
 				continue;
 			}
 
 			ProbatePerson pp = new ProbatePerson(entry);
+
+//			if (!pp.getLastPlace().contains("Vejby")) {
 			listPp.add(pp);
-			System.out.println(pp);
+//			}
+
 		}
+
+		System.out.println("Sorting GEDCOM");
 
 		Collections.sort(listPp, new ProbateFinderComparator());
 
+		System.out.println("Creating .csv file");
+
 		for (ProbatePerson probatePerson : listPp) {
-//			System.out.println(probatePerson);
 
 			if (!probatePerson.getLastPlace().equals("")) {
 				writer.write(probatePerson.toString() + "\n");
 			}
-			;
 		}
 
 		writer.flush();
@@ -140,16 +148,20 @@ public class ProbateFinder {
 	}
 
 	/**
+	 * Parse a date in GEDCOM format into ISO
+	 * 
 	 * @param anEvent
-	 * @return
+	 * @return The date of the event in ISO format
 	 */
 	protected LocalDate parseProbateDate(List<IndividualEvent> anEvent) {
+		DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMM yyyy")
+				.toFormatter(Locale.ENGLISH);
 		IndividualEvent birth = anEvent.get(0);
 		String date = birth.getDate().getValue();
 		LocalDate localDate = null;
 
 		try {
-			localDate = LocalDate.parse(date, formatter1);
+			localDate = LocalDate.parse(date, formatter);
 		} catch (Exception e) {
 			try {
 				int l = date.length();
@@ -171,7 +183,7 @@ public class ProbateFinder {
 	 * Read a GEDCOM file using org.gedcomj package
 	 * 
 	 * @param filename
-	 * @return
+	 * @return A GEDCOM object
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */

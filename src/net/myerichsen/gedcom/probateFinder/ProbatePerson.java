@@ -17,7 +17,7 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
  * A class to represent a person to be sorted
  * 
  * @author Michael Erichsen
- * @version 7. jan. 2023
+ * @version 8. jan. 2023
  *
  */
 public class ProbatePerson {
@@ -27,6 +27,7 @@ public class ProbatePerson {
 	private String name;
 	private String birthDate;
 	private String lastPlace;
+	private String isoBirthDate;
 
 	/**
 	 * Constructor
@@ -48,10 +49,14 @@ public class ProbatePerson {
 
 		birthDate = births.get(0).getDate().getValue();
 
-		/**
-		 * Last place Get death place Get burial place Get last event with a place Get
-		 * place of that event
-		 */
+		if (birthDate.length() == 4) {
+			isoBirthDate = birthDate + "-01-01";
+		} else if (birthDate.length() == 8) {
+			isoBirthDate = birthDate.substring(4) + "-" + convertMonth(birthDate.substring(4)) + "-01";
+		} else if (birthDate.length() == 11) {
+			isoBirthDate = birthDate.substring(7, 11) + "-" + convertMonth(birthDate.substring(3, 6)) + "-"
+					+ birthDate.substring(0, 2);
+		}
 
 		List<IndividualEvent> evList = value.getEventsOfType(IndividualEventType.DEATH);
 
@@ -87,8 +92,10 @@ public class ProbatePerson {
 	}
 
 	/**
-	 * @param month
-	 * @return
+	 * Convert character month to decimal month
+	 * 
+	 * @param month as 3 character string
+	 * @return month as two digit string
 	 */
 	private String convertMonth(String month) {
 		if (month.equals("JAN")) {
@@ -113,10 +120,10 @@ public class ProbatePerson {
 			return "10";
 		} else if (month.equals("NOV")) {
 			return "11";
-		} else if (month.equals("DEV")) {
+		} else if (month.equals("DEC")) {
 			return "12";
 		} else {
-			return "00";
+			return "01";
 		}
 	}
 
@@ -131,19 +138,7 @@ public class ProbatePerson {
 	 * @return the birth date so it can be compared
 	 */
 	public String getIsoBirthDate() {
-		if (birthDate.length() == 4) {
-			System.out.println(birthDate + "-01-01");
-			return birthDate + "-01-01";
-		} else if (birthDate.length() == 8) {
-			System.out.println(birthDate.substring(4) + "-" + convertMonth(birthDate.substring(4)) + "-01");
-			return birthDate.substring(4) + "-" + convertMonth(birthDate.substring(4)) + "-01";
-		} else if (birthDate.length() == 11) {
-			System.out.println(birthDate.substring(7, 11) + "-" + convertMonth(birthDate.substring(3, 6)) + "-"
-					+ birthDate.substring(0, 2));
-			return birthDate.substring(7, 11) + "-" + convertMonth(birthDate.substring(3, 6)) + "-"
-					+ birthDate.substring(0, 2);
-		}
-		return "";
+		return isoBirthDate;
 	}
 
 	/**
@@ -168,8 +163,10 @@ public class ProbatePerson {
 	}
 
 	/**
-	 * @param births
-	 * @return
+	 * Convert GEDCOM date to ISO date
+	 * 
+	 * @param anEvent
+	 * @return The date of the event in ISO format
 	 */
 	protected LocalDate parseProbateDate(IndividualEvent anEvent) {
 		if (anEvent.getDate() == null) {
@@ -199,6 +196,6 @@ public class ProbatePerson {
 
 	@Override
 	public String toString() {
-		return name.replace("/", "").trim() + ";" + birthDate + ";" + lastPlace + ";" + key;
+		return name.replace("/", "").trim() + ";" + birthDate + ";" + isoBirthDate + ";" + lastPlace + ";" + key;
 	}
 }
