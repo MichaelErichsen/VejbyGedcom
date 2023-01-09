@@ -18,55 +18,6 @@ public class Probate {
 	private String extract;
 
 	/**
-	 * @return the extract
-	 */
-	public String getExtract() {
-		return extract;
-	}
-
-	/**
-	 * @return the location
-	 */
-	public String getLocation() {
-		return location;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @return the probateDate
-	 */
-	public LocalDate getProbateDate() {
-		return probateDate;
-	}
-
-	/**
-	 * @param extract the extract to set
-	 */
-	public void setExtract(String extract) {
-		this.extract = extract;
-	}
-
-	/**
-	 * @param location the location to set
-	 */
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String aName) {
-		name = aName.replace("*", "").replace("hmd", "").replace("gmd", "").trim();
-	}
-
-	/**
 	 * Constructor
 	 *
 	 * @param extractPart
@@ -117,9 +68,53 @@ public class Probate {
 		extract = extractPart;
 	}
 
-	@Override
-	public String toString() {
-		return name + ";" + probateDate + ";" + location + ";" + extract;
+	/**
+	 * @return the extract
+	 */
+	public String getExtract() {
+		return extract;
+	}
+
+	/**
+	 * @return the location
+	 */
+	public String getLocation() {
+		return location;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the probateDate
+	 */
+	public LocalDate getProbateDate() {
+		return probateDate;
+	}
+
+	/**
+	 * @param extract the extract to set
+	 */
+	public void setExtract(String extract) {
+		this.extract = extract;
+	}
+
+	/**
+	 * @param location the location to set
+	 */
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String aName) {
+		name = aName.replace("*", "").replace("hmd", "").replace("gmd", "").trim();
 	}
 
 	/**
@@ -127,5 +122,10 @@ public class Probate {
 	 */
 	public void setProbateDate(LocalDate probateDate) {
 		this.probateDate = probateDate;
+	}
+
+	@Override
+	public String toString() {
+		return name + ";" + probateDate + ";" + location + ";" + extract;
 	}
 }

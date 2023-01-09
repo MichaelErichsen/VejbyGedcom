@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.gedcom4j.exception.GedcomParserException;
@@ -69,6 +70,8 @@ public class AureliaProbateParser {
 		int counter = 0;
 
 		listP = readProbate(filename);
+
+		Collections.sort(listP, new ProbateParserComparator());
 
 		String outfile = outputdirectory + "\\transcript_" + location + ".csv";
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
