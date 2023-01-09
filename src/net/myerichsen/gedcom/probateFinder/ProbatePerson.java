@@ -13,7 +13,7 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
  * A class to represent a person to be sorted
  * 
  * @author Michael Erichsen
- * @version 8. jan. 2023
+ * @version 9. jan. 2023
  *
  */
 public class ProbatePerson {
@@ -32,7 +32,7 @@ public class ProbatePerson {
 	 */
 	public ProbatePerson(Entry<String, Individual> individual) {
 		super();
-		key = individual.getKey();
+		key = individual.getKey().replace("@I", "").replace("@", "");
 		Individual value = individual.getValue();
 		name = value.getNames().get(0).getBasic();
 		List<IndividualEvent> births = value.getEventsOfType(IndividualEventType.BIRTH);
