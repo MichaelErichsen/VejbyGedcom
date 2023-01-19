@@ -41,7 +41,7 @@ import org.gedcom4j.parser.GedcomParser;
  * the names of one or both parents.
  * 
  * @author Michael Erichsen
- * @version 21-05-2022
+ * @version 19-01-2023
  *
  */
 
@@ -121,11 +121,15 @@ public class ParentFinder {
 		location = location.replace("Ø", ".");
 		location = location.replace("Å", ".").toLowerCase();
 
+		System.out.println("Reading " + filename);
+
 		Gedcom gedcom = readGedcom(filename);
 		boolean found = false;
 		StringBuilder sb;
 		String parents = "";
 		String outline = "";
+
+		System.out.println("Parsing " + filename);
 
 		Map<String, Individual> individuals = gedcom.getIndividuals();
 
@@ -194,8 +198,9 @@ public class ParentFinder {
 						}
 					}
 				} else {
-					outline = individual.getKey() + ";" + year + ";" + value.getFormattedName() + ";" + type + ";"
-							+ parents + ";" + sted + ";" + s;
+					outline = individual.getKey().replace("@I", "").replace("@", "") + ";" + year + ";"
+							+ value.getFormattedName() + ";" + type + ";" + parents.replace("  ", " ") + ";" + sted
+							+ ";" + s;
 					outline = outline.replace("/", "");
 					writer.write(outline + ";" + s + "\n");
 				}
