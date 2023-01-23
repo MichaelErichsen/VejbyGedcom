@@ -54,7 +54,7 @@ public class Parser {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 3) {
-			System.out.println("Usage: Parser kiptextfilename csvfiledirectory outputfilename");
+			System.out.println("Usage: Cleaner kiptextfilename csvfiledirectory outputfilename");
 			System.exit(4);
 		}
 

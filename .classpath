@@ -17,5 +17,7 @@
 			<attribute name="maven.scope" value="compile"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Workspaces/derby.jar"/>
+	<classpathentry kind="lib" path="C:/Workspaces/derbyclient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
