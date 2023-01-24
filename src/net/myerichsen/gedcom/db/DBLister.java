@@ -15,7 +15,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * Class to list contents of a GEDCOM Derby database.
  *
  * @author Michael Erichsen
- * @version 2023-01-23
+ * @version 2023-01-24
  *
  */
 public class DBLister {
@@ -72,6 +72,7 @@ public class DBLister {
 	private void execute(String[] args) throws IOException, GedcomParserException, SQLException {
 		connectToDB(args[0]);
 
+		System.out.println("\nFamily");
 		String query = "SELECT * FROM VEJBY.FAMILY FETCH FIRST 20 ROWS ONLY";
 		ResultSet rs = stmt.executeQuery(query);
 
@@ -79,13 +80,16 @@ public class DBLister {
 			System.out.println(rs.getString("ID") + ";" + rs.getString("HUSBAND") + ";" + rs.getString("WIFE"));
 		}
 
+		System.out.println("\nIndividual");
 		query = "SELECT * FROM VEJBY.INDIVIDUAL FETCH FIRST 20 ROWS ONLY";
 		rs = stmt.executeQuery(query);
 
 		while (rs.next()) {
 			System.out.println(rs.getString("ID") + ";" + rs.getString("GIVENNAME") + ";" + rs.getString("SURNAME")
-					+ ";" + rs.getString("SEX") + ";" + rs.getString("FAMC"));
+					+ ";" + rs.getString("SEX") + ";" + rs.getString("PHONNAME") + ";" + rs.getString("FAMC"));
 		}
+
+		System.out.println("\nEvent");
 		query = "SELECT * FROM VEJBY.EVENT FETCH FIRST 20 ROWS ONLY";
 		rs = stmt.executeQuery(query);
 
@@ -94,6 +98,8 @@ public class DBLister {
 					+ rs.getString("DATE") + ";" + rs.getString("INDIVIDUAL") + ";" + rs.getString("FAMILY") + ";"
 					+ rs.getString("PLACE") + ";" + rs.getString("NOTE"));
 		}
+
+		System.out.println("\nCitation");
 		query = "SELECT * FROM VEJBY.CITATION FETCH FIRST 20 ROWS ONLY";
 		rs = stmt.executeQuery(query);
 

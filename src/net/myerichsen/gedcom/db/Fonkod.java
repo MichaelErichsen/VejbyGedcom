@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * This class encodes a Danish name phonetically
  *
  * @author Michael Erichsen
- * @version 29-11-2022
+ * @version 2023-01-24
  */
 public class Fonkod {
 
@@ -152,7 +152,8 @@ public class Fonkod {
 		Pattern p = Pattern.compile("([a-zæøåäçéëöüÿž]|/|-|\\.|\\s)+");
 		Matcher m = p.matcher(out);
 		if (!m.matches()) {
-			throw new Exception("Ugyldigt slægtsnavn: " + slaegtsNavn);
+			// throw new Exception("Ugyldigt slægtsnavn: " + slaegtsNavn);
+			return "";
 		}
 
 		if (out.length() == 1) {

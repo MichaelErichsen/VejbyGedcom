@@ -3,7 +3,6 @@ package net.myerichsen.gedcom.db;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
@@ -16,9 +15,10 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.derby.client.am.SqlException;
 import org.gedcom4j.exception.GedcomParserException;
+import org.gedcom4j.model.AbstractCitation;
 import org.gedcom4j.model.Family;
+import org.gedcom4j.model.FamilyChild;
 import org.gedcom4j.model.FamilyEvent;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.model.Individual;
@@ -33,18 +33,17 @@ import org.gedcom4j.parser.GedcomParser;
  * analysis.
  *
  * @author Michael Erichsen
- * @version 2023-01-23
+ * @version 2023-01-24
  *
  */
 public class DBLoader {
 	private static Logger logger;
+	private static Fonkod fonkod = new Fonkod();
 	private static Gedcom gedcom;
 	private static int familyCounter = 0;
 	private static int individualCounter = 0;
 	private static int eventCounter = 0;
 	private static int citationCounter = 0;
-
-	// TODO Add phonetic name
 
 	/**
 	 * Main method
@@ -140,9 +139,19 @@ public class DBLoader {
 		LocalDate localDate;
 		String outDate;
 
-		date = date.replace("BEF ", "");
 		date = date.replace("ABT ", "");
+		date = date.replace("AFT ", "");
+		date = date.replace("BEF ", "");
 		date = date.replace("EST ", "");
+
+		if (date.contains("BET") && date.contains("AND")) {
+			String[] split = date.split("AND");
+			date = split[0].replace("BET ", "").trim();
+		}
+
+		if (date.length() == 8) {
+			date = "01 " + date;
+		}
 
 		try {
 			formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("dd MMM yyyy")
@@ -150,14 +159,7 @@ public class DBLoader {
 			localDate = LocalDate.parse(date, formatter);
 			outDate = localDate.toString();
 		} catch (final Exception e) {
-			try {
-				formatter = new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMM yyyy")
-						.toFormatter(Locale.ENGLISH);
-				localDate = LocalDate.parse(date, formatter);
-				outDate = localDate.toString();
-			} catch (final Exception e1) {
-				outDate = date + "-01-01";
-			}
+			outDate = date + "-01-01";
 		}
 		return outDate;
 	}
@@ -223,7 +225,7 @@ public class DBLoader {
 			if (place == null) {
 				sb.append("', NULL, ");
 			} else {
-				sb.append("', '" + place.getPlaceName() + "', ");
+				sb.append("', '" + place.getPlaceName().replace("'", "") + "', ");
 			}
 
 			noteStructures = familyEvent.getNoteStructures();
@@ -247,12 +249,11 @@ public class DBLoader {
 				stmt.execute(query);
 				eventCounter++;
 
-				// List<AbstractCitation> citations =
-				// familyEvent.getCitations();
-				//
-				// if (citations != null) {
-				// insertCitation(citations);
-				// }
+				List<AbstractCitation> citations = familyEvent.getCitations();
+
+				if (citations != null) {
+					System.out.println(citations.toString());
+				}
 			} catch (final SQLException e) {
 				throw new Exception(
 						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
@@ -269,32 +270,41 @@ public class DBLoader {
 	 */
 	private void insertIndividual(Individual individual) throws Exception {
 		final String xref = individual.getXref();
-		String query = "SELECT * FROM VEJBY.INDIVIDUAL WHERE ID = '" + xref + "'";
-		logger.info(query);
+		// String query = "SELECT * FROM VEJBY.INDIVIDUAL WHERE ID = '" + xref +
+		// "'";
+		// logger.info(query);
+		//
+		// if (xref.contains("@I4254@")) {
+		// System.out.println("Debug");
+		// }
+		//
+		// try {
+		// stmt.execute(query);
+		// final ResultSet resultSet = stmt.getResultSet();
+		//
+		// if (resultSet.next()) {
+		// if (individual.getFamiliesWhereChild() != null) {
+		// logger.info(query + ": " + resultSet.getString(1) + ", " +
+		// resultSet.getString(2) + " "
+		// + resultSet.getString(3));
+		// updateIndividual(individual);
+		// return;
+		// }
+		// }
+		// } catch (final SqlException e) {
+		// }
+
+		String query = "";
 
 		try {
-			stmt.execute(query);
-			final ResultSet resultSet = stmt.getResultSet();
-
-			if (resultSet.next()) {
-				if (individual.getFamiliesWhereChild() != null) {
-					logger.info(query + ": " + resultSet.getString(1) + ", " + resultSet.getString(2) + " "
-							+ resultSet.getString(3));
-					updateIndividual(individual);
-					return;
-				}
-			}
-		} catch (final SqlException e) {
-		}
-
-		try {
-			final String[] split = individual.getNames().get(0).getBasic().split("/");
+			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
 			final String given = split[0].trim();
 			final String surname = split[1];
 			final String sex = individual.getSex().getValue();
+			final String phonName = fonkod.generateKey(surname);
 
-			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX) VALUES ('" + xref + "', '" + given
-					+ "', '" + surname + "', '" + sex + "'	)";
+			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('" + xref + "', '"
+					+ given + "', '" + surname + "', '" + sex + "', '" + phonName + "'	)";
 
 			logger.info(query);
 			stmt.execute(query);
@@ -302,8 +312,14 @@ public class DBLoader {
 		} catch (
 
 		final SQLException e) {
-			throw new Exception(
-					"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+			// Handle duplicates
+			if (e.getSQLState().equals("23505")) {
+				logger.info("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				updateIndividual(individual);
+			} else {
+				throw new Exception(
+						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+			}
 		}
 	}
 
@@ -333,7 +349,6 @@ public class DBLoader {
 				sb.append("', '" + subtype.getValue() + "', ");
 			}
 
-			// TODO No births?!?
 			date = individualEvent.getDate();
 
 			if (date == null) {
@@ -347,7 +362,7 @@ public class DBLoader {
 			if (place == null) {
 				sb.append("NULL)");
 			} else {
-				sb.append("'" + place.getPlaceName() + "')");
+				sb.append("'" + place.getPlaceName().replace("'", "") + "')");
 			}
 
 			query = sb.toString();
@@ -497,16 +512,26 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void updateIndividual(Individual individual) throws Exception {
-		final String query = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '"
-				+ individual.getFamiliesWhereChild().get(0).getFamily().getXref() + "' WHERE ID = '"
-				+ individual.getXref() + "'";
-		try {
-			stmt.execute(query);
-			logger.info(query);
-		} catch (final SQLException e) {
-			throw new Exception(
-					"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+		List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
 
+		if (familiesWhereChild != null) {
+			final String query = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '"
+					+ individual.getFamiliesWhereChild().get(0).getFamily().getXref() + "' WHERE ID = '"
+					+ individual.getXref() + "'";
+			try {
+				stmt.execute(query);
+				logger.info(query);
+			} catch (final SQLException e) {
+				// Handle family not yet inserted
+				if (e.getSQLState().equals("23503")) {
+					logger.info(
+							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				} else {
+					throw new Exception(
+							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				}
+
+			}
 		}
 
 	}
