@@ -1,4 +1,4 @@
-package net.myerichsen.DDDCleaner;
+package net.myerichsen.gedcom.DDDCleaner;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

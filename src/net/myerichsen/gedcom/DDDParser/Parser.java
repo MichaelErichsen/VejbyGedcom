@@ -1,4 +1,4 @@
-package net.myerichsen.DDDParser;
+package net.myerichsen.gedcom.DDDParser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

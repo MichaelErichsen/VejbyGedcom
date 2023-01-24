@@ -1,4 +1,4 @@
-package net.myerichsen.gedcomdb;
+package net.myerichsen.gedcom.db;
 
 import java.io.IOException;
 import java.sql.Connection;
