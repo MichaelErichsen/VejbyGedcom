@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gedcom4j.exception.GedcomParserException;
-import org.gedcom4j.model.AbstractCitation;
 import org.gedcom4j.model.Family;
 import org.gedcom4j.model.FamilyChild;
 import org.gedcom4j.model.FamilyEvent;
@@ -145,7 +144,7 @@ public class DBLoader {
 		date = date.replace("EST ", "");
 
 		if (date.contains("BET") && date.contains("AND")) {
-			String[] split = date.split("AND");
+			final String[] split = date.split("AND");
 			date = split[0].replace("BET ", "").trim();
 		}
 
@@ -172,7 +171,7 @@ public class DBLoader {
 	 */
 	private void insertFamily(String key) throws SQLException {
 		final String query = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES ('" + key + "', NULL, NULL)";
-		logger.info(query);
+		logger.fine(query);
 		stmt.execute(query);
 		familyCounter++;
 	}
@@ -245,20 +244,44 @@ public class DBLoader {
 			query = sb.toString();
 
 			try {
-				logger.info(query);
+				logger.fine(query);
 				stmt.execute(query);
 				eventCounter++;
 
-				List<AbstractCitation> citations = familyEvent.getCitations();
+				// TODO
+				// IndividualEvent.getCitations.get(0).getWhereInSource.GetValue.
+				// Use as "To" in "Flytning" event
 
-				if (citations != null) {
-					System.out.println(citations.toString());
-				}
+				// List<AbstractCitation> citations =
+				// familyEvent.getCitations();
+				//
+				// if (citations != null) {
+				// CitationWithSource cws = (CitationWithSource)
+				// citations.get(0);
+				//
+				// if (cws.getWhereInSource() != null) {
+				// String value = cws.getWhereInSource().getValue();
+				// System.out.println(value);
+				//
+				// List<CitationData> data = cws.getData();
+				// if (data != null)
+				// System.out.println(data.toString());
+				// }
+
+				// List<NoteStructure> noteStructures2 =
+				// cws.getNoteStructures();
+				//
+				// if (noteStructures != null) {
+				// System.out.println(noteStructures.toString());
+				// }
+
+				// }
 			} catch (final SQLException e) {
 				throw new Exception(
 						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 			}
 		}
+
 	}
 
 	/**
@@ -270,30 +293,6 @@ public class DBLoader {
 	 */
 	private void insertIndividual(Individual individual) throws Exception {
 		final String xref = individual.getXref();
-		// String query = "SELECT * FROM VEJBY.INDIVIDUAL WHERE ID = '" + xref +
-		// "'";
-		// logger.info(query);
-		//
-		// if (xref.contains("@I4254@")) {
-		// System.out.println("Debug");
-		// }
-		//
-		// try {
-		// stmt.execute(query);
-		// final ResultSet resultSet = stmt.getResultSet();
-		//
-		// if (resultSet.next()) {
-		// if (individual.getFamiliesWhereChild() != null) {
-		// logger.info(query + ": " + resultSet.getString(1) + ", " +
-		// resultSet.getString(2) + " "
-		// + resultSet.getString(3));
-		// updateIndividual(individual);
-		// return;
-		// }
-		// }
-		// } catch (final SqlException e) {
-		// }
-
 		String query = "";
 
 		try {
@@ -306,7 +305,7 @@ public class DBLoader {
 			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('" + xref + "', '"
 					+ given + "', '" + surname + "', '" + sex + "', '" + phonName + "'	)";
 
-			logger.info(query);
+			logger.fine(query);
 			stmt.execute(query);
 			individualCounter++;
 		} catch (
@@ -314,7 +313,7 @@ public class DBLoader {
 		final SQLException e) {
 			// Handle duplicates
 			if (e.getSQLState().equals("23505")) {
-				logger.info("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				logger.fine("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 				updateIndividual(individual);
 			} else {
 				throw new Exception(
@@ -334,12 +333,20 @@ public class DBLoader {
 		StringWithCustomFacts subtype;
 		StringWithCustomFacts date;
 		Place place;
+		List<NoteStructure> noteStructures;
+		List<String> lines;
+		StringBuffer lineBuffer;
 		String query;
 
 		final List<IndividualEvent> events = individual.getEvents();
 
+		if (events == null) {
+			return;
+		}
+
 		for (final IndividualEvent individualEvent : events) {
-			sb = new StringBuffer("INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE) VALUES('");
+			sb = new StringBuffer(
+					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('");
 			sb.append(individualEvent.getType());
 			subtype = individualEvent.getSubType();
 
@@ -360,9 +367,23 @@ public class DBLoader {
 			place = individualEvent.getPlace();
 
 			if (place == null) {
+				sb.append("NULL, ");
+			} else {
+				sb.append("'" + place.getPlaceName().replace("'", "") + "', ");
+			}
+
+			noteStructures = individualEvent.getNoteStructures();
+
+			if (noteStructures == null) {
 				sb.append("NULL)");
 			} else {
-				sb.append("'" + place.getPlaceName().replace("'", "") + "')");
+				lines = noteStructures.get(0).getLines();
+				lineBuffer = new StringBuffer();
+
+				for (final String string : lines) {
+					lineBuffer.append(string + " ");
+				}
+				sb.append("'" + lineBuffer.toString() + "')");
 			}
 
 			query = sb.toString();
@@ -373,6 +394,48 @@ public class DBLoader {
 				stmt.execute(query);
 				eventCounter++;
 			} catch (final SQLException e) {
+				throw new Exception(
+						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+			}
+		}
+	}
+
+	/**
+	 * Insert an individual into Derby
+	 *
+	 * @param individual
+	 * @throws Exception
+	 * @throws SQLException
+	 */
+	private void insertIndividualWithFamily(Individual individual) throws Exception {
+		final String xref = individual.getXref();
+		String query = "";
+
+		try {
+			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
+			final String given = split[0].trim();
+			final String surname = split[1];
+			final String sex = individual.getSex().getValue();
+			final String phonName = fonkod.generateKey(surname);
+
+			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('" + xref + "', '"
+					+ given + "', '" + surname + "', '" + sex + "', '" + phonName + "'	)";
+
+			if (individual.getFamiliesWhereChild() == null) {
+				updateIndividual(individual);
+			}
+
+			logger.fine(query);
+			stmt.execute(query);
+			individualCounter++;
+		} catch (
+
+		final SQLException e) {
+			// Handle duplicates
+			if (e.getSQLState().equals("23505")) {
+				logger.info("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				updateIndividual(individual);
+			} else {
 				throw new Exception(
 						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 			}
@@ -445,7 +508,7 @@ public class DBLoader {
 
 		for (final Entry<String, Individual> individualNode : individuals.entrySet()) {
 			individual = individualNode.getValue();
-			insertIndividual(individual);
+			insertIndividualWithFamily(individual);
 
 			insertIndividualEvent(individual);
 		}
@@ -476,7 +539,7 @@ public class DBLoader {
 	private void updateFamilyHusband(String ID, Individual husband) throws Exception {
 		final String query = "UPDATE VEJBY.FAMILY SET HUSBAND = '" + husband.getXref() + "' WHERE ID = '" + ID + "'";
 		try {
-			logger.info(query);
+			logger.fine(query);
 			stmt.execute(query);
 		} catch (final SQLException e) {
 			throw new Exception(
@@ -495,7 +558,7 @@ public class DBLoader {
 	private void updateFamilyWife(String ID, Individual wife) throws Exception {
 		final String query = "UPDATE VEJBY.FAMILY SET WIFE = '" + wife.getXref() + "' WHERE ID = '" + ID + "'";
 		try {
-			logger.info(query);
+			logger.fine(query);
 			stmt.execute(query);
 		} catch (final SQLException e) {
 			throw new Exception(
@@ -512,7 +575,7 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void updateIndividual(Individual individual) throws Exception {
-		List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
+		final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
 
 		if (familiesWhereChild != null) {
 			final String query = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '"
@@ -520,11 +583,11 @@ public class DBLoader {
 					+ individual.getXref() + "'";
 			try {
 				stmt.execute(query);
-				logger.info(query);
+				logger.fine(query);
 			} catch (final SQLException e) {
 				// Handle family not yet inserted
 				if (e.getSQLState().equals("23503")) {
-					logger.info(
+					logger.fine(
 							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 				} else {
 					throw new Exception(

@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Tue Jan 24 12:43:08 CET 2023:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-0185-e396-c836-0000005f8aa0 
-on database directory C:\Users\michael\VEJBYDB with class loader sun.misc.Launcher$AppClassLoader@75a27283 
+Tue Jan 24 19:29:32 CET 2023:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-0185-e50a-dc4c-000000567950 
+on database directory C:\Users\michael\VEJBYDB with class loader sun.misc.Launcher$AppClassLoader@6bb4bd1e 
 Loaded from file:/C:/Workspaces/derby.jar
 java.vendor=IBM Corporation
 java.runtime.version=8.0.6.10 - pwa6480sr6fp10-20200408_01(SR6 FP10)
