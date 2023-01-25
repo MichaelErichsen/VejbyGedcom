@@ -22,6 +22,7 @@ import org.gedcom4j.model.FamilyEvent;
 import org.gedcom4j.model.Gedcom;
 import org.gedcom4j.model.Individual;
 import org.gedcom4j.model.IndividualEvent;
+import org.gedcom4j.model.IndividualReference;
 import org.gedcom4j.model.NoteStructure;
 import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
@@ -32,7 +33,7 @@ import org.gedcom4j.parser.GedcomParser;
  * analysis.
  *
  * @author Michael Erichsen
- * @version 2023-01-24
+ * @version 2023-01-25
  *
  */
 public class DBLoader {
@@ -177,7 +178,7 @@ public class DBLoader {
 	}
 
 	/**
-	 * Insert a family event into Derby
+	 * Insert a family event into Derby for husband and wife
 	 *
 	 * @param family
 	 * @throws Exception
@@ -201,7 +202,7 @@ public class DBLoader {
 
 		for (final FamilyEvent familyEvent : events) {
 			sb = new StringBuffer(
-					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('");
+					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, NOTE, INDIVIDUAL) VALUES('");
 			sb.append(familyEvent.getType());
 			subtype = familyEvent.getSubType();
 
@@ -214,9 +215,9 @@ public class DBLoader {
 			date = familyEvent.getDate();
 
 			if (date == null) {
-				sb.append("NULL, NULL, '" + family.getXref());
+				sb.append("NULL, '" + family.getXref());
 			} else {
-				sb.append("'" + formatDate(date.getValue()) + "', NULL, '" + family.getXref());
+				sb.append("'" + formatDate(date.getValue()) + "', '" + family.getXref());
 			}
 
 			place = familyEvent.getPlace();
@@ -230,7 +231,7 @@ public class DBLoader {
 			noteStructures = familyEvent.getNoteStructures();
 
 			if (noteStructures == null) {
-				sb.append("NULL)");
+				sb.append("NULL, '");
 			} else {
 				lines = noteStructures.get(0).getLines();
 				lineBuffer = new StringBuffer();
@@ -238,47 +239,33 @@ public class DBLoader {
 				for (final String string : lines) {
 					lineBuffer.append(string + " ");
 				}
-				sb.append("'" + lineBuffer.toString() + "')");
+				sb.append("'" + lineBuffer.toString() + "', '");
 			}
 
-			query = sb.toString();
+			if (family.getHusband() != null) {
+				query = sb.toString() + family.getHusband().getIndividual().getXref() + "')";
 
-			try {
-				logger.fine(query);
-				stmt.execute(query);
-				eventCounter++;
+				try {
+					logger.fine(query);
+					stmt.execute(query);
+					eventCounter++;
+				} catch (final SQLException e) {
+					throw new Exception(
+							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				}
+			}
 
-				// TODO
-				// IndividualEvent.getCitations.get(0).getWhereInSource.GetValue.
-				// Use as "To" in "Flytning" event
+			if (family.getWife() != null) {
+				query = sb.toString() + family.getWife().getIndividual().getXref() + "')";
 
-				// List<AbstractCitation> citations =
-				// familyEvent.getCitations();
-				//
-				// if (citations != null) {
-				// CitationWithSource cws = (CitationWithSource)
-				// citations.get(0);
-				//
-				// if (cws.getWhereInSource() != null) {
-				// String value = cws.getWhereInSource().getValue();
-				// System.out.println(value);
-				//
-				// List<CitationData> data = cws.getData();
-				// if (data != null)
-				// System.out.println(data.toString());
-				// }
-
-				// List<NoteStructure> noteStructures2 =
-				// cws.getNoteStructures();
-				//
-				// if (noteStructures != null) {
-				// System.out.println(noteStructures.toString());
-				// }
-
-				// }
-			} catch (final SQLException e) {
-				throw new Exception(
-						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				try {
+					logger.fine(query);
+					stmt.execute(query);
+					eventCounter++;
+				} catch (final SQLException e) {
+					throw new Exception(
+							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				}
 			}
 		}
 
@@ -482,6 +469,14 @@ public class DBLoader {
 				updateFamilyWife(key, wife);
 			} catch (final NullPointerException e) {
 				logger.fine(e.getMessage());
+			}
+
+			List<IndividualReference> children = family.getChildren();
+
+			if (children != null) {
+				for (IndividualReference individualReference : children) {
+					insertIndividualWithFamily(individualReference.getIndividual());
+				}
 			}
 
 			insertFamilyEvent(family);

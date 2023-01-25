@@ -1,21 +1,32 @@
 package net.myerichsen.gedcom.db;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gedcom4j.exception.GedcomParserException;
 
 /**
- * Class to list relocations from a GEDCOM Derby database.
+ * Find all relocations to and from a given location in a GEDCOM file. Requires
+ * the non-standard "Flytning" event with the location in the place fields (to)
+ * or part of the note field (from).
+ * <p>
+ * Parameters:
+ * <ul>
+ * <li>Full path to GEDCOM file</li>
+ * <li>Path to an existing output directory</li>
+ * </ul>
+ * <p>
+ * The program produces a .csv file with a row for each relocation found.
  *
  * @author Michael Erichsen
- * @version 2023-01-24
+ * @version 2023-01-25
  *
  */
 public class DBRelocation {
@@ -27,13 +38,12 @@ public class DBRelocation {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length < 1) {
-			System.out.println("Usage: DBRelocation derbydatabasepath");
+		if (args.length < 2) {
+			System.out.println("Usage: DBRelocation derbydatabasepath outputdirectory");
 			System.exit(4);
 		}
 
 		logger = Logger.getLogger("DBRelocation");
-		logger.setLevel(Level.FINE);
 
 		final DBRelocation dbr = new DBRelocation();
 
@@ -70,22 +80,33 @@ public class DBRelocation {
 	 * @throws SQLException
 	 */
 	private void execute(String[] args) throws IOException, GedcomParserException, SQLException {
+		int counter = 0;
 		connectToDB(args[0]);
-		final String query = "SELECT VEJBY.INDIVIDUAL.GIVENNAME, VEJBY.INDIVIDUAL.SURNAME, VEJBY.INDIVIDUAL.PHONNAME, "
-				+ "VEJBY.EVENT.DATE, VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE "
-				+ "FROM VEJBY.INDIVIDUAL, VEJBY.FAMILY, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
-				+ "AND ( VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL OR VEJBY.EVENT.FAMILY IS NOT NULL "
-				+ "AND ( VEJBY.INDIVIDUAL.ID = VEJBY.FAMILY.HUSBAND OR VEJBY.INDIVIDUAL.ID = VEJBY.FAMILY.WIFE ) ) "
+
+		String outfile = args[1] + "\\flyt_all.csv";
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		String outline = "\"ID\";\"Fornavn\";\"Efternavn\";\"Fonetisk navn\";\"Flyttedato\";\"Til\";\"Fra\"";
+		writer.write(outline + "\n");
+
+		final String query = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, VEJBY.INDIVIDUAL.SURNAME, "
+				+ "VEJBY.INDIVIDUAL.PHONNAME, VEJBY.EVENT.DATE, VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE "
+				+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT "
+				+ "WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL "
 				+ "ORDER BY VEJBY.INDIVIDUAL.SURNAME, VEJBY.INDIVIDUAL.GIVENNAME";
 
 		final ResultSet rs = stmt.executeQuery(query);
 
 		while (rs.next()) {
-			System.out.println(rs.getString(1) + ";" + rs.getString(2) + ";" + rs.getString(3) + ";" + rs.getString(4)
-					+ ";" + rs.getString(5) + ";" + rs.getString(6));
+			writer.write(rs.getString(1) + ";" + rs.getString(2) + ";" + rs.getString(3) + ";" + rs.getString(4) + ";"
+					+ rs.getString(5) + ";" + rs.getString(6) + ";" + rs.getString(7) + "\n");
+
+			counter++;
 		}
 
-		System.out.println("Program ended.");
+		writer.flush();
+		writer.close();
+
+		System.out.println(counter + " flytninger gemt i " + outfile);
 	}
 
 }
