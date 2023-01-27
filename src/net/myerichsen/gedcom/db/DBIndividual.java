@@ -1,30 +1,82 @@
 package net.myerichsen.gedcom.db;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Class representing some individual data
  *
  * @author Michael Erichsen
- * @version 2023-01-26
+ * @version 2023-01-27
  *
  */
 public class DBIndividual {
-	private String name;
-	private String birthDate;
+	private String id = "";
+	private String name = "";
+	private int birthYear = 0;
+	private int deathYear = 9999;
 
-	// TODO Add death date
-	
 	/**
-	 * No arg c:tor
+	 * Constructor
+	 *
+	 * @param statement
+	 * @param id
+	 * @throws SQLException
 	 */
-	public DBIndividual() {
+	public DBIndividual(Statement statement, String id) throws SQLException {
 		super();
+		this.setId(id);
+
+		String query = "SELECT GIVENNAME, SURNAME from VEJBY.INDIVIDUAL WHERE ID ='" + id + "'";
+
+		ResultSet rs = statement.executeQuery(query);
+
+		if (rs.next()) {
+			name = rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim();
+		}
+
+		query = "SELECT ID, TYPE, DATE, INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + id
+				+ "' AND ( TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
+
+		rs = statement.executeQuery(query);
+
+		if (rs.next()) {
+			birthYear = getYearFromDate(rs.getString("DATE"));
+		}
+
+		query = "SELECT ID, TYPE, DATE, INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + id
+				+ "' AND ( TYPE = 'Death' OR TYPE = 'Burial') ORDER BY DATE";
+
+		rs = statement.executeQuery(query);
+
+		if (rs.next()) {
+			deathYear = getYearFromDate(rs.getString("DATE"));
+		}
+
 	}
 
 	/**
-	 * @return the birthDate
+	 * @return the birthYear
 	 */
-	public String getBirthDate() {
-		return birthDate;
+	public int getBirthYear() {
+		return birthYear;
+	}
+
+	/**
+	 * @return the deathYear
+	 */
+	public int getDeathYear() {
+		return deathYear;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
 	}
 
 	/**
@@ -35,11 +87,44 @@ public class DBIndividual {
 	}
 
 	/**
-	 * @param birthDate
-	 *            the birthDate to set
+	 * Get year in integer format
+	 *
+	 * @param date
+	 * @return
 	 */
-	public void setBirthDate(String birthDate) {
-		this.birthDate = birthDate;
+	private int getYearFromDate(String date) {
+		final Pattern r = Pattern.compile("\\d{4}");
+
+		final Matcher m = r.matcher(date);
+
+		if (m.find()) {
+			return Integer.parseInt(m.group(0));
+		}
+		return 1;
+	}
+
+	/**
+	 * @param birthYear
+	 *            the birthYear to set
+	 */
+	public void setBirthYear(int birthYear) {
+		this.birthYear = birthYear;
+	}
+
+	/**
+	 * @param deathYear
+	 *            the deathYear to set
+	 */
+	public void setDeathYear(int deathYear) {
+		this.deathYear = deathYear;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/**
