@@ -84,7 +84,7 @@ public class CensusFinder {
 	private void execute(String[] args) throws SQLException, IOException {
 		final Statement statement = connectToDB(args[1]);
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
-		logger.info("Searching for censuses for " + individual.getName());
+		logger.info("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear());
 
 		parseCsvFiles(individual, args);
 		logger.info("Program ended");
@@ -206,13 +206,18 @@ public class CensusFinder {
 					}
 				}
 
+				if (col < 0) {
+					br.close();
+					return;
+				}
+
 				columns = line.split(";");
 
 				final Pattern r = Pattern.compile("\\d*");
 
 				final Matcher m = r.matcher(columns[col]);
 
-				if (m.find()) {
+				if ((m.find()) && !m.group(0).equals("")) {
 					diff = Integer.parseInt(m.group(0));
 				}
 
