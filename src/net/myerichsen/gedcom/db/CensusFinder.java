@@ -13,19 +13,21 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Find all census entries that match a given individual ID.
  *
  * Find name and birth or christening from the Derby database.
  *
- * For each csv file in the DDD census folder
+ * For each csv file in the DDD census folder within the life span of the
+ * individual
  *
  * For each person
  *
- * If the name matches completely then check the age or bith date in the census
- * with the birth or christening date in the data base. If it is within two
- * years then output in csv format
+ * If the name matches completely and the birth or christening date are within
+ * two years of the given age then output in csv format
  *
  *
  * @author Michael Erichsen
@@ -86,7 +88,23 @@ public class CensusFinder {
 
 		parseCsvFiles(individual, args);
 		logger.info("Program ended");
+	}
 
+	/**
+	 * Get year in integer format
+	 *
+	 * @param date
+	 * @return
+	 */
+	private int getYearFromDate(String date) {
+		final Pattern r = Pattern.compile("\\d{4}");
+
+		final Matcher m = r.matcher(date);
+
+		if (m.find()) {
+			return Integer.parseInt(m.group(0));
+		}
+		return 1;
 	}
 
 	/**
@@ -97,8 +115,8 @@ public class CensusFinder {
 	 * @throws IOException
 	 */
 	private void parseCsvFiles(DBIndividual individual, String[] args) throws IOException {
-		String outName = args[3] + "/" + individual.getName() + ".csv";
-		BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
+		final String outName = args[3] + "/" + individual.getName() + ".csv";
+		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
 
 		try {
 			final List<String> kipLines = parseKipText(args[2] + "/kipdata.txt");
@@ -146,18 +164,64 @@ public class CensusFinder {
 	 * @param csvFileName
 	 * @param location
 	 * @param bw
+	 * @param intYear
 	 * @param args
 	 * @throws IOException
 	 */
+	/**
+	 * @param individual
+	 * @param csvFileName
+	 * @param location
+	 * @param outfilepath
+	 * @param bw
+	 * @param intYear
+	 * @throws IOException
+	 */
 	private void processCsvFile(DBIndividual individual, String csvFileName, String location, String outfilepath,
-			BufferedWriter bw) throws IOException {
-		String line = "";
+			BufferedWriter bw, int ftYear) throws IOException {
 		final BufferedReader br = new BufferedReader(new FileReader(new File(csvFileName)));
+
+		// Read first line to get headers
+		final String headerLine = br.readLine();
+
+		int diff = 0;
+
+		String line;
 
 		while ((line = br.readLine()) != null) {
 			if (line.contains(individual.getName())) {
-				bw.write(location + ";" + line.replace(";;", ";") + "\n");
-				counter++;
+				int col = -1;
+
+				if (headerLine == null) {
+					br.close();
+					return;
+				}
+
+				String[] columns = headerLine.split(";");
+
+				for (int i = 0; i < columns.length; i++) {
+					if (columns[i].equals("Alder") || columns[i].equals("Født kildedato")) {
+						col = i;
+						break;
+					}
+				}
+
+				columns = line.split(";");
+
+				final Pattern r = Pattern.compile("\\d*");
+
+				final Matcher m = r.matcher(columns[col]);
+
+				if (m.find()) {
+					diff = Integer.parseInt(m.group(0));
+				}
+
+				diff = diff + individual.getBirthYear() - ftYear;
+
+				if (diff < 5 && diff > -5) {
+					bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
+					counter++;
+				}
 			}
 		}
 
@@ -175,7 +239,7 @@ public class CensusFinder {
 	 * If year is outside the life span then ignore
 	 * <p>
 	 * Process the csv file
-	 * 
+	 *
 	 * @param individual
 	 * @param line
 	 * @param args
@@ -186,13 +250,7 @@ public class CensusFinder {
 			throws IOException {
 		final String[] fields = line.split(";");
 
-		String year = fields[3];
-
-		if (year.startsWith("FT")) {
-			year = year.substring(2);
-		}
-
-		final int intYear = Integer.parseInt(year);
+		final int intYear = getYearFromDate(fields[3]);
 
 		if (intYear < individual.getBirthYear() || intYear > individual.getDeathYear()) {
 			return;
@@ -201,6 +259,7 @@ public class CensusFinder {
 		final String csvFileName = args[2] + "/" + fields[4] + ".csv";
 		final String location = fields[0] + ";" + fields[1] + ";" + fields[2] + ";";
 
-		processCsvFile(individual, csvFileName, location, args[3], bw);
+		processCsvFile(individual, csvFileName, location, args[3], bw, intYear);
 	}
+
 }
