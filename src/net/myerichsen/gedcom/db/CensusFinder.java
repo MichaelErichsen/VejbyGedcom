@@ -62,10 +62,32 @@ public class CensusFinder {
 	}
 
 	/**
+	 * Find part of indivudual's birth place in the census line
+	 *
+	 * @param needle
+	 * @param haystack
+	 * @return
+	 */
+	private boolean compareBirthPlace(String needle, String haystack) {
+		final String h = haystack.toLowerCase();
+		final String[] split = needle.toLowerCase().split(",");
+
+		for (final String element : split) {
+			if (h.contains(element)) {
+				return true;
+			}
+		}
+
+		return false;
+
+	}
+
+	/**
 	 * Connect to the Derby database
 	 *
+	 * @param url
+	 * @return
 	 * @throws SQLException
-	 *
 	 */
 	private Statement connectToDB(String url) throws SQLException {
 		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
@@ -84,14 +106,15 @@ public class CensusFinder {
 	private void execute(String[] args) throws SQLException, IOException {
 		final Statement statement = connectToDB(args[1]);
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
-		logger.info("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear());
+		logger.info("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear()
+				+ " in " + individual.getBirthPlace());
 
 		parseCsvFiles(individual, args);
 		logger.info("Program ended");
 	}
 
 	/**
-	 * Get year in integer format
+	 * Get year as integer
 	 *
 	 * @param date
 	 * @return
@@ -159,7 +182,7 @@ public class CensusFinder {
 
 	/**
 	 * Extract data from the census csv file into the output csv file
-	 * 
+	 *
 	 * @param individual
 	 * @param csvFileName
 	 * @param location
@@ -208,46 +231,23 @@ public class CensusFinder {
 				final Pattern r = Pattern.compile("\\d*");
 				final Matcher m = r.matcher(columns[col]);
 
-				if ((m.find()) && !m.group(0).equals("")) {
+				if (m.find() && !m.group(0).equals("")) {
 					diff = Integer.parseInt(m.group(0));
 				}
 
 				diff = diff + individual.getBirthYear() - ftYear;
 
 				if (diff < 5 && diff > -5) {
-					if (ftYear >= 1845) {
-						if (compareBirthPlace(individual.getBirthPlace(), line)) {
-							bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
-							counter++;
-						}
+					if ((ftYear < 1845) || (compareBirthPlace(individual.getBirthPlace(), line))) {
+						bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
+						counter++;
 					}
-
 				}
+
 			}
 		}
 
 		br.close();
-
-	}
-
-	/**
-	 * Find part of indivudual's birth place in the census line
-	 * 
-	 * @param needle
-	 * @param haystack
-	 * @return
-	 */
-	private boolean compareBirthPlace(String needle, String haystack) {
-		String h = haystack.toLowerCase();
-		String[] split = needle.toLowerCase().split(",");
-
-		for (int i = 0; i < split.length; i++) {
-			if (h.contains(split[i])) {
-				return true;
-			}
-		}
-
-		return false;
 
 	}
 
