@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * Class representing some individual data
  *
  * @author Michael Erichsen
- * @version 2023-01-27
+ * @version 2023-01-28
  *
  */
 public class DBIndividual {
@@ -18,6 +18,7 @@ public class DBIndividual {
 	private String name = "";
 	private int birthYear = 0;
 	private int deathYear = 9999;
+	private String birthPlace = "";
 
 	/**
 	 * Constructor
@@ -28,9 +29,9 @@ public class DBIndividual {
 	 */
 	public DBIndividual(Statement statement, String id) throws SQLException {
 		super();
-		this.setId(id);
+		this.setId("@I" + id + "@");
 
-		String query = "SELECT GIVENNAME, SURNAME from VEJBY.INDIVIDUAL WHERE ID ='" + id + "'";
+		String query = "SELECT GIVENNAME, SURNAME from VEJBY.INDIVIDUAL WHERE ID ='" + this.id + "'";
 
 		ResultSet rs = statement.executeQuery(query);
 
@@ -38,16 +39,17 @@ public class DBIndividual {
 			name = rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim();
 		}
 
-		query = "SELECT ID, TYPE, DATE, INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + id
+		query = "SELECT ID, TYPE, DATE, PLACE,INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + this.id
 				+ "' AND ( TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
 
 		rs = statement.executeQuery(query);
 
 		if (rs.next()) {
 			birthYear = getYearFromDate(rs.getString("DATE"));
+			birthPlace = rs.getString("PLACE");
 		}
 
-		query = "SELECT ID, TYPE, DATE, INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + id
+		query = "SELECT ID, TYPE, DATE, INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + this.id
 				+ "' AND ( TYPE = 'Death' OR TYPE = 'Burial') ORDER BY DATE";
 
 		rs = statement.executeQuery(query);
@@ -56,6 +58,13 @@ public class DBIndividual {
 			deathYear = getYearFromDate(rs.getString("DATE"));
 		}
 
+	}
+
+	/**
+	 * @return the birthPlace
+	 */
+	public String getBirthPlace() {
+		return birthPlace;
 	}
 
 	/**
@@ -101,6 +110,14 @@ public class DBIndividual {
 			return Integer.parseInt(m.group(0));
 		}
 		return 1;
+	}
+
+	/**
+	 * @param birthPlace
+	 *            the birthPlace to set
+	 */
+	public void setBirthPlace(String birthPlace) {
+		this.birthPlace = birthPlace;
 	}
 
 	/**

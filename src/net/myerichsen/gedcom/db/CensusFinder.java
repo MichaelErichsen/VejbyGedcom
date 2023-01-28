@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  *
  *
  * @author Michael Erichsen
- * @version 2320-01-27
+ * @version 2023-01-28
  *
  */
 public class CensusFinder {
@@ -135,53 +135,44 @@ public class CensusFinder {
 	}
 
 	/**
-	 * Parse all lines in the kipdata text file. Read each line into a String
-	 * list.
+	 * Read each line in the kipdata text file into a String list.
 	 *
 	 * @return kipLines A List of Strings
 	 * @throws IOException
 	 */
 	private List<String> parseKipText(String kipTextFileName) throws IOException {
 		final List<String> kipLines = new ArrayList<>();
-		final File file = new File(kipTextFileName);
-		final FileReader fr = new FileReader(file);
-		final BufferedReader br = new BufferedReader(fr);
+		final BufferedReader br = new BufferedReader(new FileReader(new File(kipTextFileName)));
 		String line;
 
 		while ((line = br.readLine()) != null) {
 			kipLines.add(line);
 		}
 
-		fr.close();
+		br.close();
 
+		// Remove header line
 		kipLines.remove(0);
 
 		return kipLines;
 	}
 
 	/**
-	 * @param individual
-	 * @param csvFileName
-	 * @param location
-	 * @param bw
-	 * @param intYear
-	 * @param args
-	 * @throws IOException
-	 */
-	/**
+	 * Extract data from the census csv file into the output csv file
+	 * 
 	 * @param individual
 	 * @param csvFileName
 	 * @param location
 	 * @param outfilepath
 	 * @param bw
-	 * @param intYear
+	 * @param ftYear
 	 * @throws IOException
 	 */
 	private void processCsvFile(DBIndividual individual, String csvFileName, String location, String outfilepath,
 			BufferedWriter bw, int ftYear) throws IOException {
 		final BufferedReader br = new BufferedReader(new FileReader(new File(csvFileName)));
 
-		// Read first line to get headers
+		// Read first line to get headers for later use
 		final String headerLine = br.readLine();
 
 		int diff = 0;
@@ -192,6 +183,7 @@ public class CensusFinder {
 			if (line.contains(individual.getName())) {
 				int col = -1;
 
+				// Ignore empty file
 				if (headerLine == null) {
 					br.close();
 					return;
@@ -214,7 +206,6 @@ public class CensusFinder {
 				columns = line.split(";");
 
 				final Pattern r = Pattern.compile("\\d*");
-
 				final Matcher m = r.matcher(columns[col]);
 
 				if ((m.find()) && !m.group(0).equals("")) {
