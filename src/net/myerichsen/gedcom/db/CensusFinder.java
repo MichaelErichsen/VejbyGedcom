@@ -215,13 +215,39 @@ public class CensusFinder {
 				diff = diff + individual.getBirthYear() - ftYear;
 
 				if (diff < 5 && diff > -5) {
-					bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
-					counter++;
+					if (ftYear >= 1845) {
+						if (compareBirthPlace(individual.getBirthPlace(), line)) {
+							bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
+							counter++;
+						}
+					}
+
 				}
 			}
 		}
 
 		br.close();
+
+	}
+
+	/**
+	 * Find part of indivudual's birth place in the census line
+	 * 
+	 * @param needle
+	 * @param haystack
+	 * @return
+	 */
+	private boolean compareBirthPlace(String needle, String haystack) {
+		String h = haystack.toLowerCase();
+		String[] split = needle.toLowerCase().split(",");
+
+		for (int i = 0; i < split.length; i++) {
+			if (h.contains(split[i])) {
+				return true;
+			}
+		}
+
+		return false;
 
 	}
 
