@@ -60,9 +60,10 @@ public class LoadCphArch {
 			return "NULL";
 		}
 
-		if (columnType.startsWith("INTEGER")) {
+		if ((columnType.startsWith("INTEGER")) || (columnType.startsWith("DECIMAL"))) {
 			return string;
-		} else if ((columnType.startsWith("CHAR")) || (columnType.startsWith("VARCHAR"))) {
+		} else if ((columnType.startsWith("CHAR")) || (columnType.startsWith("VARCHAR"))
+				|| (columnType.startsWith("DATE"))) {
 			return "'" + string + "'";
 		} else
 			throw new Exception("Unknown column type: " + columnType);
