@@ -1,5 +1,8 @@
 package net.myerichsen.gedcom.cpharch;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,15 +13,15 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Superclass for Cph archive loader programs
- * 
+ * Abstract superclass for Cph archive loader programs
+ *
  * @author Michael Erichsen
  * @bversion 30. jan. 2023
  *
  */
-public class LoadCphArch {
-
+public abstract class LoadCphArch {
 	protected static Logger logger;
+	protected static int counter;
 
 	/**
 	 * No arg c:tor
@@ -43,7 +46,7 @@ public class LoadCphArch {
 
 	/**
 	 * Convert a string according to column type and value
-	 * 
+	 *
 	 * @param columnType
 	 * @param strNum
 	 * @return
@@ -60,18 +63,38 @@ public class LoadCphArch {
 			return "NULL";
 		}
 
-		if ((columnType.startsWith("INTEGER")) || (columnType.startsWith("DECIMAL"))) {
+		if (columnType.startsWith("INTEGER") || columnType.startsWith("DECIMAL")) {
 			return string;
-		} else if ((columnType.startsWith("CHAR")) || (columnType.startsWith("VARCHAR"))
-				|| (columnType.startsWith("DATE"))) {
+		} else if (columnType.startsWith("CHAR") || columnType.startsWith("VARCHAR") || columnType.startsWith("DATE")) {
 			return "'" + string + "'";
-		} else
+		} else if (columnType.startsWith("BOOLEAN")) {
+			if (string.equals("b'\\x00'")) {
+				return "TRUE";
+			} else {
+				return "FALSE";
+			}
+		} else {
 			throw new Exception("Unknown column type: " + columnType);
+		}
+	}
+
+	/**
+	 * Worker method
+	 *
+	 * @param args
+	 * @throws Exception
+	 */
+	protected void execute(String[] args) throws Exception {
+		final Statement statement = connectToDB(args[1]);
+		loadTable(statement, args);
+
+		logger.info(counter + " rows added to " + getTablename() + " in " + args[0]);
+
 	}
 
 	/**
 	 * Get column types from database catalog
-	 * 
+	 *
 	 * @param statement
 	 * @param tableName
 	 * @return
@@ -85,7 +108,7 @@ public class LoadCphArch {
 
 		statement.execute(query);
 
-		List<String> ls = new ArrayList<>();
+		final List<String> ls = new ArrayList<>();
 
 		final ResultSet rs = statement.executeQuery(query);
 
@@ -94,6 +117,89 @@ public class LoadCphArch {
 		}
 
 		return ls;
+
+	}
+
+	/**
+	 * @return
+	 */
+	public abstract String getDelete();
+
+	/**
+	 * @return
+	 */
+	public abstract String getInsert();
+
+	/**
+	 * @return
+	 */
+	public abstract String getTablename();
+
+	/**
+	 * Load lines into Derby table
+	 *
+	 * @param statement
+	 * @param args
+	 * @throws Exception
+	 */
+	private void loadTable(Statement statement, String[] args) throws Exception {
+		String[] columns;
+		StringBuffer sb = new StringBuffer();
+		String query = "";
+
+		final List<String> columnTypes = getColumnTypes(statement, getTablename());
+		logger.fine("Count: " + columnTypes.size());
+
+		statement.execute(getDelete());
+
+		final BufferedReader br = new BufferedReader(new FileReader(new File(args[1])));
+		String line;
+
+		// Ignore header line
+		line = br.readLine();
+
+		while ((line = br.readLine()) != null) {
+			while (!line.endsWith("\"")) {
+				line = line + br.readLine();
+			}
+
+			sb = new StringBuffer(getInsert());
+
+			line = line.replace(";", ",");
+
+			columns = line.replace("\",\"", "\";\"").split(";");
+
+			if (columns[0].equals("id")) {
+				continue;
+			}
+
+			for (int i = 0; i < columns.length; i++) {
+				sb.append(convertString(columnTypes.get(i), columns[i]));
+
+				if (i < columns.length - 1) {
+					sb.append(", ");
+				}
+			}
+
+			try {
+				sb.append(")");
+				query = sb.toString();
+				logger.fine(query);
+				statement.execute(query);
+				counter++;
+			} catch (final SQLException e) {
+				if (e.getSQLState().equals("42821")) {
+					logger.warning(e.getSQLState() + ", " + e.getMessage() + ", " + query);
+				} else {
+					logger.severe(e.getSQLState() + ", " + e.getMessage() + ", " + query);
+					br.close();
+					throw new SQLException(e);
+				}
+			}
+
+		}
+
+		br.close();
 
 	}
 
