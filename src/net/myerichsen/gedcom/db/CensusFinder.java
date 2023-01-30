@@ -62,7 +62,7 @@ public class CensusFinder {
 	}
 
 	/**
-	 * Find part of indivudual's birth place in the census line
+	 * Find part of individual's birth place in the census line
 	 *
 	 * @param needle
 	 * @param haystack
@@ -73,13 +73,43 @@ public class CensusFinder {
 		final String[] split = needle.toLowerCase().split(",");
 
 		for (final String element : split) {
-			if (h.contains(element)) {
+			if (h.contains(element.trim())) {
 				return true;
 			}
 		}
 
 		return false;
 
+	}
+
+	/**
+	 * Find name or variants thereof in the census line
+	 *
+	 * @param needle
+	 * @param haystack
+	 * @return
+	 */
+	private boolean compareName(String needle, String haystack) {
+		final String h = haystack.toLowerCase();
+		String n = needle.toLowerCase().trim();
+		String[] variant;
+
+		if (n.endsWith("datter")) {
+			variant = new String[4];
+			variant[0] = n;
+			variant[1] = n.replace("datter", "sen");
+			variant[2] = n.replace("datter", "dtr");
+			variant[3] = n.replace("datter", "en");
+
+			for (final String element : variant) {
+				if (h.contains(element)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+		return h.contains(n);
 	}
 
 	/**
@@ -203,7 +233,7 @@ public class CensusFinder {
 		String line;
 
 		while ((line = br.readLine()) != null) {
-			if (line.contains(individual.getName())) {
+			if (compareName(individual.getName(), line)) {
 				int col = -1;
 
 				// Ignore empty file
