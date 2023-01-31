@@ -6,7 +6,7 @@ import java.util.logging.Logger;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @bversion 30. jan. 2023
+ * @version 30. jan. 2023
  *
  */
 public class LoadBurialDeathCause extends LoadCphArch {

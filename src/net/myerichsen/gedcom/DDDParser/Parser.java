@@ -18,7 +18,7 @@ import java.util.List;
  * list in the initVillages() method.
  * <p>
  * The output is sent to a text file.
- * 
+ *
  * @author Michael Erichsen
  * @version 2022-03-27
  *
@@ -67,7 +67,7 @@ public class Parser {
 		try {
 			fw = new FileWriter(args[2]);
 			bw = new BufferedWriter(fw);
-		} catch (IOException e1) {
+		} catch (final IOException e1) {
 			e1.printStackTrace();
 			System.exit(16);
 		}
@@ -122,7 +122,8 @@ public class Parser {
 	}
 
 	/**
-	 * Parse all lines in the kipdata text file. Read each line into a String list.
+	 * Parse all lines in the kipdata text file. Read each line into a String
+	 * list.
 	 *
 	 * @return kipLines A List of Strings
 	 * @throws IOException
@@ -145,7 +146,7 @@ public class Parser {
 
 	/**
 	 * Print the entire household for this person
-	 * 
+	 *
 	 * @param personColumn
 	 * @param householdColumn
 	 * @param csvLine
@@ -165,10 +166,10 @@ public class Parser {
 
 		// Find household for this person
 
-		String person = fields[personColumn];
-		int iPerson = Integer.parseInt(person);
+		final String person = fields[personColumn];
+		final int iPerson = Integer.parseInt(person);
 		int firstInHousehold = iPerson - 1;
-		String household = fields[householdColumn];
+		final String household = fields[householdColumn];
 
 		// While previous person has same household backtrack one person
 
@@ -198,15 +199,15 @@ public class Parser {
 
 	/**
 	 * Print line while omitting all blank fields
-	 * 
+	 *
 	 * @param csvLine
 	 * @throws IOException
 	 */
 	private void printHouseholdMember(String csvLine) throws IOException {
-		String[] fields = csvLine.split(";");
-		StringBuilder sb = new StringBuilder();
+		final String[] fields = csvLine.split(";");
+		final StringBuilder sb = new StringBuilder();
 
-		for (String string : fields) {
+		for (final String string : fields) {
 			if (string.trim().length() > 0) {
 				sb.append(string.trim() + ", ");
 			}
@@ -227,7 +228,7 @@ public class Parser {
 		FileReader fr;
 		try {
 			fr = new FileReader(file);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			System.out.println(e.getMessage());
 			return;
 		}
@@ -281,7 +282,7 @@ public class Parser {
 				if (villages.contains(fields[birthPlaceColumn])) {
 					printHousehold(personColumn, householdColumn, csvLine, csvLines);
 				}
-			} catch (IndexOutOfBoundsException e) {
+			} catch (final IndexOutOfBoundsException e) {
 				System.out.println(e.getMessage());
 			}
 		}
@@ -321,7 +322,8 @@ public class Parser {
 	}
 
 	/**
-	 * @param csvFileDirectory the csvFileDirectory to set
+	 * @param csvFileDirectory
+	 *            the csvFileDirectory to set
 	 */
 	public void setCsvFileDirectory(String csvFileDirectory) {
 		if (!csvFileDirectory.endsWith("/")) {
@@ -332,21 +334,24 @@ public class Parser {
 	}
 
 	/**
-	 * @param csvFileName the csvFileName to set
+	 * @param csvFileName
+	 *            the csvFileName to set
 	 */
 	public void setCsvFileName(String csvFileName) {
 		this.csvFileName = csvFileName;
 	}
 
 	/**
-	 * @param kipLine the kipLine to set
+	 * @param kipLine
+	 *            the kipLine to set
 	 */
 	public void setKipLine(String kipLine) {
 		this.kipLine = kipLine;
 	}
 
 	/**
-	 * @param kipTextFileName the kipTextFileName to set
+	 * @param kipTextFileName
+	 *            the kipTextFileName to set
 	 */
 	public void setKipTextFileName(String kipTextFileName) {
 		this.kipTextFileName = kipTextFileName;

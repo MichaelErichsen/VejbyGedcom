@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	private static final long serialVersionUID = -6676370849190065442L;
-	private Map<Integer, Color> mapColors;
+	private final Map<Integer, Color> mapColors;
 
 	public CustomTableCellRenderer() {
 		mapColors = new HashMap<>();
@@ -25,8 +25,8 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 	public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus,
 			int row, int column) {
 
-		Component cell = super.getTableCellRendererComponent(table, obj, isSelected, hasFocus, row, 1);
-		Color color = mapColors.get(row);
+		final Component cell = super.getTableCellRendererComponent(table, obj, isSelected, hasFocus, row, 1);
+		final Color color = mapColors.get(row);
 		if (color != null) {
 			cell.setBackground(color);
 		} else {

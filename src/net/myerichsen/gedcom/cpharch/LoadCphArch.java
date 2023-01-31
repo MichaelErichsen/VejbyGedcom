@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @bversion 30. jan. 2023
+ * @version 30. jan. 2023
  *
  */
 public abstract class LoadCphArch {
@@ -52,7 +52,7 @@ public abstract class LoadCphArch {
 	 * @return
 	 * @throws Exception
 	 */
-	public String convertString(String columnType, String strNum) throws Exception {
+	protected String convertString(String columnType, String strNum) throws Exception {
 		if (strNum == null) {
 			return "NULL";
 		}
@@ -123,17 +123,17 @@ public abstract class LoadCphArch {
 	/**
 	 * @return
 	 */
-	public abstract String getDelete();
+	protected abstract String getDelete();
 
 	/**
 	 * @return
 	 */
-	public abstract String getInsert();
+	protected abstract String getInsert();
 
 	/**
 	 * @return
 	 */
-	public abstract String getTablename();
+	protected abstract String getTablename();
 
 	/**
 	 * Load lines into Derby table
@@ -142,10 +142,12 @@ public abstract class LoadCphArch {
 	 * @param args
 	 * @throws Exception
 	 */
-	private void loadTable(Statement statement, String[] args) throws Exception {
+	protected void loadTable(Statement statement, String[] args) throws Exception {
 		String[] columns;
 		StringBuffer sb = new StringBuffer();
 		String query = "";
+		String previousLine = "";
+		String thisLine = "";
 
 		final List<String> columnTypes = getColumnTypes(statement, getTablename());
 		logger.fine("Count: " + columnTypes.size());
@@ -163,13 +165,20 @@ public abstract class LoadCphArch {
 				line = line + br.readLine();
 			}
 
+			thisLine = line;
+
+			if (line.endsWith("\";\"")) {
+				line = line.substring(0, line.length() - 2);
+				logger.info("Shortened line: " + line);
+			}
+
 			sb = new StringBuffer(getInsert());
 
 			line = line.replace(";", ",");
 
 			columns = line.replace("\",\"", "\";\"").split(";");
 
-			if (columns[0].equals("id")) {
+			if (columns[0].equals("\"id\"")) {
 				continue;
 			}
 
@@ -187,10 +196,16 @@ public abstract class LoadCphArch {
 				logger.fine(query);
 				statement.execute(query);
 				counter++;
+				if (counter % 100000 == 0) {
+					logger.info("Counter: " + counter);
+				}
+				previousLine = line;
 			} catch (final SQLException e) {
 				if (e.getSQLState().equals("42821")) {
 					logger.warning(e.getSQLState() + ", " + e.getMessage() + ", " + query);
 				} else {
+					logger.info("Previous: " + previousLine);
+					logger.info("This : " + thisLine);
 					logger.severe(e.getSQLState() + ", " + e.getMessage() + ", " + query);
 					br.close();
 					throw new SQLException(e);

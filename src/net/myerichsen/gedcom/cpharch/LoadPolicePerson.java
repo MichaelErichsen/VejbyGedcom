@@ -45,7 +45,7 @@ public class LoadPolicePerson extends LoadCphArch {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see net.myerichsen.gedcom.cpharch.LoadCphArch#getDelete()
 	 */
 	@Override
@@ -55,7 +55,7 @@ public class LoadPolicePerson extends LoadCphArch {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see net.myerichsen.gedcom.cpharch.LoadCphArch#getInsert()
 	 */
 	@Override
@@ -65,7 +65,7 @@ public class LoadPolicePerson extends LoadCphArch {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see net.myerichsen.gedcom.cpharch.LoadCphArch#getTablename()
 	 */
 	@Override

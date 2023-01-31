@@ -20,7 +20,7 @@ import java.util.Set;
  * It converts national characters from UTF-8 to ANSI
  * <p>
  * The output is sent to text files.
- * 
+ *
  * @author Michael Erichsen
  * @version 2023-01-20
  *
@@ -52,7 +52,7 @@ public class Cleaner {
 
 	/**
 	 * Worker method
-	 * 
+	 *
 	 * @param args
 	 */
 	private void execute(String[] args) {
@@ -75,7 +75,7 @@ public class Cleaner {
 
 	/**
 	 * List all .csv files in the directory
-	 * 
+	 *
 	 * @param dir
 	 * @return
 	 * @throws IOException
@@ -128,7 +128,8 @@ public class Cleaner {
 	}
 
 	/**
-	 * @param csvFileDirectory the csvFileDirectory to set
+	 * @param csvFileDirectory
+	 *            the csvFileDirectory to set
 	 */
 	public void setCsvFileDirectory(String csvFileDirectory) {
 		if (!csvFileDirectory.endsWith("/")) {
@@ -139,7 +140,8 @@ public class Cleaner {
 	}
 
 	/**
-	 * @param outFileDirectory the outFileDirectory to set
+	 * @param outFileDirectory
+	 *            the outFileDirectory to set
 	 */
 	public void setOutFileDirectory(String outFileDirectory) {
 		if (!outFileDirectory.endsWith("/")) {

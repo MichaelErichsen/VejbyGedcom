@@ -2,7 +2,7 @@ package net.myerichsen.vejby.gedcom;
 
 /**
  * Constants for GEDCOM sex.
- * 
+ *
  * @author Michael Erichsen
  * @version 13. aug. 2020
  */

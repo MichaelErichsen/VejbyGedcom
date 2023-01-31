@@ -16,7 +16,7 @@ import org.gedcom4j.parser.GedcomParser;
 /**
  * Find persons with the same phonetized surname, first initial, sex, and birth
  * year
- * 
+ *
  * @author Michael Erichsen
  * @version 30. nov. 2022
  *
@@ -31,27 +31,27 @@ public class BirthdateMatcher2 {
 			System.out.println("Usage: BirthdateMatcher2 gedcomfile outputdirectory");
 			System.exit(4);
 		}
-		BirthdateMatcher2 bm = new BirthdateMatcher2();
+		final BirthdateMatcher2 bm = new BirthdateMatcher2();
 
 		try {
-			String outfile = bm.execute(args[0], args[1]);
+			final String outfile = bm.execute(args[0], args[1]);
 			System.out.println("Saved to " + outfile);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Read a GEDCOM file using org.gedcomj package
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
 	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
-		GedcomParser gp = new GedcomParser();
+		final GedcomParser gp = new GedcomParser();
 		gp.load(filename);
 		return gp.getGedcom();
 	}
@@ -59,7 +59,7 @@ public class BirthdateMatcher2 {
 	/**
 	 * Read a GEDCOM file and find all persons with matching phonetic names and
 	 * birth years
-	 * 
+	 *
 	 * @param gedcomfile
 	 * @param outputdirectory
 	 * @return outfile
@@ -69,16 +69,16 @@ public class BirthdateMatcher2 {
 	private String execute(String gedcomfile, String outputdirectory) throws IOException, GedcomParserException {
 		int counter = 0;
 
-		String outfile = outputdirectory + "\\BirthdatePairs.csv";
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		final String outfile = outputdirectory + "\\BirthdatePairs.csv";
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
-		Gedcom gedcom = readGedcom(gedcomfile);
+		final Gedcom gedcom = readGedcom(gedcomfile);
 
-		Map<String, Individual> individuals = gedcom.getIndividuals();
+		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
-		ArrayList<MatchPerson> listMp = new ArrayList<>();
+		final ArrayList<MatchPerson> listMp = new ArrayList<>();
 
-		for (Entry<String, Individual> individual1 : individuals.entrySet()) {
+		for (final Entry<String, Individual> individual1 : individuals.entrySet()) {
 			listMp.add(new MatchPerson(individual1));
 		}
 

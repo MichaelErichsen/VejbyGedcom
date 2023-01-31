@@ -471,10 +471,10 @@ public class DBLoader {
 				logger.fine(e.getMessage());
 			}
 
-			List<IndividualReference> children = family.getChildren();
+			final List<IndividualReference> children = family.getChildren();
 
 			if (children != null) {
-				for (IndividualReference individualReference : children) {
+				for (final IndividualReference individualReference : children) {
 					insertIndividualWithFamily(individualReference.getIndividual());
 				}
 			}

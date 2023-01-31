@@ -10,17 +10,17 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
 
 /**
  * A class to represent a person to be matched
- * 
+ *
  * @author Michael Erichsen
  * @version 01. dec. 2022
  *
  */
 public class MatchPerson {
 	private static Fonkod fonkod = new Fonkod();
-	private String patternd = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
-	private String patternm = "[A-Z]{3}\\s\\d{4}";
+	private final String patternd = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
+	private final String patternm = "[A-Z]{3}\\s\\d{4}";
 
-	private String patterny = "\\d{4}";
+	private final String patterny = "\\d{4}";
 	private String ID = "";
 	private String fullName = "";
 	private String phoneticName = "";
@@ -44,7 +44,7 @@ public class MatchPerson {
 
 	/**
 	 * Compare birth year, phonetic name, and sex for two persons
-	 * 
+	 *
 	 * @param o
 	 * @return True if equal
 	 */
@@ -57,8 +57,8 @@ public class MatchPerson {
 			return false;
 		}
 
-		if ((fullDateFlag.equals("F")) && (o.getFullDateFlag().equals("F")) && (!birthDate.equals(o.getFullDateFlag()))
-				&& (birtChrFlag.equals(o.getBirtChrFlag()))) {
+		if (fullDateFlag.equals("F") && o.getFullDateFlag().equals("F") && !birthDate.equals(o.getFullDateFlag())
+				&& birtChrFlag.equals(o.getBirtChrFlag())) {
 			return false;
 		}
 
@@ -71,12 +71,12 @@ public class MatchPerson {
 
 	/**
 	 * Convert PersonalName object to first character and fonkoded surname
-	 * 
+	 *
 	 * @param name
 	 * @return Fonkoded name
 	 */
 	private String fonkodName(PersonalName name) {
-		String[] nameParts = name.getBasic().split("/");
+		final String[] nameParts = name.getBasic().split("/");
 		String givenName = nameParts[0].toLowerCase();
 
 		if (givenName.length() > 1) {
@@ -87,7 +87,7 @@ public class MatchPerson {
 
 		try {
 			surName = fonkod.generateKey(nameParts[1]);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			surName = "";
 		}
 
@@ -166,7 +166,7 @@ public class MatchPerson {
 
 	/**
 	 * Return the year from the date string
-	 * 
+	 *
 	 * @param date
 	 * @return year
 	 */
@@ -189,27 +189,27 @@ public class MatchPerson {
 
 	/**
 	 * Populate the object
-	 * 
+	 *
 	 * @param individual
 	 */
 	private void populate(Entry<String, Individual> individual) {
 		this.individual = individual;
 		ID = individual.getKey();
-		Individual value = individual.getValue();
+		final Individual value = individual.getValue();
 		fullName = value.toString();
-		List<PersonalName> name = value.getNames();
+		final List<PersonalName> name = value.getNames();
 		phoneticName = fonkodName(name.get(0));
 		sex = value.getSex().getValue();
 		List<IndividualEvent> event = value.getEventsOfType(IndividualEventType.BIRTH);
 
-		if ((event != null) && (event.size() > 0)) {
+		if (event != null && event.size() > 0) {
 			birthDate = event.get(0).getDate().getValue();
 			birthYear = getYear(birthDate);
 			birtChrFlag = "B";
 		} else {
 			event = value.getEventsOfType(IndividualEventType.CHRISTENING);
 
-			if ((event != null) && (event.size() > 0)) {
+			if (event != null && event.size() > 0) {
 				birthDate = event.get(0).getDate().getValue();
 				birthYear = getYear(birthDate);
 				birtChrFlag = "C";
@@ -222,7 +222,8 @@ public class MatchPerson {
 	}
 
 	/**
-	 * @param individual the individual to set
+	 * @param individual
+	 *            the individual to set
 	 */
 	public void setIndividual(Entry<String, Individual> individual) {
 		this.individual = individual;

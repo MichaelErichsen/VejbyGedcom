@@ -91,7 +91,7 @@ public class CensusFinder {
 	 */
 	private boolean compareName(String needle, String haystack) {
 		final String h = haystack.toLowerCase();
-		String n = needle.toLowerCase().trim();
+		final String n = needle.toLowerCase().trim();
 		String[] variant;
 
 		if (n.endsWith("datter")) {
@@ -268,7 +268,7 @@ public class CensusFinder {
 				diff = diff + individual.getBirthYear() - ftYear;
 
 				if (diff < 5 && diff > -5) {
-					if ((ftYear < 1845) || (compareBirthPlace(individual.getBirthPlace(), line))) {
+					if (ftYear < 1845 || compareBirthPlace(individual.getBirthPlace(), line)) {
 						bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
 						counter++;
 					}

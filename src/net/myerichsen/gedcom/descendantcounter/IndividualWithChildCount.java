@@ -4,13 +4,13 @@ import org.gedcom4j.model.Individual;
 
 /**
  * An individual with count of descendants
- * 
+ *
  * @author michael
  *
  */
 public class IndividualWithChildCount extends Individual implements Comparable<IndividualWithChildCount> {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private int descendantCount = 0;
@@ -35,7 +35,7 @@ public class IndividualWithChildCount extends Individual implements Comparable<I
 
 	@Override
 	public int compareTo(IndividualWithChildCount iwcc) {
-		int c = iwcc.getDescendantCount();
+		final int c = iwcc.getDescendantCount();
 
 		if (descendantCount > c) {
 			return 1;
@@ -56,7 +56,8 @@ public class IndividualWithChildCount extends Individual implements Comparable<I
 	}
 
 	/**
-	 * @param descendantCount the descendantCount to set
+	 * @param descendantCount
+	 *            the descendantCount to set
 	 */
 	public void setDescendantCount(int descendantCount) {
 		this.descendantCount = descendantCount;

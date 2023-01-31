@@ -28,7 +28,7 @@ import org.gedcom4j.parser.GedcomParser;
  * </ul>
  * <p>
  * The program produces a .csv file with a row for each person found
- * 
+ *
  * @author Michael Erichsen
  * @version 8. jan. 2023
  *
@@ -37,7 +37,7 @@ public class ProbateFinder {
 
 	/**
 	 * Main method
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -46,7 +46,7 @@ public class ProbateFinder {
 			System.exit(4);
 		}
 
-		ProbateFinder pf = new ProbateFinder();
+		final ProbateFinder pf = new ProbateFinder();
 
 		String outfile = "";
 
@@ -61,7 +61,7 @@ public class ProbateFinder {
 
 	/**
 	 * Worker method
-	 * 
+	 *
 	 * @param location
 	 * @param filename
 	 * @param outputdir
@@ -76,7 +76,7 @@ public class ProbateFinder {
 		LocalDate localDate = null;
 		int counter = 0;
 
-		ArrayList<ProbatePerson> listPp = new ArrayList<>();
+		final ArrayList<ProbatePerson> listPp = new ArrayList<>();
 
 		location = location.replace("æ", ".");
 		location = location.replace("ø", ".");
@@ -87,26 +87,26 @@ public class ProbateFinder {
 
 		System.out.println("Reading file " + filename);
 
-		Gedcom gedcom = readGedcom(filename);
+		final Gedcom gedcom = readGedcom(filename);
 
 		System.out.println("Parsing GEDCOM");
 
-		String outfile = outputdirectory + "\\prob_" + location + ".csv";
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		String outline = "\"Person\";\"Fødselsår\";\"ISO Fødselsår\";\"Sidste sted\";\"ID\"";
+		final String outfile = outputdirectory + "\\prob_" + location + ".csv";
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		final String outline = "\"Person\";\"Fødselsår\";\"ISO Fødselsår\";\"Sidste sted\";\"ID\"";
 		writer.write(outline + "\n");
 
-		Map<String, Individual> individuals = gedcom.getIndividuals();
+		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
-		for (Map.Entry<String, Individual> entry : individuals.entrySet()) {
+		for (final Map.Entry<String, Individual> entry : individuals.entrySet()) {
 			individual = entry.getValue();
 			births = individual.getEventsOfType(IndividualEventType.BIRTH);
 
-			if (births.isEmpty() || (births.size() == 0)) {
+			if (births.isEmpty() || births.size() == 0) {
 				births = individual.getEventsOfType(IndividualEventType.CHRISTENING);
 			}
 
-			if (births.isEmpty() || (births.size() == 0)) {
+			if (births.isEmpty() || births.size() == 0) {
 				System.err.println("No Birth: " + entry.getKey() + ";" + individual);
 				continue;
 			}
@@ -117,7 +117,7 @@ public class ProbateFinder {
 				continue;
 			}
 
-			ProbatePerson pp = new ProbatePerson(entry);
+			final ProbatePerson pp = new ProbatePerson(entry);
 
 			listPp.add(pp);
 		}
@@ -128,9 +128,9 @@ public class ProbateFinder {
 
 		System.out.println("Creating .csv file");
 
-		String pattern = ".*" + location + ".*";
+		final String pattern = ".*" + location + ".*";
 
-		for (ProbatePerson probatePerson : listPp) {
+		for (final ProbatePerson probatePerson : listPp) {
 			if (location.equalsIgnoreCase("all") || probatePerson.getLastPlace().toLowerCase().matches(pattern)) {
 				writer.write(probatePerson.toString() + "\n");
 				counter++;
@@ -145,14 +145,14 @@ public class ProbateFinder {
 
 	/**
 	 * Read a GEDCOM file using org.gedcomj package
-	 * 
+	 *
 	 * @param filename
 	 * @return A GEDCOM object
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
 	private Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
-		GedcomParser gp = new GedcomParser();
+		final GedcomParser gp = new GedcomParser();
 		gp.load(filename);
 		return gp.getGedcom();
 	}

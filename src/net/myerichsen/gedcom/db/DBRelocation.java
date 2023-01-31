@@ -83,9 +83,9 @@ public class DBRelocation {
 		int counter = 0;
 		connectToDB(args[0]);
 
-		String outfile = args[1] + "\\flyt_all.csv";
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		String outline = "\"ID\";\"Fornavn\";\"Efternavn\";\"Fonetisk navn\";\"Flyttedato\";\"Til\";\"Fra\"";
+		final String outfile = args[1] + "\\flyt_all.csv";
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		final String outline = "\"ID\";\"Fornavn\";\"Efternavn\";\"Fonetisk navn\";\"Flyttedato\";\"Til\";\"Fra\"";
 		writer.write(outline + "\n");
 
 		final String query = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, VEJBY.INDIVIDUAL.SURNAME, "

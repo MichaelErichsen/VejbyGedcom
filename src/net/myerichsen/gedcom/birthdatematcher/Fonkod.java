@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 /**
  * This class encodes a Danish name phonetically
- * 
+ *
  * @author Michael Erichsen
  * @version 29-11-2022
  */
@@ -13,7 +13,7 @@ public class Fonkod {
 
 	/**
 	 * No-arg c:tor
-	 * 
+	 *
 	 */
 	public Fonkod() {
 		super();
@@ -22,7 +22,7 @@ public class Fonkod {
 	/**
 	 * Den del af navnet, der ligger foran første vokalgruppe, undersøges for
 	 * umulige konsonantsammenstillinger.
-	 * 
+	 *
 	 * @param textField
 	 * @return String
 	 */
@@ -31,7 +31,7 @@ public class Fonkod {
 		Pattern p = null;
 		Matcher m = null;
 
-		if ((out.length() < 2) || isVowel(out.charAt(0), out.charAt(1))) {
+		if (out.length() < 2 || isVowel(out.charAt(0), out.charAt(1))) {
 			return out;
 		}
 
@@ -87,7 +87,7 @@ public class Fonkod {
 
 	/**
 	 * Navnedelen efter første vokal behandles samlet
-	 * 
+	 *
 	 * @param input
 	 * @return String
 	 */
@@ -130,10 +130,12 @@ public class Fonkod {
 
 	/**
 	 * Transform a family name to a Danish phonetic encoding
-	 * 
-	 * @param String The name as written
+	 *
+	 * @param String
+	 *            The name as written
 	 * @return String The encoding of the name
-	 * @throws Exception If name missing or not valid
+	 * @throws Exception
+	 *             If name missing or not valid
 	 */
 	public String generateKey(String slaegtsNavn) throws Exception {
 		if (slaegtsNavn == null) {
@@ -158,11 +160,11 @@ public class Fonkod {
 		}
 
 		/**
-		 * Det givne navn sammenlignes med en tabel over almindelige navne. Hvis navnet
-		 * findes heri, benyttes den hertil svarende tabelkode
-		 * 
+		 * Det givne navn sammenlignes med en tabel over almindelige navne. Hvis
+		 * navnet findes heri, benyttes den hertil svarende tabelkode
+		 *
 		 * Rykket foran næste afsnit af MER
-		 * 
+		 *
 		 */
 		// st = new StringTokenizer(out, " ");
 		// sb = new StringBuffer();
@@ -177,25 +179,26 @@ public class Fonkod {
 		// }
 		// System.out.println(out + "\tNot found in lookUpTable ");
 		/**
-		 * Indledningsvis omsættes visse tegn, således at en første standardisering af
-		 * navnet opnås
+		 * Indledningsvis omsættes visse tegn, således at en første
+		 * standardisering af navnet opnås
 		 */
 		p = Pattern.compile("(\\.|-|\\s|/)+");
 		sa = p.split(out);
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(performInitialStandardization(element) + " ");
-			// System.out.println(sb.toString() + "\tperformInitialStandardization ");
+			// System.out.println(sb.toString() +
+			// "\tperformInitialStandardization ");
 		}
 
 		/**
-		 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere end to
-		 * vokaler indgår i en vokalgruppe, behandles vokalerne parvis med start forfra
-		 * i gruppen.
+		 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere
+		 * end to vokaler indgår i en vokalgruppe, behandles vokalerne parvis
+		 * med start forfra i gruppen.
 		 */
 		sa = p.split(sb.toString().trim());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(processFirstVowelGroup(element) + " ");
 			// System.out.println(sb.toString() + "\tprocessFirstVowelGroup");
 		}
@@ -206,9 +209,10 @@ public class Fonkod {
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(processFirstConsonantGroup(element) + " ");
-			// System.out.println(sb.toString() + "\tprocessFirstConsonantGroup");
+			// System.out.println(sb.toString() +
+			// "\tprocessFirstConsonantGroup");
 		}
 
 		/**
@@ -216,7 +220,7 @@ public class Fonkod {
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(processSecondVowelGroup(element) + " ");
 			// System.out.println(sb.toString() + "\tprocessSecondVowelGroup");
 		}
@@ -226,17 +230,19 @@ public class Fonkod {
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(processSecondConsonantGroup(element) + " ");
-			// System.out.println(sb.toString() + "\tprocessSecondConsonantGroup");
+			// System.out.println(sb.toString() +
+			// "\tprocessSecondConsonantGroup");
 		}
 
 		/**
-		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én sammenhæng
+		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én
+		 * sammenhæng
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(finalizeProcessing(element) + " ");
 			// System.out.println(sb.toString() + "\tfinalizeProcessing 1");
 		}
@@ -248,24 +254,24 @@ public class Fonkod {
 		// System.out.println(out + "\teliminateDoubleCharacters");
 
 		/**
-		 * 
+		 *
 		 * Den foreløbige kode undersøges for umulige konsonantgrupper
 		 */
 		sa = p.split(out);
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(eliminateImpossibleConsonantCombinations(element) + " ");
 			// System.out.println(sb.toString() +
 			// "\teliminateImpossibleConsonantCombinations");
 		}
 
 		/**
-		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én sammenhæng
-		 * igen
+		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én
+		 * sammenhæng igen
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(finalizeProcessing(element) + " ");
 		}
 		out = sb.toString();
@@ -287,24 +293,24 @@ public class Fonkod {
 
 	/**
 	 * Is any of two characters a vowel?
-	 * 
+	 *
 	 * @param a
 	 * @param b
 	 * @return boolean
 	 */
 	private boolean isVowel(char a, char b) {
-		Pattern p = Pattern.compile("[aeiouyæøå]");
-		Matcher m = p.matcher(String.valueOf(a));
+		final Pattern p = Pattern.compile("[aeiouyæøå]");
+		final Matcher m = p.matcher(String.valueOf(a));
 		if (m.matches()) {
 			return true;
 		}
 		m.reset(String.valueOf(b));
-		return (m.matches());
+		return m.matches();
 	}
 
 	/**
 	 * Visse gamle eller fremmede staveformer narmaliseres
-	 * 
+	 *
 	 * @param input
 	 * @return
 	 */
@@ -327,9 +333,9 @@ public class Fonkod {
 	}
 
 	/**
-	 * Indledningsvis omsættes visse tegn, således at en første standardisering af
-	 * navnet opnås
-	 * 
+	 * Indledningsvis omsættes visse tegn, således at en første standardisering
+	 * af navnet opnås
+	 *
 	 * @param nextToken
 	 * @return
 	 */
@@ -338,7 +344,7 @@ public class Fonkod {
 		StringBuffer sb = new StringBuffer();
 		Pattern p = null;
 		Matcher m = null;
-		String[] patterns = { "vo", "vø", "val", "ver", "vie", "vet", "vah", "vri" };
+		final String[] patterns = { "vo", "vø", "val", "ver", "vie", "vet", "vah", "vri" };
 
 		// MER Af, de, du, la og von fjernes
 		p = Pattern.compile("(af|de|du|la|von)");
@@ -349,7 +355,7 @@ public class Fonkod {
 
 		// "vo", "vø", "val", "ver", "vie", "vet", "vah" og "vri"; dubleres v og
 		// f
-		for (String pattern : patterns) {
+		for (final String pattern : patterns) {
 			p = Pattern.compile(pattern);
 			m = p.matcher(out);
 
@@ -368,7 +374,7 @@ public class Fonkod {
 		p = Pattern.compile(" ");
 		String[] sa = p.split(out);
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(normaliseForeignSpellings(element) + " ");
 		}
 
@@ -377,7 +383,7 @@ public class Fonkod {
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
-		for (String element : sa) {
+		for (final String element : sa) {
 			sb.append(processHXAndDoubles(element) + " ");
 		}
 		out = sb.toString();
@@ -395,7 +401,7 @@ public class Fonkod {
 	/**
 	 * Efter behandlingen af første vokalgruppe behandles evt. foranstillede
 	 * konsonanter sammen med første vokal
-	 * 
+	 *
 	 * @param input
 	 * @return String
 	 */
@@ -404,8 +410,8 @@ public class Fonkod {
 
 		// Find første konsonantgruppe
 		// Afslut, hvis den ikke er foranstillet
-		Pattern p = Pattern.compile("\\b[^aeiouyæøå]+");
-		Matcher m = p.matcher(input);
+		final Pattern p = Pattern.compile("\\b[^aeiouyæøå]+");
+		final Matcher m = p.matcher(input);
 		if (!m.lookingAt()) {
 			return input;
 		}
@@ -487,10 +493,10 @@ public class Fonkod {
 	}
 
 	/**
-	 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere end to
-	 * vokaler indgår i en vokalgruppe, behandles vokalerne parvis med start forfra
-	 * i gruppen
-	 * 
+	 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere end
+	 * to vokaler indgår i en vokalgruppe, behandles vokalerne parvis med start
+	 * forfra i gruppen
+	 *
 	 * @param input
 	 * @return String
 	 */
@@ -510,7 +516,7 @@ public class Fonkod {
 		if (m.group().length() < 2) {
 
 			// y fordobles til y og ø
-			int st = m.start();
+			final int st = m.start();
 			if (input.charAt(st) == 'y') {
 				return input + " " + input.substring(0, st) + 'ø' + input.substring(st + 1);
 			} else {
@@ -537,7 +543,7 @@ public class Fonkod {
 		}
 
 		// Øvrig håndtering af vokalpar
-		String org = out;
+		final String org = out;
 		out = out.replaceFirst("([aeiouyæøå])i", "$1j");
 		out = out.replaceFirst("[iy]([aou])", "j$1");
 		out = out.replaceFirst("iø", "jø");
@@ -553,7 +559,7 @@ public class Fonkod {
 
 	/**
 	 * x, h og fordoblinger
-	 * 
+	 *
 	 * @param nextToken
 	 * @return
 	 */
@@ -593,7 +599,7 @@ public class Fonkod {
 
 	/**
 	 * Navnedelen efter første vokalgruppe behandles
-	 * 
+	 *
 	 * @param input
 	 * @return
 	 * @throws Exception
@@ -725,7 +731,7 @@ public class Fonkod {
 
 	/**
 	 * Anden vokalgruppe behandles ligesom den første
-	 * 
+	 *
 	 * @param input
 	 * @return String
 	 * @throws Exception
@@ -747,11 +753,11 @@ public class Fonkod {
 			return input;
 		}
 
-		int vgStart = m.start();
-		int vgSlut = m.end();
+		final int vgStart = m.start();
+		final int vgSlut = m.end();
 
 		// Kun én vokal i gruppen?
-		if (vgStart == (vgSlut - 1)) {
+		if (vgStart == vgSlut - 1) {
 
 			// y fordobles til y og ø
 			if (input.charAt(vgStart) == 'y') {
@@ -787,7 +793,7 @@ public class Fonkod {
 		}
 
 		// Øvrig håndtering af vokalpar
-		String org = out;
+		final String org = out;
 		out = out.replaceFirst("([aeiouyæøå])i", "$1j");
 		out = out.replaceFirst("[iy]([aou])", "j$1");
 		out = out.replaceFirst("iø", "jø");

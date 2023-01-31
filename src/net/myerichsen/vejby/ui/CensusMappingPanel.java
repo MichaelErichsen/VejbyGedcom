@@ -3,8 +3,6 @@ package net.myerichsen.vejby.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,27 +32,28 @@ import net.myerichsen.vejby.util.PrefKey;
  * The first one is field number. The second one is populated by the reduced
  * table headers. The third one has a choice for each cell with the relevant
  * attributes for each type.
- * 
+ *
  * @version 04-09-2020
  * @author Michael Erichsen
  */
 public class CensusMappingPanel extends JPanel {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static final long serialVersionUID = -2181211331271971240L;
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+	private final Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
-	private Mapping mapping;
-	private int[] mappingKeys;
+	private final Mapping mapping;
+	private final int[] mappingKeys;
 
-	private JTable mappingTable;
+	private final JTable mappingTable;
 	private DefaultTableModel mappingModel;
 	private CustomTableCellRenderer renderer;
-	private VejbyGedcom vejbyGedcom;
+	private final VejbyGedcom vejbyGedcom;
 
 	/**
 	 * Create the panel.
-	 * 
-	 * @param vejbyGedcom The root panel
+	 *
+	 * @param vejbyGedcom
+	 *            The root panel
 	 */
 	public CensusMappingPanel(VejbyGedcom vejbyGedcom) {
 		this.vejbyGedcom = vejbyGedcom;
@@ -63,35 +62,25 @@ public class CensusMappingPanel extends JPanel {
 
 		setLayout(new BorderLayout(0, 0));
 
-		JScrollPane mappingScrollPane = new JScrollPane();
+		final JScrollPane mappingScrollPane = new JScrollPane();
 		add(mappingScrollPane, BorderLayout.CENTER);
 
 		mappingTable = new JTable();
 		mappingScrollPane.setViewportView(mappingTable);
 
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 		add(buttonPanel, BorderLayout.SOUTH);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JButton btnAnalysr = new JButton("Analys\u00E9r");
-		btnAnalysr.addActionListener(new ActionListener() {
+		final JButton btnAnalysr = new JButton("Analys\u00E9r");
+		btnAnalysr.addActionListener(e -> {
+			if (populateMappingFromTable()) {
+				if (identifyHouseholds()) {
+					vejbyGedcom.getHouseholdJPanel().populateTree();
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.
-			 * ActionEvent)
-			 */
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (populateMappingFromTable()) {
-					if (identifyHouseholds()) {
-						vejbyGedcom.getHouseholdJPanel().populateTree();
-
-						JTabbedPane pane = vejbyGedcom.getTabbedPane();
-						pane.setEnabledAt(3, true);
-						pane.setSelectedIndex(3);
-					}
+					final JTabbedPane pane = vejbyGedcom.getTabbedPane();
+					pane.setEnabledAt(3, true);
+					pane.setSelectedIndex(3);
 				}
 			}
 		});
@@ -100,7 +89,7 @@ public class CensusMappingPanel extends JPanel {
 
 	/**
 	 * Identify and create households and families from census table.
-	 * 
+	 *
 	 * @return Flag to mark if identification succeeded
 	 */
 	protected boolean identifyHouseholds() {
@@ -110,19 +99,19 @@ public class CensusMappingPanel extends JPanel {
 			return false;
 		}
 
-		Census censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
+		final Census censusTable = vejbyGedcom.getCensusJPanel().getCensusTable();
 		String message = censusTable.createHouseholds(mappingKeys[3]);
 		LOGGER.log(Level.INFO, message);
 
 		// Create a family for each household
 		if (mappingKeys[5] != 0) {
-			for (Household household : censusTable.getHouseholds()) {
+			for (final Household household : censusTable.getHouseholds()) {
 				message = household.createFamilies(mappingKeys[5]);
 				LOGGER.log(Level.FINE, message);
 			}
 		} else {
 			// Handle 1787 without a sex column
-			for (Household household : censusTable.getHouseholds()) {
+			for (final Household household : censusTable.getHouseholds()) {
 				message = household.createFamilies(-1);
 				LOGGER.log(Level.FINE, message);
 			}
@@ -132,9 +121,9 @@ public class CensusMappingPanel extends JPanel {
 
 	/**
 	 * Get data from table and save into mapping array.
-	 * 
+	 *
 	 * @return
-	 * 
+	 *
 	 */
 	private boolean populateMappingFromTable() {
 		String value;
@@ -188,7 +177,7 @@ public class CensusMappingPanel extends JPanel {
 		String error = "";
 		for (int i = 0; i < mappingKeys.length; i++) {
 			for (int j = i + 1; j < mappingKeys.length; j++) {
-				if ((mappingKeys[i] != 0) && (mappingKeys[i] == mappingKeys[j])) {
+				if (mappingKeys[i] != 0 && mappingKeys[i] == mappingKeys[j]) {
 					found = true;
 					error = "Samme værdi (" + mappingKeys[i] + ") er brugt både i " + (i + 1) + ". og " + (j + 1)
 							+ ". række";
@@ -206,20 +195,21 @@ public class CensusMappingPanel extends JPanel {
 
 	/**
 	 * Populate the mapping table with values entered.
-	 * 
-	 * @param censusModel The underlying table model
+	 *
+	 * @param censusModel
+	 *            The underlying table model
 	 */
 	public void populateMappingTable(DefaultTableModel censusModel) {
-		String[] columnNames = new String[] { "Nr.", "FT kolonne", "GEDCOM kolonne" };
+		final String[] columnNames = new String[] { "Nr.", "FT kolonne", "GEDCOM kolonne" };
 
-		List<String> headers = new ArrayList<>();
+		final List<String> headers = new ArrayList<>();
 
 		for (int i = 0; i < censusModel.getColumnCount(); i++) {
 			headers.add(censusModel.getColumnName(i));
 		}
 
-		int rowCount = headers.size();
-		String[][] mappingArray = new String[rowCount][columnNames.length];
+		final int rowCount = headers.size();
+		final String[][] mappingArray = new String[rowCount][columnNames.length];
 
 		for (int i = 0; i < rowCount; i++) {
 			mappingArray[i][0] = Integer.toString(i + 1);
@@ -234,7 +224,7 @@ public class CensusMappingPanel extends JPanel {
 		mappingTable.setModel(mappingModel);
 		mappingTable.getColumnModel().getColumn(2).setCellRenderer(renderer);
 
-		JComboBox<String> individualcomboBox = new JComboBox<>();
+		final JComboBox<String> individualcomboBox = new JComboBox<>();
 		individualcomboBox.addItem(PrefKey.INDIVIDUAL_0);
 		individualcomboBox.addItem(PrefKey.INDIVIDUAL_1);
 		individualcomboBox.addItem(PrefKey.INDIVIDUAL_2);
@@ -259,83 +249,83 @@ public class CensusMappingPanel extends JPanel {
 	private void setValuesFromPreferences() {
 		int row;
 
-		int maxSize = mappingTable.getModel().getRowCount();
+		final int maxSize = mappingTable.getModel().getRowCount();
 		LOGGER.log(Level.FINE, "Mapping table row count: " + maxSize);
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_0, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_0, row, 2);
 			renderer.setRowColor(row, Color.WHITE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_1, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_1, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_2, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_2, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_3, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_3, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_4, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_4, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_5, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_5, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_6, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_6, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_7, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_7, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_8, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_8, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_9, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_9, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_10, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_10, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_11, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_11, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}
 
 		row = prefs.getInt(PrefKey.INDIVIDUAL_12, 0);
-		if ((row > 0) && (row < maxSize)) {
+		if (row > 0 && row < maxSize) {
 			mappingTable.setValueAt(PrefKey.INDIVIDUAL_12, row, 2);
 			renderer.setRowColor(row, Color.ORANGE);
 		}

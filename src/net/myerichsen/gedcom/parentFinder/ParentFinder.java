@@ -39,7 +39,7 @@ import org.gedcom4j.parser.GedcomParser;
  * citation source detail for the Christening event. When not using the family
  * record, the first line of the citation detail must contain the location and
  * the names of one or both parents.
- * 
+ *
  * @author Michael Erichsen
  * @version 19-01-2023
  *
@@ -50,7 +50,7 @@ public class ParentFinder {
 
 	/**
 	 * Main method
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -61,14 +61,14 @@ public class ParentFinder {
 			System.exit(4);
 		}
 
-		if ((args.length > 3) && args[3].equalsIgnoreCase("p")) {
+		if (args.length > 3 && args[3].equalsIgnoreCase("p")) {
 			pFlag = true;
 		}
 
-		ParentFinder pf = new ParentFinder();
+		final ParentFinder pf = new ParentFinder();
 
 		try {
-			String outfile = pf.execute(args[0], args[1], args[2]);
+			final String outfile = pf.execute(args[0], args[1], args[2]);
 			System.out.println("Saved to " + outfile);
 		} catch (IOException | GedcomParserException e) {
 			e.printStackTrace();
@@ -77,14 +77,14 @@ public class ParentFinder {
 
 	/**
 	 * Read a GEDCOM file using org.gedcomj package
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
 	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
-		GedcomParser gp = new GedcomParser();
+		final GedcomParser gp = new GedcomParser();
 		gp.load(filename);
 		return gp.getGedcom();
 	}
@@ -94,7 +94,7 @@ public class ParentFinder {
 
 	/**
 	 * Worker method
-	 * 
+	 *
 	 * @param location
 	 * @param filename
 	 * @param outputdirectory
@@ -105,10 +105,10 @@ public class ParentFinder {
 	private String execute(String location, String filename, String outputdirectory)
 			throws IOException, GedcomParserException {
 		List<String> matchParentNames;
-		String outfile = outputdirectory + "\\par_" + location + ".csv";
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		final String outfile = outputdirectory + "\\par_" + location + ".csv";
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		String type = "";
-		String s = "";
+		final String s = "";
 
 		if (location.equals("all")) {
 			location = "";
@@ -123,7 +123,7 @@ public class ParentFinder {
 
 		System.out.println("Reading " + filename);
 
-		Gedcom gedcom = readGedcom(filename);
+		final Gedcom gedcom = readGedcom(filename);
 		boolean found = false;
 		StringBuilder sb;
 		String parents = "";
@@ -131,16 +131,16 @@ public class ParentFinder {
 
 		System.out.println("Parsing " + filename);
 
-		Map<String, Individual> individuals = gedcom.getIndividuals();
+		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
-		for (Entry<String, Individual> individual : individuals.entrySet()) {
+		for (final Entry<String, Individual> individual : individuals.entrySet()) {
 			found = false;
 			year = "????";
 
-			Individual value = individual.getValue();
+			final Individual value = individual.getValue();
 
-			boolean found1 = testLocation(value, IndividualEventType.CHRISTENING, location);
-			boolean found2 = testLocation(value, IndividualEventType.BIRTH, location);
+			final boolean found1 = testLocation(value, IndividualEventType.CHRISTENING, location);
+			final boolean found2 = testLocation(value, IndividualEventType.BIRTH, location);
 			found = found1 || found2;
 
 			if (!found) {
@@ -150,29 +150,29 @@ public class ParentFinder {
 			sb = new StringBuilder();
 
 			try {
-				List<FamilyChild> familiesWhereChild = value.getFamiliesWhereChild(false);
+				final List<FamilyChild> familiesWhereChild = value.getFamiliesWhereChild(false);
 
-				for (FamilyChild familyChild : familiesWhereChild) {
-					Family family = familyChild.getFamily();
+				for (final FamilyChild familyChild : familiesWhereChild) {
+					final Family family = familyChild.getFamily();
 					boolean husb = false;
 
 					try {
 						sb.append(family.getHusband().getIndividual().getNames().get(0));
 						husb = true;
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 					try {
-						PersonalName w = family.getWife().getIndividual().getNames().get(0);
+						final PersonalName w = family.getWife().getIndividual().getNames().get(0);
 
 						if (husb) {
 							sb.append(" og ");
 						}
 
 						sb.append(w);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 
 			if (found) {
@@ -186,11 +186,11 @@ public class ParentFinder {
 					parents = getParentsFromSource(value);
 				}
 
-				if (pFlag && (parents.length() > 0)) {
+				if (pFlag && parents.length() > 0) {
 					matchParentNames = matchParentNames(individuals, parents, year);
 
 					if (matchParentNames.size() > 0) {
-						for (String string : matchParentNames) {
+						for (final String string : matchParentNames) {
 							outline = individual.getKey() + ";" + year + ";" + value.getFormattedName() + ";" + type
 									+ ";" + parents + ";" + sted + ";" + string;
 							outline = outline.replace("/", "");
@@ -214,7 +214,7 @@ public class ParentFinder {
 
 	/**
 	 * Extract year from date string
-	 * 
+	 *
 	 * @param dateString
 	 * @return
 	 */
@@ -237,7 +237,7 @@ public class ParentFinder {
 	 * <li>parent name</li>
 	 * <li>birth place</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param individuals2
 	 * @param parentName
 	 * @param childBirthYear
@@ -245,7 +245,7 @@ public class ParentFinder {
 	 */
 	private List<String> findParentCandidates(Map<String, Individual> individuals, String parentName,
 			String childBirthYear) {
-		List<String> parentList = new ArrayList<>();
+		final List<String> parentList = new ArrayList<>();
 		Individual value;
 		Matcher matcher;
 		String name;
@@ -253,9 +253,9 @@ public class ParentFinder {
 		String birthYear = "";
 		String deathYear = "";
 		String birthPlace = "";
-		Pattern pattern = Pattern.compile(parentName.toLowerCase());
+		final Pattern pattern = Pattern.compile(parentName.toLowerCase());
 
-		for (Entry<String, Individual> individual : individuals.entrySet()) {
+		for (final Entry<String, Individual> individual : individuals.entrySet()) {
 			value = individual.getValue();
 			name = value.getFormattedName().replace("/", "");
 
@@ -266,19 +266,19 @@ public class ParentFinder {
 				int by = 0;
 
 				try {
-					IndividualEvent individualEvent = getBirthEvent(value);
+					final IndividualEvent individualEvent = getBirthEvent(value);
 					try {
 						birthYear = extractYear(individualEvent.getDate().getValue());
 						by = Integer.parseInt(birthYear);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						birthYear = "";
 					}
 					try {
 						birthPlace = individualEvent.getPlace().getPlaceName();
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						birthPlace = "";
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					birthYear = "";
 					birthPlace = "";
 					by = 0;
@@ -289,13 +289,13 @@ public class ParentFinder {
 					deathYear = extractYear(
 							value.getEventsOfType(IndividualEventType.DEATH).get(0).getDate().getValue());
 					dy = Integer.parseInt(deathYear);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					deathYear = "";
 				}
 
-				String spouses = getSpouses(individuals, id);
+				final String spouses = getSpouses(individuals, id);
 
-				if ((by < (Integer.parseInt(childBirthYear) - 15)) && (dy > (Integer.parseInt(childBirthYear)))) {
+				if (by < Integer.parseInt(childBirthYear) - 15 && dy > Integer.parseInt(childBirthYear)) {
 					parentList.add(
 							id + ";" + birthYear + ";" + deathYear + ";" + name + ";" + spouses + ";" + birthPlace);
 				}
@@ -307,17 +307,17 @@ public class ParentFinder {
 
 	/**
 	 * Get either a birth or a christening event
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
 	private IndividualEvent getBirthEvent(Individual value) {
 		try {
 			return value.getEventsOfType(IndividualEventType.BIRTH).get(0);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			try {
 				return value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 				return null;
 			}
 		}
@@ -325,18 +325,18 @@ public class ParentFinder {
 
 	/**
 	 * Get parents from christening source citation
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
 	private String getParentsFromSource(Individual value) {
 		try {
-			IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
+			final IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
 			year = extractYear(event.getDate().getValue());
-			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
-			String string = citation.getWhereInSource().toString();
+			final CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
+			final String string = citation.getWhereInSource().toString();
 			return string;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 
 		return "";
@@ -344,16 +344,16 @@ public class ParentFinder {
 
 	/**
 	 * Return a string listing all spouses for a given individual
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
 	private String getSpouses(Map<String, Individual> individuals, String id) {
-		StringBuilder sb = new StringBuilder();
-		Individual individual = individuals.get(id);
-		Set<Individual> spouses = individual.getSpouses();
+		final StringBuilder sb = new StringBuilder();
+		final Individual individual = individuals.get(id);
+		final Set<Individual> spouses = individual.getSpouses();
 
-		for (Individual spouse : spouses) {
+		for (final Individual spouse : spouses) {
 			sb.append(spouse.getFormattedName().replace("/", "") + " " + spouse.getXref() + " ");
 		}
 
@@ -362,19 +362,19 @@ public class ParentFinder {
 
 	/**
 	 * Get a list of strings identifying possible matches for the parents
-	 * 
+	 *
 	 * @param individuals
 	 * @param parents
 	 * @param year
 	 * @return
 	 */
 	private List<String> matchParentNames(Map<String, Individual> individuals, String parents, String year) {
-		List<String> parentList = new ArrayList<>();
+		final List<String> parentList = new ArrayList<>();
 
-		String[] sComma = parents.split(",");
-		String[] sOg = sComma[0].split("og");
+		final String[] sComma = parents.split(",");
+		final String[] sOg = sComma[0].split("og");
 
-		for (String element : sOg) {
+		for (final String element : sOg) {
 			parentList.addAll(findParentCandidates(individuals, element.trim(), year));
 		}
 
@@ -384,20 +384,20 @@ public class ParentFinder {
 	/**
 	 * Filter for locations matching the input criteria in birth or christening
 	 * event places, handling Danish national characters
-	 * 
+	 *
 	 * @param type
 	 * @return
 	 */
 	private boolean testLocation(Individual value, IndividualEventType type, String location) {
 		try {
-			IndividualEvent event = value.getEventsOfType(type).get(0);
+			final IndividualEvent event = value.getEventsOfType(type).get(0);
 			year = event.getDate().getValue();
 
-			Pattern pattern = Pattern.compile(location);
+			final Pattern pattern = Pattern.compile(location);
 			sted = event.getPlace().getPlaceName().toLowerCase();
-			Matcher matcher = pattern.matcher(sted);
+			final Matcher matcher = pattern.matcher(sted);
 			return matcher.find();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 		}
 		return false;
 	}
@@ -405,22 +405,22 @@ public class ParentFinder {
 	/**
 	 * Filter for locations matching the input criteria in christening source
 	 * citations, handling Danish national characters
-	 * 
+	 *
 	 * @param value
 	 * @param location
 	 * @return
 	 */
 	private boolean testSource(Individual value, String location) {
 		try {
-			IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
+			final IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
 
-			CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
+			final CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
 
-			Pattern pattern = Pattern.compile(location);
+			final Pattern pattern = Pattern.compile(location);
 			sted = citation.getWhereInSource().toString();
-			Matcher matcher = pattern.matcher(sted);
+			final Matcher matcher = pattern.matcher(sted);
 			return matcher.find();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 		}
 		return false;

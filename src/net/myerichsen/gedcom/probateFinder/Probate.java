@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 /**
  * Class representing a probate extract
- * 
+ *
  * @author Michael Erichsen
  * @version 8. jan. 2023
  *
@@ -31,7 +31,7 @@ public class Probate {
 		}
 
 		// Split between name and place - and the rest
-		String[] splitStar = extractPart.split("\\*");
+		final String[] splitStar = extractPart.split("\\*");
 		String[] split = null;
 
 		if (splitStar[1].contains(" i ")) {
@@ -48,20 +48,20 @@ public class Probate {
 
 		try {
 			name = split[0].trim();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			probateDate = null;
 			return;
 		}
 
 		location = split[1].toLowerCase().trim();
 
-		String tail = splitStar[2].trim();
+		final String tail = splitStar[2].trim();
 
-		Pattern p = Pattern.compile("\\d{1,2} [a-zA-Z]{3} \\d{4}");
-		Matcher m = p.matcher(tail);
+		final Pattern p = Pattern.compile("\\d{1,2} [a-zA-Z]{3} \\d{4}");
+		final Matcher m = p.matcher(tail);
 
 		while (m.find()) {
-			String s = m.group(0);
+			final String s = m.group(0);
 			probateDate = ProbateUtil.parseProbateDate(s);
 		}
 
@@ -97,28 +97,32 @@ public class Probate {
 	}
 
 	/**
-	 * @param extract the extract to set
+	 * @param extract
+	 *            the extract to set
 	 */
 	public void setExtract(String extract) {
 		this.extract = extract;
 	}
 
 	/**
-	 * @param location the location to set
+	 * @param location
+	 *            the location to set
 	 */
 	public void setLocation(String location) {
 		this.location = location;
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String aName) {
 		name = aName.replace("*", "").replace("hmd", "").replace("gmd", "").trim();
 	}
 
 	/**
-	 * @param probateDate the probateDate to set
+	 * @param probateDate
+	 *            the probateDate to set
 	 */
 	public void setProbateDate(LocalDate probateDate) {
 		this.probateDate = probateDate;

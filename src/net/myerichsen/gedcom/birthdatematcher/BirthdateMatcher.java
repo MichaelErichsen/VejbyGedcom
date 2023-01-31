@@ -16,7 +16,7 @@ import org.gedcom4j.parser.GedcomParser;
 
 /**
  * Find persons with the same birth date
- * 
+ *
  * @author Michael Erichsen
  * @version 26. nov. 2022
  *
@@ -31,34 +31,34 @@ public class BirthdateMatcher {
 			System.out.println("Usage: BirthdateMatcher gedcomfile outputdirectory");
 			System.exit(4);
 		}
-		BirthdateMatcher bm = new BirthdateMatcher();
+		final BirthdateMatcher bm = new BirthdateMatcher();
 
 		try {
-			String outfile = bm.execute(args[0], args[1]);
+			final String outfile = bm.execute(args[0], args[1]);
 			System.out.println("Saved to " + outfile);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Read a GEDCOM file using org.gedcomj package
-	 * 
+	 *
 	 * @param filename
 	 * @return
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
 	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
-		GedcomParser gp = new GedcomParser();
+		final GedcomParser gp = new GedcomParser();
 		gp.load(filename);
 		return gp.getGedcom();
 	}
 
 	/**
 	 * Read a GEDCOM file and find all persons with matching birthdates
-	 * 
+	 *
 	 * @param gedcomfile
 	 * @param outputdirectory
 	 * @return outfile
@@ -66,7 +66,7 @@ public class BirthdateMatcher {
 	 * @throws GedcomParserException
 	 */
 	private String execute(String gedcomfile, String outputdirectory) throws IOException, GedcomParserException {
-		String outfile = outputdirectory + "\\BirthdatePairs.csv";
+		final String outfile = outputdirectory + "\\BirthdatePairs.csv";
 		int counter = 0;
 		String ID1;
 		Individual value1;
@@ -76,32 +76,32 @@ public class BirthdateMatcher {
 		Individual value2;
 		List<IndividualEvent> event2;
 		String birthDate2;
-		String pattern = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
+		final String pattern = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
-		Gedcom gedcom = readGedcom(gedcomfile);
+		final Gedcom gedcom = readGedcom(gedcomfile);
 
-		Map<String, Individual> individuals = gedcom.getIndividuals();
+		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
-		for (Entry<String, Individual> individual1 : individuals.entrySet()) {
+		for (final Entry<String, Individual> individual1 : individuals.entrySet()) {
 			ID1 = individual1.getKey();
 			value1 = individual1.getValue();
 			event1 = value1.getEventsOfType(IndividualEventType.BIRTH);
 
-			if ((event1 != null) && (event1.size() > 0)) {
+			if (event1 != null && event1.size() > 0) {
 				birthDate1 = event1.get(0).getDate().getValue();
 
 				if (!birthDate1.matches(pattern)) {
 					continue;
 				}
 
-				for (Entry<String, Individual> individual2 : individuals.entrySet()) {
+				for (final Entry<String, Individual> individual2 : individuals.entrySet()) {
 					ID2 = individual2.getKey();
 					value2 = individual2.getValue();
 					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
 
-					if ((event2 != null) && (event2.size() > 0)) {
+					if (event2 != null && event2.size() > 0) {
 						birthDate2 = event2.get(0).getDate().getValue();
 
 						if (!birthDate2.matches(pattern)) {

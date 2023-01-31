@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Singleton class containing census mapping pairs and name stubs.
- * 
+ *
  * @version 10-09-2020
  * @author Michael Erichsen
  *
@@ -15,7 +15,7 @@ public class Mapping {
 
 	/**
 	 * Static method to create instance of Singleton class.
-	 * 
+	 *
 	 * @return An instance of the class
 	 */
 	public static Mapping getInstance() {
@@ -26,10 +26,10 @@ public class Mapping {
 		return single_instance;
 	}
 
-	private int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	private final int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	private List<String> daughterNameStubs = Arrays.asList("d.", "dat", "dat.", "datt", "datt.", "datter", "dr", "dr.",
-			"dtr", "dtr.");
+	private final List<String> daughterNameStubs = Arrays.asList("d.", "dat", "dat.", "datt", "datt.", "datter", "dr",
+			"dr.", "dtr", "dtr.");
 
 	/**
 	 * Constructor
@@ -55,7 +55,7 @@ public class Mapping {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

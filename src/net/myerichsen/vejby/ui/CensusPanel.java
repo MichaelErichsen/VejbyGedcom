@@ -5,8 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,7 +30,7 @@ import net.myerichsen.vejby.census.Census;
 /**
  * This panel displays a census table as loaded from a KIP file. It creates a
  * census table object, but only populates it with census rows.
- * 
+ *
  * @version 04-09-2020
  * @author Michael Erichsen
  *
@@ -40,29 +38,29 @@ import net.myerichsen.vejby.census.Census;
 public class CensusPanel extends JPanel {
 	private static final long serialVersionUID = -6638275102973476672L;
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+	private final Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
-	private JTable censusJtable;
-	private JButton btnMapningAfFelter;
+	private final JTable censusJtable;
+	private final JButton btnMapningAfFelter;
 	private Census censusTable;
-	private JButton btnbenKipFil;
+	private final JButton btnbenKipFil;
 	private DefaultTableModel censusModel;
 
 	/**
 	 * Create the panel.
-	 * 
+	 *
 	 * @param vejbyGedcom
 	 */
 	public CensusPanel(VejbyGedcom vejbyGedcom) {
-		GridBagLayout gridBagLayout = new GridBagLayout();
+		final GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 1.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
-		JScrollPane censusscrollPane = new JScrollPane();
-		GridBagConstraints gbc_censusscrollPane = new GridBagConstraints();
+		final JScrollPane censusscrollPane = new JScrollPane();
+		final GridBagConstraints gbc_censusscrollPane = new GridBagConstraints();
 		gbc_censusscrollPane.fill = GridBagConstraints.BOTH;
 		gbc_censusscrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_censusscrollPane.gridx = 0;
@@ -73,9 +71,9 @@ public class CensusPanel extends JPanel {
 		censusJtable.setRowSelectionAllowed(false);
 		censusscrollPane.setViewportView(censusJtable);
 
-		JPanel censusButtonPanel = new JPanel();
+		final JPanel censusButtonPanel = new JPanel();
 		censusButtonPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-		GridBagConstraints gbc_censusButtonPanel = new GridBagConstraints();
+		final GridBagConstraints gbc_censusButtonPanel = new GridBagConstraints();
 		gbc_censusButtonPanel.fill = GridBagConstraints.BOTH;
 		gbc_censusButtonPanel.gridx = 0;
 		gbc_censusButtonPanel.gridy = 1;
@@ -84,23 +82,15 @@ public class CensusPanel extends JPanel {
 
 		btnMapningAfFelter = new JButton("Mapning af felter");
 		btnMapningAfFelter.setEnabled(false);
-		btnMapningAfFelter.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JTabbedPane pane = vejbyGedcom.getTabbedPane();
-				vejbyGedcom.getCensusMappingJPanel().populateMappingTable(getCensusModel());
-				pane.setEnabledAt(2, true);
-				pane.setSelectedIndex(2);
-			}
+		btnMapningAfFelter.addActionListener(e -> {
+			final JTabbedPane pane = vejbyGedcom.getTabbedPane();
+			vejbyGedcom.getCensusMappingJPanel().populateMappingTable(getCensusModel());
+			pane.setEnabledAt(2, true);
+			pane.setSelectedIndex(2);
 		});
 
 		btnbenKipFil = new JButton("\u00C5ben KIP fil");
-		btnbenKipFil.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openKipFile(vejbyGedcom);
-			}
-		});
+		btnbenKipFil.addActionListener(e -> openKipFile(vejbyGedcom));
 		censusButtonPanel.add(btnbenKipFil);
 		censusButtonPanel.add(btnMapningAfFelter);
 	}
@@ -120,28 +110,29 @@ public class CensusPanel extends JPanel {
 	}
 
 	/**
-	 * Choose and open a KIP file, remove empty columns and display i a tabbed pane.
-	 * 
+	 * Choose and open a KIP file, remove empty columns and display i a tabbed
+	 * pane.
+	 *
 	 * @param vejbyGedcom
 	 */
 	protected void openKipFile(VejbyGedcom vejbyGedcom) {
-		FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
-		String kipFileName = prefs.get("KIPFILENAME", ".");
+		final FileFilter ff = new FileNameExtensionFilter("KIP fil", "csv");
+		final String kipFileName = prefs.get("KIPFILENAME", ".");
 
-		JFileChooser kipChooser = new JFileChooser(kipFileName);
+		final JFileChooser kipChooser = new JFileChooser(kipFileName);
 		kipChooser.setFileFilter(ff);
 
-		int returnValue = kipChooser.showOpenDialog(null);
+		final int returnValue = kipChooser.showOpenDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File kipFile = kipChooser.getSelectedFile();
+			final File kipFile = kipChooser.getSelectedFile();
 			LOGGER.log(Level.INFO, kipFile.getPath());
 			prefs.put("KIPFILENAME", kipFile.getPath());
 
 			String[] headers;
 			try {
-				FileInputStream fis = new FileInputStream(kipFile);
-				Scanner sc = new Scanner(fis);
+				final FileInputStream fis = new FileInputStream(kipFile);
+				final Scanner sc = new Scanner(fis);
 
 				// First line contains headers
 				headers = sc.nextLine().split(";");
@@ -159,10 +150,10 @@ public class CensusPanel extends JPanel {
 				}
 
 				// Second line is data
-				String[] ftData = sc.nextLine().split(";");
-				String ftYear = ftData[index].substring(3);
+				final String[] ftData = sc.nextLine().split(";");
+				final String ftYear = ftData[index].substring(3);
 				LOGGER.log(Level.INFO, ftYear);
-				int year = Integer.parseInt(ftYear);
+				final int year = Integer.parseInt(ftYear);
 				String message;
 				setCensusTable(Census.getInstance(year));
 				message = getCensusTable().readKipfile(kipFile);
@@ -171,15 +162,15 @@ public class CensusPanel extends JPanel {
 				LOGGER.log(Level.INFO, message);
 				sc.close();
 				fis.close();
-			} catch (FileNotFoundException e) {
+			} catch (final FileNotFoundException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage());
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage());
 			}
 
-			String[][] censusArray = new String[getCensusTable().getPersons().size()][getCensusTable().getHeaders()
-					.size()];
-			List<List<String>> lls = getCensusTable().getPersons();
+			final String[][] censusArray = new String[getCensusTable().getPersons().size()][getCensusTable()
+					.getHeaders().size()];
+			final List<List<String>> lls = getCensusTable().getPersons();
 			List<String> list;
 
 			for (int i = 0; i < lls.size(); i++) {
@@ -191,8 +182,8 @@ public class CensusPanel extends JPanel {
 				}
 			}
 
-			List<String> cth = getCensusTable().getHeaders();
-			String[] headerArray = new String[cth.size()];
+			final List<String> cth = getCensusTable().getHeaders();
+			final String[] headerArray = new String[cth.size()];
 			for (int i = 0; i < cth.size(); i++) {
 				headerArray[i] = cth.get(i);
 			}
@@ -204,14 +195,16 @@ public class CensusPanel extends JPanel {
 	}
 
 	/**
-	 * @param censusModel the censusModel to set
+	 * @param censusModel
+	 *            the censusModel to set
 	 */
 	public void setCensusModel(DefaultTableModel censusModel) {
 		this.censusModel = censusModel;
 	}
 
 	/**
-	 * @param censusTable the censusTable to set
+	 * @param censusTable
+	 *            the censusTable to set
 	 */
 	public void setCensusTable(Census censusTable) {
 		this.censusTable = censusTable;

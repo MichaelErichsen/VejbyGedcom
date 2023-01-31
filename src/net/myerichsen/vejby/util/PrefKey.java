@@ -2,7 +2,7 @@ package net.myerichsen.vejby.util;
 
 /**
  * Constants for preference keys
- * 
+ *
  * @author Michael Erichsen
  * @version 20 aug. 2020
  *

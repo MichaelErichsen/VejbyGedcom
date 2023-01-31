@@ -23,7 +23,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * <p>
  * The program produces a .csv file with a row for each probate found
  * <p>
- * 
+ *
  * @author Michael Erichsen
  * @version 8. jan. 2023
  *
@@ -31,7 +31,7 @@ import org.gedcom4j.exception.GedcomParserException;
 public class AureliaProbateParser {
 	/**
 	 * Main method
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -40,7 +40,7 @@ public class AureliaProbateParser {
 			System.exit(4);
 		}
 
-		AureliaProbateParser pf = new AureliaProbateParser();
+		final AureliaProbateParser pf = new AureliaProbateParser();
 
 		String outfile = "";
 
@@ -57,7 +57,7 @@ public class AureliaProbateParser {
 
 	/**
 	 * Worker method
-	 * 
+	 *
 	 * @param filename
 	 * @param args
 	 * @param outputdir
@@ -73,9 +73,9 @@ public class AureliaProbateParser {
 
 		Collections.sort(listP, new ProbateParserComparator());
 
-		String outfile = outputdirectory + "\\transcript_" + location + ".csv";
-		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		String outline = "\"Person\";\"Skiftedato\";\"Sted\";\"Skifteekstrakt\"";
+		final String outfile = outputdirectory + "\\transcript_" + location + ".csv";
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
+		final String outline = "\"Person\";\"Skiftedato\";\"Sted\";\"Skifteekstrakt\"";
 		writer.write(outline + "\n");
 
 		location = location.replace("æ", ".*");
@@ -84,9 +84,9 @@ public class AureliaProbateParser {
 		location = location.replace("Æ", ".*");
 		location = location.replace("Ø", ".*");
 		location = location.replace("Å", ".*").toLowerCase();
-		String pattern = ".*" + location + ".*";
+		final String pattern = ".*" + location + ".*";
 
-		for (Probate probate : listP) {
+		for (final Probate probate : listP) {
 			if (location.equalsIgnoreCase("all") || probate.getLocation().matches(pattern)) {
 				writer.write(probate + "\n");
 				System.out.println(probate);
@@ -102,16 +102,17 @@ public class AureliaProbateParser {
 
 	/**
 	 * Read the extract file
-	 * 
-	 * @param probate extract filename
+	 *
+	 * @param probate
+	 *            extract filename
 	 * @return List of probate objects
 	 * @throws IOException
 	 */
 	private List<Probate> readProbate(String filename) throws IOException {
-		List<Probate> listP = new ArrayList<>();
+		final List<Probate> listP = new ArrayList<>();
 		Probate probate = null;
 
-		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		final BufferedReader reader = new BufferedReader(new FileReader(filename));
 		StringBuilder content = new StringBuilder();
 		String line;
 

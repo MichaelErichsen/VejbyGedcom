@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Class representing a family in GEDCOM as extracted from a household in a
  * census file.
- * 
+ *
  * @version 05-09-2020
  * @author Michael Erichsen
  */
@@ -80,7 +80,7 @@ public class Family {
 	 * @return A matrix of family member data
 	 */
 	public String[][] getMembers() {
-		String[][] members = new String[getSize()][5];
+		final String[][] members = new String[getSize()][5];
 		int index = 0;
 
 		if (father != null) {
@@ -99,7 +99,7 @@ public class Family {
 			members[index++][4] = "Moder";
 		}
 
-		for (Individual child : children) {
+		for (final Individual child : children) {
 			members[index][0] = String.valueOf(child.getId());
 			members[index][1] = child.getName();
 			members[index][2] = child.getMaritalStatus();
@@ -107,7 +107,7 @@ public class Family {
 			members[index++][4] = "Barn";
 		}
 
-		for (Individual single : singles) {
+		for (final Individual single : singles) {
 			members[index][0] = String.valueOf(single.getId());
 			members[index][1] = single.getName();
 			members[index][2] = single.getMaritalStatus();
@@ -151,25 +151,26 @@ public class Family {
 
 	/**
 	 * Remove an indvidual from a family
-	 * 
-	 * @param individual The individual to be removed
+	 *
+	 * @param individual
+	 *            The individual to be removed
 	 */
 	public void removeIndividual(Individual individual) {
-		if ((getFather() != null) && getFather().equals(individual)) {
+		if (getFather() != null && getFather().equals(individual)) {
 			setFather(null);
 		}
 
-		if ((getMother() != null) && getMother().equals(individual)) {
+		if (getMother() != null && getMother().equals(individual)) {
 			setMother(null);
 		}
 
-		for (Individual child : children) {
+		for (final Individual child : children) {
 			if (child.equals(individual)) {
 				children.remove(individual);
 			}
 		}
 
-		for (Individual single : singles) {
+		for (final Individual single : singles) {
 			if (single.equals(individual)) {
 				singles.remove(individual);
 			}
@@ -185,56 +186,64 @@ public class Family {
 	}
 
 	/**
-	 * @param children the children to set
+	 * @param children
+	 *            the children to set
 	 */
 	public void setChildren(List<Individual> children) {
 		this.children = children;
 	}
 
 	/**
-	 * @param familyId the familyId to set
+	 * @param familyId
+	 *            the familyId to set
 	 */
 	public void setFamilyId(int familyId) {
 		this.familyId = familyId;
 	}
 
 	/**
-	 * @param father the father to set
+	 * @param father
+	 *            the father to set
 	 */
 	public void setFather(Individual father) {
 		this.father = father;
 	}
 
 	/**
-	 * @param householdId the householdId to set
+	 * @param householdId
+	 *            the householdId to set
 	 */
 	public void setHouseholdId(int householdId) {
 		this.householdId = householdId;
 	}
 
 	/**
-	 * @param marriageDate the marriageDate to set
+	 * @param marriageDate
+	 *            the marriageDate to set
 	 */
 	public void setMarriageDate(String marriageDate) {
 		this.marriageDate = marriageDate;
 	}
 
 	/**
-	 * @param marriagePlace the marriagePlace to set
+	 * @param marriagePlace
+	 *            the marriagePlace to set
 	 */
 	public void setMarriagePlace(String marriagePlace) {
 		this.marriagePlace = marriagePlace;
 	}
 
 	/**
-	 * @param mother the mother to set
+	 * @param mother
+	 *            the mother to set
 	 */
 	public void setMother(Individual mother) {
 		this.mother = mother;
 	}
 
 	/**
-	 * @param singles the singles to set
+	 * @param singles
+	 *            the singles to set
 	 */
 	public void setSingles(List<Individual> singles) {
 		this.singles = singles;
@@ -244,7 +253,7 @@ public class Family {
 	 * @return
 	 */
 	public String toGedcom(int familyId) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 		// Individual tags
 		if (father != null) {
@@ -257,7 +266,7 @@ public class Family {
 			sb.append("1 FAMS @F" + familyId + "@\n");
 		}
 
-		for (Individual child : children) {
+		for (final Individual child : children) {
 			sb.append(child.toGedcom());
 			sb.append("1 FAMC @F" + familyId + "@\n");
 		}
@@ -274,7 +283,7 @@ public class Family {
 
 		}
 
-		for (Individual child : children) {
+		for (final Individual child : children) {
 			sb.append("1 CHIL @I" + child.getId() + "@\n");
 		}
 
@@ -295,7 +304,7 @@ public class Family {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

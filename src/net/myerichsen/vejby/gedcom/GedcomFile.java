@@ -19,13 +19,13 @@ import net.myerichsen.vejby.census.Census;
 
 /**
  * A class representing a GEDCOM file.
- * 
+ *
  * @version 05-09-2020
  * @author Michael Erichsen
  */
 public class GedcomFile {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	private Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
+	private final Preferences prefs = Preferences.userRoot().node("net.myerichsen.vejby.gedcom");
 
 	private List<Family> families;
 
@@ -39,7 +39,8 @@ public class GedcomFile {
 	}
 
 	/**
-	 * @param family The family to add to the GEDCOM file
+	 * @param family
+	 *            The family to add to the GEDCOM file
 	 */
 	public void addFamily(Family family) {
 		families.add(family);
@@ -54,22 +55,23 @@ public class GedcomFile {
 
 	/**
 	 * Save a census table as GEDCOM. Used by census analysis.
-	 * 
-	 * @param censusTable The census table loaded from a KIP file
+	 *
+	 * @param censusTable
+	 *            The census table loaded from a KIP file
 	 * @return
 	 */
 	public String saveCensus(Census censusTable) {
-		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
-		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+		final FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
+		final JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
 		String path = "";
 
 		gedcomChooser.setFileFilter(ff);
 
-		int returnValue = gedcomChooser.showSaveDialog(null);
+		final int returnValue = gedcomChooser.showSaveDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File gedcomFile = gedcomChooser.getSelectedFile();
-			String fileName = gedcomFile.getName();
+			final String fileName = gedcomFile.getName();
 			if (!fileName.endsWith(".ged")) {
 				gedcomFile = new File(fileName + ".ged");
 			}
@@ -102,9 +104,9 @@ public class GedcomFile {
 
 				int familyId = 1;
 
-				for (Family family : censusTable.getFamilies()) {
+				for (final Family family : censusTable.getFamilies()) {
 					if (family.getFamilyId() == 0) {
-						for (Individual person : family.getSingles()) {
+						for (final Individual person : family.getSingles()) {
 							LOGGER.log(Level.FINE, "Writing GEDCOM for person " + person.getId() + ", " + person);
 							fw.write(person.toGedcom());
 							LOGGER.log(Level.FINE, "Family " + family.getHouseholdId() + ", " + family.getFamilyId()
@@ -127,7 +129,7 @@ public class GedcomFile {
 				fw.close();
 				path = gedcomFile.getPath();
 				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + path);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -137,30 +139,31 @@ public class GedcomFile {
 
 	/**
 	 * Save a birth or marriage file as GEDCOM. Used by FS analysis.
-	 * 
-	 * @param fileNameStub Name of input file without extension
+	 *
+	 * @param fileNameStub
+	 *            Name of input file without extension
 	 * @return Save path for GEDCOM file
 	 */
 	public String saveFsExtract(String fileNameStub) {
-		FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
-		JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
+		final FileFilter ff = new FileNameExtensionFilter("GEDCOM fil", "ged");
+		final JFileChooser gedcomChooser = new JFileChooser(prefs.get("GEDCOMFILENAME", "."));
 		gedcomChooser.setSelectedFile(new File(fileNameStub + ".ged"));
 		String path = "";
 
 		gedcomChooser.setFileFilter(ff);
 
-		int returnValue = gedcomChooser.showSaveDialog(null);
+		final int returnValue = gedcomChooser.showSaveDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
 			File gedcomFile = gedcomChooser.getSelectedFile();
-			String fileName = gedcomFile.getName();
+			final String fileName = gedcomFile.getName();
 			if (!fileName.endsWith(".ged")) {
 				gedcomFile = new File(fileName + ".ged");
 			}
 			prefs.put("GEDCOMFILENAME", gedcomFile.getPath());
 
 			try {
-				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gedcomFile));
+				final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gedcomFile));
 
 				writer.write("0 HEAD\n");
 				writer.write("1 SOUR VejbyGedcom\n");
@@ -205,7 +208,7 @@ public class GedcomFile {
 				writer.close();
 				path = gedcomFile.getPath();
 				LOGGER.log(Level.INFO, "Data gemt som GEDCOM fil " + path);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, e.getMessage());
 				return "";
 			}
@@ -215,7 +218,8 @@ public class GedcomFile {
 	}
 
 	/**
-	 * @param families the families to set
+	 * @param families
+	 *            the families to set
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;

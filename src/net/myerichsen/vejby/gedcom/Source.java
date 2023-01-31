@@ -2,7 +2,7 @@ package net.myerichsen.vejby.gedcom;
 
 /**
  * A source as extracted from a KIP file.
- * 
+ *
  * @author Michael Erichsen
  * @version 16. aug. 2020
  *
@@ -37,14 +37,16 @@ public class Source {
 	}
 
 	/**
-	 * @param censusYear the censusYear to set
+	 * @param censusYear
+	 *            the censusYear to set
 	 */
 	public void setCensusYear(int censusYear) {
 		this.censusYear = censusYear;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
@@ -52,12 +54,12 @@ public class Source {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("0 @S" + id + "@ SOUR\n");
 		sb.append("1 TITL Folketælling " + censusYear + "\n");
 		sb.append("1 ABBR Folketælling " + censusYear + "\n");

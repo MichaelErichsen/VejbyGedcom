@@ -1,8 +1,6 @@
 package net.myerichsen.vejby.ui;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +26,7 @@ import net.myerichsen.vejby.gedcom.Individual;
 /**
  * This panel reads a marriage query result from Family Search and displays the
  * reduced result. The result can be saved as a GEDCOM file.
- * 
+ *
  * @author Michael Erichsen
  * @version 11-09-2020
  *
@@ -44,42 +42,27 @@ public class MarriagePanel extends FsPanel {
 
 		setLayout(new BorderLayout(0, 0));
 
-		JScrollPane scrollPane = new JScrollPane();
+		final JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
 
 		table = new JTable();
 		scrollPane.setViewportView(table);
 
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 		add(buttonPanel, BorderLayout.SOUTH);
 
-		JButton openButton = new JButton("\u00C5ben Family Search eksport fil");
-		openButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openTsvFile();
-			}
-		});
+		final JButton openButton = new JButton("\u00C5ben Family Search eksport fil");
+		openButton.addActionListener(e -> openTsvFile());
 		buttonPanel.add(openButton);
 
 		eliminateButton = new JButton("Fjern dubletter");
-		eliminateButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				eliminateDuplicates();
-			}
-		});
+		eliminateButton.addActionListener(e -> eliminateDuplicates());
 		eliminateButton.setEnabled(false);
 		buttonPanel.add(eliminateButton);
 
 		saveButton = new JButton("Gem som Gedcom");
 		saveButton.setEnabled(false);
-		saveButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				saveAsGedcom();
-			}
-		});
+		saveButton.addActionListener(e -> saveAsGedcom());
 
 		buttonPanel.add(saveButton);
 	}
@@ -87,7 +70,7 @@ public class MarriagePanel extends FsPanel {
 	/**
 	 * Open one or more tsv files from Family Search and reduce them to relevant
 	 * columns:
-	 * 
+	 *
 	 * 8 fullName, 9 sex ["male"|""], 10 birthLikeDate, 16 marriageLikeDate, 17
 	 * marriageLikePlaceText, 24 spouseFullName,
 	 */
@@ -97,18 +80,18 @@ public class MarriagePanel extends FsPanel {
 		String[] columns;
 		headerArray = new String[8];
 		FileInputStream fis;
-		FileFilter ff = new FileNameExtensionFilter("FS eksport fil (TSV)", "tsv");
-		String fsFileName = prefs.get("FSFILENAME", ".");
+		final FileFilter ff = new FileNameExtensionFilter("FS eksport fil (TSV)", "tsv");
+		final String fsFileName = prefs.get("FSFILENAME", ".");
 		String[][] marriageArray = new String[100][6];
 
-		JFileChooser fsChooser = new JFileChooser(fsFileName);
+		final JFileChooser fsChooser = new JFileChooser(fsFileName);
 		fsChooser.setFileFilter(ff);
 		fsChooser.setMultiSelectionEnabled(true);
 
-		int returnValue = fsChooser.showOpenDialog(null);
+		final int returnValue = fsChooser.showOpenDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			File[] fsFiles = fsChooser.getSelectedFiles();
+			final File[] fsFiles = fsChooser.getSelectedFiles();
 			fileNameStub = fsFiles[0].getName().replaceFirst("[.][^.]+$", "");
 			LOGGER.log(Level.INFO, fsFiles[0].getPath());
 			prefs.put("KIPFILENAME", fsFiles[0].getPath());
@@ -120,7 +103,8 @@ public class MarriagePanel extends FsPanel {
 					fis = new FileInputStream(fsFiles[fileNo]);
 					sc = new Scanner(fis);
 
-					// First line contains headers. Neds only to be read for the first file
+					// First line contains headers. Neds only to be read for the
+					// first file
 					columns = sc.nextLine().split("\t");
 
 					if (fileNo == 0) {
@@ -153,9 +137,9 @@ public class MarriagePanel extends FsPanel {
 
 					sc.close();
 					fis.close();
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage());
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
 
@@ -167,21 +151,21 @@ public class MarriagePanel extends FsPanel {
 			LOGGER.log(Level.INFO, "Data array length after concatenations: " + dataArray.length);
 		}
 
-		DefaultTableModel model = new DefaultTableModel(dataArray, headerArray);
+		final DefaultTableModel model = new DefaultTableModel(dataArray, headerArray);
 		table.setModel(model);
 		saveButton.setEnabled(true);
 		eliminateButton.setEnabled(true);
 	}
 
 	/**
-	 * 
+	 *
 	 * Instantiate a GedcomFile object and populate it with the marriage data.
 	 * Choose a file name and save it.
 	 */
 	@Override
 	protected void saveAsGedcom() {
-//		GedcomFile gedcomFile = GedcomFile.getInstance();
-		GedcomFile gedcomFile = new GedcomFile();
+		// GedcomFile gedcomFile = GedcomFile.getInstance();
+		final GedcomFile gedcomFile = new GedcomFile();
 		Family family;
 		Individual groom = null;
 		Individual bride = null;
@@ -235,7 +219,7 @@ public class MarriagePanel extends FsPanel {
 			gedcomFile.addFamily(family);
 		}
 
-		String path = gedcomFile.saveFsExtract(fileNameStub);
+		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
 		if (!path.equals("")) {
 			JOptionPane.showMessageDialog(new JFrame(), "Vielser er gemt som GEDCOM fil " + path, "Vejby Gedcom",

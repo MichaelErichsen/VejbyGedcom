@@ -11,15 +11,15 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
 
 /**
  * A class to represent a person to be sorted
- * 
+ *
  * @author Michael Erichsen
  * @version 9. jan. 2023
  *
  */
 public class ProbatePerson {
-	private String key;
-	private String name;
-	private String birthDate;
+	private final String key;
+	private final String name;
+	private final String birthDate;
 	private String lastPlace;
 	private String isoBirthDate;
 
@@ -33,11 +33,11 @@ public class ProbatePerson {
 	public ProbatePerson(Entry<String, Individual> individual) {
 		super();
 		key = individual.getKey().replace("@I", "").replace("@", "");
-		Individual value = individual.getValue();
+		final Individual value = individual.getValue();
 		name = value.getNames().get(0).getBasic();
 		List<IndividualEvent> births = value.getEventsOfType(IndividualEventType.BIRTH);
 
-		if (births.isEmpty() || (births.size() == 0)) {
+		if (births.isEmpty() || births.size() == 0) {
 			births = value.getEventsOfType(IndividualEventType.CHRISTENING);
 		}
 
@@ -54,7 +54,7 @@ public class ProbatePerson {
 
 		List<IndividualEvent> evList = value.getEventsOfType(IndividualEventType.DEATH);
 
-		if (evList.isEmpty() || (evList.size() == 0)) {
+		if (evList.isEmpty() || evList.size() == 0) {
 			evList = value.getEventsOfType(IndividualEventType.BURIAL);
 		}
 
@@ -63,14 +63,14 @@ public class ProbatePerson {
 		LocalDate eventDate;
 		Place place;
 
-		if (evList.isEmpty() || (evList.size() == 0)) {
+		if (evList.isEmpty() || evList.size() == 0) {
 			evList = value.getEvents();
 		}
 
-		for (IndividualEvent individualEvent : evList) {
+		for (final IndividualEvent individualEvent : evList) {
 			eventDate = ProbateUtil.parseProbateDate(individualEvent);
 
-			if ((eventDate != null) && eventDate.isAfter(lastDate) && (individualEvent.getPlace() != null)) {
+			if (eventDate != null && eventDate.isAfter(lastDate) && individualEvent.getPlace() != null) {
 				lastDate = eventDate;
 
 				place = individualEvent.getPlace();
@@ -87,8 +87,9 @@ public class ProbatePerson {
 
 	/**
 	 * Convert character month to decimal month
-	 * 
-	 * @param month as 3 character string
+	 *
+	 * @param month
+	 *            as 3 character string
 	 * @return month as two digit string
 	 */
 	private String convertMonth(String month) {
