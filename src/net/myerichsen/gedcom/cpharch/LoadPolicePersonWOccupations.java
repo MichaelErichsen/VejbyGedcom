@@ -6,7 +6,7 @@ import java.util.logging.Logger;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 30. jan. 2023
+ * @version 31. jan. 2023
  *
  */
 public class LoadPolicePersonWOccupations extends LoadCphArch {
@@ -33,6 +33,7 @@ public class LoadPolicePersonWOccupations extends LoadCphArch {
 		}
 
 		logger = Logger.getLogger("LoadPolicePersonWOccupations");
+		logger.info("Loading table " + TABLENAME + " from " + args[1]);
 
 		final LoadPolicePersonWOccupations lba = new LoadPolicePersonWOccupations();
 

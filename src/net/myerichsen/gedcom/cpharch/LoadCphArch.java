@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 30. jan. 2023
+ * @version 31. jan. 2023
  *
  */
 public abstract class LoadCphArch {
@@ -182,10 +182,10 @@ public abstract class LoadCphArch {
 				continue;
 			}
 
-			for (int i = 0; i < columns.length; i++) {
+			for (int i = 0; i < columnTypes.size(); i++) {
 				sb.append(convertString(columnTypes.get(i), columns[i]));
 
-				if (i < columns.length - 1) {
+				if (i < columnTypes.size() - 1) {
 					sb.append(", ");
 				}
 			}
