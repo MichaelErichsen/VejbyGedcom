@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 31. jan. 2023
+ * @version 1. feb. 2023
  *
  */
 public abstract class LoadCphArch {
@@ -38,7 +38,7 @@ public abstract class LoadCphArch {
 	 * @throws SQLException
 	 */
 	protected Statement connectToDB(String url) throws SQLException {
-		final String dbURL1 = "jdbc:derby:C:/Users/michael/CPHDB";
+		final String dbURL1 = "jdbc:derby:" + url;
 		final Connection conn1 = DriverManager.getConnection(dbURL1);
 		logger.info("Connected to database " + dbURL1);
 		return conn1.createStatement();

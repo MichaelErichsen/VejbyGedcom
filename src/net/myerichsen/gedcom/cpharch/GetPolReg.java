@@ -1,0 +1,139 @@
+package net.myerichsen.gedcom.cpharch;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+/**
+ * @author Michael Erichsen
+ * @version 1. feb. 2023
+ *
+ */
+public class GetPolReg {
+	private static Logger logger;
+	private static String template1 = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.FIRSTNAMES "
+			+ "LIKE '%s' AND CPH.POLICE_PERSON.LASTNAME = '%s'";
+	private static String template2 = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
+
+	private static int counter = 0;
+
+	/**
+	 * Main method
+	 *
+	 * @param args
+	 * @throws Exception
+	 */
+	public static void main(String[] args) throws Exception {
+		if (args.length < 4) {
+			System.out.println("Usage: GetPolReg derbydatabasepath outputdirectory firstNames lastName");
+			System.exit(4);
+		}
+
+		logger = Logger.getLogger("GetPolReg");
+
+		final GetPolReg gpr = new GetPolReg();
+
+		try {
+			gpr.execute(args);
+		} catch (final SQLException e) {
+			logger.severe(e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Connect to the Derby database
+	 *
+	 * @return
+	 *
+	 * @throws SQLException
+	 *
+	 */
+	private Statement connectToDB(String url) throws SQLException {
+		final String dbURL1 = "jdbc:derby:" + url;
+		final Connection conn1 = DriverManager.getConnection(dbURL1);
+		System.out.println("Connected to database " + dbURL1);
+		return conn1.createStatement();
+	}
+
+	/**
+	 * Worker method
+	 *
+	 * @param args
+	 * @throws Exception
+	 */
+	private void execute(String[] args) throws Exception {
+		final Statement stmt = connectToDB(args[0]);
+
+		final String outName = args[1] + "/" + args[2] + " " + args[3] + ".csv";
+		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
+
+		String query = String.format(template1, args[2] + "%", args[3]);
+		logger.fine(query);
+		ResultSet rs = stmt.executeQuery(query);
+		final List<Integer> li = new ArrayList<>();
+		final List<String> ls = new ArrayList<>();
+
+		while (rs.next()) {
+			li.add(rs.getInt("ID"));
+			ls.add(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
+		}
+
+		for (int i = 0; i < li.size(); i++) {
+			query = String.format(template2, li.get(i));
+			logger.fine(query);
+
+			rs = stmt.executeQuery(query);
+			String result = "";
+
+			while (rs.next()) {
+				result = ls.get(i) + ";" + getFieldInt(rs, "ID") + ";" + getFieldInt(rs, "PERSON_ID") + ";"
+						+ getField(rs, "STREET") + ";" + getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";"
+						+ getField(rs, "FLOOR") + ";" + getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";"
+						+ getFieldInt(rs, "DAY") + ";" + getFieldInt(rs, "MONTH") + ";" + getFieldInt(rs, "XYEAR") + ";"
+						+ getField(rs, "FULL_ADDRESS") + "\n";
+
+				logger.fine(result);
+				bw.write(result);
+				counter++;
+			}
+		}
+
+		bw.flush();
+		bw.close();
+		logger.info(counter + " lines of census data written to " + outName);
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	private String getField(ResultSet rs, String field) {
+		try {
+			return rs.getString(field).trim();
+		} catch (final Exception e) {
+			return "";
+		}
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	private String getFieldInt(ResultSet rs, String field) {
+		try {
+			return Integer.toString(rs.getInt(field));
+		} catch (final Exception e) {
+			return "";
+		}
+	}
+
+}
