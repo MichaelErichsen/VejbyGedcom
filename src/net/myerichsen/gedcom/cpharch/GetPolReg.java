@@ -10,6 +10,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
@@ -19,8 +21,9 @@ import java.util.logging.Logger;
 public class GetPolReg {
 	private static Logger logger;
 	private static String template1 = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.FIRSTNAMES "
-			+ "LIKE '%s' AND CPH.POLICE_PERSON.LASTNAME = '%s'";
+			+ "LIKE '%s' AND CPH.POLICE_PERSON.LASTNAME LIKE '%s'";
 	private static String template2 = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
+	private static String template3 = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = %d";
 
 	private static int counter = 0;
 
@@ -32,7 +35,8 @@ public class GetPolReg {
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args.length < 4) {
-			System.out.println("Usage: GetPolReg derbydatabasepath outputdirectory firstNames lastName");
+			System.out.println("Usage: GetPolReg derbydatabasepath outputdirectory firstNames lastName [birthyear]\n"
+					+ "Names can be truncated");
 			System.exit(4);
 		}
 
@@ -53,7 +57,6 @@ public class GetPolReg {
 	 * Connect to the Derby database
 	 *
 	 * @return
-	 *
 	 * @throws SQLException
 	 *
 	 */
@@ -71,20 +74,45 @@ public class GetPolReg {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
+		String result = "";
+		int calcYear = 0;
+
 		final Statement stmt = connectToDB(args[0]);
 
-		final String outName = args[1] + "/" + args[2] + " " + args[3] + ".csv";
+		final String outName = args[1] + "/" + args[2] + " " + args[3] + "_polreg.csv";
 		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
 
 		String query = String.format(template1, args[2] + "%", args[3]);
 		logger.fine(query);
 		ResultSet rs = stmt.executeQuery(query);
+		ResultSet rs3;
 		final List<Integer> li = new ArrayList<>();
+		final List<Integer> lb = new ArrayList<>();
 		final List<String> ls = new ArrayList<>();
+		final List<String> lp = new ArrayList<>();
+		String query3;
 
 		while (rs.next()) {
 			li.add(rs.getInt("ID"));
 			ls.add(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
+			try {
+				lb.add(rs.getInt("BIRTHYEAR"));
+			} catch (Exception e) {
+				lb.add(0);
+			}
+		}
+
+		for (int i = 0; i < li.size(); i++) {
+			query3 = String.format(template3, li.get(i));
+			logger.fine(query);
+
+			rs3 = stmt.executeQuery(query3);
+
+			if (rs3.next()) {
+				lp.add(getField(rs3, "POSITION_DANISH"));
+			} else {
+				lp.add(" ");
+			}
 		}
 
 		for (int i = 0; i < li.size(); i++) {
@@ -92,14 +120,22 @@ public class GetPolReg {
 			logger.fine(query);
 
 			rs = stmt.executeQuery(query);
-			String result = "";
 
 			while (rs.next()) {
-				result = ls.get(i) + ";" + getFieldInt(rs, "ID") + ";" + getFieldInt(rs, "PERSON_ID") + ";"
-						+ getField(rs, "STREET") + ";" + getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";"
-						+ getField(rs, "FLOOR") + ";" + getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";"
-						+ getFieldInt(rs, "DAY") + ";" + getFieldInt(rs, "MONTH") + ";" + getFieldInt(rs, "XYEAR") + ";"
-						+ getField(rs, "FULL_ADDRESS") + "\n";
+
+				if (args.length > 4) {
+					calcYear = getYearFromDate(args[4]) - lb.get(i);
+
+					if (calcYear > 2 || calcYear < -2) {
+						continue;
+					}
+				}
+
+				result = ls.get(i) + ";" + lb.get(i) + ";" + lp.get(i) + ";" + getField(rs, "STREET") + ";"
+						+ getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR") + ";"
+						+ getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";" + getFieldInt(rs, "DAY") + ";"
+						+ getFieldInt(rs, "MONTH") + ";" + getFieldInt(rs, "XYEAR") + ";" + getField(rs, "FULL_ADDRESS")
+						+ "\n";
 
 				logger.fine(result);
 				bw.write(result);
@@ -109,7 +145,7 @@ public class GetPolReg {
 
 		bw.flush();
 		bw.close();
-		logger.info(counter + " lines of census data written to " + outName);
+		logger.info(counter + " lines of Police Registry data written to " + outName);
 	}
 
 	/**
@@ -134,6 +170,23 @@ public class GetPolReg {
 		} catch (final Exception e) {
 			return "";
 		}
+	}
+
+	/**
+	 * Get year as integer
+	 *
+	 * @param date
+	 * @return
+	 */
+	private int getYearFromDate(String date) {
+		final Pattern r = Pattern.compile("\\d{4}");
+
+		final Matcher m = r.matcher(date);
+
+		if (m.find()) {
+			return Integer.parseInt(m.group(0));
+		}
+		return 1;
 	}
 
 }
