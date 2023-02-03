@@ -51,7 +51,7 @@ public class GetPolReg {
 
 	/**
 	 * C:tor
-	 * 
+	 *
 	 * @param args
 	 * @throws Exception
 	 */
@@ -90,7 +90,7 @@ public class GetPolReg {
 		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
 
 		String query = String.format(template1, args[2] + "%", args[3] + "%");
-		logger.info(query);
+		logger.fine(query);
 		ResultSet rs = stmt.executeQuery(query);
 		ResultSet rs3;
 		final List<Integer> li = new ArrayList<>();

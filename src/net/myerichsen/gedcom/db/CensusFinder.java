@@ -54,7 +54,7 @@ public class CensusFinder {
 		try {
 			@SuppressWarnings("unused")
 			final CensusFinder cf = new CensusFinder(args);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
@@ -83,7 +83,7 @@ public class CensusFinder {
 		String[] split;
 		try {
 			split = needle.toLowerCase().split(",");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return true;
 		}
 

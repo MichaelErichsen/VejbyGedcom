@@ -12,7 +12,7 @@ import net.myerichsen.gedcom.db.DBIndividual;
 /**
  * Find all Copenhagen registry entries that match a given individual ID in the
  * derby database
- * 
+ *
  * @author Michael Erichsen
  * @version 3. feb. 2023
  *
@@ -34,14 +34,28 @@ public class GetCphArchives {
 
 		logger = Logger.getLogger("GetCphArchives");
 
-		GetCphArchives gca = new GetCphArchives();
+		final GetCphArchives gca = new GetCphArchives();
 
 		try {
 			gca.execute(args);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Connect to the Derby database
+	 *
+	 * @param vejbydbpath
+	 * @return
+	 * @throws SQLException
+	 */
+	private Statement connectToDB(String vejbydbpath) throws SQLException {
+		final String dbURL1 = "jdbc:derby:" + vejbydbpath;
+		final Connection conn1 = DriverManager.getConnection(dbURL1);
+		logger.fine("Connected to database " + dbURL1);
+		return conn1.createStatement();
 	}
 
 	/**
@@ -60,56 +74,42 @@ public class GetCphArchives {
 		// individualId vejbydatabasepath cphdatabasepath dddcsvfilepath
 		// outputdirectory");
 
-		String[] cphArgs = new String[5];
+		final String[] cphArgs = new String[5];
 		cphArgs[0] = args[2];
 		cphArgs[1] = args[4];
 
-		String name = individual.getName();
-		String lastName = name.substring(name.lastIndexOf(" ") + 1);
+		final String name = individual.getName();
+		final String lastName = name.substring(name.lastIndexOf(" ") + 1);
 
 		cphArgs[2] = name.replace(lastName, "").trim();
 		cphArgs[3] = lastName;
 		cphArgs[4] = Integer.toString(individual.getBirthYear());
 
 		try {
-			GetPolReg gpr = new GetPolReg(cphArgs);
-		} catch (Exception e) {
+			final GetPolReg gpr = new GetPolReg(cphArgs);
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
-			GetBurReg gbr = new GetBurReg(cphArgs);
-		} catch (Exception e) {
+			final GetBurReg gbr = new GetBurReg(cphArgs);
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		// individualId derbydatabasepath csvfilepath outputdirectory");
-		String[] vejbyArgs = new String[4];
+		final String[] vejbyArgs = new String[4];
 		vejbyArgs[0] = args[0];
 		vejbyArgs[1] = args[1];
 		vejbyArgs[2] = args[3];
 		vejbyArgs[3] = args[4];
 
 		try {
-			CensusFinder cf = new CensusFinder(vejbyArgs);
-		} catch (Exception e) {
+			final CensusFinder cf = new CensusFinder(vejbyArgs);
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		logger.info("Program ended");
-	}
-
-	/**
-	 * Connect to the Derby database
-	 *
-	 * @param vejbydbpath
-	 * @return
-	 * @throws SQLException
-	 */
-	private Statement connectToDB(String vejbydbpath) throws SQLException {
-		final String dbURL1 = "jdbc:derby:" + vejbydbpath;
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		logger.fine("Connected to database " + dbURL1);
-		return conn1.createStatement();
 	}
 }
