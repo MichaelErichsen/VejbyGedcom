@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  *
  *
  * @author Michael Erichsen
- * @version 2. feb. 2023
+ * @version 3. feb. 2023
  *
  */
 public class CensusFinder {
@@ -45,20 +45,30 @@ public class CensusFinder {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 4) {
-			System.out.println("Usage: DBLister individualId derbydatabasepath csvfilepath outputdirectory");
+			System.out.println("Usage: CensusFinder individualId derbydatabasepath csvfilepath outputdirectory");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("DBLister");
-
-		final CensusFinder cf = new CensusFinder();
+		logger = Logger.getLogger("CensusFinder");
 
 		try {
-			cf.execute(args);
-		} catch (SQLException | IOException e) {
+			@SuppressWarnings("unused")
+			final CensusFinder cf = new CensusFinder(args);
+		} catch (Exception e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * C:tor
+	 *
+	 * @param args
+	 * @throws Exception
+	 */
+	public CensusFinder(String[] args) throws Exception {
+		logger = Logger.getLogger("CensusFinder");
+		execute(args);
 	}
 
 	/**
@@ -124,8 +134,8 @@ public class CensusFinder {
 	 * @return
 	 * @throws SQLException
 	 */
-	private Statement connectToDB(String url) throws SQLException {
-		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
+	private Statement connectToDB(String[] args) throws SQLException {
+		final String dbURL1 = "jdbc:derby:" + args[1];
 		final Connection conn1 = DriverManager.getConnection(dbURL1);
 		logger.info("Connected to database " + dbURL1);
 		return conn1.createStatement();
@@ -139,7 +149,7 @@ public class CensusFinder {
 	 * @throws IOException
 	 */
 	private void execute(String[] args) throws SQLException, IOException {
-		final Statement statement = connectToDB(args[1]);
+		final Statement statement = connectToDB(args);
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
 		logger.info("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear()
 				+ " in " + individual.getBirthPlace());

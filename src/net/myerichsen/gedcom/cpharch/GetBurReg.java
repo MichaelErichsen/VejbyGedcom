@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 2. feb. 2023
+ * @version 3. feb. 2023
  *
  */
 public class GetBurReg {
@@ -21,16 +21,14 @@ public class GetBurReg {
 	private static String template = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.FIRSTNAMES LIKE '%s' "
 			+ "AND CPH.BURIAL_PERSON_COMPLETE.LASTNAME LIKE '%s'";
-
 	private static int counter = 0;
 
 	/**
 	 * Main method
 	 *
 	 * @param args
-	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		if (args.length < 4) {
 			System.out.println("Usage: GetBurReg derbydatabasepath outputdirectory firstNames lastName [birthyear]\n"
 					+ "Names can be truncated");
@@ -39,15 +37,25 @@ public class GetBurReg {
 
 		logger = Logger.getLogger("GetBurReg");
 
-		final GetBurReg gpr = new GetBurReg();
-
 		try {
-			gpr.execute(args);
-		} catch (final SQLException e) {
+			@SuppressWarnings("unused")
+			final GetBurReg gpr = new GetBurReg(args);
+		} catch (final Exception e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * C:tor
+	 *
+	 * @param args
+	 * @throws Exception
+	 */
+	public GetBurReg(String[] args) throws Exception {
+		logger = Logger.getLogger("GetPolReg");
+		execute(args);
 	}
 
 	/**
@@ -57,11 +65,11 @@ public class GetBurReg {
 	 * @throws SQLException
 	 *
 	 */
-	private Statement connectToDB(String url) throws SQLException {
-		final String dbURL1 = "jdbc:derby:" + url;
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		System.out.println("Connected to database " + dbURL1);
-		return conn1.createStatement();
+	private Statement connectToDB(String[] args) throws SQLException {
+		final String dbURL = "jdbc:derby:" + args[0];
+		final Connection conn = DriverManager.getConnection(dbURL);
+		logger.fine("Connected to database " + dbURL);
+		return conn.createStatement();
 	}
 
 	/**
@@ -74,14 +82,19 @@ public class GetBurReg {
 		String result = "";
 		int calcYear = 0;
 
-		final Statement stmt = connectToDB(args[0]);
+		final Statement stmt = connectToDB(args);
 
 		final String outName = args[1] + "/" + args[2] + " " + args[3] + "_burreg.csv";
 		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
+		final String header = "FIRSTNAMES;LASTNAME;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
+				+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
+				+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
+				+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
+		bw.write(header);
 
-		String query = String.format(template, args[2] + "%", args[3] + "%");
+		final String query = String.format(template, args[2] + "%", args[3] + "%");
 		logger.fine(query);
-		ResultSet rs = stmt.executeQuery(query);
+		final ResultSet rs = stmt.executeQuery(query);
 		int birthYear = 0;
 
 		while (rs.next()) {
@@ -90,7 +103,7 @@ public class GetBurReg {
 				try {
 					birthYear = rs.getInt("YEAROFBIRTH");
 					calcYear = getYearFromDate(args[4]) - birthYear;
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					calcYear = 0;
 				}
 
@@ -99,9 +112,8 @@ public class GetBurReg {
 				}
 			}
 
-			result = getField(rs, "FIRSTNAMES") + ";" + getField(rs, "LASTNAME") + ";" + getField(rs, "BIRTHNAME") + ";"
-					+ getFieldInt(rs, "AGEYEARS") + ";" + getFieldInt(rs, "YEAROFBIRTH") + ";"
-					+ getField(rs, "DEATHPLACE") + ";" + getField(rs, "CIVILSTATUS") + ";"
+			result = getField(rs, "FIRSTNAMES") + ";" + getField(rs, "LASTNAME") + ";" + getFieldInt(rs, "YEAROFBIRTH")
+					+ ";" + getField(rs, "DEATHPLACE") + ";" + getField(rs, "CIVILSTATUS") + ";"
 					+ getField(rs, "ADRESSOUTSIDECPH") + ";" + getField(rs, "SEX") + ";" + getField(rs, "COMMENT") + ";"
 					+ getField(rs, "CEMETARY") + ";" + getField(rs, "CHAPEL") + ";" + getField(rs, "PARISH") + ";"
 					+ getField(rs, "STREET") + ";" + getField(rs, "HOOD") + ";" + getFieldInt(rs, "STREET_NUMBER") + ";"

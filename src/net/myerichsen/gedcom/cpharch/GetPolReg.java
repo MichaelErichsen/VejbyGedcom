@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 2. feb. 2023
+ * @version 3. feb. 2023
  *
  */
 public class GetPolReg {
@@ -24,7 +24,6 @@ public class GetPolReg {
 			+ "LIKE '%s' AND CPH.POLICE_PERSON.LASTNAME LIKE '%s'";
 	private static String template2 = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
 	private static String template3 = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = %d";
-
 	private static int counter = 0;
 
 	/**
@@ -40,17 +39,25 @@ public class GetPolReg {
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("GetPolReg");
-
-		final GetPolReg gpr = new GetPolReg();
-
 		try {
-			gpr.execute(args);
+			@SuppressWarnings("unused")
+			final GetPolReg gpr = new GetPolReg(args);
 		} catch (final SQLException e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * C:tor
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
+	public GetPolReg(String[] args) throws Exception {
+		logger = Logger.getLogger("GetPolReg");
+		execute(args);
 	}
 
 	/**
@@ -60,11 +67,11 @@ public class GetPolReg {
 	 * @throws SQLException
 	 *
 	 */
-	private Statement connectToDB(String url) throws SQLException {
-		final String dbURL1 = "jdbc:derby:" + url;
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		System.out.println("Connected to database " + dbURL1);
-		return conn1.createStatement();
+	private Statement connectToDB(String[] args) throws SQLException {
+		final String dbURL = "jdbc:derby:" + args[0];
+		final Connection conn = DriverManager.getConnection(dbURL);
+		logger.fine("Connected to database " + dbURL);
+		return conn.createStatement();
 	}
 
 	/**
@@ -77,13 +84,13 @@ public class GetPolReg {
 		String result = "";
 		int calcYear = 0;
 
-		final Statement stmt = connectToDB(args[0]);
+		final Statement stmt = connectToDB(args);
 
 		final String outName = args[1] + "/" + args[2] + " " + args[3] + "_polreg.csv";
 		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
 
-		String query = String.format(template1, args[2] + "%", args[3]);
-		logger.fine(query);
+		String query = String.format(template1, args[2] + "%", args[3] + "%");
+		logger.info(query);
 		ResultSet rs = stmt.executeQuery(query);
 		ResultSet rs3;
 		final List<Integer> li = new ArrayList<>();
@@ -97,7 +104,7 @@ public class GetPolReg {
 			ls.add(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
 			try {
 				lb.add(rs.getInt("BIRTHYEAR"));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				lb.add(0);
 			}
 		}
