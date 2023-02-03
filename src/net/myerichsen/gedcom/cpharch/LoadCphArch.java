@@ -16,8 +16,7 @@ import java.util.logging.Logger;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 1. feb. 2023
- *
+ * @version 3. feb. 2023
  */
 public abstract class LoadCphArch {
 	protected static Logger logger;
@@ -89,6 +88,7 @@ public abstract class LoadCphArch {
 		loadTable(statement, args);
 
 		logger.info(counter + " rows added to " + getTablename() + " in " + args[0]);
+		statement.close();
 
 	}
 

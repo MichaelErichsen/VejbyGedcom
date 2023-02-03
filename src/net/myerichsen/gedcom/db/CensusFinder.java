@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  *
  *
  * @author Michael Erichsen
- * @version 2023-01-28
+ * @version 2. feb. 2023
  *
  */
 public class CensusFinder {
@@ -70,7 +70,12 @@ public class CensusFinder {
 	 */
 	private boolean compareBirthPlace(String needle, String haystack) {
 		final String h = haystack.toLowerCase();
-		final String[] split = needle.toLowerCase().split(",");
+		String[] split;
+		try {
+			split = needle.toLowerCase().split(",");
+		} catch (Exception e) {
+			return true;
+		}
 
 		for (final String element : split) {
 			if (h.contains(element.trim())) {
@@ -140,6 +145,7 @@ public class CensusFinder {
 				+ " in " + individual.getBirthPlace());
 
 		parseCsvFiles(individual, args);
+		statement.close();
 		logger.info("Program ended");
 	}
 
@@ -168,7 +174,7 @@ public class CensusFinder {
 	 * @throws IOException
 	 */
 	private void parseCsvFiles(DBIndividual individual, String[] args) throws IOException {
-		final String outName = args[3] + "/" + individual.getName() + ".csv";
+		final String outName = args[3] + "/" + individual.getName() + "_census.csv";
 		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
 
 		try {

@@ -15,7 +15,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * Class to list contents of a GEDCOM Derby database.
  *
  * @author Michael Erichsen
- * @version 2023-01-24
+ * @version 3. feb. 2023
  *
  */
 public class DBLister {
@@ -107,6 +107,7 @@ public class DBLister {
 			System.out.println(rs.getInt("ID") + ";" + rs.getString("EVENT") + ";" + rs.getString("TEXT"));
 		}
 
+		stmt.close();
 		System.out.println("Program ended.");
 	}
 

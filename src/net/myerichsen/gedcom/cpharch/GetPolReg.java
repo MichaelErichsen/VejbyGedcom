@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 1. feb. 2023
+ * @version 2. feb. 2023
  *
  */
 public class GetPolReg {
@@ -145,6 +145,7 @@ public class GetPolReg {
 
 		bw.flush();
 		bw.close();
+		stmt.close();
 		logger.info(counter + " lines of Police Registry data written to " + outName);
 	}
 

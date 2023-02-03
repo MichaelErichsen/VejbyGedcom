@@ -26,7 +26,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * The program produces a .csv file with a row for each relocation found.
  *
  * @author Michael Erichsen
- * @version 2023-01-25
+ * @version 3. feb. 2023
  *
  */
 public class DBRelocation {
@@ -105,6 +105,7 @@ public class DBRelocation {
 
 		writer.flush();
 		writer.close();
+		stmt.close();
 
 		System.out.println(counter + " flytninger gemt i " + outfile);
 	}

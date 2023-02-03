@@ -33,7 +33,7 @@ import org.gedcom4j.parser.GedcomParser;
  * analysis.
  *
  * @author Michael Erichsen
- * @version 2023-01-25
+ * @version 3. feb. 2023
  *
  */
 public class DBLoader {
@@ -122,6 +122,8 @@ public class DBLoader {
 
 		System.out.println("Parsing individuals");
 		parseAllIndividuals();
+
+		stmt.close();
 
 		System.out.println("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
 				+ " individuals inserted.\n" + eventCounter + " events inserted\n" + citationCounter
