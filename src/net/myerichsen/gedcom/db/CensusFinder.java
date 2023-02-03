@@ -137,7 +137,7 @@ public class CensusFinder {
 	private Statement connectToDB(String[] args) throws SQLException {
 		final String dbURL1 = "jdbc:derby:" + args[1];
 		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		logger.info("Connected to database " + dbURL1);
+		logger.fine("Connected to database " + dbURL1);
 		return conn1.createStatement();
 	}
 
@@ -151,12 +151,11 @@ public class CensusFinder {
 	private void execute(String[] args) throws SQLException, IOException {
 		final Statement statement = connectToDB(args);
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
-		logger.info("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear()
+		logger.fine("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear()
 				+ " in " + individual.getBirthPlace());
 
 		parseCsvFiles(individual, args);
 		statement.close();
-		logger.info("Program ended");
 	}
 
 	/**
@@ -200,7 +199,10 @@ public class CensusFinder {
 
 		bw.flush();
 		bw.close();
-		logger.info(counter + " lines of census data written to " + outName);
+
+		if (counter > 0) {
+			logger.info(counter + " lines of census data written to " + outName);
+		}
 	}
 
 	/**

@@ -81,13 +81,12 @@ public class GetPolReg {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
+		String outName = "";
+		BufferedWriter bw = null;
 		String result = "";
 		int calcYear = 0;
 
 		final Statement stmt = connectToDB(args);
-
-		final String outName = args[1] + "/" + args[2] + " " + args[3] + "_polreg.csv";
-		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
 
 		String query = String.format(template1, args[2] + "%", args[3] + "%");
 		logger.fine(query);
@@ -145,15 +144,29 @@ public class GetPolReg {
 						+ "\n";
 
 				logger.fine(result);
+
+				if (counter == 0) {
+					outName = args[1] + "/" + args[2] + " " + args[3] + "_polreg.csv";
+					bw = new BufferedWriter(new FileWriter(outName));
+					final String header = "ID;NAME;BIRTHYEAR;STREET;NUMBER;LETTER;FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_ADDRESS";
+					bw.write(header);
+				}
+
 				bw.write(result);
 				counter++;
 			}
 		}
 
-		bw.flush();
-		bw.close();
+		if (counter > 0) {
+			bw.flush();
+			bw.close();
+		}
+
 		stmt.close();
-		logger.info(counter + " lines of Police Registry data written to " + outName);
+
+		if (counter > 0) {
+			logger.info(counter + " lines of Police Registry data written to " + outName);
+		}
 	}
 
 	/**

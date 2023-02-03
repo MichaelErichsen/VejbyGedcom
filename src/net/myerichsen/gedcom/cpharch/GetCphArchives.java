@@ -71,9 +71,6 @@ public class GetCphArchives {
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
 		statement.close();
 
-		// individualId vejbydatabasepath cphdatabasepath dddcsvfilepath
-		// outputdirectory");
-
 		final String[] cphArgs = new String[5];
 		cphArgs[0] = args[2];
 		cphArgs[1] = args[4];
@@ -97,7 +94,6 @@ public class GetCphArchives {
 			e.printStackTrace();
 		}
 
-		// individualId derbydatabasepath csvfilepath outputdirectory");
 		final String[] vejbyArgs = new String[4];
 		vejbyArgs[0] = args[0];
 		vejbyArgs[1] = args[1];

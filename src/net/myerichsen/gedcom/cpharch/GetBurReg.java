@@ -79,19 +79,12 @@ public class GetBurReg {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
+		String outName = "";
+		BufferedWriter bw = null;
 		String result = "";
 		int calcYear = 0;
 
 		final Statement stmt = connectToDB(args);
-
-		final String outName = args[1] + "/" + args[2] + " " + args[3] + "_burreg.csv";
-		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
-		final String header = "FIRSTNAMES;LASTNAME;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
-				+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
-				+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
-				+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
-		bw.write(header);
-
 		final String query = String.format(template, args[2] + "%", args[3] + "%");
 		logger.fine(query);
 		final ResultSet rs = stmt.executeQuery(query);
@@ -124,14 +117,30 @@ public class GetBurReg {
 					+ getField(rs, "DEATHCAUSES_DANISH") + "\n";
 
 			logger.fine(result);
+
+			if (counter == 0) {
+				outName = args[1] + "/" + args[2] + " " + args[3] + "_burreg.csv";
+				bw = new BufferedWriter(new FileWriter(outName));
+				final String header = "FIRSTNAMES;LASTNAME;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
+						+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
+						+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
+						+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
+				bw.write(header);
+			}
 			bw.write(result);
 			counter++;
 		}
 
-		bw.flush();
-		bw.close();
+		if (counter > 0) {
+			bw.flush();
+			bw.close();
+		}
+
 		stmt.close();
-		logger.info(counter + " lines of Copenhagen burial registry data written to " + outName);
+
+		if (counter > 0) {
+			logger.info(counter + " lines of Copenhagen burial registry data written to " + outName);
+		}
 
 	}
 
