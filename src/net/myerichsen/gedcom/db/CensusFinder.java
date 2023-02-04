@@ -1,5 +1,6 @@
 package net.myerichsen.gedcom.db;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,12 +32,17 @@ import java.util.regex.Pattern;
  *
  *
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 4. feb. 2023
  *
  */
 public class CensusFinder {
 	private static Logger logger;
+	private static String outName = "";
+	private static BufferedWriter bw = null;
 	private static int counter = 0;
+
+	private static final String header = "År;Amt;Herred;Sogn;-;-;-;Sted;-;Adressat;Navn;Køn;Alder;Ægt. Status;Erhverv;"
+			+ "Status i husstanden;Note;Religion;-;-;-;-;-;-;-;-;-;-;-;-;-;-;FT år;Kilde;-\n";
 
 	/**
 	 * Main method
@@ -52,8 +58,7 @@ public class CensusFinder {
 		logger = Logger.getLogger("CensusFinder");
 
 		try {
-			@SuppressWarnings("unused")
-			final CensusFinder cf = new CensusFinder(args);
+			new CensusFinder(args);
 		} catch (final Exception e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
@@ -153,6 +158,7 @@ public class CensusFinder {
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
 		logger.fine("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear()
 				+ " in " + individual.getBirthPlace());
+		outName = args[3] + "/" + individual.getName() + "_census.csv";
 
 		parseCsvFiles(individual, args);
 		statement.close();
@@ -183,25 +189,23 @@ public class CensusFinder {
 	 * @throws IOException
 	 */
 	private void parseCsvFiles(DBIndividual individual, String[] args) throws IOException {
-		final String outName = args[3] + "/" + individual.getName() + "_census.csv";
-		final BufferedWriter bw = new BufferedWriter(new FileWriter(outName));
-
 		try {
 			final List<String> kipLines = parseKipText(args[2] + "/kipdata.txt");
 
 			for (final String xline : kipLines) {
-				processKipTextLine(individual, xline, args, bw);
+				processKipTextLine(individual, xline, args);
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();
 			System.exit(16);
 		}
 
-		bw.flush();
-		bw.close();
-
 		if (counter > 0) {
+			bw.flush();
+			bw.close();
 			logger.info(counter + " lines of census data written to " + outName);
+
+			Desktop.getDesktop().open(new File(outName));
 		}
 	}
 
@@ -240,7 +244,7 @@ public class CensusFinder {
 	 * @throws IOException
 	 */
 	private void processCsvFile(DBIndividual individual, String csvFileName, String location, String outfilepath,
-			BufferedWriter bw, int ftYear) throws IOException {
+			int ftYear) throws IOException {
 		final BufferedReader br = new BufferedReader(new FileReader(new File(csvFileName)));
 
 		// Read first line to get headers for later use
@@ -285,8 +289,14 @@ public class CensusFinder {
 
 				diff = diff + individual.getBirthYear() - ftYear;
 
-				if (diff < 5 && diff > -5) {
+				if (diff < 2 && diff > -2) {
 					if (ftYear < 1845 || compareBirthPlace(individual.getBirthPlace(), line)) {
+
+						if (counter == 0) {
+							bw = new BufferedWriter(new FileWriter(outName));
+							bw.write(header);
+						}
+
 						bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
 						counter++;
 					}
@@ -313,11 +323,9 @@ public class CensusFinder {
 	 * @param individual
 	 * @param line
 	 * @param args
-	 * @param bw
 	 * @throws IOException
 	 */
-	private void processKipTextLine(DBIndividual individual, String line, String[] args, BufferedWriter bw)
-			throws IOException {
+	private void processKipTextLine(DBIndividual individual, String line, String[] args) throws IOException {
 		final String[] fields = line.split(";");
 
 		final int intYear = getYearFromDate(fields[3]);
@@ -329,7 +337,7 @@ public class CensusFinder {
 		final String csvFileName = args[2] + "/" + fields[4] + ".csv";
 		final String location = fields[0] + ";" + fields[1] + ";" + fields[2] + ";";
 
-		processCsvFile(individual, csvFileName, location, args[3], bw, intYear);
+		processCsvFile(individual, csvFileName, location, args[3], intYear);
 	}
 
 }

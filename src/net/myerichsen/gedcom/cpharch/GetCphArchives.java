@@ -83,13 +83,13 @@ public class GetCphArchives {
 		cphArgs[4] = Integer.toString(individual.getBirthYear());
 
 		try {
-			final GetPolReg gpr = new GetPolReg(cphArgs);
+			new GetPolReg(cphArgs);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
-			final GetBurReg gbr = new GetBurReg(cphArgs);
+			new GetBurReg(cphArgs);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -101,7 +101,7 @@ public class GetCphArchives {
 		vejbyArgs[3] = args[4];
 
 		try {
-			final CensusFinder cf = new CensusFinder(vejbyArgs);
+			new CensusFinder(vejbyArgs);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

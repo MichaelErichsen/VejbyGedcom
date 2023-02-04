@@ -1,6 +1,8 @@
 package net.myerichsen.gedcom.cpharch;
 
+import java.awt.Desktop;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,7 +17,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 4. feb. 2023
  *
  */
 public class GetPolReg {
@@ -24,6 +26,7 @@ public class GetPolReg {
 			+ "LIKE '%s' AND CPH.POLICE_PERSON.LASTNAME LIKE '%s'";
 	private static String template2 = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
 	private static String template3 = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = %d";
+	private static final String header = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static int counter = 0;
 
 	/**
@@ -40,8 +43,7 @@ public class GetPolReg {
 		}
 
 		try {
-			@SuppressWarnings("unused")
-			final GetPolReg gpr = new GetPolReg(args);
+			new GetPolReg(args);
 		} catch (final SQLException e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
@@ -97,6 +99,9 @@ public class GetPolReg {
 		final List<String> ls = new ArrayList<>();
 		final List<String> lp = new ArrayList<>();
 		String query3;
+		String day;
+		String month;
+		String year;
 
 		while (rs.next()) {
 			li.add(rs.getInt("ID"));
@@ -137,18 +142,20 @@ public class GetPolReg {
 					}
 				}
 
+				day = getFieldInt(rs, "DAY");
+				month = getFieldInt(rs, "MONTH");
+				year = getFieldInt(rs, "XYEAR");
+
 				result = ls.get(i) + ";" + lb.get(i) + ";" + lp.get(i) + ";" + getField(rs, "STREET") + ";"
 						+ getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR") + ";"
-						+ getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";" + getFieldInt(rs, "DAY") + ";"
-						+ getFieldInt(rs, "MONTH") + ";" + getFieldInt(rs, "XYEAR") + ";" + getField(rs, "FULL_ADDRESS")
-						+ "\n";
+						+ getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";" + day + ";" + month + ";" + year
+						+ ";" + day + "-" + month + "-" + year + ";" + getField(rs, "FULL_ADDRESS") + "\n";
 
 				logger.fine(result);
 
 				if (counter == 0) {
 					outName = args[1] + "/" + args[2] + " " + args[3] + "_polreg.csv";
 					bw = new BufferedWriter(new FileWriter(outName));
-					final String header = "ID;NAME;BIRTHYEAR;STREET;NUMBER;LETTER;FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_ADDRESS";
 					bw.write(header);
 				}
 
@@ -157,15 +164,14 @@ public class GetPolReg {
 			}
 		}
 
-		if (counter > 0) {
-			bw.flush();
-			bw.close();
-		}
-
 		stmt.close();
 
 		if (counter > 0) {
+			bw.flush();
+			bw.close();
 			logger.info(counter + " lines of Police Registry data written to " + outName);
+
+			Desktop.getDesktop().open(new File(outName));
 		}
 	}
 

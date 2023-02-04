@@ -1,6 +1,8 @@
 package net.myerichsen.gedcom.cpharch;
 
+import java.awt.Desktop;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 4. feb. 2023
  *
  */
 public class GetBurReg {
@@ -21,6 +23,10 @@ public class GetBurReg {
 	private static String template = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.FIRSTNAMES LIKE '%s' "
 			+ "AND CPH.BURIAL_PERSON_COMPLETE.LASTNAME LIKE '%s'";
+	private static final String header = "FIRSTNAMES;LASTNAME;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
+			+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
+			+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
+			+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
 	private static int counter = 0;
 
 	/**
@@ -38,8 +44,7 @@ public class GetBurReg {
 		logger = Logger.getLogger("GetBurReg");
 
 		try {
-			@SuppressWarnings("unused")
-			final GetBurReg gpr = new GetBurReg(args);
+			new GetBurReg(args);
 		} catch (final Exception e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
@@ -121,25 +126,20 @@ public class GetBurReg {
 			if (counter == 0) {
 				outName = args[1] + "/" + args[2] + " " + args[3] + "_burreg.csv";
 				bw = new BufferedWriter(new FileWriter(outName));
-				final String header = "FIRSTNAMES;LASTNAME;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
-						+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
-						+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
-						+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
 				bw.write(header);
 			}
 			bw.write(result);
 			counter++;
 		}
 
-		if (counter > 0) {
-			bw.flush();
-			bw.close();
-		}
-
 		stmt.close();
 
 		if (counter > 0) {
+			bw.flush();
+			bw.close();
 			logger.info(counter + " lines of Copenhagen burial registry data written to " + outName);
+
+			Desktop.getDesktop().open(new File(outName));
 		}
 
 	}
