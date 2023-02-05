@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 4. feb. 2023
+ * @version 5. feb. 2023
  *
  */
 public class GetBurReg {
@@ -23,7 +23,7 @@ public class GetBurReg {
 	private static String template = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.FIRSTNAMES LIKE '%s' "
 			+ "AND CPH.BURIAL_PERSON_COMPLETE.LASTNAME LIKE '%s'";
-	private static final String header = "FIRSTNAMES;LASTNAME;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
+	private static final String header = "FIRSTNAMES;LASTNAME;DATEOFDEATH;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
 			+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
 			+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
 			+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
@@ -110,18 +110,18 @@ public class GetBurReg {
 				}
 			}
 
-			result = getField(rs, "FIRSTNAMES") + ";" + getField(rs, "LASTNAME") + ";" + getFieldInt(rs, "YEAROFBIRTH")
-					+ ";" + getField(rs, "DEATHPLACE") + ";" + getField(rs, "CIVILSTATUS") + ";"
-					+ getField(rs, "ADRESSOUTSIDECPH") + ";" + getField(rs, "SEX") + ";" + getField(rs, "COMMENT") + ";"
-					+ getField(rs, "CEMETARY") + ";" + getField(rs, "CHAPEL") + ";" + getField(rs, "PARISH") + ";"
-					+ getField(rs, "STREET") + ";" + getField(rs, "HOOD") + ";" + getFieldInt(rs, "STREET_NUMBER") + ";"
-					+ getField(rs, "LETTER") + ";" + getField(rs, "FLOOR") + ";" + getField(rs, "INSTITUTION") + ";"
-					+ getField(rs, "INSTITUTION_STREET") + ";" + getField(rs, "INSTITUTION_HOOD") + ";"
-					+ getField(rs, "INSTITUTION_STREET_NUMBER") + ";" + getField(rs, "OCCUPTATIONS") + ";"
-					+ getField(rs, "OCCUPATION_RELATION_TYPES)") + ";" + getField(rs, "DEATHCAUSES") + ";"
-					+ getField(rs, "DEATHCAUSES_DANISH") + "\n";
+			result = getField(rs, "FIRSTNAMES") + ";" + getField(rs, "LASTNAME") + ";" + getField(rs, "DATEOFDEATH")
+					+ ";" + getFieldInt(rs, "YEAROFBIRTH") + ";" + getField(rs, "DEATHPLACE") + ";"
+					+ getField(rs, "CIVILSTATUS") + ";" + getField(rs, "ADRESSOUTSIDECPH") + ";" + getField(rs, "SEX")
+					+ ";" + getField(rs, "COMMENT") + ";" + getField(rs, "CEMETARY") + ";" + getField(rs, "CHAPEL")
+					+ ";" + getField(rs, "PARISH") + ";" + getField(rs, "STREET") + ";" + getField(rs, "HOOD") + ";"
+					+ getFieldInt(rs, "STREET_NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR")
+					+ ";" + getField(rs, "INSTITUTION") + ";" + getField(rs, "INSTITUTION_STREET") + ";"
+					+ getField(rs, "INSTITUTION_HOOD") + ";" + getField(rs, "INSTITUTION_STREET_NUMBER") + ";"
+					+ getField(rs, "OCCUPTATIONS") + ";" + getField(rs, "OCCUPATION_RELATION_TYPES)") + ";"
+					+ getField(rs, "DEATHCAUSES") + ";" + getField(rs, "DEATHCAUSES_DANISH") + "\n";
 
-			logger.fine(result);
+			logger.info(result);
 
 			if (counter == 0) {
 				outName = args[1] + "/" + args[2] + " " + args[3] + "_burreg.csv";
