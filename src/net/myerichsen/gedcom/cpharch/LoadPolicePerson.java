@@ -6,7 +6,7 @@ import java.util.logging.Logger;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 31. jan. 2023
+ * @version 12. feb. 2023
  *
  */
 public class LoadPolicePerson extends LoadCphArch {
@@ -15,9 +15,9 @@ public class LoadPolicePerson extends LoadCphArch {
 	 */
 	static final String TABLENAME = "POLICE_PERSON";
 	static final String DELETE = "DELETE FROM CPH.POLICE_PERSON";
-	static final String INSERT = "INSERT INTO CPH.POLICE_PERSON (ID, FIRSTNAMES, LASTNAME, MAIDENNAME, MARRIED, "
-			+ "TYPE, GENDER, BIRTHPLACE, BIRTHDAY, BIRTHMONTH, BIRTHYEAR, DEATHDAY, DEATHMONTH, DEATHYEAR) "
-			+ "VALUES (";
+	static final String INSERT = "INSERT INTO CPH.POLICE_PERSON (ID, FIRSTNAMES, LASTNAME, "
+			+ "MAIDENNAME, MARRIED, TYPE, GENDER, BIRTHPLACE, BIRTHDAY, BIRTHMONTH, "
+			+ "BIRTHYEAR, DEATHDAY, DEATHMONTH, DEATHYEAR, PHONNAME) VALUES (";
 	static int counter = 0;
 
 	/**

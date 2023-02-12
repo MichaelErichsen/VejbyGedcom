@@ -6,7 +6,7 @@ import java.util.logging.Logger;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 30. jan. 2023
+ * @version 12. feb. 2023
  *
  */
 public class LoadBurialPersonComplete extends LoadCphArch {
@@ -19,8 +19,8 @@ public class LoadBurialPersonComplete extends LoadCphArch {
 			+ "BIRTHNAME, AGEYEARS, AGEMONTH, AGEWEEKS, AGEDAYS, AGEHOURS, DATEOFBIRTH, DATEOFDEATH, YEAROFBIRTH, "
 			+ "DEATHPLACE, CIVILSTATUS, ADRESSOUTSIDECPH, SEX, COMMENT, CEMETARY, CHAPEL, PARISH, STREET, HOOD, "
 			+ "STREET_NUMBER, LETTER, FLOOR, INSTITUTION, INSTITUTION_STREET, INSTITUTION_HOOD, "
-			+ "INSTITUTION_STREET_NUMBER, OCCUPTATIONS, OCCUPATION_RELATION_TYPES, DEATHCAUSES, DEATHCAUSES_DANISH) "
-			+ "VALUES (";
+			+ "INSTITUTION_STREET_NUMBER, OCCUPTATIONS, OCCUPATION_RELATION_TYPES, DEATHCAUSES, DEATHCAUSES_DANISH, "
+			+ "PHONNAME) VALUES (";
 	static int counter = 0;
 
 	/**

@@ -33,7 +33,7 @@ import org.gedcom4j.parser.GedcomParser;
  * analysis.
  *
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 12. feb. 2023
  *
  */
 public class DBLoader {
@@ -289,7 +289,7 @@ public class DBLoader {
 			final String given = split[0].trim();
 			final String surname = split[1];
 			final String sex = individual.getSex().getValue();
-			final String phonName = fonkod.generateKey(surname);
+			final String phonName = fonkod.generateKey(given) + " " + fonkod.generateKey(surname);
 
 			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('" + xref + "', '"
 					+ given + "', '" + surname + "', '" + sex + "', '" + phonName + "'	)";
