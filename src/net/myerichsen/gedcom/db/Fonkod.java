@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * This class encodes a Danish name phonetically
  *
  * @author Michael Erichsen
- * @version 2023-01-24
+ * @version 2023-02-13
  */
 public class Fonkod {
 
@@ -41,6 +41,10 @@ public class Fonkod {
 		if (!m.find()) {
 			return out;
 		}
+
+		// æøå etc
+//		out = out.replace("Ã¸", "ø").replace("Ã¥", "å").replace("Ã«", "ë").replace("Ã¼", "ü");
+		out = out.replace("Ã¸", "ø").replace("Ã¥", "å").replace("Ã«", "e").replace("Ã¼", "u");
 
 		// _n/l/r jC -> _n/l/r j
 		out = out.replaceFirst("\\b([nlr]j)[^aeiouyæøå]", "$1");
@@ -131,11 +135,9 @@ public class Fonkod {
 	/**
 	 * Transform a family name to a Danish phonetic encoding
 	 *
-	 * @param String
-	 *            The name as written
+	 * @param String The name as written
 	 * @return String The encoding of the name
-	 * @throws Exception
-	 *             If name missing or not valid
+	 * @throws Exception If name missing or not valid
 	 */
 	public String generateKey(String slaegtsNavn) throws Exception {
 		if (slaegtsNavn == null) {
@@ -161,8 +163,8 @@ public class Fonkod {
 		}
 
 		/**
-		 * Det givne navn sammenlignes med en tabel over almindelige navne. Hvis
-		 * navnet findes heri, benyttes den hertil svarende tabelkode
+		 * Det givne navn sammenlignes med en tabel over almindelige navne. Hvis navnet
+		 * findes heri, benyttes den hertil svarende tabelkode
 		 *
 		 * Rykket foran næste afsnit af MER
 		 *
@@ -180,8 +182,8 @@ public class Fonkod {
 		// }
 		// System.out.println(out + "\tNot found in lookUpTable ");
 		/**
-		 * Indledningsvis omsættes visse tegn, således at en første
-		 * standardisering af navnet opnås
+		 * Indledningsvis omsættes visse tegn, således at en første standardisering af
+		 * navnet opnås
 		 */
 		p = Pattern.compile("(\\.|-|\\s|/)+");
 		sa = p.split(out);
@@ -193,9 +195,9 @@ public class Fonkod {
 		}
 
 		/**
-		 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere
-		 * end to vokaler indgår i en vokalgruppe, behandles vokalerne parvis
-		 * med start forfra i gruppen.
+		 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere end to
+		 * vokaler indgår i en vokalgruppe, behandles vokalerne parvis med start forfra
+		 * i gruppen.
 		 */
 		sa = p.split(sb.toString().trim());
 		sb = new StringBuffer();
@@ -238,8 +240,7 @@ public class Fonkod {
 		}
 
 		/**
-		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én
-		 * sammenhæng
+		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én sammenhæng
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
@@ -267,8 +268,8 @@ public class Fonkod {
 		}
 
 		/**
-		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én
-		 * sammenhæng igen
+		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én sammenhæng
+		 * igen
 		 */
 		sa = p.split(sb.toString());
 		sb = new StringBuffer();
@@ -334,8 +335,8 @@ public class Fonkod {
 	}
 
 	/**
-	 * Indledningsvis omsættes visse tegn, således at en første standardisering
-	 * af navnet opnås
+	 * Indledningsvis omsættes visse tegn, således at en første standardisering af
+	 * navnet opnås
 	 *
 	 * @param nextToken
 	 * @return
@@ -494,9 +495,9 @@ public class Fonkod {
 	}
 
 	/**
-	 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere end
-	 * to vokaler indgår i en vokalgruppe, behandles vokalerne parvis med start
-	 * forfra i gruppen
+	 * Første vokalgruppe identificeres og omdannes efter behov. Hvis flere end to
+	 * vokaler indgår i en vokalgruppe, behandles vokalerne parvis med start forfra
+	 * i gruppen
 	 *
 	 * @param input
 	 * @return String

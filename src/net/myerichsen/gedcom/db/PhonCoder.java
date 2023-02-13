@@ -2,24 +2,26 @@ package net.myerichsen.gedcom.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Read each individual in a table. Insert phonetic coding of first word in
- * FIRSTNAMES and of LASTNAME and store the result in PHONNAME.
+ * Read each individual in a table. Insert phonetic coding of FIRSTNAMES and
+ * LASTNAME and store the result in PHONNAME.
  * 
  * C:\Users\michael\CPHDB CPH.BURIAL_PERSON_COMPLETE FIRSTNAMES LASTNAME
  * PHONNAME
  * 
  * @author Michael Erichsen
- * @version 12. feb. 2023
+ * @version 13. feb. 2023
  *
  */
+
+// TODO  Code page                                                                                         MÃ¸ller                                                                                              NULL                                                                                                        0     NULL     6.00    NULL     NULL NULL        1909-09-28         1909 Dronning Louises BÃ¸rnehospital (DLH - D L H - FRA 1879 - 1971), Øster Farimagsgade 34 NULL                      NULL                    Mand       NULL                                                                     Bispebjerg KirkegÃ¥rd                                                                                Kommunehospitalet (KH)                                                                               Christians                                                                                           Egilsgade                                                                   Amager Vest                          30 NULL   NULL  NULL                                                                                                 NULL                                                                        NULL                                           NULL Banearbejder (Banearbeider)                                                 Fars erhverv                                          Atrophia infantilis (Atrophia infantum)                                                              Atrophia infantilis (Atrophia infant.)                                                                                                                               
+
 public class PhonCoder {
 	private static Logger logger;
 
@@ -33,9 +35,9 @@ public class PhonCoder {
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("DBLister");
-
+		logger = Logger.getLogger("PhonCoder");
 		final PhonCoder pc = new PhonCoder();
+
 		try {
 			pc.execute(args);
 		} catch (final Exception e) {
@@ -45,68 +47,65 @@ public class PhonCoder {
 	}
 
 	/**
-	 * Connect to the Derby database
-	 * 
-	 * @return connected statement
-	 *
-	 * @throws SQLException
-	 *
-	 */
-	private Statement connectToDB(String[] args) throws SQLException {
-		final String dbURL1 = "jdbc:derby:" + args[0];
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		System.out.println("Connected to database " + dbURL1);
-		return conn1.createStatement();
-	}
-
-	/**
 	 * Worker method
 	 * 
 	 * @param args
+	 * @throws SQLException
 	 * @throws Exception
 	 * 
 	 */
-	private void execute(String[] args) throws Exception {
-		int counter = 0;
-		String phonName = "";
+	private void execute(String[] args) throws SQLException {
+		final String COUNT = "SELECT COUNT(*) FROM %s";
+		final String SELECT = "SELECT %s, %s FROM %s FOR UPDATE OF %s";
+		final String UPDATE = "UPDATE %s SET %s = '%s' WHERE CURRENT OF PHONCURSOR";
 		final Fonkod fk = new Fonkod();
+		final String dbURL = "jdbc:derby:" + args[0];
+		int counter = 0;
+		Connection conn;
+		Statement statement;
+		PreparedStatement ps;
+		String phonName;
 
-		final Statement statement = connectToDB(args);
-
-		final String SELECT = "SELECT " + args[2] + ", " + args[3] + " FROM " + args[1] + " FOR UPDATE OF " + args[4];
-		logger.fine(SELECT);
-
-		String[] sa;
-		final List<String[]> lsa = new ArrayList<>();
-
-		final ResultSet rs = statement.executeQuery(SELECT);
-
-		while (rs.next()) {
-			sa = new String[2];
-			sa[0] = rs.getString(args[2]).trim();
-			sa[1] = rs.getString(args[3]).trim();
-			lsa.add(sa);
+		try {
+			conn = DriverManager.getConnection(dbURL);
+			conn.setAutoCommit(false);
+			logger.info("Connected to database " + dbURL);
+			statement = conn.createStatement();
+			statement.setCursorName("PHONCURSOR");
+		} catch (final SQLException e) {
+			throw new SQLException(e);
 		}
 
-		logger.info("Læste rækker: " + lsa.size());
+		String query = String.format(COUNT, args[1]);
+		ResultSet rs = statement.executeQuery(query);
+		if (rs.next()) {
+			logger.info("Tabellen indeholder " + rs.getInt(1) + " rækker");
+		}
 
-		final String UPDATE = "UPDATE " + args[1] + " SET " + args[4] + " = '%s' WHERE " + args[2] + " = '%s' AND "
-				+ args[3] + " = '%s'";
-		String query = "";
+		query = String.format(SELECT, args[2], args[3], args[1], args[4]);
+		logger.info(query);
 
-		for (final String[] strings : lsa) {
-			phonName = fk.generateKey(strings[0]) + " " + fk.generateKey(strings[1]);
-			query = String.format(UPDATE, phonName, strings[0], strings[1]);
-			statement.executeUpdate(query);
+		rs = statement.executeQuery(query);
+
+		while (rs.next()) {
+			try {
+				phonName = fk.generateKey(rs.getString(args[2]).trim() + " " + rs.getString(args[3]).trim());
+			} catch (final Exception e) {
+				phonName = "";
+			}
+
+			query = String.format(UPDATE, args[1], args[4], phonName);
+			ps = conn.prepareStatement(query);
+			ps.execute();
 			counter++;
 
-			if ((counter % 1000) == 0) {
+			if ((counter % 10000) == 0) {
 				logger.info("Opdateret " + counter);
 			}
 		}
 
+		conn.commit();
 		statement.close();
 		logger.info(counter + " rækker er opdateret");
 	}
-
 }
