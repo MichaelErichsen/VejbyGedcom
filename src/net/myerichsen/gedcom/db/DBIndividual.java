@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * Class representing some individual data
  *
  * @author Michael Erichsen
- * @version 2023-01-28
+ * @version 14-02-2023
  *
  */
 public class DBIndividual {
@@ -19,6 +19,7 @@ public class DBIndividual {
 	private int birthYear = 0;
 	private int deathYear = 9999;
 	private String birthPlace = "";
+	private String phonName = "";
 
 	/**
 	 * Constructor
@@ -28,18 +29,22 @@ public class DBIndividual {
 	 * @throws SQLException
 	 */
 	public DBIndividual(Statement statement, String id) throws SQLException {
-		super();
-		this.setId("@I" + id + "@");
+		if (id.contains("@")) {
+			this.setId(id);
+		} else {
+			this.setId("@I" + id + "@");
+		}
 
-		String query = "SELECT GIVENNAME, SURNAME from VEJBY.INDIVIDUAL WHERE ID ='" + this.id + "'";
+		String query = "SELECT * from VEJBY.INDIVIDUAL WHERE ID ='" + this.id + "'";
 
 		ResultSet rs = statement.executeQuery(query);
 
 		if (rs.next()) {
 			name = rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim();
+			phonName = rs.getString("PHONNAME");
 		}
 
-		query = "SELECT ID, TYPE, DATE, PLACE,INDIVIDUAL FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + this.id
+		query = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = '" + this.id
 				+ "' AND ( TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
 
 		rs = statement.executeQuery(query);
@@ -96,6 +101,13 @@ public class DBIndividual {
 	}
 
 	/**
+	 * @return the phonName
+	 */
+	public String getPhonName() {
+		return phonName;
+	}
+
+	/**
 	 * Get year in integer format
 	 *
 	 * @param date
@@ -113,42 +125,44 @@ public class DBIndividual {
 	}
 
 	/**
-	 * @param birthPlace
-	 *            the birthPlace to set
+	 * @param birthPlace the birthPlace to set
 	 */
 	public void setBirthPlace(String birthPlace) {
 		this.birthPlace = birthPlace;
 	}
 
 	/**
-	 * @param birthYear
-	 *            the birthYear to set
+	 * @param birthYear the birthYear to set
 	 */
 	public void setBirthYear(int birthYear) {
 		this.birthYear = birthYear;
 	}
 
 	/**
-	 * @param deathYear
-	 *            the deathYear to set
+	 * @param deathYear the deathYear to set
 	 */
 	public void setDeathYear(int deathYear) {
 		this.deathYear = deathYear;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * @param phonName the phonName to set
+	 */
+	public void setPhonName(String phonName) {
+		this.phonName = phonName;
 	}
 }

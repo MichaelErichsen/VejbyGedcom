@@ -20,12 +20,12 @@ import java.util.logging.Logger;
  *
  */
 
-// TODO  Code page                                                                                         MÃ¸ller                                                                                              NULL                                                                                                        0     NULL     6.00    NULL     NULL NULL        1909-09-28         1909 Dronning Louises BÃ¸rnehospital (DLH - D L H - FRA 1879 - 1971), Øster Farimagsgade 34 NULL                      NULL                    Mand       NULL                                                                     Bispebjerg KirkegÃ¥rd                                                                                Kommunehospitalet (KH)                                                                               Christians                                                                                           Egilsgade                                                                   Amager Vest                          30 NULL   NULL  NULL                                                                                                 NULL                                                                        NULL                                           NULL Banearbejder (Banearbeider)                                                 Fars erhverv                                          Atrophia infantilis (Atrophia infantum)                                                              Atrophia infantilis (Atrophia infant.)                                                                                                                               
-
 public class PhonCoder {
 	private static Logger logger;
 
 	/**
+	 * Main method
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -66,6 +66,8 @@ public class PhonCoder {
 		PreparedStatement ps;
 		String phonName;
 
+		// Connect to Derby database
+
 		try {
 			conn = DriverManager.getConnection(dbURL);
 			conn.setAutoCommit(false);
@@ -76,11 +78,15 @@ public class PhonCoder {
 			throw new SQLException(e);
 		}
 
+		// Get row count
+
 		String query = String.format(COUNT, args[1]);
 		ResultSet rs = statement.executeQuery(query);
 		if (rs.next()) {
 			logger.info("Tabellen indeholder " + rs.getInt(1) + " rækker");
 		}
+
+		// Select each row in the individual table
 
 		query = String.format(SELECT, args[2], args[3], args[1], args[4]);
 		logger.info(query);
@@ -88,11 +94,15 @@ public class PhonCoder {
 		rs = statement.executeQuery(query);
 
 		while (rs.next()) {
+			// Generate a phonetic key for the name
+
 			try {
 				phonName = fk.generateKey(rs.getString(args[2]).trim() + " " + rs.getString(args[3]).trim());
 			} catch (final Exception e) {
 				phonName = "";
 			}
+
+			// Update the individual with a phonetic name
 
 			query = String.format(UPDATE, args[1], args[4], phonName);
 			ps = conn.prepareStatement(query);

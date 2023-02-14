@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  *
  *
  * @author Michael Erichsen
- * @version 4. feb. 2023
+ * @version 14. feb. 2023
  *
  */
 public class CensusFinder {
@@ -156,8 +156,8 @@ public class CensusFinder {
 	private void execute(String[] args) throws SQLException, IOException {
 		final Statement statement = connectToDB(args);
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
-		logger.fine("Searching for censuses for " + individual.getName() + ", born " + individual.getBirthYear()
-				+ " in " + individual.getBirthPlace());
+		logger.info("Searching for censuses for ID " + individual.getId() + ", " + individual.getName() + ", born "
+				+ individual.getBirthYear() + " in " + individual.getBirthPlace());
 		outName = args[3] + "/" + individual.getName() + "_census.csv";
 
 		parseCsvFiles(individual, args);

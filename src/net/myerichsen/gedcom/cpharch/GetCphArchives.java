@@ -28,11 +28,11 @@ public class GetCphArchives {
 	public static void main(String[] args) {
 		if (args.length < 5) {
 			System.out.println(
-					"Usage: GetCphArchives individualId vejbydatabasepath cphdatabasepath dddcsvfilepath outputdirectory");
+					"Usage: FindLocationSources individualId vejbydatabasepath cphdatabasepath dddcsvfilepath outputdirectory");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("GetCphArchives");
+		logger = Logger.getLogger("FindLocationSources");
 
 		final GetCphArchives gca = new GetCphArchives();
 
