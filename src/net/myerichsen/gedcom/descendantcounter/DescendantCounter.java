@@ -86,8 +86,7 @@ public class DescendantCounter {
 	private static Gedcom readGedcom(String filename) throws IOException, GedcomParserException {
 		final GedcomParser gp = new GedcomParser();
 		gp.load(filename);
-		final Gedcom gedcom = gp.getGedcom();
-		return gedcom;
+		return gp.getGedcom();
 	}
 
 }

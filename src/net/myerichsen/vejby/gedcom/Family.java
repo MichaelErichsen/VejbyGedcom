@@ -29,7 +29,6 @@ public class Family {
 	 * @param familyId
 	 */
 	public Family(int householdId, int familyId) {
-		super();
 		this.setHouseholdId(householdId);
 		this.setFamilyId(familyId);
 	}
@@ -88,7 +87,8 @@ public class Family {
 			members[index][1] = father.getName();
 			members[index][2] = father.getMaritalStatus();
 			members[index][3] = father.getTrade();
-			members[index++][4] = "Fader";
+			members[index][4] = "Fader";
+			index++;
 		}
 
 		if (mother != null) {
@@ -96,7 +96,8 @@ public class Family {
 			members[index][1] = mother.getName();
 			members[index][2] = mother.getMaritalStatus();
 			members[index][3] = mother.getTrade();
-			members[index++][4] = "Moder";
+			members[index][4] = "Moder";
+			index++;
 		}
 
 		for (final Individual child : children) {
@@ -104,7 +105,8 @@ public class Family {
 			members[index][1] = child.getName();
 			members[index][2] = child.getMaritalStatus();
 			members[index][3] = child.getTrade();
-			members[index++][4] = "Barn";
+			members[index][4] = "Barn";
+			index++;
 		}
 
 		for (final Individual single : singles) {
@@ -112,7 +114,8 @@ public class Family {
 			members[index][1] = single.getName();
 			members[index][2] = single.getMaritalStatus();
 			members[index][3] = single.getTrade();
-			members[index++][4] = "";
+			members[index][4] = "";
+			index++;
 		}
 
 		return members;
@@ -152,15 +155,14 @@ public class Family {
 	/**
 	 * Remove an indvidual from a family
 	 *
-	 * @param individual
-	 *            The individual to be removed
+	 * @param individual The individual to be removed
 	 */
 	public void removeIndividual(Individual individual) {
-		if (getFather() != null && getFather().equals(individual)) {
+		if ((getFather() != null) && getFather().equals(individual)) {
 			setFather(null);
 		}
 
-		if (getMother() != null && getMother().equals(individual)) {
+		if ((getMother() != null) && getMother().equals(individual)) {
 			setMother(null);
 		}
 
@@ -186,64 +188,56 @@ public class Family {
 	}
 
 	/**
-	 * @param children
-	 *            the children to set
+	 * @param children the children to set
 	 */
 	public void setChildren(List<Individual> children) {
 		this.children = children;
 	}
 
 	/**
-	 * @param familyId
-	 *            the familyId to set
+	 * @param familyId the familyId to set
 	 */
 	public void setFamilyId(int familyId) {
 		this.familyId = familyId;
 	}
 
 	/**
-	 * @param father
-	 *            the father to set
+	 * @param father the father to set
 	 */
 	public void setFather(Individual father) {
 		this.father = father;
 	}
 
 	/**
-	 * @param householdId
-	 *            the householdId to set
+	 * @param householdId the householdId to set
 	 */
 	public void setHouseholdId(int householdId) {
 		this.householdId = householdId;
 	}
 
 	/**
-	 * @param marriageDate
-	 *            the marriageDate to set
+	 * @param marriageDate the marriageDate to set
 	 */
 	public void setMarriageDate(String marriageDate) {
 		this.marriageDate = marriageDate;
 	}
 
 	/**
-	 * @param marriagePlace
-	 *            the marriagePlace to set
+	 * @param marriagePlace the marriagePlace to set
 	 */
 	public void setMarriagePlace(String marriagePlace) {
 		this.marriagePlace = marriagePlace;
 	}
 
 	/**
-	 * @param mother
-	 *            the mother to set
+	 * @param mother the mother to set
 	 */
 	public void setMother(Individual mother) {
 		this.mother = mother;
 	}
 
 	/**
-	 * @param singles
-	 *            the singles to set
+	 * @param singles the singles to set
 	 */
 	public void setSingles(List<Individual> singles) {
 		this.singles = singles;

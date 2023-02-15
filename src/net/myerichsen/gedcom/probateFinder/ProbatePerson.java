@@ -31,13 +31,12 @@ public class ProbatePerson {
 	 * @param birthDate
 	 */
 	public ProbatePerson(Entry<String, Individual> individual) {
-		super();
 		key = individual.getKey().replace("@I", "").replace("@", "");
 		final Individual value = individual.getValue();
 		name = value.getNames().get(0).getBasic();
 		List<IndividualEvent> births = value.getEventsOfType(IndividualEventType.BIRTH);
 
-		if (births.isEmpty() || births.size() == 0) {
+		if (births.isEmpty() || (births.size() == 0)) {
 			births = value.getEventsOfType(IndividualEventType.CHRISTENING);
 		}
 
@@ -54,7 +53,7 @@ public class ProbatePerson {
 
 		List<IndividualEvent> evList = value.getEventsOfType(IndividualEventType.DEATH);
 
-		if (evList.isEmpty() || evList.size() == 0) {
+		if (evList.isEmpty() || (evList.size() == 0)) {
 			evList = value.getEventsOfType(IndividualEventType.BURIAL);
 		}
 
@@ -63,14 +62,14 @@ public class ProbatePerson {
 		LocalDate eventDate;
 		Place place;
 
-		if (evList.isEmpty() || evList.size() == 0) {
+		if (evList.isEmpty() || (evList.size() == 0)) {
 			evList = value.getEvents();
 		}
 
 		for (final IndividualEvent individualEvent : evList) {
 			eventDate = ProbateUtil.parseProbateDate(individualEvent);
 
-			if (eventDate != null && eventDate.isAfter(lastDate) && individualEvent.getPlace() != null) {
+			if ((eventDate != null) && eventDate.isAfter(lastDate) && (individualEvent.getPlace() != null)) {
 				lastDate = eventDate;
 
 				place = individualEvent.getPlace();
@@ -88,14 +87,14 @@ public class ProbatePerson {
 	/**
 	 * Convert character month to decimal month
 	 *
-	 * @param month
-	 *            as 3 character string
+	 * @param month as 3 character string
 	 * @return month as two digit string
 	 */
 	private String convertMonth(String month) {
 		if (month.equals("JAN")) {
 			return "01";
-		} else if (month.equals("FEB")) {
+		}
+		if (month.equals("FEB")) {
 			return "02";
 		} else if (month.equals("MAR")) {
 			return "03";

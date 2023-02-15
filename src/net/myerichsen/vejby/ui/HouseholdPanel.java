@@ -65,8 +65,7 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 *
-	 * @param vejbyGedcom
-	 *            The main panel of the application
+	 * @param vejbyGedcom The main panel of the application
 	 */
 	public HouseholdPanel(VejbyGedcom vejbyGedcom) {
 		this.vejbyGedcom = vejbyGedcom;
@@ -178,17 +177,22 @@ public class HouseholdPanel extends JPanel {
 	 * <p>
 	 * Set requested family role to spaces
 	 *
-	 * @param i
-	 *            Family number
+	 * @param i Family number
 	 */
 	private void clearFamilyRoles(int i) {
 		for (final Individual individual : selectedHousehold.getPersons()) {
-			if (i == 2) {
+			switch (i) {
+			case 2:
 				individual.setFamilyRole2("");
-			} else if (i == 3) {
+				break;
+			case 3:
 				individual.setFamilyRole3("");
-			} else if (i == 4) {
+				break;
+			case 4:
 				individual.setFamilyRole4("");
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -242,18 +246,15 @@ public class HouseholdPanel extends JPanel {
 	}
 
 	/**
-	 * Populate table with family data. Rows contain father, mother and
-	 * children.
+	 * Populate table with family data. Rows contain father, mother and children.
 	 *
-	 * @param householdId
-	 *            The id of the household
-	 * @param familyId
-	 *            The id of the family in the household
+	 * @param householdId The id of the household
+	 * @param familyId    The id of the family in the household
 	 */
 	private void populateFamilyTable(int householdId, int familyId) {
 		final Family family = censusTable.getFamily(householdId, familyId);
 
-		final String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Rolle" };
+		final String[] columnNames = { "Løbenr", "Navn", "Civilstand", "Erhverv", "Rolle" };
 		final String[][] data = family.getMembers();
 
 		final DefaultTableModel familyTableModel = new DefaultTableModel(data, columnNames);
@@ -266,12 +267,11 @@ public class HouseholdPanel extends JPanel {
 	 * If a household is selected in the tree then display all persons in the
 	 * household.
 	 * <p>
-	 * Next columns marks up to three family roles and can be edited. Each
-	 * contains a combobox to select a new family role. A second and a third
-	 * Family is created, when button is pressed.
+	 * Next columns marks up to three family roles and can be edited. Each contains
+	 * a combobox to select a new family role. A second and a third Family is
+	 * created, when button is pressed.
 	 *
-	 * @param id
-	 *            The id of the household
+	 * @param id The id of the household
 	 */
 	private void populateHouseholdTable(int id) {
 		Individual person;
@@ -279,8 +279,8 @@ public class HouseholdPanel extends JPanel {
 		selectedHousehold = censusTable.getHouseholds().get(id);
 
 		// Create table
-		final String[] columnNames = new String[] { "Løbenr", "Navn", "Civilstand", "Erhverv", "Stilling", "Familie 1",
-				"Familie 2", "Familie 3", "Familie 4" };
+		final String[] columnNames = { "Løbenr", "Navn", "Civilstand", "Erhverv", "Stilling", "Familie 1", "Familie 2",
+				"Familie 3", "Familie 4" };
 		final int size = selectedHousehold.getPersonCount();
 		final String[][] data = new String[size][columnNames.length];
 
@@ -316,8 +316,7 @@ public class HouseholdPanel extends JPanel {
 	 * Populate the table with either a household or a family, depending on
 	 * selection the tree.
 	 *
-	 * @param table
-	 *            The visible table
+	 * @param table The visible table
 	 */
 	private void populateTable(JTable table) {
 		final DefaultMutableTreeNode lastSelectedPathComponent = (DefaultMutableTreeNode) tree
@@ -438,11 +437,11 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Update the singles list (family 0) and the second family.
 	 * <p>
-	 * The list starts empty. Each individual added must be removed from family
-	 * 0, but not from 1 or 3.
+	 * The list starts empty. Each individual added must be removed from family 0,
+	 * but not from 1 or 3.
 	 * <p>
-	 * If this cannot be done concurrently, then family 0 must be deleted and
-	 * then populated by all individuals not in families 1-3.
+	 * If this cannot be done concurrently, then family 0 must be deleted and then
+	 * populated by all individuals not in families 1-3.
 	 */
 	protected void updateFamily2() {
 		Individual individual;

@@ -122,8 +122,7 @@ public class Parser {
 	}
 
 	/**
-	 * Parse all lines in the kipdata text file. Read each line into a String
-	 * list.
+	 * Parse all lines in the kipdata text file. Read each line into a String list.
 	 *
 	 * @return kipLines A List of Strings
 	 * @throws IOException
@@ -186,7 +185,8 @@ public class Parser {
 
 		// Print each person in the same household
 
-		String thisLine = csvLines.get(firstInHousehold++);
+		String thisLine = csvLines.get(firstInHousehold);
+		firstInHousehold++;
 		fields = thisLine.split(";");
 
 		while (fields[householdColumn].equals(household)) {
@@ -322,8 +322,7 @@ public class Parser {
 	}
 
 	/**
-	 * @param csvFileDirectory
-	 *            the csvFileDirectory to set
+	 * @param csvFileDirectory the csvFileDirectory to set
 	 */
 	public void setCsvFileDirectory(String csvFileDirectory) {
 		if (!csvFileDirectory.endsWith("/")) {
@@ -334,24 +333,21 @@ public class Parser {
 	}
 
 	/**
-	 * @param csvFileName
-	 *            the csvFileName to set
+	 * @param csvFileName the csvFileName to set
 	 */
 	public void setCsvFileName(String csvFileName) {
 		this.csvFileName = csvFileName;
 	}
 
 	/**
-	 * @param kipLine
-	 *            the kipLine to set
+	 * @param kipLine the kipLine to set
 	 */
 	public void setKipLine(String kipLine) {
 		this.kipLine = kipLine;
 	}
 
 	/**
-	 * @param kipTextFileName
-	 *            the kipTextFileName to set
+	 * @param kipTextFileName the kipTextFileName to set
 	 */
 	public void setKipTextFileName(String kipTextFileName) {
 		this.kipTextFileName = kipTextFileName;

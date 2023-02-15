@@ -67,11 +67,11 @@ public class ConfirmationPanel extends FsPanel {
 	}
 
 	/**
-	 * Open one or more tsv files from Family Search and reduce them to the
-	 * relevant columns:
+	 * Open one or more tsv files from Family Search and reduce them to the relevant
+	 * columns:
 	 *
-	 * fullName 8, sex 9, birthLikeDate 10, birthLikePlaceText 11,
-	 * fatherFullName 22, motherFullName 23, otherEvents 28
+	 * fullName 8, sex 9, birthLikeDate 10, birthLikePlaceText 11, fatherFullName
+	 * 22, motherFullName 23, otherEvents 28
 	 */
 	@Override
 	protected void openTsvFile() {
@@ -149,8 +149,6 @@ public class ConfirmationPanel extends FsPanel {
 
 					sc.close();
 					fis.close();
-				} catch (final FileNotFoundException e) {
-					LOGGER.log(Level.SEVERE, e.getMessage());
 				} catch (final IOException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
@@ -170,8 +168,8 @@ public class ConfirmationPanel extends FsPanel {
 	}
 
 	/**
-	 * Instantiate a GedcomFile object and populate it with the confirmation
-	 * data. Choose a file name and save it.
+	 * Instantiate a GedcomFile object and populate it with the confirmation data.
+	 * Choose a file name and save it.
 	 */
 	@Override
 	protected void saveAsGedcom() {
@@ -190,7 +188,8 @@ public class ConfirmationPanel extends FsPanel {
 
 			family = new Family(0, i);
 
-			child = new Individual(individualId++);
+			child = new Individual(individualId);
+			individualId++;
 
 			final String childName = line[0];
 
@@ -203,13 +202,11 @@ public class ConfirmationPanel extends FsPanel {
 			// Handle cases with and without child surnames
 			if (childNamePart.length == 1) {
 				child.setName(childName + " ?");
+			} else if (childName.endsWith("sen") || childName.endsWith("datter") || childName.endsWith("dtr")
+					|| childName.endsWith("d") || childName.endsWith("D") || childName.endsWith("son")) {
+				child.setName(childName);
 			} else {
-				if (childName.endsWith("sen") || childName.endsWith("datter") || childName.endsWith("dtr")
-						|| childName.endsWith("d") || childName.endsWith("D") || childName.endsWith("son")) {
-					child.setName(childName);
-				} else {
-					child.setName(childName + " ?");
-				}
+				child.setName(childName + " ?");
 			}
 
 			child.setSex(line[1].equals("male") ? "M" : "F");

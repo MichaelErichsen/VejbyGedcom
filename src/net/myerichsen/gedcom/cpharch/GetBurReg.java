@@ -105,7 +105,7 @@ public class GetBurReg {
 					calcYear = 0;
 				}
 
-				if (calcYear > 2 || calcYear < -2) {
+				if ((calcYear > 2) || (calcYear < -2)) {
 					continue;
 				}
 			}

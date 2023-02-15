@@ -38,7 +38,6 @@ public class MatchPerson {
 	 * @param individual
 	 */
 	public MatchPerson(Entry<String, Individual> individual) {
-		super();
 		populate(individual);
 	}
 
@@ -49,11 +48,7 @@ public class MatchPerson {
 	 * @return True if equal
 	 */
 	public boolean equals(MatchPerson o) {
-		if (birthDate.contains("BEF ")) {
-			return false;
-		}
-
-		if (o.getBirthDate().contains("BEF ")) {
+		if (birthDate.contains("BEF ") || o.getBirthDate().contains("BEF ")) {
 			return false;
 		}
 
@@ -202,14 +197,14 @@ public class MatchPerson {
 		sex = value.getSex().getValue();
 		List<IndividualEvent> event = value.getEventsOfType(IndividualEventType.BIRTH);
 
-		if (event != null && event.size() > 0) {
+		if ((event != null) && (event.size() > 0)) {
 			birthDate = event.get(0).getDate().getValue();
 			birthYear = getYear(birthDate);
 			birtChrFlag = "B";
 		} else {
 			event = value.getEventsOfType(IndividualEventType.CHRISTENING);
 
-			if (event != null && event.size() > 0) {
+			if ((event != null) && (event.size() > 0)) {
 				birthDate = event.get(0).getDate().getValue();
 				birthYear = getYear(birthDate);
 				birtChrFlag = "C";
@@ -222,8 +217,7 @@ public class MatchPerson {
 	}
 
 	/**
-	 * @param individual
-	 *            the individual to set
+	 * @param individual the individual to set
 	 */
 	public void setIndividual(Entry<String, Individual> individual) {
 		this.individual = individual;

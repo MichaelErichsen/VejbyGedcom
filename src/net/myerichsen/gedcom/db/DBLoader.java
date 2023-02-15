@@ -95,7 +95,7 @@ public class DBLoader {
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB(String url) throws SQLException {
+	private void connectToDB() throws SQLException {
 		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
 		final Connection conn1 = DriverManager.getConnection(dbURL1);
 		System.out.println("Connected to database " + dbURL1);
@@ -109,7 +109,7 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
-		connectToDB(args[1]);
+		connectToDB();
 
 		System.out.println("Reading " + args[0]);
 		readGedcom(args[0]);
@@ -186,12 +186,12 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void insertFamilyEvent(Family family) throws Exception {
-		StringBuffer sb;
+		StringBuilder sb;
 		StringWithCustomFacts subtype;
 		StringWithCustomFacts date;
 		List<NoteStructure> noteStructures;
 		List<String> lines;
-		StringBuffer lineBuffer;
+		StringBuilder lineBuffer;
 		Place place;
 
 		String query;
@@ -203,7 +203,7 @@ public class DBLoader {
 		}
 
 		for (final FamilyEvent familyEvent : events) {
-			sb = new StringBuffer(
+			sb = new StringBuilder(
 					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, NOTE, INDIVIDUAL) VALUES('");
 			sb.append(familyEvent.getType());
 			subtype = familyEvent.getSubType();
@@ -236,7 +236,7 @@ public class DBLoader {
 				sb.append("NULL, '");
 			} else {
 				lines = noteStructures.get(0).getLines();
-				lineBuffer = new StringBuffer();
+				lineBuffer = new StringBuilder();
 
 				for (final String string : lines) {
 					lineBuffer.append(string + " ");
@@ -301,13 +301,12 @@ public class DBLoader {
 
 		final SQLException e) {
 			// Handle duplicates
-			if (e.getSQLState().equals("23505")) {
-				logger.fine("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
-				updateIndividual(individual);
-			} else {
+			if (!e.getSQLState().equals("23505")) {
 				throw new Exception(
 						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 			}
+			logger.fine("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+			updateIndividual(individual);
 		}
 	}
 
@@ -318,13 +317,13 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void insertIndividualEvent(Individual individual) throws Exception {
-		StringBuffer sb;
+		StringBuilder sb;
 		StringWithCustomFacts subtype;
 		StringWithCustomFacts date;
 		Place place;
 		List<NoteStructure> noteStructures;
 		List<String> lines;
-		StringBuffer lineBuffer;
+		StringBuilder lineBuffer;
 		String query;
 
 		final List<IndividualEvent> events = individual.getEvents();
@@ -334,7 +333,7 @@ public class DBLoader {
 		}
 
 		for (final IndividualEvent individualEvent : events) {
-			sb = new StringBuffer(
+			sb = new StringBuilder(
 					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('");
 			sb.append(individualEvent.getType());
 			subtype = individualEvent.getSubType();
@@ -367,7 +366,7 @@ public class DBLoader {
 				sb.append("NULL)");
 			} else {
 				lines = noteStructures.get(0).getLines();
-				lineBuffer = new StringBuffer();
+				lineBuffer = new StringBuilder();
 
 				for (final String string : lines) {
 					lineBuffer.append(string + " ");
@@ -421,13 +420,12 @@ public class DBLoader {
 
 		final SQLException e) {
 			// Handle duplicates
-			if (e.getSQLState().equals("23505")) {
-				logger.info("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
-				updateIndividual(individual);
-			} else {
+			if (!e.getSQLState().equals("23505")) {
 				throw new Exception(
 						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 			}
+			logger.info("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+			updateIndividual(individual);
 		}
 	}
 
@@ -483,8 +481,6 @@ public class DBLoader {
 
 			insertFamilyEvent(family);
 		}
-
-		return;
 	}
 
 	/**
@@ -583,13 +579,11 @@ public class DBLoader {
 				logger.fine(query);
 			} catch (final SQLException e) {
 				// Handle family not yet inserted
-				if (e.getSQLState().equals("23503")) {
-					logger.fine(
-							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
-				} else {
+				if (!e.getSQLState().equals("23503")) {
 					throw new Exception(
 							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 				}
+				logger.fine("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 
 			}
 		}

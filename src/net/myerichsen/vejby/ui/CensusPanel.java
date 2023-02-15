@@ -110,8 +110,7 @@ public class CensusPanel extends JPanel {
 	}
 
 	/**
-	 * Choose and open a KIP file, remove empty columns and display i a tabbed
-	 * pane.
+	 * Choose and open a KIP file, remove empty columns and display i a tabbed pane.
 	 *
 	 * @param vejbyGedcom
 	 */
@@ -162,8 +161,6 @@ public class CensusPanel extends JPanel {
 				LOGGER.log(Level.INFO, message);
 				sc.close();
 				fis.close();
-			} catch (final FileNotFoundException e) {
-				LOGGER.log(Level.SEVERE, e.getMessage());
 			} catch (final IOException e) {
 				LOGGER.log(Level.SEVERE, e.getMessage());
 			}
@@ -195,16 +192,14 @@ public class CensusPanel extends JPanel {
 	}
 
 	/**
-	 * @param censusModel
-	 *            the censusModel to set
+	 * @param censusModel the censusModel to set
 	 */
 	public void setCensusModel(DefaultTableModel censusModel) {
 		this.censusModel = censusModel;
 	}
 
 	/**
-	 * @param censusTable
-	 *            the censusTable to set
+	 * @param censusTable the censusTable to set
 	 */
 	public void setCensusTable(Census censusTable) {
 		this.censusTable = censusTable;

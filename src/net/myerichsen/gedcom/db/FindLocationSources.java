@@ -21,6 +21,7 @@ import java.util.logging.Logger;
  * @version 15. feb. 2023
  */
 public class FindLocationSources {
+	private static final String KRONBORG = "ronb";
 	private static Logger logger;
 
 	/**
@@ -57,7 +58,6 @@ public class FindLocationSources {
 	 * @param args
 	 * @throws SQLException
 	 * @throws IOException
-	 * @throws Exception
 	 */
 	private void execute(String[] args) throws SQLException, IOException {
 		// Connect to Derby
@@ -71,23 +71,6 @@ public class FindLocationSources {
 
 		final List<DBIndividual> ldbi = getIndividualIds(statement, args);
 
-		// For each individual, get census records
-//		String[] vejbyArgs;
-//
-//		for (final DBIndividual individual : ldbi) {
-//			vejbyArgs = new String[4];
-//			vejbyArgs[0] = individual.getId();
-//			vejbyArgs[1] = args[1];
-//			vejbyArgs[2] = args[3];
-//			vejbyArgs[3] = args[4];
-//
-//			try {
-//				new CensusFinder(vejbyArgs);
-//			} catch (final Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-
 		// For each individual, get probate records
 
 		for (final DBIndividual individual : ldbi) {
@@ -98,7 +81,9 @@ public class FindLocationSources {
 	}
 
 	/**
-	 * @param indId
+	 * Find probates mentioning the individual
+	 *
+	 * @param individual
 	 * @param args
 	 * @throws SQLException
 	 * @throws IOException
@@ -117,40 +102,34 @@ public class FindLocationSources {
 
 		final ResultSet rs = statement.executeQuery(query);
 		String singleLine;
-		HashSet<String> outLines = new HashSet<String>();
+		final HashSet<String> outLines = new HashSet<>();
 
 		while (rs.next()) {
 			if (rs.getString("COVERED_DATA").toLowerCase().contains(args[0].toLowerCase())) {
-				logger.fine(query);
 				singleLine = individual.getId() + ";" + rs.getString("ID").trim() + ";"
 						+ rs.getString("FROMDATE").trim() + ";" + rs.getString("TODATE").trim() + ";"
 						+ rs.getString("PLACE").trim() + ";" + rs.getString("EVENTTYPE").trim() + ";"
-						+ rs.getString("VITALTYPE").trim() + ";" + rs.getString("COVERED_DATA").trim() + ";"
-						+ rs.getString("SOURCE").trim() + ";" + rs.getString("NAME").trim() + ";"
-						+ rs.getString("FONKOD").trim();
+						+ rs.getString("VITALTYPE").trim() + ";" + rs.getString("COVERED_DATA").replace(";", ".").trim()
+						+ ";" + rs.getString("SOURCE").replace(";", ".").trim() + ";" + rs.getString("NAME").trim()
+						+ ";" + rs.getString("FONKOD").trim();
 				singleLine = singleLine.replaceAll("\\r\\n", " ¤ ");
-				logger.fine(singleLine);
 
-				if (singleLine.toLowerCase().contains("ronb")) {
-					if (outLines.add(singleLine)) {
-						counter++;
-					}
+				if (singleLine.toLowerCase().contains(KRONBORG) && outLines.add(singleLine)) {
+					counter++;
 				}
 			}
 		}
 
-		logger.info(counter + " records read for " + individual.getName());
-
 		statement.close();
 
 		if (counter > 0) {
-			String outName = args[4] + "/" + individual.getName() + "_probate.csv";
+			final String outName = args[4] + "/" + individual.getName() + "_probate.csv";
 			bw = new BufferedWriter(new FileWriter(outName));
 
-			String header = "GEDCOM ID;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;VITALTYPE;COVERED_DATA;SOURCE;NAME;FONKOD";
+			final String header = "GEDCOM ID;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;VITALTYPE;COVERED_DATA;SOURCE;NAME;FONKOD";
 			bw.write(header + "\n");
 
-			for (String string : outLines) {
+			for (final String string : outLines) {
 				bw.write(string + "\n");
 			}
 
@@ -164,7 +143,7 @@ public class FindLocationSources {
 
 	/**
 	 * Get all individuals in the Derby database with events in the location
-	 * 
+	 *
 	 * @param statement
 	 * @param args
 	 * @return

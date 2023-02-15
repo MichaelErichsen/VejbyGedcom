@@ -30,16 +30,13 @@ public class Household {
 	private int id;
 	private CensusEvent censusEvent;
 	private final int[] mappingKeys;
-	private int iYear;
 
 	/**
 	 * Constructor
 	 *
-	 * @param id
-	 *            Id of this household in the census
+	 * @param id Id of this household in the census
 	 */
 	public Household(int id) {
-		super();
 		rows = new ArrayList<>();
 		families = new ArrayList<>();
 		setPersons(new ArrayList<Individual>());
@@ -57,11 +54,11 @@ public class Household {
 	}
 
 	/**
-	 * Separate a household into families, defined as father, mother, and
-	 * children. Each household contains either one or more families and perhaps
-	 * further singles (tenants, lodgers, servants, etc.). Only the main family
-	 * is identified by the application. The others (up to two more) must be
-	 * done manually.
+	 * Separate a household into families, defined as father, mother, and children.
+	 * Each household contains either one or more families and perhaps further
+	 * singles (tenants, lodgers, servants, etc.). Only the main family is
+	 * identified by the application. The others (up to two more) must be done
+	 * manually.
 	 *
 	 * @param sexMappingKey
 	 *
@@ -109,16 +106,14 @@ public class Household {
 				}
 				first = false;
 
-			} else {
-				if (individual.getFamilyRole1().equals("Fader")) {
-					family1.setFather(individual);
-				} else if (individual.getFamilyRole1().equals("Moder")) {
-					family1.setMother(individual);
-				} else if (individual.getFamilyRole1().equals("Barn")) {
-					family1.getChildren().add(individual);
-				} else if (individual.getFamilyRole1().equals("")) {
-					family0.getSingles().add(individual);
-				}
+			} else if (individual.getFamilyRole1().equals("Fader")) {
+				family1.setFather(individual);
+			} else if (individual.getFamilyRole1().equals("Moder")) {
+				family1.setMother(individual);
+			} else if (individual.getFamilyRole1().equals("Barn")) {
+				family1.getChildren().add(individual);
+			} else if (individual.getFamilyRole1().equals("")) {
+				family0.getSingles().add(individual);
 			}
 
 			getPersons().add(individual);
@@ -135,8 +130,7 @@ public class Household {
 	/**
 	 * Create an individual from a row in the census table.
 	 *
-	 * @param row
-	 *            A row in the census table
+	 * @param row A row in the census table
 	 * @return A GEDCOM individual
 	 */
 	public Individual createIndividual(List<String> row) {
@@ -169,7 +163,7 @@ public class Household {
 			try {
 				// Calculate difference between age and census year
 				final String sYear = row.get(mappingKeys[12]);
-				iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
+				int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
 
 				final int birthDate = iYear - Integer.parseInt(row.get(mappingKeys[7]));
 				individual.setBirthDate("Abt. " + birthDate);
@@ -301,40 +295,35 @@ public class Household {
 	}
 
 	/**
-	 * @param families
-	 *            the families to set
+	 * @param families the families to set
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @param persons
-	 *            the persons to set
+	 * @param persons the persons to set
 	 */
 	public void setPersons(List<Individual> persons) {
 		this.persons = persons;
 	}
 
 	/**
-	 * @param rows
-	 *            the rows to set
+	 * @param rows the rows to set
 	 */
 	public void setRows(List<List<String>> rows) {
 		this.rows = rows;
 	}
 
 	/**
-	 * @param singles
-	 *            the singles to set
+	 * @param singles the singles to set
 	 */
 	public void setSingles(List<Individual> singles) {
 		this.singles = singles;

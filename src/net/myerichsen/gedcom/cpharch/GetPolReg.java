@@ -137,7 +137,7 @@ public class GetPolReg {
 				if (args.length > 4) {
 					calcYear = getYearFromDate(args[4]) - lb.get(i);
 
-					if (calcYear > 2 || calcYear < -2) {
+					if ((calcYear > 2) || (calcYear < -2)) {
 						continue;
 					}
 				}

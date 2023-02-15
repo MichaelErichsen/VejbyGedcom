@@ -128,8 +128,7 @@ public class Cleaner {
 	}
 
 	/**
-	 * @param csvFileDirectory
-	 *            the csvFileDirectory to set
+	 * @param csvFileDirectory the csvFileDirectory to set
 	 */
 	public void setCsvFileDirectory(String csvFileDirectory) {
 		if (!csvFileDirectory.endsWith("/")) {
@@ -140,8 +139,7 @@ public class Cleaner {
 	}
 
 	/**
-	 * @param outFileDirectory
-	 *            the outFileDirectory to set
+	 * @param outFileDirectory the outFileDirectory to set
 	 */
 	public void setOutFileDirectory(String outFileDirectory) {
 		if (!outFileDirectory.endsWith("/")) {

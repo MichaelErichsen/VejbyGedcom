@@ -11,10 +11,10 @@ import java.util.logging.Logger;
 /**
  * Read each individual in a table. Insert phonetic coding of FIRSTNAMES and
  * LASTNAME and store the result in PHONNAME.
- * 
+ *
  * C:\Users\michael\CPHDB CPH.BURIAL_PERSON_COMPLETE FIRSTNAMES LASTNAME
  * PHONNAME
- * 
+ *
  * @author Michael Erichsen
  * @version 13. feb. 2023
  *
@@ -25,7 +25,7 @@ public class PhonCoder {
 
 	/**
 	 * Main method
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -48,11 +48,11 @@ public class PhonCoder {
 
 	/**
 	 * Worker method
-	 * 
+	 *
 	 * @param args
 	 * @throws SQLException
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	private void execute(String[] args) throws SQLException {
 		final String COUNT = "SELECT COUNT(*) FROM %s";

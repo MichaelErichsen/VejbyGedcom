@@ -287,19 +287,18 @@ public class CensusFinder {
 					diff = Integer.parseInt(m.group(0));
 				}
 
-				diff = diff + individual.getBirthYear() - ftYear;
+				diff = (diff + individual.getBirthYear()) - ftYear;
 
-				if (diff < 2 && diff > -2) {
-					if (ftYear < 1845 || compareBirthPlace(individual.getBirthPlace(), line)) {
+				if (((diff < 2) && (diff > -2))
+						&& ((ftYear < 1845) || compareBirthPlace(individual.getBirthPlace(), line))) {
 
-						if (counter == 0) {
-							bw = new BufferedWriter(new FileWriter(outName));
-							bw.write(header);
-						}
-
-						bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
-						counter++;
+					if (counter == 0) {
+						bw = new BufferedWriter(new FileWriter(outName));
+						bw.write(header);
 					}
+
+					bw.write(ftYear + ";" + location + ";" + line.replace(";;", ";") + "\n");
+					counter++;
 				}
 
 			}
@@ -330,7 +329,7 @@ public class CensusFinder {
 
 		final int intYear = getYearFromDate(fields[3]);
 
-		if (intYear < individual.getBirthYear() || intYear > individual.getDeathYear()) {
+		if ((intYear < individual.getBirthYear()) || (intYear > individual.getDeathYear())) {
 			return;
 		}
 

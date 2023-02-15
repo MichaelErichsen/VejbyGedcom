@@ -61,7 +61,7 @@ public class ParentFinder {
 			System.exit(4);
 		}
 
-		if (args.length > 3 && args[3].equalsIgnoreCase("p")) {
+		if ((args.length > 3) && args[3].equalsIgnoreCase("p")) {
 			pFlag = true;
 		}
 
@@ -186,7 +186,7 @@ public class ParentFinder {
 					parents = getParentsFromSource(value);
 				}
 
-				if (pFlag && parents.length() > 0) {
+				if (pFlag && (parents.length() > 0)) {
 					matchParentNames = matchParentNames(individuals, parents, year);
 
 					if (matchParentNames.size() > 0) {
@@ -295,7 +295,7 @@ public class ParentFinder {
 
 				final String spouses = getSpouses(individuals, id);
 
-				if (by < Integer.parseInt(childBirthYear) - 15 && dy > Integer.parseInt(childBirthYear)) {
+				if ((by < (Integer.parseInt(childBirthYear) - 15)) && (dy > Integer.parseInt(childBirthYear))) {
 					parentList.add(
 							id + ";" + birthYear + ";" + deathYear + ";" + name + ";" + spouses + ";" + birthPlace);
 				}
@@ -334,8 +334,7 @@ public class ParentFinder {
 			final IndividualEvent event = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
 			year = extractYear(event.getDate().getValue());
 			final CitationWithSource citation = (CitationWithSource) event.getCitations().get(0);
-			final String string = citation.getWhereInSource().toString();
-			return string;
+			return citation.getWhereInSource().toString();
 		} catch (final Exception e) {
 		}
 

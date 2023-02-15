@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.Gedcom;
@@ -56,6 +57,8 @@ public class BirthdateMatcher {
 		return gp.getGedcom();
 	}
 
+	private static final Pattern pattern_pattern = Pattern.compile("\\d{2}\\s[A-Z]{3}\\s\\d{4}");
+
 	/**
 	 * Read a GEDCOM file and find all persons with matching birthdates
 	 *
@@ -76,7 +79,7 @@ public class BirthdateMatcher {
 		Individual value2;
 		List<IndividualEvent> event2;
 		String birthDate2;
-		final String pattern = "\\d{2}\\s[A-Z]{3}\\s\\d{4}";
+		final Pattern pattern = pattern_pattern;
 
 		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 
@@ -89,10 +92,10 @@ public class BirthdateMatcher {
 			value1 = individual1.getValue();
 			event1 = value1.getEventsOfType(IndividualEventType.BIRTH);
 
-			if (event1 != null && event1.size() > 0) {
+			if ((event1 != null) && (event1.size() > 0)) {
 				birthDate1 = event1.get(0).getDate().getValue();
 
-				if (!birthDate1.matches(pattern)) {
+				if (!pattern.matcher(birthDate1).matches()) {
 					continue;
 				}
 
@@ -101,10 +104,10 @@ public class BirthdateMatcher {
 					value2 = individual2.getValue();
 					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
 
-					if (event2 != null && event2.size() > 0) {
+					if ((event2 != null) && (event2.size() > 0)) {
 						birthDate2 = event2.get(0).getDate().getValue();
 
-						if (!birthDate2.matches(pattern)) {
+						if (!pattern.matcher(birthDate2).matches()) {
 							continue;
 						}
 

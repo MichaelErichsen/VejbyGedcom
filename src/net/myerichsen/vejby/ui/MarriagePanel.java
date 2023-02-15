@@ -137,8 +137,6 @@ public class MarriagePanel extends FsPanel {
 
 					sc.close();
 					fis.close();
-				} catch (final FileNotFoundException e) {
-					LOGGER.log(Level.SEVERE, e.getMessage());
 				} catch (final IOException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
@@ -188,7 +186,8 @@ public class MarriagePanel extends FsPanel {
 
 			// Test for principal's sex
 			if (line[1].equals("male")) {
-				groom = new Individual(individualId++);
+				groom = new Individual(individualId);
+				individualId++;
 				groom.setName(line[0]);
 
 				if (!line[2].equals("")) {
@@ -198,7 +197,8 @@ public class MarriagePanel extends FsPanel {
 				bride = new Individual(individualId++);
 				bride.setName(line[5]);
 			} else {
-				bride = new Individual(individualId++);
+				bride = new Individual(individualId);
+				individualId++;
 				bride.setName(line[0]);
 
 				if (!line[2].equals("")) {

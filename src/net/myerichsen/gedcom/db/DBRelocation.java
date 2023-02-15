@@ -64,7 +64,7 @@ public class DBRelocation {
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB(String url) throws SQLException {
+	private void connectToDB() throws SQLException {
 		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
 		final Connection conn1 = DriverManager.getConnection(dbURL1);
 		System.out.println("Connected to database " + dbURL1);
@@ -81,7 +81,7 @@ public class DBRelocation {
 	 */
 	private void execute(String[] args) throws IOException, GedcomParserException, SQLException {
 		int counter = 0;
-		connectToDB(args[0]);
+		connectToDB();
 
 		final String outfile = args[1] + "\\flyt_all.csv";
 		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));

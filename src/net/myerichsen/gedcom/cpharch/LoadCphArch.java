@@ -26,7 +26,6 @@ public abstract class LoadCphArch {
 	 * No arg c:tor
 	 */
 	public LoadCphArch() {
-		super();
 	}
 
 	/**
@@ -64,7 +63,8 @@ public abstract class LoadCphArch {
 
 		if (columnType.startsWith("INTEGER") || columnType.startsWith("DECIMAL")) {
 			return string;
-		} else if (columnType.startsWith("CHAR") || columnType.startsWith("VARCHAR") || columnType.startsWith("DATE")) {
+		}
+		if (columnType.startsWith("CHAR") || columnType.startsWith("VARCHAR") || columnType.startsWith("DATE")) {
 			return "'" + string + "'";
 		} else if (columnType.startsWith("BOOLEAN")) {
 			if (string.equals("b'\\x00'")) {
@@ -144,7 +144,7 @@ public abstract class LoadCphArch {
 	 */
 	protected void loadTable(Statement statement, String[] args) throws Exception {
 		String[] columns;
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String query = "";
 		String previousLine = "";
 		String thisLine = "";
@@ -172,7 +172,7 @@ public abstract class LoadCphArch {
 				logger.info("Shortened line: " + line);
 			}
 
-			sb = new StringBuffer(getInsert());
+			sb = new StringBuilder(getInsert());
 
 			line = line.replace(";", ",");
 
@@ -185,7 +185,7 @@ public abstract class LoadCphArch {
 			for (int i = 0; i < columnTypes.size(); i++) {
 				sb.append(convertString(columnTypes.get(i), columns[i]));
 
-				if (i < columnTypes.size() - 1) {
+				if (i < (columnTypes.size() - 1)) {
 					sb.append(", ");
 				}
 			}
@@ -196,20 +196,19 @@ public abstract class LoadCphArch {
 				logger.fine(query);
 				statement.execute(query);
 				counter++;
-				if (counter % 100000 == 0) {
+				if ((counter % 100000) == 0) {
 					logger.info("Counter: " + counter);
 				}
 				previousLine = line;
 			} catch (final SQLException e) {
-				if (e.getSQLState().equals("42821")) {
-					logger.warning(e.getSQLState() + ", " + e.getMessage() + ", " + query);
-				} else {
+				if (!e.getSQLState().equals("42821")) {
 					logger.info("Previous: " + previousLine);
 					logger.info("This : " + thisLine);
 					logger.severe(e.getSQLState() + ", " + e.getMessage() + ", " + query);
 					br.close();
 					throw new SQLException(e);
 				}
+				logger.warning(e.getSQLState() + ", " + e.getMessage() + ", " + query);
 			}
 
 		}

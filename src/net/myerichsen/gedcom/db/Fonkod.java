@@ -16,7 +16,6 @@ public class Fonkod {
 	 *
 	 */
 	public Fonkod() {
-		super();
 	}
 
 	/**
@@ -28,16 +27,13 @@ public class Fonkod {
 	 */
 	private String eliminateImpossibleConsonantCombinations(String input) {
 		String out = input;
-		Pattern p = null;
-		Matcher m = null;
-
-		if (out.length() < 2 || isVowel(out.charAt(0), out.charAt(1))) {
+		if ((out.length() < 2) || isVowel(out.charAt(0), out.charAt(1))) {
 			return out;
 		}
 
 		// Er der overhovedet vokaler?
-		p = Pattern.compile("[aeiouyæøå]+");
-		m = p.matcher(out);
+		Pattern p = Pattern.compile("[aeiouyæøå]+");
+		Matcher m = p.matcher(out);
 		if (!m.find()) {
 			return out;
 		}
@@ -83,10 +79,7 @@ public class Fonkod {
 			return out.replaceFirst("skj", "sk") + " " + out.replaceFirst("skj", "sj");
 		}
 
-		// sk C^(r/j) -> sk
-		out = out.replaceFirst("(sk)[^aeijoruyæøå]", "$1");
-
-		return out;
+		return out.replaceFirst("(sk)[^aeijoruyæøå]", "$1");
 	}
 
 	/**
@@ -126,10 +119,7 @@ public class Fonkod {
 		// (C^s)(C^s)_
 		out = out.replaceFirst("([aeiouyæøå]+[^aeiouyæøå]*[^aieosuyæøå]{2})\\b", "$1");
 
-		// (C^s)...s/V
-		out = out.replaceFirst("([aeiouyæøå]+[^aeiouyæøå]*[^aieosuyæøå])[^aeiosuyæøå]*([aeiosuyæøå]).*", "$1$2");
-
-		return out;
+		return out.replaceFirst("([aeiouyæøå]+[^aeiouyæøå]*[^aieosuyæøå])[^aeiosuyæøå]*([aeiosuyæøå]).*", "$1$2");
 	}
 
 	/**
@@ -145,12 +135,10 @@ public class Fonkod {
 		}
 
 		String out = slaegtsNavn.toLowerCase();
-		// System.out.println(slaegtsNavn);
-		StringBuffer sb = null;
 		String[] sa;
 
 		// Kun bogstaver, blank, bindestreg og gnyf er tilladt
-		out = out.replaceAll("'", "");
+		out = out.replace("'", "");
 		Pattern p = Pattern.compile("([a-zæøåäçéëöüÿž]|/|-|\\.|\\s)+");
 		Matcher m = p.matcher(out);
 		if (!m.matches()) {
@@ -187,7 +175,7 @@ public class Fonkod {
 		 */
 		p = Pattern.compile("(\\.|-|\\s|/)+");
 		sa = p.split(out);
-		sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(performInitialStandardization(element) + " ");
 			// System.out.println(sb.toString() +
@@ -200,7 +188,7 @@ public class Fonkod {
 		 * i gruppen.
 		 */
 		sa = p.split(sb.toString().trim());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(processFirstVowelGroup(element) + " ");
 			// System.out.println(sb.toString() + "\tprocessFirstVowelGroup");
@@ -211,7 +199,7 @@ public class Fonkod {
 		 * konsonanter sammen med første vokal
 		 */
 		sa = p.split(sb.toString());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(processFirstConsonantGroup(element) + " ");
 			// System.out.println(sb.toString() +
@@ -222,7 +210,7 @@ public class Fonkod {
 		 * En evt. anden vokalgruppe behandles som den første
 		 */
 		sa = p.split(sb.toString());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(processSecondVowelGroup(element) + " ");
 			// System.out.println(sb.toString() + "\tprocessSecondVowelGroup");
@@ -232,7 +220,7 @@ public class Fonkod {
 		 * Navnedelen efter første vokalgruppe behandles
 		 */
 		sa = p.split(sb.toString());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(processSecondConsonantGroup(element) + " ");
 			// System.out.println(sb.toString() +
@@ -243,7 +231,7 @@ public class Fonkod {
 		 * De to vokalgrupper samt mellemliggende konsonanter behandles i én sammenhæng
 		 */
 		sa = p.split(sb.toString());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(finalizeProcessing(element) + " ");
 			// System.out.println(sb.toString() + "\tfinalizeProcessing 1");
@@ -260,7 +248,7 @@ public class Fonkod {
 		 * Den foreløbige kode undersøges for umulige konsonantgrupper
 		 */
 		sa = p.split(out);
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(eliminateImpossibleConsonantCombinations(element) + " ");
 			// System.out.println(sb.toString() +
@@ -272,7 +260,7 @@ public class Fonkod {
 		 * igen
 		 */
 		sa = p.split(sb.toString());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(finalizeProcessing(element) + " ");
 		}
@@ -321,17 +309,15 @@ public class Fonkod {
 
 		// MER Tilføjelser
 		out = out.replaceAll("(aa|å)", "o");
-		out = out.replaceAll("qu", "kv");
+		out = out.replace("qu", "kv");
 		out = out.replaceAll("(ph|pf)", "f");
 		out = out.replaceAll("[üÿ]", "y");
 		out = out.replaceAll("[äéëæ]", "e");
 		out = out.replaceAll("[çz]", "s");
-		out = out.replaceAll("q", "k");
-		out = out.replaceAll("w", "v");
-		out = out.replaceAll("ö", "ø");
-		out = out.replaceAll("ž", "sj");
-
-		return out;
+		out = out.replace('q', 'k');
+		out = out.replace('w', 'v');
+		out = out.replace('ö', 'ø');
+		return out.replace("ž", "sj");
 	}
 
 	/**
@@ -343,14 +329,12 @@ public class Fonkod {
 	 */
 	private String performInitialStandardization(String nextToken) {
 		String out = nextToken;
-		StringBuffer sb = new StringBuffer();
-		Pattern p = null;
-		Matcher m = null;
+		StringBuilder sb = new StringBuilder();
 		final String[] patterns = { "vo", "vø", "val", "ver", "vie", "vet", "vah", "vri" };
 
 		// MER Af, de, du, la og von fjernes
-		p = Pattern.compile("(af|de|du|la|von)");
-		m = p.matcher(out.trim());
+		Pattern p = Pattern.compile("(af|de|du|la|von)");
+		Matcher m = p.matcher(out.trim());
 		if (m.matches()) {
 			return "";
 		}
@@ -361,12 +345,10 @@ public class Fonkod {
 			p = Pattern.compile(pattern);
 			m = p.matcher(out);
 
-			if (m.lookingAt()) {
-				if (m.start() == 0) {
-					sb.append("v" + out.substring(1) + " f" + out.substring(1));
-					out = sb.toString();
-					break;
-				}
+			if (m.lookingAt() && (m.start() == 0)) {
+				sb.append("v" + out.substring(1) + " f" + out.substring(1));
+				out = sb.toString();
+				break;
 			}
 		}
 
@@ -375,7 +357,7 @@ public class Fonkod {
 		 */
 		p = Pattern.compile(" ");
 		String[] sa = p.split(out);
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(normaliseForeignSpellings(element) + " ");
 		}
@@ -384,7 +366,7 @@ public class Fonkod {
 		 * x, h og fordoblinger
 		 */
 		sa = p.split(sb.toString());
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 		for (final String element : sa) {
 			sb.append(processHXAndDoubles(element) + " ");
 		}
@@ -488,10 +470,7 @@ public class Fonkod {
 		// cs/j -> ss/j
 		out = out.replaceFirst("\\b([^aceiouyæøå]*)c([js])", "$1s$2");
 
-		// c -> k
-		out = out.replaceFirst("\\b([^aceiouyæøå]*)c", "$1k");
-
-		return out;
+		return out.replaceFirst("\\b([^aceiouyæøå]*)c", "$1k");
 	}
 
 	/**
@@ -521,10 +500,9 @@ public class Fonkod {
 			final int st = m.start();
 			if (input.charAt(st) == 'y') {
 				return input + " " + input.substring(0, st) + 'ø' + input.substring(st + 1);
-			} else {
-				// Kun en vokal i gruppen, men ikke y
-				return input;
 			}
+			// Kun en vokal i gruppen, men ikke y
+			return input;
 		}
 
 		// Der er mindst to vokaler i gruppen
@@ -554,9 +532,8 @@ public class Fonkod {
 		out = out.replaceFirst("([aeoø])y", "$1j");
 		if (org.equalsIgnoreCase(out)) {
 			return out.replaceFirst("([aeiouyæøå])[aeiouyæøå]", "$1");
-		} else {
-			return out;
 		}
+		return out;
 	}
 
 	/**
@@ -577,7 +554,7 @@ public class Fonkod {
 			if (m.start() == 0) {
 				out = m.replaceFirst("s");
 			} else {
-				out = out.replaceAll("x", "ks");
+				out = out.replace("x", "ks");
 			}
 		}
 
@@ -588,15 +565,12 @@ public class Fonkod {
 		out = out.replaceFirst("\\bhv", "v");
 
 		// gg -> k
-		out = out.replaceAll("gg", "k");
+		out = out.replace("gg", "k");
 
 		// BB -> B
 		out = out.replaceAll("(.)\\1", "$1");
 
-		// ck -> k
-		out = out.replaceAll("ck", "k");
-
-		return out;
+		return out.replace("ck", "k");
 	}
 
 	/**
@@ -725,10 +699,7 @@ public class Fonkod {
 		// c -> k
 		out = out.replaceFirst("c", "k");
 
-		// kje -> ke
-		out = out.replaceFirst("kje", "ke");
-
-		return out;
+		return out.replaceFirst("kje", "ke");
 	}
 
 	/**
@@ -759,15 +730,14 @@ public class Fonkod {
 		final int vgSlut = m.end();
 
 		// Kun én vokal i gruppen?
-		if (vgStart == vgSlut - 1) {
+		if (vgStart == (vgSlut - 1)) {
 
 			// y fordobles til y og ø
 			if (input.charAt(vgStart) == 'y') {
 				return input + " " + input.substring(0, vgStart) + 'ø' + input.substring(vgStart + 1);
-			} else {
-				// Kun en vokal i gruppen, men ikke y
-				return input;
 			}
+			// Kun en vokal i gruppen, men ikke y
+			return input;
 		}
 
 		// Der er mindst to vokaler i gruppen
@@ -804,9 +774,8 @@ public class Fonkod {
 		out = out.replaceFirst("([aeoø])y", "$1j");
 		if (org.equalsIgnoreCase(out)) {
 			return out.replaceFirst("([aeiouyæøå])[aeiouyæøå]", "$1");
-		} else {
-			return out;
 		}
+		return out;
 	}
 
 }

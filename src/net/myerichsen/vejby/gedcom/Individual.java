@@ -46,7 +46,6 @@ public class Individual {
 	 * @param id
 	 */
 	public Individual(int id) {
-		super();
 		this.id = id;
 	}
 
@@ -219,16 +218,14 @@ public class Individual {
 	}
 
 	/**
-	 * @param address
-	 *            the address to set
+	 * @param address the address to set
 	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
 	/**
-	 * @param birthDate
-	 *            the birthDate to set
+	 * @param birthDate the birthDate to set
 	 */
 	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
@@ -236,176 +233,154 @@ public class Individual {
 	}
 
 	/**
-	 * @param birthPlace
-	 *            the birthPlace to set
+	 * @param birthPlace the birthPlace to set
 	 */
 	public void setBirthPlace(String birthPlace) {
 		this.birthPlace = birthPlace;
 	}
 
 	/**
-	 * @param censusEvent
-	 *            the censusEvent to set
+	 * @param censusEvent the censusEvent to set
 	 */
 	public void setCensusEvent(CensusEvent censusEvent) {
 		this.censusEvent = censusEvent;
 	}
 
 	/**
-	 * @param christeningDate
-	 *            the christeningDate to set
+	 * @param christeningDate the christeningDate to set
 	 */
 	public void setChristeningDate(String christeningDate) {
 		this.christeningDate = christeningDate;
 	}
 
 	/**
-	 * @param christeningPlace
-	 *            the christeningPlace to set
+	 * @param christeningPlace the christeningPlace to set
 	 */
 	public void setChristeningPlace(String christeningPlace) {
 		this.christeningPlace = christeningPlace;
 	}
 
 	/**
-	 * @param confirmationDate
-	 *            the confirmationDate to set
+	 * @param confirmationDate the confirmationDate to set
 	 */
 	public void setConfirmationDate(String confirmationDate) {
 		this.confirmationDate = confirmationDate;
 	}
 
 	/**
-	 * @param confirmationPlace
-	 *            the confirmationPlace to set
+	 * @param confirmationPlace the confirmationPlace to set
 	 */
 	public void setConfirmationPlace(String confirmationPlace) {
 		this.confirmationPlace = confirmationPlace;
 	}
 
 	/**
-	 * @param deathDate
-	 *            the deathDate to set
+	 * @param deathDate the deathDate to set
 	 */
 	public void setDeathDate(String deathDate) {
 		this.deathDate = deathDate;
 	}
 
 	/**
-	 * @param deathPlace
-	 *            the deathPlace to set
+	 * @param deathPlace the deathPlace to set
 	 */
 	public void setDeathPlace(String deathPlace) {
 		this.deathPlace = deathPlace;
 	}
 
 	/**
-	 * @param familyRole1
-	 *            the familyRole1 to set
+	 * @param familyRole1 the familyRole1 to set
 	 */
 	public void setFamilyRole1(String familyRole1) {
 		this.familyRole1 = familyRole1;
 	}
 
 	/**
-	 * @param familyRole2
-	 *            the familyRole2 to set
+	 * @param familyRole2 the familyRole2 to set
 	 */
 	public void setFamilyRole2(String familyRole2) {
 		this.familyRole2 = familyRole2;
 	}
 
 	/**
-	 * @param familyRole3
-	 *            the familyRole3 to set
+	 * @param familyRole3 the familyRole3 to set
 	 */
 	public void setFamilyRole3(String familyRole3) {
 		this.familyRole3 = familyRole3;
 	}
 
 	/**
-	 * @param familyRole4
-	 *            the familyRole4 to set
+	 * @param familyRole4 the familyRole4 to set
 	 */
 	public void setFamilyRole4(String familyRole4) {
 		this.familyRole4 = familyRole4;
 	}
 
 	/**
-	 * @param household
-	 *            the household to set
+	 * @param household the household to set
 	 */
 	public void setHousehold(Household household) {
 		this.household = household;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @param maritalStatus
-	 *            the maritalStatus to set
+	 * @param maritalStatus the maritalStatus to set
 	 */
 	public void setMaritalStatus(String maritalStatus) {
 		this.maritalStatus = maritalStatus;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * @param place
-	 *            the place to set
+	 * @param place the place to set
 	 */
 	public void setPlace(String place) {
 		this.place = place;
 	}
 
 	/**
-	 * @param position
-	 *            the position to set
+	 * @param position the position to set
 	 */
 	public void setPosition(String position) {
 		this.position = position;
 	}
 
 	/**
-	 * @param sex
-	 *            the sex to set
+	 * @param sex the sex to set
 	 */
 	public void setSex(String sex) {
 		this.sex = sex;
 	}
 
 	/**
-	 * @param source
-	 *            the source to set
+	 * @param source the source to set
 	 */
 	public void setSource(String source) {
 		this.source = source;
 	}
 
 	/**
-	 * @param trade
-	 *            the trade to set
+	 * @param trade the trade to set
 	 */
 	public void setTrade(String trade) {
 		this.trade = trade;
 	}
 
 	/**
-	 * @param year
-	 *            the year to set
+	 * @param year the year to set
 	 */
 	public void setYear(int year) {
 		this.year = year;
@@ -418,7 +393,7 @@ public class Individual {
 	 */
 	public String toGedcom() {
 		final Mapping mapping = Mapping.getInstance();
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append("0 @I" + getId() + "@ INDI\n");
 		sb.append("1 NAME ");
@@ -451,13 +426,13 @@ public class Individual {
 
 		if (mapping.getDaughterNameStubs().contains(familyName.toLowerCase())) {
 			LOGGER.log(Level.INFO, "Invalid family name: " + familyName);
-			familyName = new String(nameParts[nameParts.length - 2] + "datter");
+			familyName = (nameParts[nameParts.length - 2] + "datter");
 
-			for (int i = 0; i < nameParts.length - 2; i++) {
+			for (int i = 0; i < (nameParts.length - 2); i++) {
 				sb.append(nameParts[i] + " ");
 			}
 		} else {
-			for (int i = 0; i < nameParts.length - 1; i++) {
+			for (int i = 0; i < (nameParts.length - 1); i++) {
 				sb.append(nameParts[i] + " ");
 			}
 		}
@@ -465,7 +440,7 @@ public class Individual {
 		// Surround with slashes to mark as family name
 		sb.append("/" + familyName + "/\n");
 
-		if (getSource() != null && !getSource().equals("")) {
+		if ((getSource() != null) && !getSource().equals("")) {
 			sb.append("2 SOUR @S1@\n");
 			sb.append("3 PAGE " + getSource() + "\n");
 		}
@@ -477,43 +452,43 @@ public class Individual {
 			sb.append("1 SEX M\n");
 		}
 
-		if (getBirthDate() != null && !getBirthDate().equals("")) {
+		if ((getBirthDate() != null) && !getBirthDate().equals("")) {
 			sb.append("1 BIRT\n");
 			sb.append("2 DATE " + getBirthDate() + "\n");
-			if (getBirthPlace() != null && !getBirthPlace().equals("")) {
+			if ((getBirthPlace() != null) && !getBirthPlace().equals("")) {
 				sb.append("2 PLAC " + getBirthPlace() + ",\n");
 			}
 		}
 
-		if (getChristeningDate() != null && !getChristeningDate().equals("")) {
+		if ((getChristeningDate() != null) && !getChristeningDate().equals("")) {
 			sb.append("1 CHR\n");
 			sb.append("2 DATE " + getChristeningDate() + "\n");
-			if (getChristeningPlace() != null && !getChristeningPlace().equals("")) {
+			if ((getChristeningPlace() != null) && !getChristeningPlace().equals("")) {
 				sb.append("2 PLAC " + getChristeningPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if (getConfirmationDate() != null && !getConfirmationDate().equals("")) {
+		if ((getConfirmationDate() != null) && !getConfirmationDate().equals("")) {
 			sb.append("1 CONF\n");
 			sb.append("2 DATE " + getConfirmationDate() + "\n");
-			if (getConfirmationPlace() != null && !getConfirmationPlace().equals("")) {
+			if ((getConfirmationPlace() != null) && !getConfirmationPlace().equals("")) {
 				sb.append("2 PLAC " + getConfirmationPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if (getDeathDate() != null && !getDeathDate().equals("")) {
+		if ((getDeathDate() != null) && !getDeathDate().equals("")) {
 			sb.append("1 DEAT\n");
 			sb.append("2 DATE " + getDeathDate() + "\n");
 
-			if (getDeathPlace() != null && !getDeathPlace().equals("")) {
+			if ((getDeathPlace() != null) && !getDeathPlace().equals("")) {
 				sb.append("2 PLAC " + getDeathPlace() + "\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if (getTrade() != null && !getTrade().equals("")) {
+		if ((getTrade() != null) && !getTrade().equals("")) {
 			sb.append("1 OCCU " + getTrade() + "\n");
 		}
 

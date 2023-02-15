@@ -49,7 +49,6 @@ public class Census {
 	 * @param year
 	 */
 	private Census(int year) {
-		super();
 		this.year = year;
 		persons = new ArrayList<>();
 	}
@@ -57,8 +56,8 @@ public class Census {
 	/**
 	 * Split the table into households
 	 *
-	 * @param householdFieldNumber
-	 *            The column in the table that contains the household number
+	 * @param householdFieldNumber The column in the table that contains the
+	 *                             household number
 	 * @return message
 	 */
 	public String createHouseholds(int householdFieldNumber) {
@@ -79,7 +78,8 @@ public class Census {
 			// create a new household. Add household to households list
 			if (!currentHouseholdNumber.equals(newHouseholdNumber)
 					|| !currentSourceLocation.equals(newSourceLocation)) {
-				currentHousehold = new Household(id++);
+				currentHousehold = new Household(id);
+				id++;
 				getHouseholds().add(currentHousehold);
 				currentHouseholdNumber = newHouseholdNumber;
 			}
@@ -104,9 +104,7 @@ public class Census {
 		for (final Household household : households) {
 			final List<Family> families = household.getFamilies();
 
-			for (int j = 0; j < families.size(); j++) {
-				lf.add(families.get(j));
-			}
+			lf.addAll(families);
 		}
 
 		return lf;
@@ -143,8 +141,7 @@ public class Census {
 	/**
 	 * Get a household.
 	 *
-	 * @param id
-	 *            Id of the household
+	 * @param id Id of the household
 	 * @return The household
 	 */
 	public Household getHousehold(int id) {
@@ -252,32 +249,28 @@ public class Census {
 	}
 
 	/**
-	 * @param headers
-	 *            the headers to set
+	 * @param headers the headers to set
 	 */
 	public void setHeaders(List<String> headers) {
 		this.headers = headers;
 	}
 
 	/**
-	 * @param households
-	 *            the households to set
+	 * @param households the households to set
 	 */
 	public void setHouseholds(List<Household> households) {
 		this.households = households;
 	}
 
 	/**
-	 * @param fields
-	 *            the fields to set
+	 * @param fields the fields to set
 	 */
 	public void setPersons(List<List<String>> persons) {
 		this.persons = persons;
 	}
 
 	/**
-	 * @param year
-	 *            the year to set
+	 * @param year the year to set
 	 */
 	public void setYear(int year) {
 		this.year = year;

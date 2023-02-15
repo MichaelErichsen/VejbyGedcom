@@ -56,8 +56,7 @@ public class IndividualWithChildCount extends Individual implements Comparable<I
 	}
 
 	/**
-	 * @param descendantCount
-	 *            the descendantCount to set
+	 * @param descendantCount the descendantCount to set
 	 */
 	public void setDescendantCount(int descendantCount) {
 		this.descendantCount = descendantCount;

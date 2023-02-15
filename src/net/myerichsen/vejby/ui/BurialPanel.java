@@ -67,8 +67,8 @@ public class BurialPanel extends FsPanel {
 	}
 
 	/**
-	 * Open one or more tsv files from Family Search and reduce them to the
-	 * relevant columns:
+	 * Open one or more tsv files from Family Search and reduce them to the relevant
+	 * columns:
 	 *
 	 * fullName 8 sex 9 birthLikeDate 10 deathLikeDate 18 deathLikePlaceText 19
 	 * burialDate 20 burialPlaceText 21 fatherFullName 22 motherFullName 23
@@ -139,8 +139,6 @@ public class BurialPanel extends FsPanel {
 
 					sc.close();
 					fis.close();
-				} catch (final FileNotFoundException e) {
-					LOGGER.log(Level.SEVERE, e.getMessage());
 				} catch (final IOException e) {
 					LOGGER.log(Level.SEVERE, e.getMessage());
 				}
@@ -160,8 +158,8 @@ public class BurialPanel extends FsPanel {
 	}
 
 	/**
-	 * Instantiate a GedcomFile object and populate it with the burial data.
-	 * Choose a file name and save it.
+	 * Instantiate a GedcomFile object and populate it with the burial data. Choose
+	 * a file name and save it.
 	 */
 	@Override
 	protected void saveAsGedcom() {
@@ -178,7 +176,8 @@ public class BurialPanel extends FsPanel {
 
 			family = new Family(0, i);
 
-			deceased = new Individual(individualId++);
+			deceased = new Individual(individualId);
+			individualId++;
 			final String deceasedName = line[0];
 
 			if (deceasedName == null) {
@@ -190,13 +189,11 @@ public class BurialPanel extends FsPanel {
 			// Handle cases with and without surnames
 			if (deceasedNamePart.length == 1) {
 				deceased.setName(deceasedName + " ?");
+			} else if (deceasedName.endsWith("sen") || deceasedName.endsWith("datter") || deceasedName.endsWith("dtr")
+					|| deceasedName.endsWith("d") || deceasedName.endsWith("D") || deceasedName.endsWith("son")) {
+				deceased.setName(deceasedName);
 			} else {
-				if (deceasedName.endsWith("sen") || deceasedName.endsWith("datter") || deceasedName.endsWith("dtr")
-						|| deceasedName.endsWith("d") || deceasedName.endsWith("D") || deceasedName.endsWith("son")) {
-					deceased.setName(deceasedName);
-				} else {
-					deceased.setName(deceasedName + " ?");
-				}
+				deceased.setName(deceasedName + " ?");
 			}
 
 			deceased.setSex(line[1].equals("male") ? "M" : "F");
@@ -216,7 +213,7 @@ public class BurialPanel extends FsPanel {
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
 		if (!path.equals("")) {
-			JOptionPane.showMessageDialog(new JFrame(), individualId - 1 + " dødsfald er gemt som GEDCOM fil " + path,
+			JOptionPane.showMessageDialog(new JFrame(), (individualId - 1) + " dødsfald er gemt som GEDCOM fil " + path,
 					"Vejby Gedcom", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

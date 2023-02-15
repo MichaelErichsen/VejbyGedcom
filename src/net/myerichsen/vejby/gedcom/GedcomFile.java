@@ -34,13 +34,11 @@ public class GedcomFile {
 	 *
 	 */
 	public GedcomFile() {
-		super();
 		setFamilies(new ArrayList<Family>());
 	}
 
 	/**
-	 * @param family
-	 *            The family to add to the GEDCOM file
+	 * @param family The family to add to the GEDCOM file
 	 */
 	public void addFamily(Family family) {
 		families.add(family);
@@ -56,8 +54,7 @@ public class GedcomFile {
 	/**
 	 * Save a census table as GEDCOM. Used by census analysis.
 	 *
-	 * @param censusTable
-	 *            The census table loaded from a KIP file
+	 * @param censusTable The census table loaded from a KIP file
 	 * @return
 	 */
 	public String saveCensus(Census censusTable) {
@@ -113,7 +110,8 @@ public class GedcomFile {
 									+ ", " + person.toString());
 						}
 					} else {
-						fw.write(family.toGedcom(familyId++));
+						fw.write(family.toGedcom(familyId));
+						familyId++;
 						LOGGER.log(Level.FINE, "Family " + family.getHouseholdId() + ", " + family.getFamilyId() + ", "
 								+ family.toString());
 					}
@@ -140,8 +138,7 @@ public class GedcomFile {
 	/**
 	 * Save a birth or marriage file as GEDCOM. Used by FS analysis.
 	 *
-	 * @param fileNameStub
-	 *            Name of input file without extension
+	 * @param fileNameStub Name of input file without extension
 	 * @return Save path for GEDCOM file
 	 */
 	public String saveFsExtract(String fileNameStub) {
@@ -218,8 +215,7 @@ public class GedcomFile {
 	}
 
 	/**
-	 * @param families
-	 *            the families to set
+	 * @param families the families to set
 	 */
 	public void setFamilies(List<Family> families) {
 		this.families = families;

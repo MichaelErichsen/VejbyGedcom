@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db;
 
 /**
  * Class representing an event in the derby database
- * 
+ *
  * @author Michael Erichsen
  * @version 14. feb. 2023
  *

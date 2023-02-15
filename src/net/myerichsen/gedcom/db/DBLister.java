@@ -54,7 +54,7 @@ public class DBLister {
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB(String url) throws SQLException {
+	private void connectToDB() throws SQLException {
 		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
 		final Connection conn1 = DriverManager.getConnection(dbURL1);
 		System.out.println("Connected to database " + dbURL1);
@@ -70,7 +70,7 @@ public class DBLister {
 	 * @throws SQLException
 	 */
 	private void execute(String[] args) throws IOException, GedcomParserException, SQLException {
-		connectToDB(args[0]);
+		connectToDB();
 
 		System.out.println("\nFamily");
 		String query = "SELECT * FROM VEJBY.FAMILY FETCH FIRST 20 ROWS ONLY";

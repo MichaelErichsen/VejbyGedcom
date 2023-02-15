@@ -24,7 +24,6 @@ public class CensusEvent {
 	 * @param household
 	 */
 	public CensusEvent(int censusYear, String place, Household household) {
-		super();
 		this.censusYear = censusYear;
 		this.place = place;
 		this.household = household;
@@ -52,24 +51,21 @@ public class CensusEvent {
 	}
 
 	/**
-	 * @param censusYear
-	 *            the censusYear to set
+	 * @param censusYear the censusYear to set
 	 */
 	public void setCensusYear(int censusYear) {
 		this.censusYear = censusYear;
 	}
 
 	/**
-	 * @param household
-	 *            the household to set
+	 * @param household the household to set
 	 */
 	public void setHousehold(Household household) {
 		this.household = household;
 	}
 
 	/**
-	 * @param place
-	 *            the place to set
+	 * @param place the place to set
 	 */
 	public void setPlace(String place) {
 		this.place = place;

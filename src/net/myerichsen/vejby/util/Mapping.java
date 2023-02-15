@@ -26,7 +26,7 @@ public class Mapping {
 		return single_instance;
 	}
 
-	private final int[] mappingKeys = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	private final int[] mappingKeys = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	private final List<String> daughterNameStubs = Arrays.asList("d.", "dat", "dat.", "datt", "datt.", "datter", "dr",
 			"dr.", "dtr", "dtr.");
@@ -36,7 +36,6 @@ public class Mapping {
 	 *
 	 */
 	private Mapping() {
-		super();
 	}
 
 	/**

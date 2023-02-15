@@ -103,8 +103,7 @@ public class AureliaProbateParser {
 	/**
 	 * Read the extract file
 	 *
-	 * @param probate
-	 *            extract filename
+	 * @param probate extract filename
 	 * @return List of probate objects
 	 * @throws IOException
 	 */

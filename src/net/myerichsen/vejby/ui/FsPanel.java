@@ -35,7 +35,6 @@ public abstract class FsPanel extends JPanel {
 	 *
 	 */
 	public FsPanel() {
-		super();
 	}
 
 	/**
@@ -130,7 +129,7 @@ public abstract class FsPanel extends JPanel {
 		for (int i = 0; i < dataArray.length; i++) {
 			// LOGGER.log(Level.INFO, "Række: " + i + "; " + dataArray[i][0]);
 
-			if (dataArray[i][0] == null || dataArray[i][0].equals("")) {
+			if ((dataArray[i][0] == null) || dataArray[i][0].equals("")) {
 				continue;
 			}
 			stringI = dataArrayToString(i);
@@ -138,7 +137,7 @@ public abstract class FsPanel extends JPanel {
 			for (int j = i + 1; j < dataArray.length; j++) {
 				// LOGGER.log(Level.INFO, "Række: " + j + "; " +
 				// dataArray[j][0]);
-				if (dataArray[j][0] == null || dataArray[j][0].equals("")) {
+				if ((dataArray[j][0] == null) || dataArray[j][0].equals("")) {
 					continue;
 				}
 				stringJ = dataArrayToString(j);
@@ -157,8 +156,9 @@ public abstract class FsPanel extends JPanel {
 
 		int i2 = 0;
 		for (final String[] element : dataArray) {
-			if (element[0] != null && !element[0].equals("")) {
-				dataArray2[i2++] = element;
+			if ((element[0] != null) && !element[0].equals("")) {
+				dataArray2[i2] = element;
+				i2++;
 			}
 		}
 
@@ -199,8 +199,8 @@ public abstract class FsPanel extends JPanel {
 	}
 
 	/**
-	 * Open a Tab Separated Values file as exported from a Family Search query
-	 * and analyze it into a data array.
+	 * Open a Tab Separated Values file as exported from a Family Search query and
+	 * analyze it into a data array.
 	 */
 	protected abstract void openTsvFile();
 

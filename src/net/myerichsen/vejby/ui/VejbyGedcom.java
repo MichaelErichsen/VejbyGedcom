@@ -148,8 +148,7 @@ public class VejbyGedcom {
 	}
 
 	/**
-	 * @param tabbedPane
-	 *            the tabbedPane to set
+	 * @param tabbedPane the tabbedPane to set
 	 */
 	public void setTabbedPane(JTabbedPane tabbedPane) {
 		this.tabbedPane = tabbedPane;

@@ -23,8 +23,6 @@ public class Probate {
 	 * @param extractPart
 	 */
 	public Probate(String extractPart) {
-		super();
-
 		if (!extractPart.contains("*")) {
 			probateDate = null;
 			return;
@@ -97,32 +95,28 @@ public class Probate {
 	}
 
 	/**
-	 * @param extract
-	 *            the extract to set
+	 * @param extract the extract to set
 	 */
 	public void setExtract(String extract) {
 		this.extract = extract;
 	}
 
 	/**
-	 * @param location
-	 *            the location to set
+	 * @param location the location to set
 	 */
 	public void setLocation(String location) {
 		this.location = location;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String aName) {
 		name = aName.replace("*", "").replace("hmd", "").replace("gmd", "").trim();
 	}
 
 	/**
-	 * @param probateDate
-	 *            the probateDate to set
+	 * @param probateDate the probateDate to set
 	 */
 	public void setProbateDate(LocalDate probateDate) {
 		this.probateDate = probateDate;
