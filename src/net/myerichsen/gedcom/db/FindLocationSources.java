@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 
 /**
  * Find all probate and census entries that match a given individual ID and
- * location in the derby database
+ * location in the Derby database
  *
  * @author Michael Erichsen
- * @version 14. feb. 2023
+ * @version 15. feb. 2023
  */
 public class FindLocationSources {
 	private static Logger logger;
@@ -114,11 +114,10 @@ public class FindLocationSources {
 		final String query = "SELECT * FROM GEDCOM.EVENT JOIN GEDCOM.INDIVIDUAL "
 				+ "ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID WHERE GEDCOM.INDIVIDUAL.FONKOD = '"
 				+ individual.getPhonName().trim() + "'";
-//						+ " FETCH FIRST 25 ROWS ONLY";
 
 		final ResultSet rs = statement.executeQuery(query);
 		String singleLine;
-		List<String> outLines = new ArrayList<String>();
+		HashSet<String> outLines = new HashSet<String>();
 
 		while (rs.next()) {
 			if (rs.getString("COVERED_DATA").toLowerCase().contains(args[0].toLowerCase())) {
@@ -132,11 +131,11 @@ public class FindLocationSources {
 				singleLine = singleLine.replaceAll("\\r\\n", " ¤ ");
 				logger.fine(singleLine);
 
-				if (singleLine.compareToIgnoreCase("Kronborg") >= 0) {
-					outLines.add(singleLine);
-					counter++;
+				if (singleLine.toLowerCase().contains("ronb")) {
+					if (outLines.add(singleLine)) {
+						counter++;
+					}
 				}
-
 			}
 		}
 
@@ -178,7 +177,7 @@ public class FindLocationSources {
 		final List<DBIndividual> ldbi = new ArrayList<>();
 		int counter = 0;
 
-		final ResultSet rs = statement.executeQuery("SELECT * FROM VEJBY.EVENT FETCH FIRST 100 ROWS ONLY");
+		final ResultSet rs = statement.executeQuery("SELECT * FROM VEJBY.EVENT");
 
 		while (rs.next()) {
 			dbe = new DBEvent(rs.getInt("ID"), rs.getString("INDIVIDUAL"), rs.getString("PLACE"));
