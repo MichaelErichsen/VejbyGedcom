@@ -1,6 +1,8 @@
 package net.myerichsen.gedcom.db;
 
+import java.awt.Desktop;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -8,20 +10,21 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Find all probate and census entries that match a given individual ID and
- * location in the Derby database
+ * Find all probate and census entries that match a given individual ID in the
+ * Derby database
  *
  * @author Michael Erichsen
- * @version 15. feb. 2023
+ * @version 17. feb. 2023
  */
 public class FindLocationSources {
-	private static final String KRONBORG = "ronb";
+	/**
+	 *
+	 */
+	private static final String KRONBORG = "Kronborg";
 	private static Logger logger;
 
 	/**
@@ -31,7 +34,7 @@ public class FindLocationSources {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 5) {
-			System.out.println("Usage: FindLocationSources location vejbydatabasepath "
+			System.out.println("Usage: FindLocationSources id vejbydatabasepath "
 					+ "probatedatabasepath dddcsvfilepath outputdirectory");
 			System.exit(4);
 		}
@@ -66,15 +69,19 @@ public class FindLocationSources {
 		logger.info("Connected to database " + dbURL);
 		final Statement statement = conn.createStatement();
 
-		// Get ID's of all individuals in GEDCOM extract database with events in Holbo
-		// shire
+		final DBIndividual individual = new DBIndividual(statement, args[0]);
+		findProbate(individual, args);
 
-		final List<DBIndividual> ldbi = getIndividualIds(statement, args);
+		final String[] vejbyArgs = new String[4];
+		vejbyArgs[0] = args[0];
+		vejbyArgs[1] = args[1];
+		vejbyArgs[2] = args[3];
+		vejbyArgs[3] = args[4];
 
-		// For each individual, get probate records
-
-		for (final DBIndividual individual : ldbi) {
-			findProbate(individual, args);
+		try {
+			new CensusFinder(vejbyArgs);
+		} catch (final Exception e) {
+			e.printStackTrace();
 		}
 
 		logger.info("Program ended");
@@ -103,27 +110,31 @@ public class FindLocationSources {
 		final ResultSet rs = statement.executeQuery(query);
 		String singleLine;
 		final HashSet<String> outLines = new HashSet<>();
+		String coveredData;
+		String source;
+		String name;
 
 		while (rs.next()) {
-			if (rs.getString("COVERED_DATA").toLowerCase().contains(args[0].toLowerCase())) {
+			coveredData = rs.getString("COVERED_DATA");
+			source = rs.getString("SOURCE");
+			name = rs.getString("NAME").trim();
+
+			if (source.contains(KRONBORG) && coveredData.contains(name)) {
 				singleLine = individual.getId() + ";" + rs.getString("ID").trim() + ";"
 						+ rs.getString("FROMDATE").trim() + ";" + rs.getString("TODATE").trim() + ";"
 						+ rs.getString("PLACE").trim() + ";" + rs.getString("EVENTTYPE").trim() + ";"
-						+ rs.getString("VITALTYPE").trim() + ";" + rs.getString("COVERED_DATA").replace(";", ".").trim()
-						+ ";" + rs.getString("SOURCE").replace(";", ".").trim() + ";" + rs.getString("NAME").trim()
-						+ ";" + rs.getString("FONKOD").trim();
+						+ rs.getString("VITALTYPE").trim() + ";" + coveredData.replace(";", ".").trim() + ";"
+						+ source.replace(";", ".").trim() + ";" + name + ";" + rs.getString("FONKOD").trim();
 				singleLine = singleLine.replaceAll("\\r\\n", " ¤ ");
-
-				if (singleLine.toLowerCase().contains(KRONBORG) && outLines.add(singleLine)) {
-					counter++;
-				}
+				outLines.add(singleLine);
+				counter++;
 			}
 		}
 
 		statement.close();
 
 		if (counter > 0) {
-			final String outName = args[4] + "/" + individual.getName() + "_probate.csv";
+			final String outName = args[4] + "/" + individual.getName() + "_probates.csv";
 			bw = new BufferedWriter(new FileWriter(outName));
 
 			final String header = "GEDCOM ID;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;VITALTYPE;COVERED_DATA;SOURCE;NAME;FONKOD";
@@ -137,42 +148,8 @@ public class FindLocationSources {
 			bw.close();
 
 			logger.info(counter + " records written to " + outName);
+			Desktop.getDesktop().open(new File(outName));
 		}
 
-	}
-
-	/**
-	 * Get all individuals in the Derby database with events in the location
-	 *
-	 * @param statement
-	 * @param args
-	 * @return
-	 * @throws SQLException
-	 */
-	private List<DBIndividual> getIndividualIds(Statement statement, String[] args) throws SQLException {
-		DBEvent dbe;
-		DBIndividual individual;
-		final HashSet<String> hss = new HashSet<>();
-		final List<DBIndividual> ldbi = new ArrayList<>();
-		int counter = 0;
-
-		final ResultSet rs = statement.executeQuery("SELECT * FROM VEJBY.EVENT");
-
-		while (rs.next()) {
-			dbe = new DBEvent(rs.getInt("ID"), rs.getString("INDIVIDUAL"), rs.getString("PLACE"));
-
-			if (dbe.isInLocation(args[0])) {
-				hss.add(dbe.getIndividual().trim());
-			}
-		}
-
-		for (final String id : hss) {
-			individual = new DBIndividual(statement, id);
-			ldbi.add(individual);
-			counter++;
-		}
-
-		logger.info(counter + " individuals with events in the location found");
-		return ldbi;
 	}
 }

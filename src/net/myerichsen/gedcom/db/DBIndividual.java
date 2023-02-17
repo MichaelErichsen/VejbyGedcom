@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * Class representing some individual data
  *
  * @author Michael Erichsen
- * @version 14-02-2023
+ * @version 17-02-2023
  *
  */
 public class DBIndividual {
@@ -164,5 +164,15 @@ public class DBIndividual {
 	 */
 	public void setPhonName(String phonName) {
 		this.phonName = phonName;
+	}
+
+	@Override
+	public String toString() {
+		String dy = "";
+		if (deathYear < 9999)
+			dy = Integer.toString(deathYear);
+
+		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthYear + ";" + dy + ";" + birthPlace + ";"
+				+ phonName;
 	}
 }
