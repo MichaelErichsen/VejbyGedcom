@@ -18,9 +18,13 @@ import java.util.logging.Logger;
  * database
  *
  * @author Michael Erichsen
- * @version 17. feb. 2023
+ * @version 19. feb. 2023
  */
 public class FindLocationIndividuals {
+	/**
+	 * 
+	 */
+	private static final String SELECT_EVENT = "SELECT * FROM VEJBY.EVENT";
 	private static Logger logger;
 	private static final String header = "ID;Navn;Fødselsår;Dødsår;Fødested;Fonetisk navn\n";
 
@@ -70,10 +74,11 @@ public class FindLocationIndividuals {
 		String outName = args[2] + "/" + args[0] + "_individuals.csv";
 		BufferedWriter bw = null;
 
-		final ResultSet rs = statement.executeQuery("SELECT * FROM VEJBY.EVENT");
+		final ResultSet rs = statement.executeQuery(SELECT_EVENT);
 
 		while (rs.next()) {
-			dbe = new DBEvent(rs.getInt("ID"), rs.getString("INDIVIDUAL"), rs.getString("PLACE"));
+			dbe = new DBEvent(rs.getInt("ID"), rs.getString("INDIVIDUAL"), rs.getString("PLACE"),
+					rs.getString("SUBTYPE"), rs.getString("NOTE"));
 
 			if (dbe.isInLocation(args[0])) {
 				hss.add(dbe.getIndividual().trim());
@@ -99,6 +104,6 @@ public class FindLocationIndividuals {
 			Desktop.getDesktop().open(new File(outName));
 		}
 
-		logger.info(counter + " individuals with events in the location written to " + outName + ". Program ended");
+		logger.info(counter + " individuals with events in " + args[0] + " written to " + outName + ". Program ended");
 	}
 }

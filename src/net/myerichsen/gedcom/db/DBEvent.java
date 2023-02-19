@@ -4,13 +4,15 @@ package net.myerichsen.gedcom.db;
  * Class representing an event in the derby database
  *
  * @author Michael Erichsen
- * @version 14. feb. 2023
+ * @version 19. feb. 2023
  *
  */
 public class DBEvent {
 	private final int id;
 	private final String individual;
 	private final String place;
+	private final String subType;
+	private final String note;
 
 	/**
 	 * Constructor
@@ -18,11 +20,15 @@ public class DBEvent {
 	 * @param id
 	 * @param individual
 	 * @param place
+	 * @param subType
+	 * @param note
 	 */
-	public DBEvent(int id, String individual, String place) {
+	public DBEvent(int id, String individual, String place, String subType, String note) {
 		this.id = id;
 		this.individual = individual;
 		this.place = place;
+		this.subType = subType;
+		this.note = note;
 	}
 
 	/**
@@ -40,6 +46,13 @@ public class DBEvent {
 	}
 
 	/**
+	 * @return the note
+	 */
+	public String getNote() {
+		return note;
+	}
+
+	/**
 	 * @return the place
 	 */
 	public String getPlace() {
@@ -47,16 +60,23 @@ public class DBEvent {
 	}
 
 	/**
-	 * @return true if place is in the shire
+	 * @return the subType
+	 */
+	public String getSubType() {
+		return subType;
+	}
+
+	/**
+	 * @return true if place or relocation note is in the location
 	 */
 	public boolean isInLocation(String location) {
-		if (place == null) {
-			return false;
-		}
+		final String l = location.toLowerCase().trim();
 
-		if (place.toLowerCase().contains(location.toLowerCase())) {
+		if (((place != null) && (place.toLowerCase().contains(l))) || ((subType != null) && (subType.equals("Flytning"))
+				&& (note != null) && (note.toLowerCase().contains(l)))) {
 			return true;
 		}
+
 		return false;
 	}
 }
