@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gedcom4j.exception.GedcomParserException;
@@ -33,17 +32,29 @@ import org.gedcom4j.parser.GedcomParser;
  * analysis.
  *
  * @author Michael Erichsen
- * @version 12. feb. 2023
+ * @version 24. feb. 2023
  *
  */
 public class DBLoader {
+	/**
+	 * 
+	 */
+	private static final String INSERT_EVENT_START_I = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('";
+	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '%s' WHERE ID = '%s'";
+	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
+	private static final String DELETE_INDIVIDUAL = "DELETE FROM VEJBY.INDIVIDUAL";
+	private static final String DELETE_FAMILY = "DELETE FROM VEJBY.FAMILY";
+	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE='%s'	WHERE ID = '%s'";
+	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = '%s' WHERE ID = '%s'";
+	private static final String INSERT_INDIVIDUAL = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('%s', '%s', '%s', '%s', '%s')";
+	private static final String INSERT_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, NOTE, INDIVIDUAL) VALUES('";
+	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES ('%s', NULL, NULL)";
 	private static Logger logger;
 	private static Fonkod fonkod = new Fonkod();
 	private static Gedcom gedcom;
 	private static int familyCounter = 0;
 	private static int individualCounter = 0;
 	private static int eventCounter = 0;
-	private static int citationCounter = 0;
 
 	/**
 	 * Main method
@@ -57,7 +68,6 @@ public class DBLoader {
 		}
 
 		logger = Logger.getLogger("DBLoader");
-		logger.setLevel(Level.FINE);
 
 		final DBLoader ir = new DBLoader();
 
@@ -79,27 +89,27 @@ public class DBLoader {
 	 *
 	 */
 	private void clearTables() throws SQLException {
-		String query = "DELETE FROM VEJBY.FAMILY";
+		String query = DELETE_FAMILY;
 		stmt.execute(query);
-		query = "DELETE FROM VEJBY.INDIVIDUAL";
+		query = DELETE_INDIVIDUAL;
 		stmt.execute(query);
-		query = "DELETE FROM VEJBY.EVENT";
-		stmt.execute(query);
-		query = "DELETE FROM VEJBY.CITATION";
+		query = DELETE_EVENT;
 		stmt.execute(query);
 	}
 
 	/**
 	 * Connect to the Derby database
+	 * 
+	 * @param args
 	 *
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB() throws SQLException {
-		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		System.out.println("Connected to database " + dbURL1);
-		stmt = conn1.createStatement();
+	private void connectToDB(String[] args) throws SQLException {
+		final String dbURL = "jdbc:derby:" + args[1];
+		final Connection conn = DriverManager.getConnection(dbURL);
+		System.out.println("Connected to database " + dbURL);
+		stmt = conn.createStatement();
 	}
 
 	/**
@@ -109,7 +119,7 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
-		connectToDB();
+		connectToDB(args);
 
 		System.out.println("Reading " + args[0]);
 		readGedcom(args[0]);
@@ -126,8 +136,7 @@ public class DBLoader {
 		stmt.close();
 
 		System.out.println("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
-				+ " individuals inserted.\n" + eventCounter + " events inserted\n" + citationCounter
-				+ " citations inserted");
+				+ " individuals inserted.\n" + eventCounter + " events inserted");
 	}
 
 	/**
@@ -173,7 +182,7 @@ public class DBLoader {
 	 * @throws SQLException
 	 */
 	private void insertFamily(String key) throws SQLException {
-		final String query = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES ('" + key + "', NULL, NULL)";
+		final String query = String.format(INSERT_FAMILY, key);
 		logger.fine(query);
 		stmt.execute(query);
 		familyCounter++;
@@ -203,8 +212,7 @@ public class DBLoader {
 		}
 
 		for (final FamilyEvent familyEvent : events) {
-			sb = new StringBuilder(
-					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, NOTE, INDIVIDUAL) VALUES('");
+			sb = new StringBuilder(INSERT_EVENT_START);
 			sb.append(familyEvent.getType());
 			subtype = familyEvent.getSubType();
 
@@ -290,16 +298,11 @@ public class DBLoader {
 			final String surname = split[1];
 			final String sex = individual.getSex().getValue();
 			final String phonName = fonkod.generateKey(given) + " " + fonkod.generateKey(surname);
-
-			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('" + xref + "', '"
-					+ given + "', '" + surname + "', '" + sex + "', '" + phonName + "'	)";
-
+			query = String.format(INSERT_INDIVIDUAL, xref, given, surname, sex, phonName);
 			logger.fine(query);
 			stmt.execute(query);
 			individualCounter++;
-		} catch (
-
-		final SQLException e) {
+		} catch (final SQLException e) {
 			// Handle duplicates
 			if (!e.getSQLState().equals("23505")) {
 				throw new Exception(
@@ -333,8 +336,7 @@ public class DBLoader {
 		}
 
 		for (final IndividualEvent individualEvent : events) {
-			sb = new StringBuilder(
-					"INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('");
+			sb = new StringBuilder(INSERT_EVENT_START_I);
 			sb.append(individualEvent.getType());
 			subtype = individualEvent.getSubType();
 
@@ -375,10 +377,9 @@ public class DBLoader {
 			}
 
 			query = sb.toString();
-			logger.info(query);
 
 			try {
-				logger.info(query);
+				logger.fine(query);
 				stmt.execute(query);
 				eventCounter++;
 			} catch (final SQLException e) {
@@ -404,10 +405,10 @@ public class DBLoader {
 			final String given = split[0].trim();
 			final String surname = split[1];
 			final String sex = individual.getSex().getValue();
-			final String phonName = fonkod.generateKey(surname);
+			final String phonName = fonkod.generateKey(given) + " " + fonkod.generateKey(surname);
 
-			query = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('" + xref + "', '"
-					+ given + "', '" + surname + "', '" + sex + "', '" + phonName + "'	)";
+			query = String.format(INSERT_INDIVIDUAL, xref, given, surname, sex, phonName);
+			logger.fine(query);
 
 			if (individual.getFamiliesWhereChild() == null) {
 				updateIndividual(individual);
@@ -424,7 +425,7 @@ public class DBLoader {
 				throw new Exception(
 						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
 			}
-			logger.info("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+
 			updateIndividual(individual);
 		}
 	}
@@ -512,7 +513,6 @@ public class DBLoader {
 	 * Read a GEDCOM file using org.gedcomj package
 	 *
 	 * @param filename
-	 * @return
 	 * @throws GedcomParserException
 	 * @throws IOException
 	 */
@@ -530,7 +530,8 @@ public class DBLoader {
 	 * @throws SQLException
 	 */
 	private void updateFamilyHusband(String ID, Individual husband) throws Exception {
-		final String query = "UPDATE VEJBY.FAMILY SET HUSBAND = '" + husband.getXref() + "' WHERE ID = '" + ID + "'";
+		final String query = String.format(UPDATE_FAMILY_HUSBAND, husband.getXref(), ID);
+
 		try {
 			logger.fine(query);
 			stmt.execute(query);
@@ -549,7 +550,8 @@ public class DBLoader {
 	 * @throws Exception
 	 */
 	private void updateFamilyWife(String ID, Individual wife) throws Exception {
-		final String query = "UPDATE VEJBY.FAMILY SET WIFE = '" + wife.getXref() + "' WHERE ID = '" + ID + "'";
+		final String query = String.format(UPDATE_FAMILY_WIFE, wife.getXref(), ID);
+
 		try {
 			logger.fine(query);
 			stmt.execute(query);
@@ -571,9 +573,9 @@ public class DBLoader {
 		final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
 
 		if (familiesWhereChild != null) {
-			final String query = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '"
-					+ individual.getFamiliesWhereChild().get(0).getFamily().getXref() + "' WHERE ID = '"
-					+ individual.getXref() + "'";
+			final String query = String.format(UPDATE_INDIVIDUAL_FAMC,
+					individual.getFamiliesWhereChild().get(0).getFamily().getXref(), individual.getXref());
+
 			try {
 				stmt.execute(query);
 				logger.fine(query);
