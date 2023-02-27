@@ -15,7 +15,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * Class to list contents of a GEDCOM Derby database.
  *
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 27. feb. 2023
  *
  */
 public class DBLister {
@@ -100,11 +100,13 @@ public class DBLister {
 		}
 
 		System.out.println("\nCitation");
-		query = "SELECT * FROM VEJBY.CITATION FETCH FIRST 20 ROWS ONLY";
+		query = "SELECT * FROM VEJBY.CENSUS FETCH FIRST 20 ROWS ONLY";
 		rs = stmt.executeQuery(query);
 
 		while (rs.next()) {
-			System.out.println(rs.getInt("ID") + ";" + rs.getString("EVENT") + ";" + rs.getString("TEXT"));
+			System.out.println(rs.getString("KIPNR") + ";" + rs.getString("LOEBENR") + ";" + rs.getString("AMT") + ";"
+					+ rs.getString("HERRED") + ";" + rs.getString("SOGN") + ";" + rs.getString("KILDESTEDNAVN") + ";"
+					+ rs.getString("KILDENAVN"));
 		}
 
 		stmt.close();

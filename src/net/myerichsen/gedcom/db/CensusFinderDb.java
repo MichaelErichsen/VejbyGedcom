@@ -31,17 +31,16 @@ import java.util.logging.Logger;
  */
 public class CensusFinderDb {
 	private static Logger logger;
-	private static String outName = "";
 	private static BufferedWriter bw = null;
 	private static int counter = 0;
 
-	private static final String header = "KIPnr;Loebenr;Kildestednavn;Husstands_familienr;"
-			+ "Matr_nr_Adresse;Kildenavn;Fonnavn;Koen;Alder;Civilstand;Kildeerhverv;"
-			+ "Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;Adresse;"
-			+ "Matrikel;Gade_nr;FTaar;Kildehenvisning;Kildekommentar\n";
+	private static final String header = "KIPnr;Loebenr;Kildestednavn;Amt;Herred;Sogn;"
+			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Fonnavn;Koen;Alder;Civilstand;"
+			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
+			+ "Adresse;Matrikel;Gade_nr;FTaar;Kildehenvisning;Kildekommentar\n";
 
 	private static final String SELECT = "SELECT * FROM VEJBY.CENSUS "
-			+ "WHERE KILDENAVN = '%s' AND FTAAR >= %d AND FTAAR <= %d";
+			+ "WHERE KILDENAVN = '%s' AND FTAAR >= %s AND FTAAR <= %s";
 
 	/**
 	 * Main method
@@ -76,30 +75,31 @@ public class CensusFinderDb {
 	}
 
 	/**
-	 * Find part of individual's birth place in the census line
-	 *
-	 * @param needle
-	 * @param haystack
+	 * @param ci
+	 * @param location
 	 * @return
 	 */
-	// private boolean compareBirthPlace(String needle, String haystack) {
-	// final String h = haystack.toLowerCase();
-	// String[] split;
-	// try {
-	// split = needle.toLowerCase().split(",");
-	// } catch (final Exception e) {
-	// return true;
-	// }
-	//
-	// for (final String element : split) {
-	// if (h.contains(element.trim())) {
-	// return true;
-	// }
-	// }
-	//
-	// return false;
-	//
-	// }
+	private boolean compareLocation(CensusIndividual ci, String location) {
+
+		final String[] locationParts = location.split(",");
+
+		for (final String part : locationParts) {
+			if (ci.getAmt().contains(part.trim())) {
+				return true;
+			}
+			if (ci.getHerred().contains(part.trim())) {
+				return true;
+			}
+			if (ci.getSogn().contains(part.trim())) {
+				return true;
+			}
+			if (ci.getKildestednavn().contains(location.trim())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Connect to the Derby database
@@ -130,13 +130,11 @@ public class CensusFinderDb {
 		final DBIndividual individual = new DBIndividual(statement, args[0]);
 
 		// Select records for the individual within its lifetime
-		final String birthYear = Integer.toString(individual.getBirthYear());
-		final String deathYear = Integer.toString(individual.getDeathYear());
-
 		logger.info("Searching for censuses for ID " + individual.getId() + ", " + individual.getName() + ", born "
-				+ birthYear + " in " + individual.getBirthPlace());
+				+ individual.getBirthYear() + " in " + individual.getBirthPlace());
 
-		final String query = String.format(SELECT, args[0], birthYear, deathYear);
+		final String query = String.format(SELECT, individual.getName(), individual.getBirthYear(),
+				individual.getDeathYear());
 		final ResultSet rs = statement.executeQuery(query);
 
 		while (rs.next()) {
@@ -145,96 +143,57 @@ public class CensusFinderDb {
 
 		statement.close();
 
-		// TODO Compare birth year
-
-		if (cil.size() > 0) {
-			bw = new BufferedWriter(new FileWriter(outName));
-			bw.write(header);
-
-			String location = individual.getBirthPlace().trim();
-
-			for (final CensusIndividual ci : cil) {
-				if ((ci.getAmt().contains(location)) || (ci.getHerred().contains(location))
-						|| (ci.getSogn().contains(location)) || (ci.getKildestednavn().contains(location))) {
-					bw.write(ci.toString());
-					counter++;
-				}
-			}
-
-			bw.flush();
-			bw.close();
-			logger.info(counter + " lines of census data written to " + outName);
-
-			Desktop.getDesktop().open(new File(outName));
+		if ((cil != null) && (cil.size() > 0)) {
+			writeOutput(cil, individual, args[2] + "/" + individual.getName() + "_census.csv");
+		}
+		if (counter == 0) {
+			logger.info("No census records found");
 		}
 
 	}
 
 	/**
-	 * Extract data from the census csv file into the output csv file
-	 *
+	 * @param cil
 	 * @param individual
-	 * @param csvFileName
-	 * @param location
-	 * @param outfilepath
-	 * @param bw
-	 * @param ftYear
 	 * @throws IOException
 	 */
-	// private void processCsvFile(DBIndividual individual, String csvFileName,
-	// String location, String outfilepath,
-	// int ftYear) throws IOException {
-	// final BufferedReader br = new BufferedReader(new FileReader(new
-	// File(csvFileName)));
-	//
-	// // Read first line to get headers for later use
-	// final String headerLine = br.readLine();
-	//
-	// int diff = 0;
-	//
-	// String line;
-	//
-	// while ((line = br.readLine()) != null) {
-	// if (compareName(individual.getName(), line)) {
-	// int col = -1;
-	//
-	// // Ignore empty file
-	// if (headerLine == null) {
-	// br.close();
-	// return;
-	// }
-	//
-	// String[] columns = headerLine.split(";");
-	//
-	// for (int i = 0; i < columns.length; i++) {
-	// if (columns[i].equals("Alder") || columns[i].equals("Født kildedato")) {
-	// col = i;
-	// break;
-	// }
-	// }
-	//
-	// if (col < 0) {
-	// br.close();
-	// return;
-	// }
-	//
-	// columns = line.split(";");
-	//
-	// final Pattern r = Pattern.compile("\\d*");
-	// final Matcher m = r.matcher(columns[col]);
-	//
-	// if (m.find() && !m.group(0).equals("")) {
-	// diff = Integer.parseInt(m.group(0));
-	// }
-	//
-	// diff = (diff + individual.getBirthYear()) - ftYear;
-	//
-	// if (((diff < 2) && (diff > -2))
-	// && ((ftYear < 1845) || compareBirthPlace(individual.getBirthPlace(),
-	// line))) {
-	//
+	private void writeOutput(List<CensusIndividual> cil, final DBIndividual individual, String outName)
+			throws IOException {
+		int foedeAar;
+		int diff;
 
-	//
-	// }
+		bw = new BufferedWriter(new FileWriter(outName));
+		bw.write(header);
 
+		final String location = individual.getBirthPlace().trim();
+
+		for (final CensusIndividual ci : cil) {
+			if (compareLocation(ci, location)) {
+				foedeAar = ci.getFoedeaar();
+
+				if (foedeAar == 0) {
+					if (ci.getAlder().equals("")) {
+						foedeAar = Integer.parseInt(ci.getFoedt_kildedato().substring(0, 4));
+					} else {
+						foedeAar = ci.getFTaar() - Integer.parseInt(ci.getAlder());
+					}
+				}
+
+				diff = individual.getBirthYear() - foedeAar;
+
+				if ((diff > -2) && (diff < 2)) {
+					bw.write(ci.toString());
+					counter++;
+				}
+			}
+		}
+
+		bw.flush();
+		bw.close();
+		logger.info(counter + " lines of census data written to " + outName);
+
+		if (counter > 0) {
+			Desktop.getDesktop().open(new File(outName));
+		}
+	}
 }

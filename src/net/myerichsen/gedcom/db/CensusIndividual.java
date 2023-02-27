@@ -19,7 +19,7 @@ public class CensusIndividual {
 			+ "KOEN, ALDER, CIVILSTAND, KILDEERHVERV, STILLING_I_HUSSTANDEN, "
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "
 			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES ('%s','%s','%s','%s', '%s', '%s', '%s', '%s', "
-			+ "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s')";
+			+ "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
 
 	/**
 	 * @param rs
@@ -48,7 +48,7 @@ public class CensusIndividual {
 			ci.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
 			ci.setKildefoedested(rs.getString("Kildefoedested"));
 			ci.setFoedt_kildedato(rs.getString("Foedt_kildedato"));
-			ci.setFoedeaar(rs.getString("Foedeaar"));
+			ci.setFoedeaar(rs.getInt("Foedeaar"));
 			ci.setAdresse(rs.getString("Adresse"));
 			ci.setMatrikel(rs.getString("Matrikel"));
 			ci.setGade_nr(rs.getString("Gade_nr"));
@@ -61,6 +61,7 @@ public class CensusIndividual {
 	}
 
 	private String KIPnr = "";
+
 	private String Loebenr = "";
 	private String Amt = "";
 	private String Herred = "";
@@ -77,7 +78,7 @@ public class CensusIndividual {
 	private String Stilling_i_husstanden = "";
 	private String Kildefoedested = "";
 	private String Foedt_kildedato = "";
-	private String Foedeaar = "";
+	private int Foedeaar = 0;
 	private String Adresse = "";
 	private String Matrikel = "";
 	private String Gade_nr = "";
@@ -116,7 +117,7 @@ public class CensusIndividual {
 	/**
 	 * @return the foedeaar
 	 */
-	public String getFoedeaar() {
+	public int getFoedeaar() {
 		return Foedeaar;
 	}
 
@@ -301,11 +302,24 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param foedeaar
+	 * @param aar
 	 *            the foedeaar to set
 	 */
-	public void setFoedeaar(String foedeaar) {
-		Foedeaar = foedeaar.replace("'", "").trim();
+	public void setFoedeaar(int aar) {
+		Foedeaar = aar;
+	}
+
+	/**
+	 * @param aar
+	 *            the foedeaar to set
+	 */
+	public void setFoedeaar(String aar) {
+		final Pattern pattern = Pattern.compile("\\d{4}");
+		final Matcher matcher = pattern.matcher(aar);
+
+		if (matcher.find()) {
+			Foedeaar = Integer.parseInt(matcher.group(0));
+		}
 	}
 
 	/**
@@ -477,32 +491,7 @@ public class CensusIndividual {
 				+ Husstands_familienr + ";" + Matr_nr_Adresse + ";" + Kildenavn + ";" + Fonnavn + ";" + Koen + ";"
 				+ Alder + ";" + Civilstand + ";" + Kildeerhverv + ";" + Stilling_i_husstanden + ";" + Kildefoedested
 				+ ";" + Foedt_kildedato + ";" + Foedeaar + ";" + Adresse + ";" + Matrikel + ";" + Gade_nr + ";" + FTaar
-				+ ";" + Kildehenvisning + ";" + Kildekommentar;
+				+ ";" + Kildehenvisning + ";" + Kildekommentar + "\n";
 	}
 
-	/**
-	 * @return
-	 */
-	public String toStringX() {
-		return "CensusIndividual [" + (KIPnr != null ? "KIPnr=" + KIPnr + ", " : "")
-				+ (Loebenr != null ? "Loebenr=" + Loebenr + ", " : "") + (Amt != null ? "Amt=" + Amt + ", " : "")
-				+ (Herred != null ? "Herred=" + Herred + ", " : "") + (Sogn != null ? "Sogn=" + Sogn + ", " : "")
-				+ (Kildestednavn != null ? "Kildestednavn=" + Kildestednavn + ", " : "")
-				+ (Husstands_familienr != null ? "Husstands_familienr=" + Husstands_familienr + ", " : "")
-				+ (Matr_nr_Adresse != null ? "Matr_nr_Adresse=" + Matr_nr_Adresse + ", " : "")
-				+ (Kildenavn != null ? "Kildenavn=" + Kildenavn + ", " : "")
-				+ (Fonnavn != null ? "Fonnavn=" + Fonnavn + ", " : "") + (Koen != null ? "Koen=" + Koen + ", " : "")
-				+ (Alder != null ? "Alder=" + Alder + ", " : "")
-				+ (Civilstand != null ? "Civilstand=" + Civilstand + ", " : "")
-				+ (Kildeerhverv != null ? "Kildeerhverv=" + Kildeerhverv + ", " : "")
-				+ (Stilling_i_husstanden != null ? "Stilling_i_husstanden=" + Stilling_i_husstanden + ", " : "")
-				+ (Kildefoedested != null ? "Kildefoedested=" + Kildefoedested + ", " : "")
-				+ (Foedt_kildedato != null ? "Foedt_kildedato=" + Foedt_kildedato + ", " : "")
-				+ (Foedeaar != null ? "Foedeaar=" + Foedeaar + ", " : "")
-				+ (Adresse != null ? "Adresse=" + Adresse + ", " : "")
-				+ (Matrikel != null ? "Matrikel=" + Matrikel + ", " : "")
-				+ (Gade_nr != null ? "Gade_nr=" + Gade_nr + ", " : "") + "FTaar=" + FTaar + ", "
-				+ (Kildehenvisning != null ? "Kildehenvisning=" + Kildehenvisning + ", " : "")
-				+ (Kildekommentar != null ? "Kildekommentar=" + Kildekommentar : "") + "]";
-	}
 }

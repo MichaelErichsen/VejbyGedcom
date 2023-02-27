@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @version 27. feb. 2023
  */
 public class CensusDbLoader {
-	private static final String DROP_INDEX = "DROP INDEX VEJBY.SQL230227105837570;";
+	private static final String DROP_INDEX = "DROP INDEX VEJBY.CENSUS_UI;";
 	private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
 	private static final String DROP_PK = "ALTER TABLE VEJBY.CENSUS DROP CONSTRAINT CENSUS_PK";
 	private static final String DROP_TABLE = "DROP TABLE VEJBY.CENSUS";
@@ -30,13 +30,13 @@ public class CensusDbLoader {
 			+ "SOGN VARCHAR(256), KILDESTEDNAVN VARCHAR(256), HUSSTANDS_FAMILIENR VARCHAR(256), "
 			+ "MATR_NR_ADRESSE VARCHAR(256), KILDENAVN VARCHAR(256), FONNAVN "
 			+ "VARCHAR(256), KOEN VARCHAR(256), ALDER VARCHAR(256), CIVILSTAND "
-			+ "VARCHAR(256), KILDEERHVERV VARCHAR(256), STILLING_I_HUSSTANDEN "
+			+ "VARCHAR(256), KILDEERHVERV VARCHAR(4096), STILLING_I_HUSSTANDEN "
 			+ "VARCHAR(256), KILDEFOEDESTED VARCHAR(256), FOEDT_KILDEDATO VARCHAR(256), "
-			+ "FOEDEAAR CHAR(32), ADRESSE VARCHAR(256), MATRIKEL VARCHAR(512), GADE_NR "
+			+ "FOEDEAAR INTEGER, ADRESSE VARCHAR(256), MATRIKEL VARCHAR(512), GADE_NR "
 			+ "VARCHAR(256), FTAAR INTEGER, KILDEHENVISNING VARCHAR(256), KILDEKOMMENTAR VARCHAR(512) )";
 	private static final String CREATE_PK = "ALTER TABLE VEJBY.CENSUS "
 			+ "ADD CONSTRAINT CENSUS_PK PRIMARY KEY (KIPNR, LOEBENR)";
-	private static final String CREATE_INDEX = "CREATE UNIQUE INDEX VEJBY.SQL230227105837570 "
+	private static final String CREATE_INDEX = "CREATE UNIQUE INDEX VEJBY.CENSUS_UI "
 			+ "ON VEJBY.CENSUS (KIPNR ASC, LOEBENR ASC)";
 	private static Logger logger;
 	private static Statement statement;
@@ -228,8 +228,8 @@ public class CensusDbLoader {
 			fields = line.split(";");
 
 			ci = new CensusIndividual();
-			ci.setKIPnr(fields[kipNr]);
 			try {
+				ci.setKIPnr(fields[kipNr]);
 				ci.setLoebenr(fields[Loebenr]);
 				ci.setKildestednavn(fields[Kildestednavn]);
 				ci.setAmt(kipTextEntry.getAmt());
