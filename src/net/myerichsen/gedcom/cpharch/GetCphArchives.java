@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.db.DBIndividual;
  * derby database
  *
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 24. feb. 2023
  *
  */
 public class GetCphArchives {
@@ -28,11 +28,11 @@ public class GetCphArchives {
 	public static void main(String[] args) {
 		if (args.length < 5) {
 			System.out.println(
-					"Usage: FindLocationSources individualId vejbydatabasepath cphdatabasepath dddcsvfilepath outputdirectory");
+					"Usage: GetCphArchives individualId vejbydatabasepath cphdatabasepath dddcsvfilepath outputdirectory");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("FindLocationSources");
+		logger = Logger.getLogger("GetCphArchives");
 
 		final GetCphArchives gca = new GetCphArchives();
 
