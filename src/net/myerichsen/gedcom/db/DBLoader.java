@@ -261,7 +261,7 @@ public class DBLoader {
 					eventCounter++;
 				} catch (final SQLException e) {
 					throw new Exception(
-							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+							"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 				}
 			}
 
@@ -274,7 +274,7 @@ public class DBLoader {
 					eventCounter++;
 				} catch (final SQLException e) {
 					throw new Exception(
-							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+							"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 				}
 			}
 		}
@@ -306,9 +306,9 @@ public class DBLoader {
 			// Handle duplicates
 			if (!e.getSQLState().equals("23505")) {
 				throw new Exception(
-						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+						"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 			}
-			logger.fine("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+			logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 			updateIndividual(individual);
 		}
 	}
@@ -384,7 +384,7 @@ public class DBLoader {
 				eventCounter++;
 			} catch (final SQLException e) {
 				throw new Exception(
-						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+						"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 			}
 		}
 	}
@@ -423,7 +423,7 @@ public class DBLoader {
 			// Handle duplicates
 			if (!e.getSQLState().equals("23505")) {
 				throw new Exception(
-						"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+						"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 			}
 
 			updateIndividual(individual);
@@ -537,7 +537,7 @@ public class DBLoader {
 			stmt.execute(query);
 		} catch (final SQLException e) {
 			throw new Exception(
-					"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+					"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 		}
 
 	}
@@ -557,7 +557,7 @@ public class DBLoader {
 			stmt.execute(query);
 		} catch (final SQLException e) {
 			throw new Exception(
-					"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+					"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 
 		}
 
@@ -583,9 +583,9 @@ public class DBLoader {
 				// Handle family not yet inserted
 				if (!e.getSQLState().equals("23503")) {
 					throw new Exception(
-							"SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+							"sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 				}
-				logger.fine("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState() + ", " + query);
+				logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 
 			}
 		}

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 27. feb. 2023
+ * @version 28. feb. 2023
  *
  */
 public class CensusIndividual {
@@ -18,8 +18,8 @@ public class CensusIndividual {
 			+ "KILDESTEDNAVN, HUSSTANDS_FAMILIENR, MATR_NR_ADRESSE, KILDENAVN, FONNAVN, "
 			+ "KOEN, ALDER, CIVILSTAND, KILDEERHVERV, STILLING_I_HUSSTANDEN, "
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "
-			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES ('%s','%s','%s','%s', '%s', '%s', '%s', '%s', "
-			+ "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
+			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES ('%s',%d,'%s','%s', '%s', '%s', '%s', '%s', "
+			+ "'%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
 
 	/**
 	 * @param rs
@@ -33,7 +33,7 @@ public class CensusIndividual {
 		while (rs.next()) {
 			ci = new CensusIndividual();
 			ci.setKIPnr(rs.getString("kipNr"));
-			ci.setLoebenr(rs.getString("Loebenr"));
+			ci.setLoebenr(rs.getInt("Loebenr"));
 			ci.setKildestednavn(rs.getString("Kildestednavn"));
 			ci.setAmt(rs.getString("Amt"));
 			ci.setHerred(rs.getString("Herred"));
@@ -42,7 +42,7 @@ public class CensusIndividual {
 			ci.setMatr_nr_Adresse(rs.getString("Matr_nr_Adresse"));
 			ci.setKildenavn(rs.getString("Kildenavn"));
 			ci.setKoen(rs.getString("Koen"));
-			ci.setAlder(rs.getString("Alder"));
+			ci.setAlder(rs.getInt("Alder"));
 			ci.setCivilstand(rs.getString("Civilstand"));
 			ci.setKildeerhverv(rs.getString("Kildeerhverv"));
 			ci.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
@@ -61,8 +61,7 @@ public class CensusIndividual {
 	}
 
 	private String KIPnr = "";
-
-	private String Loebenr = "";
+	private int Loebenr = 0;
 	private String Amt = "";
 	private String Herred = "";
 	private String Sogn = "";
@@ -72,7 +71,7 @@ public class CensusIndividual {
 	private String Kildenavn = "";
 	private String Fonnavn = "";
 	private String Koen = "";
-	private String Alder = "";
+	private int Alder = 0;
 	private String Civilstand = "";
 	private String Kildeerhverv = "";
 	private String Stilling_i_husstanden = "";
@@ -96,7 +95,7 @@ public class CensusIndividual {
 	/**
 	 * @return the alder
 	 */
-	public String getAlder() {
+	public int getAlder() {
 		return Alder;
 	}
 
@@ -222,7 +221,7 @@ public class CensusIndividual {
 	/**
 	 * @return the loebenr
 	 */
-	public String getLoebenr() {
+	public int getLoebenr() {
 		return Loebenr;
 	}
 
@@ -281,8 +280,21 @@ public class CensusIndividual {
 	 * @param alder
 	 *            the alder to set
 	 */
+	private void setAlder(int alder) {
+		Alder = alder;
+	}
+
+	/**
+	 * @param alder
+	 *            the alder to set
+	 */
 	public void setAlder(String alder) {
-		Alder = alder.replace("'", "").trim();
+		final Pattern pattern = Pattern.compile("\\d*");
+		final Matcher matcher = pattern.matcher(alder);
+
+		if (matcher.find()) {
+			Alder = Integer.parseInt(matcher.group(0));
+		}
 	}
 
 	/**
@@ -449,8 +461,21 @@ public class CensusIndividual {
 	 * @param loebenr
 	 *            the loebenr to set
 	 */
+	private void setLoebenr(int loebenr) {
+		Loebenr = loebenr;
+	}
+
+	/**
+	 * @param loebenr
+	 *            the loebenr to set
+	 */
 	public void setLoebenr(String loebenr) {
-		Loebenr = loebenr.replace("'", "").trim();
+		final Pattern pattern = Pattern.compile("\\d*");
+		final Matcher matcher = pattern.matcher(loebenr);
+
+		if (matcher.find()) {
+			Loebenr = Integer.parseInt(matcher.group(0));
+		}
 	}
 
 	/**

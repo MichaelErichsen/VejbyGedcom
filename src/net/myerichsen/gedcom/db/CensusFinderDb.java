@@ -16,17 +16,16 @@ import java.util.logging.Logger;
 /**
  * Find all census entries that match a given individual ID.
  *
- * Find name and birth or christening from the INDIVIDUAL Derby table.
+ * Find phonetic name and birth or christening from the INDIVIDUAL Derby table.
  *
  * For each individual in the CENSUS Derby table within the life span of the
  * individual.
  *
- * If the name matches completely and the birth or christening date are within
+ * If the name matches phonetically and the birth or christening date are within
  * two years of the given age then output in csv format
  *
- *
  * @author Michael Erichsen
- * @version 27. feb. 2023
+ * @version 28. feb. 2023
  *
  */
 public class CensusFinderDb {
@@ -40,7 +39,7 @@ public class CensusFinderDb {
 			+ "Adresse;Matrikel;Gade_nr;FTaar;Kildehenvisning;Kildekommentar\n";
 
 	private static final String SELECT = "SELECT * FROM VEJBY.CENSUS "
-			+ "WHERE KILDENAVN = '%s' AND FTAAR >= %s AND FTAAR <= %s";
+			+ "WHERE FONNAVN = '%s' AND FTAAR >= %s AND FTAAR <= %s";
 
 	/**
 	 * Main method
@@ -83,17 +82,19 @@ public class CensusFinderDb {
 
 		final String[] locationParts = location.split(",");
 
-		for (final String part : locationParts) {
-			if (ci.getAmt().contains(part.trim())) {
+		for (String part : locationParts) {
+			part = part.trim();
+
+			if (ci.getAmt().contains(part)) {
 				return true;
 			}
-			if (ci.getHerred().contains(part.trim())) {
+			if (ci.getHerred().contains(part)) {
 				return true;
 			}
-			if (ci.getSogn().contains(part.trim())) {
+			if (ci.getSogn().contains(part)) {
 				return true;
 			}
-			if (ci.getKildestednavn().contains(location.trim())) {
+			if (ci.getKildestednavn().contains(part)) {
 				return true;
 			}
 		}
@@ -133,8 +134,9 @@ public class CensusFinderDb {
 		logger.info("Searching for censuses for ID " + individual.getId() + ", " + individual.getName() + ", born "
 				+ individual.getBirthYear() + " in " + individual.getBirthPlace());
 
-		final String query = String.format(SELECT, individual.getName(), individual.getBirthYear(),
+		final String query = String.format(SELECT, individual.getPhonName().trim(), individual.getBirthYear(),
 				individual.getDeathYear());
+
 		final ResultSet rs = statement.executeQuery(query);
 
 		while (rs.next()) {
@@ -146,6 +148,7 @@ public class CensusFinderDb {
 		if ((cil != null) && (cil.size() > 0)) {
 			writeOutput(cil, individual, args[2] + "/" + individual.getName() + "_census.csv");
 		}
+
 		if (counter == 0) {
 			logger.info("No census records found");
 		}
@@ -159,8 +162,8 @@ public class CensusFinderDb {
 	 */
 	private void writeOutput(List<CensusIndividual> cil, final DBIndividual individual, String outName)
 			throws IOException {
-		int foedeAar;
-		int diff;
+		int foedeAar = 0;
+		int diff = 0;
 
 		bw = new BufferedWriter(new FileWriter(outName));
 		bw.write(header);
@@ -168,24 +171,28 @@ public class CensusFinderDb {
 		final String location = individual.getBirthPlace().trim();
 
 		for (final CensusIndividual ci : cil) {
-			if (compareLocation(ci, location)) {
-				foedeAar = ci.getFoedeaar();
+			foedeAar = ci.getFoedeaar();
 
-				if (foedeAar == 0) {
-					if (ci.getAlder().equals("")) {
-						foedeAar = Integer.parseInt(ci.getFoedt_kildedato().substring(0, 4));
-					} else {
-						foedeAar = ci.getFTaar() - Integer.parseInt(ci.getAlder());
-					}
-				}
+			// if (compareLocation(ci, location)) {
 
+			if (foedeAar > 0) {
 				diff = individual.getBirthYear() - foedeAar;
+			} else {
+				if ((ci.getAlder()) == 0) {
+					if (ci.getFoedt_kildedato().length() > 0) {
+						diff = individual.getBirthYear() - Integer.parseInt(ci.getFoedt_kildedato().substring(0, 4));
+					}
 
-				if ((diff > -2) && (diff < 2)) {
-					bw.write(ci.toString());
-					counter++;
+				} else {
+					diff = individual.getBirthYear() - ci.getFTaar() + ci.getAlder();
 				}
 			}
+
+			if ((diff > -2) && (diff < 2)) {
+				bw.write(ci.toString());
+				counter++;
+			}
+			// }
 		}
 
 		bw.flush();

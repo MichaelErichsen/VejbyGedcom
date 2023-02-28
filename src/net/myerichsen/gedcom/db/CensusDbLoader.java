@@ -18,26 +18,10 @@ import java.util.logging.Logger;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 27. feb. 2023
+ * @version 28. feb. 2023
  */
 public class CensusDbLoader {
-	private static final String DROP_INDEX = "DROP INDEX VEJBY.CENSUS_UI;";
 	private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
-	private static final String DROP_PK = "ALTER TABLE VEJBY.CENSUS DROP CONSTRAINT CENSUS_PK";
-	private static final String DROP_TABLE = "DROP TABLE VEJBY.CENSUS";
-	private static final String CREATE_TABLE = "CREATE TABLE VEJBY.CENSUS ( KIPNR CHAR(8) NOT NULL, "
-			+ "LOEBENR CHAR(8) NOT NULL, AMT VARCHAR(256), HERRED VARCHAR(256), "
-			+ "SOGN VARCHAR(256), KILDESTEDNAVN VARCHAR(256), HUSSTANDS_FAMILIENR VARCHAR(256), "
-			+ "MATR_NR_ADRESSE VARCHAR(256), KILDENAVN VARCHAR(256), FONNAVN "
-			+ "VARCHAR(256), KOEN VARCHAR(256), ALDER VARCHAR(256), CIVILSTAND "
-			+ "VARCHAR(256), KILDEERHVERV VARCHAR(4096), STILLING_I_HUSSTANDEN "
-			+ "VARCHAR(256), KILDEFOEDESTED VARCHAR(256), FOEDT_KILDEDATO VARCHAR(256), "
-			+ "FOEDEAAR INTEGER, ADRESSE VARCHAR(256), MATRIKEL VARCHAR(512), GADE_NR "
-			+ "VARCHAR(256), FTAAR INTEGER, KILDEHENVISNING VARCHAR(256), KILDEKOMMENTAR VARCHAR(512) )";
-	private static final String CREATE_PK = "ALTER TABLE VEJBY.CENSUS "
-			+ "ADD CONSTRAINT CENSUS_PK PRIMARY KEY (KIPNR, LOEBENR)";
-	private static final String CREATE_INDEX = "CREATE UNIQUE INDEX VEJBY.CENSUS_UI "
-			+ "ON VEJBY.CENSUS (KIPNR ASC, LOEBENR ASC)";
 	private static Logger logger;
 	private static Statement statement;
 	private static int counter = 0;
@@ -59,8 +43,6 @@ public class CensusDbLoader {
 		final CensusDbLoader censusDbLoader = new CensusDbLoader();
 
 		try {
-			// CensusDbLoader.newTable();
-			// System.exit(0);
 			censusDbLoader.execute(args);
 
 			logger.info(counter + " rækker indsat i VEJBY.CENSUS");
@@ -70,35 +52,6 @@ public class CensusDbLoader {
 			e.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * Drop and create the table and primary key
-	 */
-	public static void newTable() {
-		final String dbURL = "jdbc:derby:c:\\Users\\michael\\VEJBYDB";
-		try {
-			final Connection conn = DriverManager.getConnection(dbURL);
-			statement = conn.createStatement();
-		} catch (final SQLException e) {
-			e.printStackTrace();
-			return;
-		}
-		try {
-			statement.execute(DROP_PK);
-			statement.execute(DROP_INDEX);
-			statement.execute(DROP_TABLE);
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			statement.execute(CREATE_TABLE);
-			statement.execute(CREATE_INDEX);
-			statement.execute(CREATE_PK);
-			statement.close();
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -112,6 +65,7 @@ public class CensusDbLoader {
 	private void connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[2];
 		final Connection conn = DriverManager.getConnection(dbURL);
+		conn.setAutoCommit(false);
 		logger.info("Connected to database " + dbURL);
 		statement = conn.createStatement();
 	}
@@ -127,8 +81,7 @@ public class CensusDbLoader {
 		connectToDB(args);
 
 		// Clear table
-		final String query = CLEAR_TABLE;
-		statement.execute(query);
+		statement.execute(CLEAR_TABLE);
 
 		// Find all census csv files from the index file
 		final List<KipTextEntry> lkte = parseKipText(args);
@@ -136,9 +89,11 @@ public class CensusDbLoader {
 		// Remove header line
 		lkte.remove(0);
 
-		// Parse and store each census file
+		// Parse and store contens of each census file in a single table
 		for (final KipTextEntry kipTextEntry : lkte) {
-			parseCensusFile(args, kipTextEntry);
+			if (!kipTextEntry.getAar().equals("1771")) {
+				parseCensusFile(args, kipTextEntry);
+			}
 		}
 
 	}
@@ -173,8 +128,7 @@ public class CensusDbLoader {
 		final List<String> kipLines = new ArrayList<>();
 		String line;
 
-		final File file = new File(csvfiledirectory + "/" + kipNr + ".csv");
-		final BufferedReader br = new BufferedReader(new FileReader(file));
+		final BufferedReader br = new BufferedReader(new FileReader(new File(csvfiledirectory + "/" + kipNr + ".csv")));
 
 		while ((line = br.readLine()) != null) {
 			kipLines.add(line);
@@ -185,7 +139,7 @@ public class CensusDbLoader {
 	}
 
 	/**
-	 * Parse a census file and store into a Derby table
+	 * Parse a census file and store contents into a Derby table
 	 *
 	 * @param args
 	 * @param kipTextEntry
@@ -193,6 +147,7 @@ public class CensusDbLoader {
 	 */
 	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
 		logger.info("Parsing " + kipTextEntry.getKipNr());
+		statement.getConnection().commit();
 
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
 		CensusIndividual ci;
@@ -228,42 +183,116 @@ public class CensusDbLoader {
 			fields = line.split(";");
 
 			ci = new CensusIndividual();
+
+			ci.setKIPnr(fields[kipNr]);
 			try {
-				ci.setKIPnr(fields[kipNr]);
 				ci.setLoebenr(fields[Loebenr]);
-				ci.setKildestednavn(fields[Kildestednavn]);
-				ci.setAmt(kipTextEntry.getAmt());
-				ci.setHerred(kipTextEntry.getHerred());
-				ci.setSogn(kipTextEntry.getSogn());
-				ci.setHusstands_familienr(fields[Husstands_familienr]);
-				ci.setMatr_nr_Adresse(fields[Matr_nr_Adresse]);
-				ci.setKildenavn(fields[Kildenavn]);
-				ci.setKoen(fields[Koen]);
-				ci.setAlder(fields[Alder]);
-				ci.setCivilstand(fields[Civilstand]);
-				ci.setKildeerhverv(fields[Kildeerhverv]);
-				ci.setStilling_i_husstanden(fields[Stilling_i_husstanden]);
-				ci.setKildefoedested(fields[Kildefoedested]);
-				ci.setFoedt_kildedato(fields[Foedt_kildedato]);
-				ci.setFoedeaar(fields[Foedeaar]);
-				ci.setAdresse(fields[Adresse]);
-				ci.setMatrikel(fields[Matrikel]);
-				ci.setGade_nr(fields[Gade_nr]);
-				ci.setFTaar(fields[FTaar]);
-				ci.setKildehenvisning(fields[Kildehenvisning]);
-				ci.setKildekommentar(fields[Kildekommentar]);
 			} catch (final Exception e) {
-				// Ignore
+			}
+			try {
+				ci.setKildestednavn(fields[Kildestednavn]);
+			} catch (final Exception e1) {
+
+			}
+			try {
+				ci.setAmt(kipTextEntry.getAmt());
+			} catch (final Exception e2) {
+
+			}
+			try {
+				ci.setHerred(kipTextEntry.getHerred());
+			} catch (final Exception e3) {
+			}
+			try {
+				ci.setSogn(kipTextEntry.getSogn());
+			} catch (final Exception e4) {
+			}
+			try {
+				ci.setHusstands_familienr(fields[Husstands_familienr]);
+			} catch (final Exception e5) {
+			}
+			try {
+				ci.setMatr_nr_Adresse(fields[Matr_nr_Adresse]);
+			} catch (final Exception e6) {
+			}
+			try {
+				ci.setKildenavn(fields[Kildenavn]);
+			} catch (final Exception e7) {
+			}
+			try {
+				ci.setKoen(fields[Koen]);
+			} catch (final Exception e8) {
+			}
+			try {
+				ci.setAlder(fields[Alder]);
+			} catch (final Exception e9) {
+			}
+			try {
+				ci.setCivilstand(fields[Civilstand]);
+			} catch (final Exception e10) {
+
+			}
+			try {
+				ci.setKildeerhverv(fields[Kildeerhverv]);
+			} catch (final Exception e11) {
+			}
+			try
+
+			{
+				ci.setStilling_i_husstanden(fields[Stilling_i_husstanden]);
+			} catch (final Exception e12) {
+			}
+			try
+
+			{
+				ci.setKildefoedested(fields[Kildefoedested]);
+			} catch (final Exception e13) {
+			}
+			try {
+				ci.setFoedt_kildedato(fields[Foedt_kildedato]);
+			} catch (final Exception e14) {
+			}
+			try {
+				ci.setFoedeaar(fields[Foedeaar]);
+			} catch (final Exception e15) {
+			}
+			try {
+				ci.setAdresse(fields[Adresse]);
+			} catch (final Exception e16) {
+			}
+			try {
+				ci.setMatrikel(fields[Matrikel]);
+			} catch (final Exception e17) {
+			}
+			try {
+				ci.setGade_nr(fields[Gade_nr]);
+			} catch (final Exception e18) {
+
+			}
+			try {
+				ci.setFTaar(fields[FTaar]);
+			} catch (final Exception e19) {
+
+			}
+			try {
+				ci.setKildehenvisning(fields[Kildehenvisning]);
+			} catch (final Exception e20) {
+
+			}
+			try {
+				ci.setKildekommentar(fields[Kildekommentar]);
+			} catch (final Exception e21) {
+
 			}
 
 			lastCi = ci;
 
 			try {
 				ci.insertIntoDb(statement);
-			} catch (final SQLException e) {
+			} catch (final SQLException e30) {
 				// Handle duplicates
-				if (!e.getSQLState().equals("23505")) {
-					throw new Exception("SQL Error Code: " + e.getErrorCode() + ", SQL State: " + e.getSQLState());
+				if (!e30.getSQLState().equals("23505")) {
+					throw new Exception("sql Error Code: " + e30.getErrorCode() + ", sql State: " + e30.getSQLState());
 				}
 			}
 
@@ -273,7 +302,7 @@ public class CensusDbLoader {
 
 	/**
 	 * Parse all lines in the kipdata text file. Read each line into an object
-	 * and return them in a list.
+	 * and return them all in a list.
 	 *
 	 * @param args
 	 * @return
@@ -281,8 +310,7 @@ public class CensusDbLoader {
 	 */
 	private List<KipTextEntry> parseKipText(String[] args) throws IOException {
 		final List<KipTextEntry> kipLines = new ArrayList<>();
-		final File file = new File(args[1] + "/" + args[0]);
-		final BufferedReader br = new BufferedReader(new FileReader(file));
+		final BufferedReader br = new BufferedReader(new FileReader(new File(args[1] + "/" + args[0])));
 		String line;
 		KipTextEntry kte;
 
