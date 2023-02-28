@@ -81,7 +81,7 @@ public class CensusDbLoader {
 		connectToDB(args);
 
 		// Clear table
-		statement.execute(CLEAR_TABLE);
+		// statement.execute(CLEAR_TABLE);
 
 		// Find all census csv files from the index file
 		final List<KipTextEntry> lkte = parseKipText(args);
