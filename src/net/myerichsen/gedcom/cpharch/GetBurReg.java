@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Michael Erichsen
- * @version 5. feb. 2023
+ * @version 1. mar. 2023
  *
  */
 public class GetBurReg {
@@ -120,8 +120,6 @@ public class GetBurReg {
 					+ getField(rs, "INSTITUTION_HOOD") + ";" + getField(rs, "INSTITUTION_STREET_NUMBER") + ";"
 					+ getField(rs, "OCCUPTATIONS") + ";" + getField(rs, "OCCUPATION_RELATION_TYPES)") + ";"
 					+ getField(rs, "DEATHCAUSES") + ";" + getField(rs, "DEATHCAUSES_DANISH") + "\n";
-
-			logger.info(result);
 
 			if (counter == 0) {
 				outName = args[1] + "/" + args[2] + " " + args[3] + "_burreg.csv";

@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -18,10 +19,11 @@ import java.util.logging.Logger;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 28. feb. 2023
+ * @version 1. mar. 2023
  */
 public class CensusDbLoader {
-	private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
+	// private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
+	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.CENSUS WHERE KIPNR = '%s'";
 	private static Logger logger;
 	private static Statement statement;
 	private static int counter = 0;
@@ -48,7 +50,11 @@ public class CensusDbLoader {
 			logger.info(counter + " rækker indsat i VEJBY.CENSUS");
 		} catch (final Exception e) {
 			logger.severe(e.getMessage());
-			logger.info(lastCi.toString());
+
+			if (lastCi != null) {
+				logger.info(lastCi.toString());
+			}
+
 			e.printStackTrace();
 		}
 
@@ -146,6 +152,17 @@ public class CensusDbLoader {
 	 * @throws Exception
 	 */
 	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
+		String query = String.format(SELECT_COUNT, kipTextEntry.getKipNr());
+		ResultSet rs = statement.executeQuery(query);
+
+		// Skip if already loaded
+		if (rs.next()) {
+			if (rs.getInt("COUNT") > 0) {
+				logger.info("Skipping " + kipTextEntry.getKipNr());
+				return;
+			}
+		}
+
 		logger.info("Parsing " + kipTextEntry.getKipNr());
 		statement.getConnection().commit();
 
@@ -301,8 +318,8 @@ public class CensusDbLoader {
 	}
 
 	/**
-	 * Parse all lines in the kipdata text file. Read each line into an object
-	 * and return them all in a list.
+	 * Parse all lines in the kipdata text file. Read each line into an object and
+	 * return them all in a list.
 	 *
 	 * @param args
 	 * @return

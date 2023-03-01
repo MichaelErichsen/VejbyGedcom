@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 
 import net.myerichsen.gedcom.db.CensusFinder;
+import net.myerichsen.gedcom.db.CensusFinderDb;
 import net.myerichsen.gedcom.db.DBIndividual;
 
 /**
@@ -14,7 +15,7 @@ import net.myerichsen.gedcom.db.DBIndividual;
  * derby database
  *
  * @author Michael Erichsen
- * @version 24. feb. 2023
+ * @version 28. feb. 2023
  *
  */
 public class GetCphArchives {
@@ -102,6 +103,17 @@ public class GetCphArchives {
 
 		try {
 			new CensusFinder(vejbyArgs);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
+		final String[] vejbyArgsDb = new String[3];
+		vejbyArgsDb[0] = individual.getId();
+		vejbyArgsDb[1] = args[1];
+		vejbyArgsDb[2] = args[4];
+
+		try {
+			new CensusFinderDb(vejbyArgsDb);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

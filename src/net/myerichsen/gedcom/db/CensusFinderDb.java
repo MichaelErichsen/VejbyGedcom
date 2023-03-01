@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Find all census entries that match a given individual ID.
@@ -25,7 +27,7 @@ import java.util.logging.Logger;
  * two years of the given age then output in csv format
  *
  * @author Michael Erichsen
- * @version 28. feb. 2023
+ * @version 01. mar. 2023
  *
  */
 public class CensusFinderDb {
@@ -33,10 +35,10 @@ public class CensusFinderDb {
 	private static BufferedWriter bw = null;
 	private static int counter = 0;
 
-	private static final String header = "KIPnr;Loebenr;Kildestednavn;Amt;Herred;Sogn;"
+	private static final String header = "FTaar;KIPnr;Loebenr;Kildestednavn;Amt;Herred;Sogn;"
 			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Fonnavn;Koen;Alder;Civilstand;"
 			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
-			+ "Adresse;Matrikel;Gade_nr;FTaar;Kildehenvisning;Kildekommentar\n";
+			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar\n";
 
 	private static final String SELECT = "SELECT * FROM VEJBY.CENSUS "
 			+ "WHERE FONNAVN = '%s' AND FTAAR >= %s AND FTAAR <= %s";
@@ -78,29 +80,29 @@ public class CensusFinderDb {
 	 * @param location
 	 * @return
 	 */
-	private boolean compareLocation(CensusIndividual ci, String location) {
-
-		final String[] locationParts = location.split(",");
-
-		for (String part : locationParts) {
-			part = part.trim();
-
-			if (ci.getAmt().contains(part)) {
-				return true;
-			}
-			if (ci.getHerred().contains(part)) {
-				return true;
-			}
-			if (ci.getSogn().contains(part)) {
-				return true;
-			}
-			if (ci.getKildestednavn().contains(part)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
+	// private boolean compareLocation(CensusIndividual ci, String location) {
+	//
+	// final String[] locationParts = location.split(",");
+	//
+	// for (String part : locationParts) {
+	// part = part.trim();
+	//
+	// if (ci.getAmt().contains(part)) {
+	// return true;
+	// }
+	// if (ci.getHerred().contains(part)) {
+	// return true;
+	// }
+	// if (ci.getSogn().contains(part)) {
+	// return true;
+	// }
+	// if (ci.getKildestednavn().contains(part)) {
+	// return true;
+	// }
+	// }
+	//
+	// return false;
+	// }
 
 	/**
 	 * Connect to the Derby database
@@ -146,7 +148,7 @@ public class CensusFinderDb {
 		statement.close();
 
 		if ((cil != null) && (cil.size() > 0)) {
-			writeOutput(cil, individual, args[2] + "/" + individual.getName() + "_census.csv");
+			writeOutput(cil, individual, args[2] + "/" + individual.getName() + "db_census.csv");
 		}
 
 		if (counter == 0) {
@@ -168,7 +170,7 @@ public class CensusFinderDb {
 		bw = new BufferedWriter(new FileWriter(outName));
 		bw.write(header);
 
-		final String location = individual.getBirthPlace().trim();
+		// final String location = individual.getBirthPlace().trim();
 
 		for (final CensusIndividual ci : cil) {
 			foedeAar = ci.getFoedeaar();
@@ -180,7 +182,17 @@ public class CensusFinderDb {
 			} else {
 				if ((ci.getAlder()) == 0) {
 					if (ci.getFoedt_kildedato().length() > 0) {
-						diff = individual.getBirthYear() - Integer.parseInt(ci.getFoedt_kildedato().substring(0, 4));
+						try {
+							diff = individual.getBirthYear()
+									- Integer.parseInt(ci.getFoedt_kildedato().substring(0, 4));
+						} catch (Exception e) {
+							final Pattern pattern = Pattern.compile("\\d{4}");
+							final Matcher matcher = pattern.matcher(ci.getFoedt_kildedato());
+
+							if (matcher.find()) {
+								diff = individual.getBirthYear() - Integer.parseInt(matcher.group(0));
+							}
+						}
 					}
 
 				} else {
