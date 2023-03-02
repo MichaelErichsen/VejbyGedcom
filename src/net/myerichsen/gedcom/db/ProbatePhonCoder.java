@@ -12,17 +12,14 @@ import java.util.logging.Logger;
  * Read each individual in a table. Insert phonetic coding of FIRSTNAMES and
  * LASTNAME and store the result in PHONNAME.
  *
- * C:\Users\michael\CPHDB CPH.BURIAL_PERSON_COMPLETE FIRSTNAMES LASTNAME
- * PHONNAME
- * 
- * C:\DerbyDB\gedcom GEDCOM.INDIVIDUAL NAME PHONNAME
+ * C:\DerbyDB\gedcom GEDCOM.INDIVIDUAL NAME FONKOD
  *
  * @author Michael Erichsen
  * @version 13. feb. 2023
  *
  */
 
-public class PhonCoder {
+public class ProbatePhonCoder {
 	private static Logger logger;
 
 	/**
@@ -31,14 +28,13 @@ public class PhonCoder {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length < 5) {
-			System.out.println(
-					"Usage: PhonCoder derbydatabasepath tablename firstnamecolumn lastnamecolumn phoncodedcolumn");
+		if (args.length < 4) {
+			System.out.println("Usage: ProbatePhonCoder derbydatabasepath tablename namecolumn phoncodedcolumn");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("PhonCoder");
-		final PhonCoder pc = new PhonCoder();
+		logger = Logger.getLogger("ProbatePhonCoder");
+		final ProbatePhonCoder pc = new ProbatePhonCoder();
 
 		try {
 			pc.execute(args);
@@ -58,7 +54,7 @@ public class PhonCoder {
 	 */
 	private void execute(String[] args) throws SQLException {
 		final String COUNT = "SELECT COUNT(*) FROM %s";
-		final String SELECT = "SELECT %s, %s FROM %s FOR UPDATE OF %s";
+		final String SELECT = "SELECT %s FROM %s FOR UPDATE OF %s";
 		final String UPDATE = "UPDATE %s SET %s = '%s' WHERE CURRENT OF PHONCURSOR";
 		final Fonkod fk = new Fonkod();
 		final String dbURL = "jdbc:derby:" + args[0];
@@ -90,7 +86,7 @@ public class PhonCoder {
 
 		// Select each row in the individual table
 
-		query = String.format(SELECT, args[2], args[3], args[1], args[4]);
+		query = String.format(SELECT, args[2], args[1], args[3]);
 		logger.info(query);
 
 		rs = statement.executeQuery(query);
@@ -99,14 +95,14 @@ public class PhonCoder {
 			// Generate a phonetic key for the name
 
 			try {
-				phonName = fk.generateKey(rs.getString(args[2]).trim() + " " + rs.getString(args[3]).trim());
+				phonName = fk.generateKey(rs.getString(args[2]).trim());
 			} catch (final Exception e) {
 				phonName = "";
 			}
 
 			// Update the individual with a phonetic name
 
-			query = String.format(UPDATE, args[1], args[4], phonName);
+			query = String.format(UPDATE, args[1], args[3], phonName);
 			ps = conn.prepareStatement(query);
 			ps.execute();
 			counter++;
