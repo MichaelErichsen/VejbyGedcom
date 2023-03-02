@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Find all registry entries that match the phonetic name and life span of a
@@ -166,32 +168,23 @@ public class SearchArchives {
 		statement.close();
 
 		if (counter > 0) {
-			final String outName = args[2] + "/" + args[3] + "_probates.csv";
-			bw = new BufferedWriter(new FileWriter(outName));
-			bw.write(PROBATE_HEADER + "\n");
-
-			for (final String string : outLines) {
-				bw.write(string + "\n");
-			}
-
-			bw.flush();
-			bw.close();
-
-			logger.info(counter + " records written to " + outName);
-			Desktop.getDesktop().open(new File(outName));
+			writeProbateOutput(args, outLines, counter);
 		}
 
 	}
 
 	/**
 	 * Write output for the census search
-	 * 
+	 *
 	 * @param cil
 	 * @param args
 	 * @throws IOException
 	 */
 	private void writeCensusOutput(List<CensusIndividual> cil, String[] args) throws IOException {
 		final String outName = args[2] + "/" + args[3] + "db_census.csv";
+		int diff = 0;
+		Pattern pattern = Pattern.compile("\\d{4}");
+		Matcher matcher;
 
 		for (final CensusIndividual ci : cil) {
 			if (counter == 0) {
@@ -199,8 +192,28 @@ public class SearchArchives {
 				bw.write(CENSUS_HEADER);
 			}
 
-			bw.write(ci.toString());
-			counter++;
+			diff = 0;
+
+			if (args.length > 4) {
+				if (ci.getFoedeaar() != 0) {
+					diff = Integer.getInteger(args[4]) - ci.getFoedeaar();
+				} else {
+					if (ci.getFoedt_kildedato().length() > 0) {
+						matcher = pattern.matcher(ci.getFoedt_kildedato());
+
+						if (matcher.find()) {
+							diff = Integer.getInteger(args[4]) - Integer.getInteger(matcher.group(1));
+						}
+					}
+				}
+			}
+
+			if ((diff > -2) && (diff < 2)) {
+//				if ((diff > -2) && (diff > 2) && (compareLocation(ci, birthPlace))) {
+				bw.write(ci.toString());
+				counter++;
+			}
+
 		}
 
 		if (counter > 0) {
@@ -212,4 +225,53 @@ public class SearchArchives {
 		}
 	}
 
+	/**
+	 * @param args
+	 * @param outLines
+	 * @param counter
+	 * @throws IOException
+	 */
+	private void writeProbateOutput(String[] args, final HashSet<String> outLines, int counter) throws IOException {
+		final String outName = args[2] + "/" + args[3] + "_probates.csv";
+		bw = new BufferedWriter(new FileWriter(outName));
+		bw.write(PROBATE_HEADER + "\n");
+
+		for (final String string : outLines) {
+			bw.write(string + "\n");
+		}
+
+		bw.flush();
+		bw.close();
+
+		logger.info(counter + " records written to " + outName);
+		Desktop.getDesktop().open(new File(outName));
+	}
+
+	/**
+	 * @param ci
+	 * @param location
+	 * @return
+	 */
+//	private boolean compareLocation(CensusIndividual ci, String location) {
+//		final String[] locationParts = location.split(",");
+//
+//		for (String part : locationParts) {
+//			part = part.trim();
+//
+//			if (ci.getAmt().contains(part)) {
+//				return true;
+//			}
+//			if (ci.getHerred().contains(part)) {
+//				return true;
+//			}
+//			if (ci.getSogn().contains(part)) {
+//				return true;
+//			}
+//			if (ci.getKildestednavn().contains(part)) {
+//				return true;
+//			}
+//		}
+//
+//		return false;
+//	}
 }
