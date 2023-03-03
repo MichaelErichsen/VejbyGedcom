@@ -185,7 +185,7 @@ public class CensusFinderDb {
 						try {
 							diff = individual.getBirthYear()
 									- Integer.parseInt(ci.getFoedt_kildedato().substring(0, 4));
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							final Pattern pattern = Pattern.compile("\\d{4}");
 							final Matcher matcher = pattern.matcher(ci.getFoedt_kildedato());
 
@@ -196,7 +196,7 @@ public class CensusFinderDb {
 					}
 
 				} else {
-					diff = individual.getBirthYear() - ci.getFTaar() + ci.getAlder();
+					diff = (individual.getBirthYear() - ci.getFTaar()) + ci.getAlder();
 				}
 			}
 

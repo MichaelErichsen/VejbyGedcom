@@ -21,11 +21,16 @@ import java.util.regex.Pattern;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 2. mar. 2023
+ * @version 3. mar. 2023
  *
  */
 public class SearchArchives {
-	private static final String KRONBORG = "Kronborg";
+	/**
+	 * Constants and static fields
+	 */
+	private static final String FOUR_DIGITS = "\\d{4}";
+	private static final String DIGITS_ONLY = "\\d+";
+	private static final String PROBATE_SOURCE = "Kronborg";
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
@@ -47,8 +52,8 @@ public class SearchArchives {
 	 */
 	public static void main(String[] args) {
 		if ((args.length < 4) || (args.length > 6)) {
-			System.out.println(
-					"Usage: SearchArchives censusdatabasepath probatedatabasepath outputdirectory name [birthyear [deathyear]]");
+			System.out.println("Usage: SearchArchives censusdatabasepath probatedatabasepath "
+					+ "outputdirectory [id | name] [birthyear [deathyear]]");
 			System.exit(4);
 		}
 
@@ -62,6 +67,32 @@ public class SearchArchives {
 			logger.severe(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Compare all component parts of the two locations with each other
+	 *
+	 * @param ci
+	 * @param location
+	 * @return
+	 */
+	private boolean compareLocation(CensusIndividual ci, String location) {
+		if (ci.getKildefoedested().length() == 0) {
+			return true;
+		}
+
+		final String[] locationParts = location.split(",");
+
+		for (String part : locationParts) {
+			part = part.trim();
+
+			if (ci.getAmt().contains(part) || ci.getHerred().contains(part) || ci.getSogn().contains(part)
+					|| ci.getKildestednavn().contains(part)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -85,10 +116,31 @@ public class SearchArchives {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
-		// Search Census Derby table
-		searchCensusTable(args);
+		// Get a DBIndividual object
+		logger.info("Get individual " + args[3]);
+		DBIndividual individual;
 
-		// Search for probates
+		if (args[3].matches(DIGITS_ONLY)) {
+			final Statement statement = connectToDB(args[0]);
+			individual = new DBIndividual(statement, args[3]);
+			statement.close();
+
+			if (individual.getName().length() == 0) {
+				logger.warning("Individual " + args[3] + " findes ikke i tabellen");
+				System.exit(4);
+			}
+		} else {
+			final String birthYear = ((args.length >= 5) ? args[4] : "0001");
+			final String deathYear = ((args.length >= 6) ? args[5] : "9999");
+			individual = new DBIndividual(args[3], birthYear, deathYear);
+		}
+
+		// Search Census Derby table
+		logger.info("Search for censuses for " + individual.getName());
+		searchCensusTable(args, individual);
+
+		// Search Probates Derby table
+		logger.info("Search for probates for " + individual.getName() + " in " + PROBATE_SOURCE);
 		searchProbates(args);
 
 		logger.info("Program ended");
@@ -98,28 +150,26 @@ public class SearchArchives {
 	 * Search the census table for the individual
 	 *
 	 * @param args
+	 * @param individual
 	 * @throws Exception
 	 */
-	private void searchCensusTable(String[] args) throws Exception {
+	private void searchCensusTable(String[] args, DBIndividual individual) throws Exception {
 		final Statement statement = connectToDB(args[0]);
-
-		final String phonName = new Fonkod().generateKey(args[3]);
-		final String birthYear = (args.length < 5 ? "0" : args[4]);
-		final String deathYear = (args.length < 6 ? "9999" : args[5]);
-		final String query = String.format(SELECT_CENSUS, phonName, birthYear, deathYear);
-		logger.info(query);
+		final String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(), individual.getBirthYear(),
+				individual.getDeathYear());
+		logger.fine(query);
 		final ResultSet rs = statement.executeQuery(query);
 
 		List<CensusIndividual> cil = null;
 
-		while (rs.next()) {
-			cil = CensusIndividual.getFromDb(rs);
-		}
+//		if (rs.next()) {
+		cil = CensusIndividual.getFromDb(rs);
+//		}
 
 		statement.close();
 
 		if ((cil != null) && (cil.size() > 0)) {
-			writeCensusOutput(cil, args);
+			writeCensusOutput(cil, args, individual);
 		}
 
 	}
@@ -138,7 +188,6 @@ public class SearchArchives {
 		final String birthYear = (args.length < 5 ? "0001" : args[4]);
 		final String deathYear = (args.length < 6 ? "9999" : args[5]);
 		final String query = String.format(SELECT_PROBATE, phonName, birthYear + "-01-01", deathYear + "-12-31");
-		logger.info(query);
 		final ResultSet rs = statement.executeQuery(query);
 
 		String singleLine;
@@ -153,7 +202,7 @@ public class SearchArchives {
 			source = rs.getString("SOURCE");
 			name = rs.getString("NAME").trim();
 
-			if (source.contains(KRONBORG) && coveredData.contains(name)) {
+			if (source.contains(PROBATE_SOURCE) && coveredData.contains(name)) {
 				singleLine = name + ";" + rs.getString("ID").trim() + ";" + rs.getString("FROMDATE").trim() + ";"
 						+ rs.getString("TODATE").trim() + ";" + rs.getString("PLACE").trim() + ";"
 						+ rs.getString("EVENTTYPE").trim() + ";" + rs.getString("VITALTYPE").trim() + ";"
@@ -178,42 +227,48 @@ public class SearchArchives {
 	 *
 	 * @param cil
 	 * @param args
+	 * @param individual
 	 * @throws IOException
 	 */
-	private void writeCensusOutput(List<CensusIndividual> cil, String[] args) throws IOException {
-		final String outName = args[2] + "/" + args[3] + "db_census.csv";
+	private void writeCensusOutput(List<CensusIndividual> cil, String[] args, DBIndividual individual)
+			throws IOException {
+		final String outName = args[2] + "/" + individual.getName() + "_census.csv";
 		int diff = 0;
-		Pattern pattern = Pattern.compile("\\d{4}");
+		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
 		Matcher matcher;
 
 		for (final CensusIndividual ci : cil) {
-			if (counter == 0) {
-				bw = new BufferedWriter(new FileWriter(new File(outName)));
-				bw.write(CENSUS_HEADER);
-			}
-
 			diff = 0;
 
-			if (args.length > 4) {
-				if (ci.getFoedeaar() != 0) {
-					diff = Integer.getInteger(args[4]) - ci.getFoedeaar();
-				} else {
-					if (ci.getFoedt_kildedato().length() > 0) {
-						matcher = pattern.matcher(ci.getFoedt_kildedato());
+			if (ci.getFoedeaar() > 0) {
+				diff = individual.getBirthYear() - ci.getFoedeaar();
+			} else {
+				if (ci.getFoedt_kildedato().length() > 0) {
+					matcher = pattern.matcher(ci.getFoedt_kildedato());
 
-						if (matcher.find()) {
-							diff = Integer.getInteger(args[4]) - Integer.getInteger(matcher.group(1));
-						}
+					if (matcher.find()) {
+						diff = individual.getBirthYear() - Integer.parseInt(matcher.group(0));
+					}
+				} else {
+					if (ci.getAlder() > 0) {
+						diff = (individual.getBirthYear() - ci.getFTaar()) + ci.getAlder();
 					}
 				}
 			}
 
-			if ((diff > -2) && (diff < 2)) {
-//				if ((diff > -2) && (diff > 2) && (compareLocation(ci, birthPlace))) {
-				bw.write(ci.toString());
-				counter++;
-			}
+			if ((diff >= -2) && (diff <= 2)) {
+				if ((individual.getBirthPlace() == null) || (individual.getBirthPlace().length() == 0)
+						|| (ci.getKildefoedested().length() == 0)
+						|| (compareLocation(ci, individual.getBirthPlace()))) {
+					if (counter == 0) {
+						bw = new BufferedWriter(new FileWriter(new File(outName)));
+						bw.write(CENSUS_HEADER);
+					}
 
+					bw.write(ci.toString());
+					counter++;
+				}
+			}
 		}
 
 		if (counter > 0) {
@@ -246,32 +301,4 @@ public class SearchArchives {
 		logger.info(counter + " records written to " + outName);
 		Desktop.getDesktop().open(new File(outName));
 	}
-
-	/**
-	 * @param ci
-	 * @param location
-	 * @return
-	 */
-//	private boolean compareLocation(CensusIndividual ci, String location) {
-//		final String[] locationParts = location.split(",");
-//
-//		for (String part : locationParts) {
-//			part = part.trim();
-//
-//			if (ci.getAmt().contains(part)) {
-//				return true;
-//			}
-//			if (ci.getHerred().contains(part)) {
-//				return true;
-//			}
-//			if (ci.getSogn().contains(part)) {
-//				return true;
-//			}
-//			if (ci.getKildestednavn().contains(part)) {
-//				return true;
-//			}
-//		}
-//
-//		return false;
-//	}
 }

@@ -152,8 +152,8 @@ public class CensusDbLoader {
 	 * @throws Exception
 	 */
 	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
-		String query = String.format(SELECT_COUNT, kipTextEntry.getKipNr());
-		ResultSet rs = statement.executeQuery(query);
+		final String query = String.format(SELECT_COUNT, kipTextEntry.getKipNr());
+		final ResultSet rs = statement.executeQuery(query);
 
 		// Skip if already loaded
 		if (rs.next()) {

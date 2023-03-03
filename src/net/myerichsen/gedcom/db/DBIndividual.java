@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * Class representing some individual data
  *
  * @author Michael Erichsen
- * @version 17-02-2023
+ * @version 3. mar. 2023
  *
  */
 public class DBIndividual {
@@ -22,7 +22,7 @@ public class DBIndividual {
 	private String phonName = "";
 
 	/**
-	 * Constructor
+	 * Constructor from ID
 	 *
 	 * @param statement
 	 * @param id
@@ -61,6 +61,24 @@ public class DBIndividual {
 
 		if (rs.next()) {
 			deathYear = getYearFromDate(rs.getString("DATE"));
+		}
+
+	}
+
+	/**
+	 * Constructor from name
+	 *
+	 * @param string
+	 * @param birthYear2
+	 * @param deathYear2
+	 */
+	public DBIndividual(String name, String birthYear, String deathYear) {
+		this.name = name;
+		this.birthYear = Integer.parseInt(birthYear);
+		this.deathYear = Integer.parseInt(deathYear);
+		try {
+			this.phonName = new Fonkod().generateKey(name);
+		} catch (final Exception e) {
 		}
 
 	}
@@ -169,8 +187,9 @@ public class DBIndividual {
 	@Override
 	public String toString() {
 		String dy = "";
-		if (deathYear < 9999)
+		if (deathYear < 9999) {
 			dy = Integer.toString(deathYear);
+		}
 
 		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthYear + ";" + dy + ";" + birthPlace + ";"
 				+ phonName;

@@ -37,7 +37,7 @@ import org.gedcom4j.parser.GedcomParser;
  */
 public class DBLoader {
 	/**
-	 * 
+	 *
 	 */
 	private static final String INSERT_EVENT_START_I = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('";
 	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '%s' WHERE ID = '%s'";
@@ -99,7 +99,7 @@ public class DBLoader {
 
 	/**
 	 * Connect to the Derby database
-	 * 
+	 *
 	 * @param args
 	 *
 	 * @throws SQLException

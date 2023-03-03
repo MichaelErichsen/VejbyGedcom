@@ -163,7 +163,7 @@ public class Household {
 			try {
 				// Calculate difference between age and census year
 				final String sYear = row.get(mappingKeys[12]);
-				int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
+				final int iYear = Integer.parseInt(sYear.replaceAll("[^0-9]", ""));
 
 				final int birthDate = iYear - Integer.parseInt(row.get(mappingKeys[7]));
 				individual.setBirthDate("Abt. " + birthDate);

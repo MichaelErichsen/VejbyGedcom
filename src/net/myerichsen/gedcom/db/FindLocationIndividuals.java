@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class FindLocationIndividuals {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SELECT_EVENT = "SELECT * FROM VEJBY.EVENT";
 	private static Logger logger;
@@ -71,7 +71,7 @@ public class FindLocationIndividuals {
 		DBIndividual individual;
 		final HashSet<String> hss = new HashSet<>();
 		int counter = 0;
-		String outName = args[2] + "/" + args[0] + "_individuals.csv";
+		final String outName = args[2] + "/" + args[0] + "_individuals.csv";
 		BufferedWriter bw = null;
 
 		final ResultSet rs = statement.executeQuery(SELECT_EVENT);

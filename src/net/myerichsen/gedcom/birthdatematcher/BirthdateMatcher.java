@@ -24,6 +24,8 @@ import org.gedcom4j.parser.GedcomParser;
  */
 public class BirthdateMatcher {
 
+	private static final Pattern pattern_pattern = Pattern.compile("\\d{2}\\s[A-Z]{3}\\s\\d{4}");
+
 	/**
 	 * @param args
 	 */
@@ -56,8 +58,6 @@ public class BirthdateMatcher {
 		gp.load(filename);
 		return gp.getGedcom();
 	}
-
-	private static final Pattern pattern_pattern = Pattern.compile("\\d{2}\\s[A-Z]{3}\\s\\d{4}");
 
 	/**
 	 * Read a GEDCOM file and find all persons with matching birthdates

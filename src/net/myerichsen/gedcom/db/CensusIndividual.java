@@ -5,23 +5,33 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Class representing an individual in the census table
+ *
  * @author Michael Erichsen
- * @version 28. feb. 2023
+ * @version 3. mar. 2023
  *
  */
 public class CensusIndividual {
+	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
+	private static final String EIGHT_DIGITS = "\\d{8}";
+	private static final String FOUR_DIGITS = "\\d{4}";
+	private static final String DIGITS_ONLY = "\\d+";
 	private static final String INSERT = "INSERT INTO VEJBY.CENSUS (KIPNR, LOEBENR, AMT, HERRED, SOGN, "
 			+ "KILDESTEDNAVN, HUSSTANDS_FAMILIENR, MATR_NR_ADRESSE, KILDENAVN, FONNAVN, "
 			+ "KOEN, ALDER, CIVILSTAND, KILDEERHVERV, STILLING_I_HUSSTANDEN, "
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "
 			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES ('%s',%d,'%s','%s', '%s', '%s', '%s', '%s', "
 			+ "'%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
+	private static Logger logger = Logger.getLogger("CensusIndividual");
 
 	/**
+	 * Get a list of census records from the Derby table
+	 *
 	 * @param rs
 	 * @return
 	 * @throws SQLException
@@ -55,6 +65,7 @@ public class CensusIndividual {
 			ci.setFTaar(rs.getInt("FTaar"));
 			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
+			logger.fine(ci.toString());
 			cil.add(ci);
 		}
 		return cil;
@@ -254,7 +265,7 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * Insert into a Derby database
+	 * Insert a census record into a Derby database
 	 *
 	 * @param statement
 	 * @throws SQLException
@@ -286,7 +297,7 @@ public class CensusIndividual {
 	 * @param alder the alder to set
 	 */
 	public void setAlder(String alder) {
-		final Pattern pattern = Pattern.compile("\\d*");
+		final Pattern pattern = Pattern.compile(DIGITS_ONLY);
 		final Matcher matcher = pattern.matcher(alder);
 
 		if (matcher.find()) {
@@ -319,7 +330,7 @@ public class CensusIndividual {
 	 * @param aar the foedeaar to set
 	 */
 	public void setFoedeaar(String aar) {
-		final Pattern pattern = Pattern.compile("\\d{4}");
+		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
 		final Matcher matcher = pattern.matcher(aar);
 
 		if (matcher.find()) {
@@ -332,6 +343,26 @@ public class CensusIndividual {
 	 */
 	public void setFoedt_kildedato(String foedt_kildedato) {
 		Foedt_kildedato = foedt_kildedato.replace("'", "").trim();
+
+		if (Foedt_kildedato.length() > 0) {
+			Pattern pattern = Pattern.compile(EIGHT_DIGITS);
+			Matcher matcher = pattern.matcher(Foedt_kildedato);
+
+			if (!matcher.find()) {
+				pattern = Pattern.compile(DASH_DATE);
+				matcher = pattern.matcher(Foedt_kildedato);
+
+				if (!matcher.find()) {
+					pattern = Pattern.compile(FOUR_DIGITS);
+					matcher = pattern.matcher(Foedt_kildedato);
+
+					if (matcher.find()) {
+						Foedt_kildedato = "";
+						Foedeaar = Integer.parseInt(matcher.group(0));
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -346,7 +377,7 @@ public class CensusIndividual {
 	 * @param fTaar the fTaar to set
 	 */
 	public void setFTaar(String fTaar) {
-		final Pattern pattern = Pattern.compile("\\d{4}");
+		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
 		final Matcher matcher = pattern.matcher(fTaar);
 
 		if (matcher.find()) {
@@ -447,7 +478,7 @@ public class CensusIndividual {
 	 * @param loebenr the loebenr to set
 	 */
 	public void setLoebenr(String loebenr) {
-		final Pattern pattern = Pattern.compile("\\d*");
+		final Pattern pattern = Pattern.compile(DIGITS_ONLY);
 		final Matcher matcher = pattern.matcher(loebenr);
 
 		if (matcher.find()) {

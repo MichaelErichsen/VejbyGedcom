@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *
  * C:\Users\michael\CPHDB CPH.BURIAL_PERSON_COMPLETE FIRSTNAMES LASTNAME
  * PHONNAME
- * 
+ *
  * C:\DerbyDB\gedcom GEDCOM.INDIVIDUAL NAME PHONNAME
  *
  * @author Michael Erichsen
