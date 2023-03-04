@@ -1,1 +1,0 @@
-java -cp GetCphArchives.jar net.myerichsen.gedcom.cpharch.GetCphArchives %1 "c:\Users\michael\VEJBYDB"   "c:\Users\michael\CPHDB" "C:\Users\michael\Documents\The Master Genealogist v9\Kilder\DDD" "C:\Users\michael\Documents\Vejby\VejbyGedcom"

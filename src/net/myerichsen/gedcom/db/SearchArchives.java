@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,29 +22,42 @@ import java.util.regex.Pattern;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 3. mar. 2023
+ * @version 4. mar. 2023
  *
  */
 public class SearchArchives {
 	/**
 	 * Constants and static fields
 	 */
-	private static final String FOUR_DIGITS = "\\d{4}";
-	private static final String DIGITS_ONLY = "\\d+";
 	private static final String PROBATE_SOURCE = "Kronborg";
-	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
-			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
-			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
+	private static final String BURIAL_HEADER = "FIRSTNAMES;LASTNAME;DATEOFDEATH;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
+			+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
+			+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
+			+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
 	private static final String CENSUS_HEADER = "FTaar;KIPnr;Loebenr;Amt;Herred;Sogn;Kildestednavn;"
 			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Fonnavn;Koen;Alder;Civilstand;"
 			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
 			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar\n";
+	private static final String POLREG_HEADER = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
+	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
+
+	private static final String DIGITS_ONLY = "\\d+";
+	private static final String FOUR_DIGITS = "\\d{4}";
+
+	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
+			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = '%s'";
 	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = '%s' "
 			+ "AND FTAAR >= %s AND FTAAR <= %s";
-	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
-	private static Logger logger;
+	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
+	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = '%s'";
+	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = %d";
+	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
+			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
+			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
+
+	private static BufferedWriter bw = null;
 	private static int counter = 0;
-	private static BufferedWriter bw;
+	private static Logger logger;
 
 	/**
 	 * Main method
@@ -51,9 +65,9 @@ public class SearchArchives {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if ((args.length < 4) || (args.length > 6)) {
+		if ((args.length < 5) || (args.length > 7)) {
 			System.out.println("Usage: SearchArchives censusdatabasepath probatedatabasepath "
-					+ "outputdirectory [id | name] [birthyear [deathyear]]");
+					+ "cphdatabasepath outputdirectory [id | name] [birthyear [deathyear]]");
 			System.exit(4);
 		}
 
@@ -117,16 +131,16 @@ public class SearchArchives {
 	 */
 	private void execute(String[] args) throws Exception {
 		// Get a DBIndividual object
-		logger.info("Get individual " + args[3]);
+		logger.info("Get individual " + args[4]);
 		DBIndividual individual;
 
-		if (args[3].matches(DIGITS_ONLY)) {
+		if (args[4].matches(DIGITS_ONLY)) {
 			final Statement statement = connectToDB(args[0]);
-			individual = new DBIndividual(statement, args[3]);
+			individual = new DBIndividual(statement, args[4]);
 			statement.close();
 
 			if (individual.getName().length() == 0) {
-				logger.warning("Individual " + args[3] + " findes ikke i tabellen");
+				logger.warning("Individual " + args[4] + " findes ikke i tabellen");
 				System.exit(4);
 			}
 		} else {
@@ -143,7 +157,114 @@ public class SearchArchives {
 		logger.info("Search for probates for " + individual.getName() + " in " + PROBATE_SOURCE);
 		searchProbates(args);
 
+		// Search Copenhagen Police Registry
+		logger.info("Search Police Registry");
+
+		try {
+			searchPoliceRegistry(args, individual);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
+		// Search Copenhagen burial registry
+		logger.info("Search Copenhagen burial registry");
+		try {
+			searchBurialRegistry(args, individual);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
 		logger.info("Program ended");
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	private String getField(ResultSet rs, String field) {
+		try {
+			return rs.getString(field).trim();
+		} catch (final Exception e) {
+			return "";
+		}
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	private String getFieldInt(ResultSet rs, String field) {
+		try {
+			return Integer.toString(rs.getInt(field));
+		} catch (final Exception e) {
+			return "";
+		}
+	}
+
+	/**
+	 * Search Copenhagen burial registry
+	 *
+	 * @param args
+	 * @param individual
+	 * @throws Exception
+	 */
+	private void searchBurialRegistry(String[] args, DBIndividual individual) throws Exception {
+		String outName = "";
+		String result = "";
+		int calcYear = 0;
+		counter = 0;
+
+		final Statement stmt = connectToDB(args[2]);
+
+		final String query = String.format(SELECT_BURIAL_PERSON, individual.getPhonName());
+		logger.fine(query);
+		final ResultSet rs = stmt.executeQuery(query);
+
+		while (rs.next()) {
+			if (individual.getBirthYear() < 1000) {
+				calcYear = 0;
+			} else {
+				try {
+					calcYear = individual.getBirthYear() - rs.getInt("YEAROFBIRTH");
+				} catch (final Exception e) {
+					calcYear = 0;
+				}
+			}
+
+			if ((calcYear > 2) || (calcYear < -2)) {
+				continue;
+			}
+
+			result = getField(rs, "FIRSTNAMES") + ";" + getField(rs, "LASTNAME") + ";" + getField(rs, "DATEOFDEATH")
+					+ ";" + getFieldInt(rs, "YEAROFBIRTH") + ";" + getField(rs, "DEATHPLACE") + ";"
+					+ getField(rs, "CIVILSTATUS") + ";" + getField(rs, "ADRESSOUTSIDECPH") + ";" + getField(rs, "SEX")
+					+ ";" + getField(rs, "COMMENT") + ";" + getField(rs, "CEMETARY") + ";" + getField(rs, "CHAPEL")
+					+ ";" + getField(rs, "PARISH") + ";" + getField(rs, "STREET") + ";" + getField(rs, "HOOD") + ";"
+					+ getFieldInt(rs, "STREET_NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR")
+					+ ";" + getField(rs, "INSTITUTION") + ";" + getField(rs, "INSTITUTION_STREET") + ";"
+					+ getField(rs, "INSTITUTION_HOOD") + ";" + getField(rs, "INSTITUTION_STREET_NUMBER") + ";"
+					+ getField(rs, "OCCUPTATIONS") + ";" + getField(rs, "OCCUPATION_RELATION_TYPES)") + ";"
+					+ getField(rs, "DEATHCAUSES") + ";" + getField(rs, "DEATHCAUSES_DANISH") + "\n";
+
+			if (counter == 0) {
+				outName = args[3] + "/" + individual.getName() + "_burreg.csv";
+				bw = new BufferedWriter(new FileWriter(new File(outName)));
+				bw.write(BURIAL_HEADER);
+			}
+			bw.write(result);
+			counter++;
+		}
+
+		stmt.close();
+
+		if (counter > 0) {
+			bw.flush();
+			bw.close();
+			logger.info(counter + " lines of Copenhagen burial registry data written to " + outName);
+
+			Desktop.getDesktop().open(new File(outName));
+		}
+
 	}
 
 	/**
@@ -172,6 +293,111 @@ public class SearchArchives {
 	}
 
 	/**
+	 * Search Police Registry
+	 *
+	 * @param args
+	 * @param individual
+	 * @throws Exception
+	 */
+	private void searchPoliceRegistry(String[] args, DBIndividual individual) throws Exception {
+		String outName = "";
+		String result = "";
+		int calcYear = 0;
+
+		final Statement stmt = connectToDB(args[2]);
+
+		String query = String.format(SELECT_POLICE_PERSON, individual.getPhonName());
+		logger.fine(query);
+		ResultSet rs = stmt.executeQuery(query);
+		ResultSet rs3;
+		final List<Integer> li = new ArrayList<>();
+		final List<Integer> lb = new ArrayList<>();
+		final List<String> ls = new ArrayList<>();
+		final List<String> lp = new ArrayList<>();
+		String query3;
+		String day;
+		String month;
+		String year;
+		counter = 0;
+
+		while (rs.next()) {
+			li.add(rs.getInt("ID"));
+			ls.add(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
+			try {
+				lb.add(rs.getInt("BIRTHYEAR"));
+			} catch (final Exception e) {
+				lb.add(0);
+			}
+		}
+
+		for (int i = 0; i < li.size(); i++) {
+			query3 = String.format(SELECT_POLICE_POSITION, li.get(i));
+			logger.fine(query);
+
+			rs3 = stmt.executeQuery(query3);
+
+			if (rs3.next()) {
+				lp.add(getField(rs3, "POSITION_DANISH"));
+			} else {
+				lp.add(" ");
+			}
+		}
+
+		for (int i = 0; i < li.size(); i++) {
+			query = String.format(SELECT_POLICE_ADDRESS, li.get(i));
+			logger.fine(query);
+
+			rs = stmt.executeQuery(query);
+
+			while (rs.next()) {
+				if (individual.getBirthYear() < 1000) {
+					calcYear = 0;
+				} else {
+					try {
+						calcYear = individual.getBirthYear() - lb.get(i);
+					} catch (final Exception e) {
+						calcYear = 0;
+					}
+				}
+
+				if ((calcYear > 2) || (calcYear < -2)) {
+					continue;
+				}
+
+				day = getFieldInt(rs, "DAY");
+				month = getFieldInt(rs, "MONTH");
+				year = getFieldInt(rs, "XYEAR");
+
+				result = ls.get(i) + ";" + lb.get(i) + ";" + lp.get(i) + ";" + getField(rs, "STREET") + ";"
+						+ getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR") + ";"
+						+ getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";" + day + ";" + month + ";" + year
+						+ ";" + day + "-" + month + "-" + year + ";" + getField(rs, "FULL_ADDRESS") + "\n";
+
+				logger.fine(result);
+
+				if (counter == 0) {
+					outName = args[3] + "/" + individual.getName() + "_polreg.csv";
+					bw = new BufferedWriter(new FileWriter(new File(outName)));
+					bw.write(POLREG_HEADER);
+				}
+
+				bw.write(result);
+				counter++;
+			}
+		}
+
+		stmt.close();
+
+		if (counter > 0) {
+			bw.flush();
+			bw.close();
+			logger.info(counter + " lines of Police Registry data written to " + outName);
+
+			Desktop.getDesktop().open(new File(outName));
+		}
+	}
+
+	/**
 	 * Find probates mentioning the individual
 	 *
 	 * @param individual
@@ -181,9 +407,9 @@ public class SearchArchives {
 	private void searchProbates(String[] args) throws Exception {
 		final Statement statement = connectToDB(args[1]);
 
-		final String phonName = new Fonkod().generateKey(args[3]);
-		final String birthYear = (args.length < 5 ? "0001" : args[4]);
-		final String deathYear = (args.length < 6 ? "9999" : args[5]);
+		final String phonName = new Fonkod().generateKey(args[4]);
+		final String birthYear = (args.length < 6 ? "0001" : args[5]);
+		final String deathYear = (args.length < 7 ? "9999" : args[6]);
 		final String query = String.format(SELECT_PROBATE, phonName, birthYear + "-01-01", deathYear + "-12-31");
 		final ResultSet rs = statement.executeQuery(query);
 
@@ -229,7 +455,7 @@ public class SearchArchives {
 	 */
 	private void writeCensusOutput(List<CensusIndividual> cil, String[] args, DBIndividual individual)
 			throws IOException {
-		final String outName = args[2] + "/" + individual.getName() + "_census.csv";
+		final String outName = args[3] + "/" + individual.getName() + "_census.csv";
 		int diff = 0;
 		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
 		Matcher matcher;
@@ -284,7 +510,7 @@ public class SearchArchives {
 	 * @throws IOException
 	 */
 	private void writeProbateOutput(String[] args, final HashSet<String> outLines, int counter) throws IOException {
-		final String outName = args[2] + "/" + args[3] + "_probates.csv";
+		final String outName = args[3] + "/" + args[3] + "_probates.csv";
 		bw = new BufferedWriter(new FileWriter(outName));
 		bw.write(PROBATE_HEADER + "\n");
 
@@ -298,4 +524,5 @@ public class SearchArchives {
 		logger.info(counter + " records written to " + outName);
 		Desktop.getDesktop().open(new File(outName));
 	}
+
 }
