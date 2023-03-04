@@ -34,7 +34,7 @@ public class SearchArchives {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
-	private static final String CENSUS_HEADER = "FTaar;KIPnr;Loebenr;Kildestednavn;Amt;Herred;Sogn;"
+	private static final String CENSUS_HEADER = "FTaar;KIPnr;Loebenr;Amt;Herred;Sogn;Kildestednavn;"
 			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Fonnavn;Koen;Alder;Civilstand;"
 			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
 			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar\n";
@@ -161,10 +161,7 @@ public class SearchArchives {
 		final ResultSet rs = statement.executeQuery(query);
 
 		List<CensusIndividual> cil = null;
-
-//		if (rs.next()) {
 		cil = CensusIndividual.getFromDb(rs);
-//		}
 
 		statement.close();
 
@@ -251,7 +248,7 @@ public class SearchArchives {
 					}
 				} else {
 					if (ci.getAlder() > 0) {
-						diff = (individual.getBirthYear() - ci.getFTaar()) + ci.getAlder();
+						diff = ci.getFTaar() - individual.getBirthYear() - ci.getAlder();
 					}
 				}
 			}
