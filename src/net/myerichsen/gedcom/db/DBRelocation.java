@@ -14,8 +14,8 @@ import org.gedcom4j.exception.GedcomParserException;
 
 /**
  * Find all relocations to and from a given location in a GEDCOM file. Requires
- * the non-standard "Flytning" event with the location in the place fields (to)
- * or part of the note field (from).
+ * the non-standard "Flytning" event subtype with the location in the place
+ * fields (to) or as part of the note field (from).
  * <p>
  * Parameters:
  * <ul>
@@ -26,10 +26,16 @@ import org.gedcom4j.exception.GedcomParserException;
  * The program produces a .csv file with a row for each relocation found.
  *
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 5. mar. 2023
  *
  */
 public class DBRelocation {
+	private static final String HEADER = "ID;Fornavn;Efternavn;Fonetisk navn;Flyttedato;Til;Fra;Detaljer";
+	private static final String query = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, VEJBY.INDIVIDUAL.SURNAME, "
+			+ "VEJBY.INDIVIDUAL.PHONNAME, VEJBY.EVENT.DATE, VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL "
+			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT "
+			+ "WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL "
+			+ "ORDER BY VEJBY.INDIVIDUAL.SURNAME, VEJBY.INDIVIDUAL.GIVENNAME";
 	private static Logger logger;
 
 	/**
@@ -56,19 +62,20 @@ public class DBRelocation {
 
 	}
 
-	private Statement stmt;
-
 	/**
 	 * Connect to the Derby database
+	 *
+	 * @param args
+	 * @return
 	 *
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB() throws SQLException {
-		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		System.out.println("Connected to database " + dbURL1);
-		stmt = conn1.createStatement();
+	private Statement connectToDB(String[] args) throws SQLException {
+		final String dbURL = "jdbc:derby:" + args[0];
+		final Connection conn = DriverManager.getConnection(dbURL);
+		System.out.println("Connected to database " + dbURL);
+		return conn.createStatement();
 	}
 
 	/**
@@ -81,31 +88,26 @@ public class DBRelocation {
 	 */
 	private void execute(String[] args) throws IOException, GedcomParserException, SQLException {
 		int counter = 0;
-		connectToDB();
+		final Statement statement = connectToDB(args);
 
 		final String outfile = args[1] + "\\flyt_all.csv";
 		final BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
-		final String outline = "\"ID\";\"Fornavn\";\"Efternavn\";\"Fonetisk navn\";\"Flyttedato\";\"Til\";\"Fra\"";
-		writer.write(outline + "\n");
 
-		final String query = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, VEJBY.INDIVIDUAL.SURNAME, "
-				+ "VEJBY.INDIVIDUAL.PHONNAME, VEJBY.EVENT.DATE, VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE "
-				+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT "
-				+ "WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL "
-				+ "ORDER BY VEJBY.INDIVIDUAL.SURNAME, VEJBY.INDIVIDUAL.GIVENNAME";
+		writer.write(HEADER + "\n");
 
-		final ResultSet rs = stmt.executeQuery(query);
+		final ResultSet rs = statement.executeQuery(query);
 
 		while (rs.next()) {
-			writer.write(rs.getString(1) + ";" + rs.getString(2) + ";" + rs.getString(3) + ";" + rs.getString(4) + ";"
-					+ rs.getString(5) + ";" + rs.getString(6) + ";" + rs.getString(7) + "\n");
+			writer.write(rs.getString(1).replace("I", "").replace("@", "") + ";" + rs.getString(2) + ";"
+					+ rs.getString(3) + ";" + rs.getString(4) + ";" + rs.getString(5) + ";" + rs.getString(6) + ";"
+					+ rs.getString(7) + ";" + rs.getString(8) + "\n");
 
 			counter++;
 		}
 
 		writer.flush();
 		writer.close();
-		stmt.close();
+		statement.close();
 
 		System.out.println(counter + " flytninger gemt i " + outfile);
 	}

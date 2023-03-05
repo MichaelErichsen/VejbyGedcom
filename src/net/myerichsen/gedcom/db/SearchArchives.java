@@ -28,6 +28,8 @@ import net.myerichsen.gedcom.db.models.DBIndividual;
  *
  */
 public class SearchArchives {
+	// TODO Add a search of relocations with the same phonetic name and approximate
+	// age
 	/**
 	 * Constants and static fields
 	 */

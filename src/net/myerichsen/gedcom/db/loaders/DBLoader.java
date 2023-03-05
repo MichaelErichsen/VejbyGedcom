@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.gedcom4j.exception.GedcomParserException;
+import org.gedcom4j.model.AbstractCitation;
+import org.gedcom4j.model.CitationWithSource;
 import org.gedcom4j.model.Family;
 import org.gedcom4j.model.FamilyChild;
 import org.gedcom4j.model.FamilyEvent;
@@ -30,18 +32,14 @@ import org.gedcom4j.parser.GedcomParser;
 import net.myerichsen.gedcom.db.Fonkod;
 
 /**
- * Class to read a GEDCOM and load data into a Derby database to use for
- * analysis.
+ * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 24. feb. 2023
- *
+ * @version 5. mar. 2023
  */
 public class DBLoader {
-	/**
-	 *
-	 */
-	private static final String INSERT_EVENT_START_I = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, FAMILY, PLACE, NOTE) VALUES('";
+	private static final String INSERT_EVENT_START_I = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
+			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES('";
 	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '%s' WHERE ID = '%s'";
 	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM VEJBY.INDIVIDUAL";
@@ -49,7 +47,8 @@ public class DBLoader {
 	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE='%s'	WHERE ID = '%s'";
 	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = '%s' WHERE ID = '%s'";
 	private static final String INSERT_INDIVIDUAL = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('%s', '%s', '%s', '%s', '%s')";
-	private static final String INSERT_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, NOTE, INDIVIDUAL) VALUES('";
+	private static final String INSERT_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
+			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES('";
 	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES ('%s', NULL, NULL)";
 	private static Logger logger;
 	private static Fonkod fonkod = new Fonkod();
@@ -65,7 +64,7 @@ public class DBLoader {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: DBLoader gedcomfile derbydatabasepath");
+			logger.info("Usage: DBLoader gedcomfile derbydatabasepath");
 			System.exit(4);
 		}
 
@@ -110,7 +109,7 @@ public class DBLoader {
 	private void connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn = DriverManager.getConnection(dbURL);
-		System.out.println("Connected to database " + dbURL);
+		logger.info("Connected to database " + dbURL);
 		stmt = conn.createStatement();
 	}
 
@@ -123,21 +122,21 @@ public class DBLoader {
 	private void execute(String[] args) throws Exception {
 		connectToDB(args);
 
-		System.out.println("Reading " + args[0]);
+		logger.info("Reading " + args[0]);
 		readGedcom(args[0]);
 
-		System.out.println("Clearing tables");
+		logger.info("Clearing tables");
 		clearTables();
 
-		System.out.println("Parsing families");
+		logger.info("Parsing families");
 		parseAllFamilies();
 
-		System.out.println("Parsing individuals");
+		logger.info("Parsing individuals");
 		parseAllIndividuals();
 
 		stmt.close();
 
-		System.out.println("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
+		logger.info("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
 				+ " individuals inserted.\n" + eventCounter + " events inserted");
 	}
 
@@ -201,10 +200,12 @@ public class DBLoader {
 		StringWithCustomFacts subtype;
 		StringWithCustomFacts date;
 		List<NoteStructure> noteStructures;
+		List<AbstractCitation> citations;
+		CitationWithSource cfs;
+		StringWithCustomFacts whereInSource;
 		List<String> lines;
 		StringBuilder lineBuffer;
 		Place place;
-
 		String query;
 
 		final List<FamilyEvent> events = family.getEvents();
@@ -243,7 +244,7 @@ public class DBLoader {
 			noteStructures = familyEvent.getNoteStructures();
 
 			if (noteStructures == null) {
-				sb.append("NULL, '");
+				sb.append("NULL, ");
 			} else {
 				lines = noteStructures.get(0).getLines();
 				lineBuffer = new StringBuilder();
@@ -251,7 +252,23 @@ public class DBLoader {
 				for (final String string : lines) {
 					lineBuffer.append(string + " ");
 				}
-				sb.append("'" + lineBuffer.toString() + "', '");
+				sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
+			}
+
+			citations = familyEvent.getCitations();
+
+			if (citations == null) {
+				sb.append("NULL, '");
+			} else {
+				cfs = (CitationWithSource) citations.get(0);
+				whereInSource = cfs.getWhereInSource();
+
+				if (whereInSource == null) {
+					sb.append("NULL, '");
+				} else {
+					sb.append("'" + cfs.getWhereInSource().getValue().replace("'", "¤") + "', '");
+				}
+
 			}
 
 			if (family.getHusband() != null) {
@@ -327,6 +344,9 @@ public class DBLoader {
 		StringWithCustomFacts date;
 		Place place;
 		List<NoteStructure> noteStructures;
+		List<AbstractCitation> citations;
+		CitationWithSource cfs;
+		StringWithCustomFacts whereInSource;
 		List<String> lines;
 		StringBuilder lineBuffer;
 		String query;
@@ -347,7 +367,6 @@ public class DBLoader {
 			} else {
 				sb.append("', '" + subtype.getValue() + "', ");
 			}
-
 			date = individualEvent.getDate();
 
 			if (date == null) {
@@ -367,7 +386,7 @@ public class DBLoader {
 			noteStructures = individualEvent.getNoteStructures();
 
 			if (noteStructures == null) {
-				sb.append("NULL)");
+				sb.append("NULL, ");
 			} else {
 				lines = noteStructures.get(0).getLines();
 				lineBuffer = new StringBuilder();
@@ -375,7 +394,23 @@ public class DBLoader {
 				for (final String string : lines) {
 					lineBuffer.append(string + " ");
 				}
-				sb.append("'" + lineBuffer.toString() + "')");
+				sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
+			}
+
+			citations = individualEvent.getCitations();
+
+			if (citations == null) {
+				sb.append("NULL)");
+			} else {
+				cfs = (CitationWithSource) citations.get(0);
+				whereInSource = cfs.getWhereInSource();
+
+				if (whereInSource == null) {
+					sb.append("NULL)");
+				} else {
+					sb.append("'" + cfs.getWhereInSource().getValue().replace("'", "¤") + "')");
+				}
+
 			}
 
 			query = sb.toString();
