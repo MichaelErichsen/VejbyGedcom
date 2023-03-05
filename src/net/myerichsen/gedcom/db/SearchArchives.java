@@ -36,12 +36,14 @@ public class SearchArchives {
 			+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
 			+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
 			+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
-	private static final String CENSUS_HEADER = "FTaar;KIPnr;Loebenr;Amt;Herred;Sogn;Kildestednavn;"
-			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Fonnavn;Koen;Alder;Civilstand;"
+	private static final String CENSUS_HEADER = "FTaar;Amt;Herred;Sogn;Kildestednavn;"
+			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Koen;Alder;Civilstand;"
 			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
-			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar\n";
-	private static final String POLREG_HEADER = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
-	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
+			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar;KIPnr;Loebenr;Fonnavn\n";
+	private static final String POLREG_HEADER = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;"
+			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
+	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
+			+ "VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
 
 	private static final String DIGITS_ONLY = "\\d+";
 	private static final String FOUR_DIGITS = "\\d{4}";
