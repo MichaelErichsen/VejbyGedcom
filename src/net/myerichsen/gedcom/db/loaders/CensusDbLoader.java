@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,6 +12,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import net.myerichsen.gedcom.db.CensusIndividual;
+import net.myerichsen.gedcom.db.models.KipTextEntry;
 
 /**
  * This program needs a kipdata.txt and a set of KIP csv files as input.

@@ -13,6 +13,9 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
+import net.myerichsen.gedcom.db.models.DBEvent;
+import net.myerichsen.gedcom.db.models.DBIndividual;
+
 /**
  * Find all individuals ID with events for a given location in the Derby
  * database

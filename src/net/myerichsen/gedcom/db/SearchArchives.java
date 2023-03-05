@@ -17,12 +17,14 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.myerichsen.gedcom.db.models.DBIndividual;
+
 /**
  * Find all registry entries that match the phonetic name and life span of a
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 4. mar. 2023
+ * @version 5. mar. 2023
  *
  */
 public class SearchArchives {
@@ -144,9 +146,9 @@ public class SearchArchives {
 				System.exit(4);
 			}
 		} else {
-			final String birthYear = ((args.length >= 5) ? args[4] : "0001");
-			final String deathYear = ((args.length >= 6) ? args[5] : "9999");
-			individual = new DBIndividual(args[3], birthYear, deathYear);
+			final String birthYear = ((args.length >= 6) ? args[5] : "0001");
+			final String deathYear = ((args.length >= 7) ? args[6] : "9999");
+			individual = new DBIndividual(args[4], birthYear, deathYear);
 		}
 
 		// Search Census Derby table

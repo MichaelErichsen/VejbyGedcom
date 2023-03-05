@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.cpharch;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.util.logging.Logger;
 

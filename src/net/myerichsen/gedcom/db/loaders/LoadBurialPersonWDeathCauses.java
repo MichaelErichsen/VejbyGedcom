@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.cpharch;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.util.logging.Logger;
 
@@ -9,15 +9,16 @@ import java.util.logging.Logger;
  * @version 30. jan. 2023
  *
  */
-public class LoadBurialPerson extends LoadCphArch {
+public class LoadBurialPersonWDeathCauses extends LoadCphArch {
 	/**
 	 *
 	 */
-	static final String TABLENAME = "BURIAL_PERSON";
-	static final String DELETE = "DELETE FROM CPH.BURIAL_PERSON";
-	static final String INSERT = "INSERT INTO CPH.BURIAL_PERSON (ID, NUMBER, FIRSTNAMES, LASTNAME, "
-			+ "BIRTHNAME, AGEYEARS, AGEMONTH, AGEWEEKS, AGEDAYS, AGEHOURS, DATEOFBIRTH, DATEOFDEATH, YEAROFBIRTH, "
-			+ "DEATHPLACE, CIVILSTATUS, ADRESSOUTSIDECPH, SEX, COMMENT, CEMETARY, CHAPEL, PARISH ) VALUES (";
+	static final String TABLENAME = "BURIAL_PERSON_W_DEATHCAUSES";
+	static final String DELETE = "DELETE FROM CPH.BURIAL_PERSON_W_DEATHCAUSES";
+	static final String INSERT = "INSERT INTO CPH.BURIAL_PERSON_W_DEATHCAUSES (ID, NUMBER, FIRSTNAMES, "
+			+ "LASTNAME, BIRTHNAME, AGEYEARS, AGEMONTH, AGEWEEKS, AGEDAYS, AGEHOURS, DATEOFBIRTH, DATEOFDEATH, "
+			+ "YEAROFBIRTH, DEATHPLACE, CIVILSTATUS, ADRESSOUTSIDECPH, SEX, COMMENT, CEMETARY, CHAPEL, PARISH, "
+			+ "DEATHCAUSES, DEATHCAUSES_DANISH) VALUES (";
 	static int counter = 0;
 
 	/**
@@ -27,13 +28,13 @@ public class LoadBurialPerson extends LoadCphArch {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: LoadBurialPerson derbydatabasepath csvfile");
+			System.out.println("Usage: LoadBurialPersonWDeathCauses derbydatabasepath csvfile");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("LoadBurialPerson");
+		logger = Logger.getLogger("LoadBurialPersonWDeathCauses");
 
-		final LoadBurialPerson lba = new LoadBurialPerson();
+		final LoadBurialPersonWDeathCauses lba = new LoadBurialPersonWDeathCauses();
 
 		try {
 			lba.execute(args);

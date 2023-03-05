@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db;
+package net.myerichsen.gedcom.db.models;
 
 /**
  * Class representing an event in the derby database

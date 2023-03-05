@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.cpharch;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.util.logging.Logger;
 
@@ -6,17 +6,17 @@ import java.util.logging.Logger;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 31. jan. 2023
+ * @version 30. jan. 2023
  *
  */
-public class LoadPoliceRelation extends LoadCphArch {
+public class LoadBurialPosition extends LoadCphArch {
 	/**
 	 *
 	 */
-	static final String TABLENAME = "POLICE_RELATION";
-	static final String DELETE = "DELETE FROM CPH.POLICE_RELATION";
-	static final String INSERT = "INSERT INTO CPH.POLICE_RELATION (PERSON_MAIN_ID, PERSON_RELATED_ID, RELATION_TYPE) "
-			+ "VALUES (";
+	static final String TABLENAME = "BURIAL_POSITION";
+	static final String DELETE = "DELETE FROM CPH.BURIAL_POSITION";
+	static final String INSERT = "INSERT INTO CPH.BURIAL_POSITION (ID, PERSON_ID, POSITION, RELATIONTYPE, "
+			+ "WORKPLACE) VALUES (";
 	static int counter = 0;
 
 	/**
@@ -26,14 +26,13 @@ public class LoadPoliceRelation extends LoadCphArch {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: LoadPoliceRelation derbydatabasepath csvfile");
+			System.out.println("Usage: LoadBurialPosition derbydatabasepath csvfile");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("LoadPoliceRelation");
-		logger.info("Loading table " + TABLENAME + " from " + args[1]);
+		logger = Logger.getLogger("LoadBurialPosition");
 
-		final LoadPoliceRelation lba = new LoadPoliceRelation();
+		final LoadBurialPosition lba = new LoadBurialPosition();
 
 		try {
 			lba.execute(args);

@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.myerichsen.gedcom.db.models.DBIndividual;
+
 /**
  * Find all census entries that match a given individual ID.
  *

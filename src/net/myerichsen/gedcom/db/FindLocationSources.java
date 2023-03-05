@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
+import net.myerichsen.gedcom.db.models.DBIndividual;
+
 /**
  * Find all probate and census entries that match a given individual ID in the
  * Derby database

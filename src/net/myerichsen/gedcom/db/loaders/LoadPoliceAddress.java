@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.cpharch;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.util.logging.Logger;
 
@@ -9,14 +9,14 @@ import java.util.logging.Logger;
  * @version 30. jan. 2023
  *
  */
-public class LoadBurialDeathCause extends LoadCphArch {
+public class LoadPoliceAddress extends LoadCphArch {
 	/**
 	 *
 	 */
-	static final String TABLENAME = "BURIAL_DEATHCAUSE";
-	static final String DELETE = "DELETE FROM CPH.BURIAL_DEATHCAUSE";
-	static final String INSERT = "INSERT INTO CPH.BURIAL_DEATHCAUSE (ID, PERSON_ID, DEATHCAUSE, "
-			+ "DEATHCAUSE_DANISH, XORDER, PRIORITY) VALUES (";
+	static final String TABLENAME = "POLICE_ADDRESS";
+	static final String DELETE = "DELETE FROM CPH.POLICE_ADDRESS";
+	static final String INSERT = "INSERT INTO CPH.POLICE_ADDRESS (ID, PERSON_ID, STREET, NUMBER, LETTER, FLOOR, "
+			+ "SIDE, PLACE, HOST, LATITUDE, LONGITUDE, DAY, MONTH, XYEAR, FULL_ADDRESS) VALUES (";
 	static int counter = 0;
 
 	/**
@@ -26,13 +26,13 @@ public class LoadBurialDeathCause extends LoadCphArch {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: LoadBurialDeathCause derbydatabasepath csvfile");
+			System.out.println("Usage: LoadPoliceAddress derbydatabasepath csvfile");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("LoadBurialDeathCause");
+		logger = Logger.getLogger("LoadPoliceAddress");
 
-		final LoadBurialDeathCause lba = new LoadBurialDeathCause();
+		final LoadPoliceAddress lba = new LoadPoliceAddress();
 
 		try {
 			lba.execute(args);

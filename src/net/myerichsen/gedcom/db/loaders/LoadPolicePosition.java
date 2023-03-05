@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.cpharch;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.util.logging.Logger;
 
@@ -9,16 +9,14 @@ import java.util.logging.Logger;
  * @version 31. jan. 2023
  *
  */
-public class LoadPolicePersonWOccupations extends LoadCphArch {
+public class LoadPolicePosition extends LoadCphArch {
 	/**
 	 *
 	 */
-	static final String TABLENAME = "POLICE_PERSON_W_OCCUPATIONS";
-	static final String DELETE = "DELETE FROM CPH.POLICE_PERSON_W_OCCUPATIONS";
-	static final String INSERT = "INSERT INTO CPH.POLICE_PERSON_W_OCCUPATIONS (ID, FIRSTNAMES, LASTNAME, MAIDENNAME, "
-			+ "MARRIED, TYPE, GENDER, BIRTHPLACE, BIRTHDAY, BIRTHMONTH, BIRTHYEAR, DEATHDAY, DEATHMONTH, "
-			+ "DEATHYEAR, OCCUPATIONS, OCCUPATIONS_ISCO_MAJOR_GROUPS, OCCUPATIONS_ISCO_SUBMAJOR_GROUPS, "
-			+ "OCCUPATIONS_ISCO_MINOR_GROUPS) VALUES (";
+	static final String TABLENAME = "POLICE_POSITION";
+	static final String DELETE = "DELETE FROM CPH.POLICE_POSITION";
+	static final String INSERT = "INSERT INTO CPH.POLICE_POSITION (ID, PERSON_ID, POSITION_DANISH, POSITION_ENGLISH, "
+			+ "ISCO_MAJOR_GROUP, ISCO_SUBMAJOR_GROUP, ISCO_MINOR_GROUP, ISCO_UNIT)  VALUES (";
 	static int counter = 0;
 
 	/**
@@ -28,14 +26,14 @@ public class LoadPolicePersonWOccupations extends LoadCphArch {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: LoadPolicePersonWOccupations derbydatabasepath csvfile");
+			System.out.println("Usage: LoadPolicePosition derbydatabasepath csvfile");
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("LoadPolicePersonWOccupations");
+		logger = Logger.getLogger("LoadPolicePosition");
 		logger.info("Loading table " + TABLENAME + " from " + args[1]);
 
-		final LoadPolicePersonWOccupations lba = new LoadPolicePersonWOccupations();
+		final LoadPolicePosition lba = new LoadPolicePosition();
 
 		try {
 			lba.execute(args);

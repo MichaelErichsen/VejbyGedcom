@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db;
+package net.myerichsen.gedcom.db.models;
 
 /**
  * @author Michael Erichsen

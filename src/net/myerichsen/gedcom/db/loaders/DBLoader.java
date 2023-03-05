@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db;
+package net.myerichsen.gedcom.db.loaders;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,6 +26,8 @@ import org.gedcom4j.model.NoteStructure;
 import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.parser.GedcomParser;
+
+import net.myerichsen.gedcom.db.Fonkod;
 
 /**
  * Class to read a GEDCOM and load data into a Derby database to use for
