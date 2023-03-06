@@ -24,12 +24,10 @@ import net.myerichsen.gedcom.db.models.DBIndividual;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 5. mar. 2023
+ * @version 6. mar. 2023
  *
  */
 public class SearchArchives {
-	// TODO Add a search of relocations with the same phonetic name and approximate
-	// age
 	/**
 	 * Constants and static fields
 	 */
@@ -46,6 +44,7 @@ public class SearchArchives {
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
 			+ "VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
+	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer";
 
 	private static final String DIGITS_ONLY = "\\d+";
 	private static final String FOUR_DIGITS = "\\d{4}";
@@ -60,6 +59,11 @@ public class SearchArchives {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
+	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
+			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
+			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL "
+			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
+			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = '%s'";
 
 	private static BufferedWriter bw = null;
 	private static int counter = 0;
@@ -155,6 +159,10 @@ public class SearchArchives {
 			individual = new DBIndividual(args[4], birthYear, deathYear);
 		}
 
+		// Search for similar relocations
+		logger.info("Search for similar relocations for " + individual.getName());
+		searchForSimilarRelocations(args, individual);
+
 		// Search Census Derby table
 		logger.info("Search for censuses for " + individual.getName());
 		searchCensusTable(args, individual);
@@ -165,20 +173,11 @@ public class SearchArchives {
 
 		// Search Copenhagen Police Registry
 		logger.info("Search Police Registry");
-
-		try {
-			searchPoliceRegistry(args, individual);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+		searchPoliceRegistry(args, individual);
 
 		// Search Copenhagen burial registry
 		logger.info("Search Copenhagen burial registry");
-		try {
-			searchBurialRegistry(args, individual);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+		searchBurialRegistry(args, individual);
 
 		logger.info("Program ended");
 	}
@@ -215,7 +214,8 @@ public class SearchArchives {
 	 * @throws Exception
 	 */
 	private void searchBurialRegistry(String[] args, DBIndividual individual) throws Exception {
-		String outName = "";
+		final String outName = args[3] + "/" + individual.getName() + "_burreg.csv";
+
 		String result = "";
 		int calcYear = 0;
 		counter = 0;
@@ -253,7 +253,6 @@ public class SearchArchives {
 					+ getField(rs, "DEATHCAUSES") + ";" + getField(rs, "DEATHCAUSES_DANISH") + "\n";
 
 			if (counter == 0) {
-				outName = args[3] + "/" + individual.getName() + "_burreg.csv";
 				bw = new BufferedWriter(new FileWriter(new File(outName)));
 				bw.write(BURIAL_HEADER);
 			}
@@ -299,6 +298,45 @@ public class SearchArchives {
 	}
 
 	/**
+	 * Search for similar relocations
+	 *
+	 * @param args
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	private void searchForSimilarRelocations(String[] args, DBIndividual individual) throws SQLException, IOException {
+		final String outName = args[3] + "/" + individual.getName() + "_flyt.csv";
+		counter = 0;
+
+		final Statement statement = connectToDB(args[0]);
+		final String query = String.format(SELECT_RELOCATION, individual.getPhonName());
+		final ResultSet rs = statement.executeQuery(query);
+
+		if (rs.next()) {
+			bw = new BufferedWriter(new FileWriter(new File(outName)));
+			bw.write(RELOCATION_HEADER + "\n");
+			writeRelocationLine(rs, individual);
+			counter++;
+		}
+
+		while (rs.next()) {
+			writeRelocationLine(rs, individual);
+			counter++;
+		}
+
+		statement.close();
+
+		if (counter > 0) {
+			bw.flush();
+			bw.close();
+
+			logger.info(counter + " flytninger gemt i " + outName);
+			Desktop.getDesktop().open(new File(outName));
+		}
+
+	}
+
+	/**
 	 * Search Police Registry
 	 *
 	 * @param args
@@ -306,7 +344,7 @@ public class SearchArchives {
 	 * @throws Exception
 	 */
 	private void searchPoliceRegistry(String[] args, DBIndividual individual) throws Exception {
-		String outName = "";
+		final String outName = args[3] + "/" + individual.getName() + "_polreg.csv";
 		String result = "";
 		int calcYear = 0;
 
@@ -382,7 +420,6 @@ public class SearchArchives {
 				logger.fine(result);
 
 				if (counter == 0) {
-					outName = args[3] + "/" + individual.getName() + "_polreg.csv";
 					bw = new BufferedWriter(new FileWriter(new File(outName)));
 					bw.write(POLREG_HEADER);
 				}
@@ -465,6 +502,7 @@ public class SearchArchives {
 		int diff = 0;
 		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
 		Matcher matcher;
+		counter = 0;
 
 		for (final CensusIndividual ci : cil) {
 			diff = 0;
@@ -529,6 +567,30 @@ public class SearchArchives {
 
 		logger.info(counter + " records written to " + outName);
 		Desktop.getDesktop().open(new File(outName));
+	}
+
+	/**
+	 * Write a line to the relocation file, if birthyear matches
+	 *
+	 * @param rs
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	private void writeRelocationLine(final ResultSet rs, DBIndividual individual) throws IOException, SQLException {
+//		int calcYear = 0;
+//
+//		if (individual.getBirthYear() > 1000) {
+//			try {
+//				logger.info(rs.getString("YEAROFBIRTH"));
+//				calcYear = individual.getBirthYear() - rs.getInt("YEAROFBIRTH");
+//			} catch (final Exception e) {
+//			}
+//		}
+
+//		if ((calcYear >= -2) && (calcYear <= 2)) {
+		bw.write(rs.getString(1).replace("I", "").replace("@", "") + ";" + rs.getString(2) + ";" + rs.getString(3) + ";"
+				+ rs.getString(4) + ";" + rs.getString(5) + ";" + rs.getString(6) + ";" + rs.getString(7) + "\n");
+//		}
 	}
 
 }
