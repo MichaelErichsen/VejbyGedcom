@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 5. mar. 2023
+ * @version 7. mar. 2023
  *
  */
 public class CensusIndividual {
@@ -95,6 +95,7 @@ public class CensusIndividual {
 	private int FTaar = 0;
 	private String Kildehenvisning = "";
 	private String Kildekommentar = "";
+	private String Kildedetaljer = "";
 
 	/**
 	 * @return the adresse
@@ -171,6 +172,13 @@ public class CensusIndividual {
 	 */
 	public String getHusstands_familienr() {
 		return Husstands_familienr;
+	}
+
+	/**
+	 * @return the kildedetaljer
+	 */
+	public String getKildedetaljer() {
+		return Kildedetaljer;
 	}
 
 	/**
@@ -407,6 +415,13 @@ public class CensusIndividual {
 	}
 
 	/**
+	 * @param kildedetaljer the kildedetaljer to set
+	 */
+	public void setKildedetaljer(String kildedetaljer) {
+		Kildedetaljer = kildedetaljer;
+	}
+
+	/**
 	 * @param kildeerhverv the kildeerhverv to set
 	 */
 	public void setKildeerhverv(String kildeerhverv) {
@@ -520,7 +535,7 @@ public class CensusIndividual {
 				+ Matr_nr_Adresse + ";" + Kildenavn + ";" + Koen + ";" + Alder + ";" + Civilstand + ";" + Kildeerhverv
 				+ ";" + Stilling_i_husstanden + ";" + Kildefoedested + ";" + Foedt_kildedato + ";" + Foedeaar + ";"
 				+ Adresse + ";" + Matrikel + ";" + Gade_nr + ";" + Kildehenvisning + ";" + Kildekommentar + ";" + KIPnr
-				+ ";" + Loebenr + ";" + Fonnavn + "\n";
+				+ ";" + Loebenr + ";" + Fonnavn + ";" + Kildedetaljer + "\n";
 	}
 
 }

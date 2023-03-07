@@ -24,9 +24,10 @@ import net.myerichsen.gedcom.db.models.DBIndividual;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 6. mar. 2023
+ * @version 7. mar. 2023
  *
  */
+
 public class SearchArchives {
 	/**
 	 * Constants and static fields
@@ -39,7 +40,7 @@ public class SearchArchives {
 	private static final String CENSUS_HEADER = "FTaar;Amt;Herred;Sogn;Kildestednavn;"
 			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Koen;Alder;Civilstand;"
 			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
-			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar;KIPnr;Loebenr;Fonnavn\n";
+			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar;KIPnr;Loebenr;Fonnavn;Kildedetaljer\n";
 	private static final String POLREG_HEADER = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;"
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
@@ -53,6 +54,8 @@ public class SearchArchives {
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = '%s'";
 	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = '%s' "
 			+ "AND FTAAR >= %s AND FTAAR <= %s";
+	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = '%s' "
+			+ "AND HUSSTANDS_FAMILIENR = '%s' ORDER BY LOEBENR";
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
 	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = '%s'";
 	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = %d";
@@ -161,7 +164,7 @@ public class SearchArchives {
 
 		// Search for similar relocations
 		logger.info("Search for similar relocations for " + individual.getName());
-		searchForSimilarRelocations(args, individual);
+		searchRelocations(args, individual);
 
 		// Search Census Derby table
 		logger.info("Search for censuses for " + individual.getName());
@@ -169,7 +172,7 @@ public class SearchArchives {
 
 		// Search Probates Derby table
 		logger.info("Search for probates for " + individual.getName() + " in " + PROBATE_SOURCE);
-		searchProbates(args);
+		searchProbates(args, individual);
 
 		// Search Copenhagen Police Registry
 		logger.info("Search Police Registry");
@@ -279,22 +282,36 @@ public class SearchArchives {
 	 * @param individual
 	 * @throws Exception
 	 */
+
 	private void searchCensusTable(String[] args, DBIndividual individual) throws Exception {
 		final Statement statement = connectToDB(args[0]);
-		final String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(), individual.getBirthYear(),
+		String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(), individual.getBirthYear(),
 				individual.getDeathYear());
 		logger.fine(query);
-		final ResultSet rs = statement.executeQuery(query);
+		ResultSet rs = statement.executeQuery(query);
 
 		List<CensusIndividual> cil = null;
 		cil = CensusIndividual.getFromDb(rs);
+
+		// Add all household members as source details
+		for (CensusIndividual ci : cil) {
+			query = String.format(SELECT_CENSUS_HOUSEHOLD, ci.getKIPnr(), ci.getHusstands_familienr());
+			rs = statement.executeQuery(query);
+			StringBuffer sb = new StringBuffer();
+
+			while (rs.next()) {
+				sb.append(rs.getString("KILDENAVN") + ", " + rs.getString("ALDER") + ", " + rs.getString("CIVILSTAND")
+						+ ", " + rs.getString("KILDEERHVERV") + ", " + rs.getString("STILLING_I_HUSSTANDEN") + " - ");
+			}
+
+			ci.setKildedetaljer(sb.toString());
+		}
 
 		statement.close();
 
 		if ((cil != null) && (cil.size() > 0)) {
 			writeCensusOutput(cil, args, individual);
 		}
-
 	}
 
 	/**
@@ -304,12 +321,13 @@ public class SearchArchives {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	private void searchForSimilarRelocations(String[] args, DBIndividual individual) throws SQLException, IOException {
+	private void searchRelocations(String[] args, DBIndividual individual) throws SQLException, IOException {
 		final String outName = args[3] + "/" + individual.getName() + "_flyt.csv";
 		counter = 0;
 
 		final Statement statement = connectToDB(args[0]);
 		final String query = String.format(SELECT_RELOCATION, individual.getPhonName());
+		logger.fine(query);
 		final ResultSet rs = statement.executeQuery(query);
 
 		if (rs.next()) {
@@ -447,7 +465,7 @@ public class SearchArchives {
 	 * @param args
 	 * @throws Exception
 	 */
-	private void searchProbates(String[] args) throws Exception {
+	private void searchProbates(String[] args, DBIndividual individual) throws Exception {
 		final Statement statement = connectToDB(args[1]);
 
 		final String phonName = new Fonkod().generateKey(args[4]);
@@ -483,7 +501,7 @@ public class SearchArchives {
 		statement.close();
 
 		if (counter > 0) {
-			writeProbateOutput(args, outLines, counter);
+			writeProbateOutput(args, outLines, individual);
 		}
 
 	}
@@ -548,13 +566,16 @@ public class SearchArchives {
 	}
 
 	/**
+	 * Writa a line of probate output
+	 * 
 	 * @param args
 	 * @param outLines
 	 * @param counter
 	 * @throws IOException
 	 */
-	private void writeProbateOutput(String[] args, final HashSet<String> outLines, int counter) throws IOException {
-		final String outName = args[3] + "/" + args[3] + "_probates.csv";
+	private void writeProbateOutput(String[] args, final HashSet<String> outLines, DBIndividual individual)
+			throws IOException {
+		final String outName = args[3] + "/" + individual.getName() + "_probates.csv";
 		bw = new BufferedWriter(new FileWriter(outName));
 		bw.write(PROBATE_HEADER + "\n");
 
@@ -577,20 +598,9 @@ public class SearchArchives {
 	 * @throws SQLException
 	 */
 	private void writeRelocationLine(final ResultSet rs, DBIndividual individual) throws IOException, SQLException {
-//		int calcYear = 0;
-//
-//		if (individual.getBirthYear() > 1000) {
-//			try {
-//				logger.info(rs.getString("YEAROFBIRTH"));
-//				calcYear = individual.getBirthYear() - rs.getInt("YEAROFBIRTH");
-//			} catch (final Exception e) {
-//			}
-//		}
-
-//		if ((calcYear >= -2) && (calcYear <= 2)) {
 		bw.write(rs.getString(1).replace("I", "").replace("@", "") + ";" + rs.getString(2) + ";" + rs.getString(3) + ";"
-				+ rs.getString(4) + ";" + rs.getString(5) + ";" + rs.getString(6) + ";" + rs.getString(7) + "\n");
-//		}
+				+ rs.getString(4) + ";" + rs.getString(5) + ";" + rs.getString(6) + ";"
+				+ (rs.getString(7) == null ? "" : rs.getString(7)) + "\n");
 	}
 
 }
