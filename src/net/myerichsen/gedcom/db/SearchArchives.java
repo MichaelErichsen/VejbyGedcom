@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.myerichsen.gedcom.db.models.DBIndividual;
+import net.myerichsen.gedcom.db.models.Relocation;
 
 /**
  * Find all registry entries that match the phonetic name and life span of a
@@ -294,10 +295,10 @@ public class SearchArchives {
 		cil = CensusIndividual.getFromDb(rs);
 
 		// Add all household members as source details
-		for (CensusIndividual ci : cil) {
+		for (final CensusIndividual ci : cil) {
 			query = String.format(SELECT_CENSUS_HOUSEHOLD, ci.getKIPnr(), ci.getHusstands_familienr());
 			rs = statement.executeQuery(query);
-			StringBuffer sb = new StringBuffer();
+			final StringBuffer sb = new StringBuffer();
 
 			while (rs.next()) {
 				sb.append(rs.getString("KILDENAVN") + ", " + rs.getString("ALDER") + ", " + rs.getString("CIVILSTAND")
@@ -312,46 +313,6 @@ public class SearchArchives {
 		if ((cil != null) && (cil.size() > 0)) {
 			writeCensusOutput(cil, args, individual);
 		}
-	}
-
-	/**
-	 * Search for similar relocations
-	 *
-	 * @param args
-	 * @throws SQLException
-	 * @throws IOException
-	 */
-	private void searchRelocations(String[] args, DBIndividual individual) throws SQLException, IOException {
-		final String outName = args[3] + "/" + individual.getName() + "_flyt.csv";
-		counter = 0;
-
-		final Statement statement = connectToDB(args[0]);
-		final String query = String.format(SELECT_RELOCATION, individual.getPhonName());
-		logger.fine(query);
-		final ResultSet rs = statement.executeQuery(query);
-
-		if (rs.next()) {
-			bw = new BufferedWriter(new FileWriter(new File(outName)));
-			bw.write(RELOCATION_HEADER + "\n");
-			writeRelocationLine(rs, individual);
-			counter++;
-		}
-
-		while (rs.next()) {
-			writeRelocationLine(rs, individual);
-			counter++;
-		}
-
-		statement.close();
-
-		if (counter > 0) {
-			bw.flush();
-			bw.close();
-
-			logger.info(counter + " flytninger gemt i " + outName);
-			Desktop.getDesktop().open(new File(outName));
-		}
-
 	}
 
 	/**
@@ -507,6 +468,77 @@ public class SearchArchives {
 	}
 
 	/**
+	 * Search for similar relocations
+	 *
+	 * @param args
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	private void searchRelocations(String[] args, DBIndividual individual) throws SQLException, IOException {
+		final String outName = args[3] + "/" + individual.getName() + "_flyt.csv";
+		counter = 0;
+
+		final Statement statement = connectToDB(args[0]);
+		final String query = String.format(SELECT_RELOCATION, individual.getPhonName());
+		logger.fine(query);
+		final ResultSet rs = statement.executeQuery(query);
+		Relocation relocation;
+		final List<Relocation> lr = new ArrayList<>();
+
+		while (rs.next()) {
+			relocation = new Relocation(rs.getString(1).replace("I", "").replace("@", "").trim(),
+					rs.getString(2).trim(), rs.getString(3).trim(), rs.getString(4).trim(), rs.getString(5).trim(),
+					rs.getString(6).trim(), (rs.getString(7) == null ? "" : rs.getString(7).trim()));
+			lr.add(relocation);
+		}
+
+		statement.close();
+
+		// Find relocation dates outside the life span of the individual
+
+		final List<String> ls = new ArrayList<>();
+
+		for (final Relocation relocation2 : lr) {
+			logger.fine(individual.getBirthYear() + ", " + relocation2.getYear() + ", " + individual.getDeathYear());
+			if ((relocation2.getYear() < individual.getBirthYear())
+					|| (relocation2.getYear() > individual.getDeathYear())) {
+				ls.add(relocation2.getId());
+			}
+		}
+
+		// Eliminate individuals with relocation dates outside their life span
+
+		for (int j = 0; j < lr.size(); j++) {
+			for (final String id : ls) {
+				if (lr.get(j).getId().equals(id)) {
+					lr.remove(j);
+				}
+			}
+		}
+
+		// Write out remaining records
+
+		for (final Relocation relocation2 : lr) {
+			if (counter == 0) {
+				bw = new BufferedWriter(new FileWriter(new File(outName)));
+				bw.write(RELOCATION_HEADER + "\n");
+			}
+
+			bw.write(relocation2.toString() + "\n");
+			counter++;
+		}
+
+		if (counter > 0) {
+			bw.flush();
+			bw.close();
+
+			logger.info(counter + " flytninger gemt i " + outName);
+			Desktop.getDesktop().open(new File(outName));
+		}
+
+	}
+
+	/**
 	 * Write output for the census search
 	 *
 	 * @param cil
@@ -567,7 +599,7 @@ public class SearchArchives {
 
 	/**
 	 * Writa a line of probate output
-	 * 
+	 *
 	 * @param args
 	 * @param outLines
 	 * @param counter
@@ -589,18 +621,4 @@ public class SearchArchives {
 		logger.info(counter + " records written to " + outName);
 		Desktop.getDesktop().open(new File(outName));
 	}
-
-	/**
-	 * Write a line to the relocation file, if birthyear matches
-	 *
-	 * @param rs
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	private void writeRelocationLine(final ResultSet rs, DBIndividual individual) throws IOException, SQLException {
-		bw.write(rs.getString(1).replace("I", "").replace("@", "") + ";" + rs.getString(2) + ";" + rs.getString(3) + ";"
-				+ rs.getString(4) + ";" + rs.getString(5) + ";" + rs.getString(6) + ";"
-				+ (rs.getString(7) == null ? "" : rs.getString(7)) + "\n");
-	}
-
 }
