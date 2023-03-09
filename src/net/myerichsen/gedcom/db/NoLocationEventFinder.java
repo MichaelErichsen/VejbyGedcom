@@ -14,15 +14,15 @@ import java.util.HashSet;
 import java.util.logging.Logger;
 
 /**
- * Find all individuals with no events in Vejby and with less than two children,
- * possibly to be removed from the database
+ * Find all individuals with no events in a location and with less than two
+ * children, possibly to be removed from the database
  *
  * @author Michael Erichsen
  * @version 9. mar. 2023
  *
  */
 
-public class NoVejbyEventCleaner {
+public class NoLocationEventFinder {
 	/**
 	 * Private class representing an individual
 	 *
@@ -69,18 +69,18 @@ public class NoVejbyEventCleaner {
 	private static final String SELECT_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = '%s'";
 
 	private static final String HEADER = "Id;Fornavn;Efternavn;Antal børn";
-	private static final Logger logger = Logger.getLogger("NoVejbyEventCleaner");
+	private static final Logger logger = Logger.getLogger("NoLocationEventFinder");
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length < 2) {
-			System.out.println("Usage: NoVejbyEventCleaner derbydatabasepath outputdirectory");
+		if (args.length < 3) {
+			System.out.println("Usage: NoLocationEventFinder location derbydatabasepath outputdirectory");
 			System.exit(4);
 		}
 
-		final NoVejbyEventCleaner nvec = new NoVejbyEventCleaner();
+		final NoLocationEventFinder nvec = new NoLocationEventFinder();
 
 		try {
 			nvec.execute(args);
@@ -106,10 +106,11 @@ public class NoVejbyEventCleaner {
 		final HashSet<NvecIndividual> hsni = new HashSet<>();
 		int counter = 0;
 
-		final String dbURL = "jdbc:derby:" + args[0];
+		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn1 = DriverManager.getConnection(dbURL);
 		logger.info("Connected to database " + dbURL);
 		final Statement statement = conn1.createStatement();
+		String location = args[0].toLowerCase();
 
 		// Get all individuals
 
@@ -121,7 +122,8 @@ public class NoVejbyEventCleaner {
 			hsni.add(individual);
 			counter++;
 
-			// If any event has Vejby as location then remove individual from hash set
+			// If any event has the location as location then remove individual from hash
+			// set
 
 			query = String.format(SELECT_EVENT, individual.getId());
 			ps = conn1.prepareStatement(query);
@@ -130,7 +132,7 @@ public class NoVejbyEventCleaner {
 			while (rs2.next()) {
 				place = rs2.getString("PLACE");
 
-				if ((place != null) && (place.toLowerCase().contains("vejby"))) {
+				if ((place != null) && (place.toLowerCase().contains(location))) {
 					hsni.remove(individual);
 					break;
 				}
@@ -141,15 +143,15 @@ public class NoVejbyEventCleaner {
 			}
 		}
 
-		logger.info("Analysed individuals: " + counter);
-		logger.info("Individuals outside Vejby: " + hsni.size());
+		logger.info(counter + " analysed individuals");
+		logger.info(hsni.size() + " individuals have no events in " + location);
 
 		// If children count less than two or more, then print output
 
 		int count = 0;
 		counter = 0;
 
-		final String outfile = args[1] + "\\NoVejbyEvents.csv";
+		final String outfile = args[2] + "\\No" + location + "Events.csv";
 		final BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outfile)));
 		writer.write(HEADER + "\n");
 
