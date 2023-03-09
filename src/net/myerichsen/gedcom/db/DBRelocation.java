@@ -26,7 +26,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * The program produces a .csv file with a row for each relocation found.
  *
  * @author Michael Erichsen
- * @version 5. mar. 2023
+ * @version 8. mar. 2023
  *
  */
 public class DBRelocation {
@@ -74,7 +74,7 @@ public class DBRelocation {
 	private Statement connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[0];
 		final Connection conn = DriverManager.getConnection(dbURL);
-		System.out.println("Connected to database " + dbURL);
+		logger.info("Connected to database " + dbURL);
 		return conn.createStatement();
 	}
 

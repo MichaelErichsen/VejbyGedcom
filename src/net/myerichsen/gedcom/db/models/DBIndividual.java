@@ -79,7 +79,7 @@ public class DBIndividual {
 		this.birthYear = Integer.parseInt(birthYear);
 		this.deathYear = Integer.parseInt(deathYear);
 		try {
-			this.phonName = new Fonkod().generateKey(name);
+			this.phonName = new Fonkod().generateKey(name).trim();
 		} catch (final Exception e) {
 		}
 

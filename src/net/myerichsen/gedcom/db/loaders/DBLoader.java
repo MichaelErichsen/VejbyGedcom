@@ -35,7 +35,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 5. mar. 2023
+ * @version 8. mar. 2023
  */
 public class DBLoader {
 	private static final String INSERT_EVENT_START_I = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
@@ -367,6 +367,7 @@ public class DBLoader {
 			} else {
 				sb.append("', '" + subtype.getValue() + "', ");
 			}
+
 			date = individualEvent.getDate();
 
 			if (date == null) {

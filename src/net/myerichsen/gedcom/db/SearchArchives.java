@@ -25,7 +25,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 7. mar. 2023
+ * @version 8. mar. 2023
  *
  */
 
@@ -290,6 +290,7 @@ public class SearchArchives {
 				individual.getDeathYear());
 		logger.fine(query);
 		ResultSet rs = statement.executeQuery(query);
+		String string = "";
 
 		List<CensusIndividual> cil = null;
 		cil = CensusIndividual.getFromDb(rs);
@@ -305,7 +306,13 @@ public class SearchArchives {
 						+ ", " + rs.getString("KILDEERHVERV") + ", " + rs.getString("STILLING_I_HUSSTANDEN") + " - ");
 			}
 
-			ci.setKildedetaljer(sb.toString());
+			string = sb.toString();
+
+			if (string.length() > 4096) {
+				string = string.substring(0, 4095);
+			}
+
+			ci.setKildedetaljer(string);
 		}
 
 		statement.close();
@@ -486,9 +493,14 @@ public class SearchArchives {
 		final List<Relocation> lr = new ArrayList<>();
 
 		while (rs.next()) {
-			relocation = new Relocation(rs.getString(1).replace("I", "").replace("@", "").trim(),
-					rs.getString(2).trim(), rs.getString(3).trim(), rs.getString(4).trim(), rs.getString(5).trim(),
-					rs.getString(6).trim(), (rs.getString(7) == null ? "" : rs.getString(7).trim()));
+			relocation = new Relocation(
+					(rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim()),
+					(rs.getString(2) == null ? "" : rs.getString(2).trim()),
+					(rs.getString(3) == null ? "" : rs.getString(3).trim()),
+					(rs.getString(4) == null ? "" : rs.getString(4).trim()),
+					(rs.getString(5) == null ? "" : rs.getString(5).trim()),
+					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
+					(rs.getString(7) == null ? "" : rs.getString(7).trim()));
 			lr.add(relocation);
 		}
 
