@@ -10,15 +10,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Find all individuals with no events in a location and with less than two
- * children, possibly to be removed from the database
+ * Find all individuals with no events in a location, with less than two
+ * children and with no children born or christened at this location, possibly
+ * to be removed from the database
  *
  * @author Michael Erichsen
- * @version 9. mar. 2023
+ * @version 11. mar. 2023
  *
  */
 
@@ -27,13 +30,14 @@ public class NoLocationEventFinder {
 	 * Private class representing an individual
 	 *
 	 * @author Michael Erichsen
-	 * @version 9. mar. 2023
+	 * @version 10. mar. 2023
 	 *
 	 */
 	private class NvecIndividual {
 		private String id = "";
 		private String givenName = "";
 		private String surName = "";
+		private int birthYear;
 
 		/**
 		 * Constructor
@@ -41,6 +45,7 @@ public class NoLocationEventFinder {
 		 * @param id
 		 * @param givenName
 		 * @param surName
+		 * @param birthYear
 		 */
 		public NvecIndividual(String id, String givenName, String surName) {
 			this.id = id;
@@ -55,20 +60,28 @@ public class NoLocationEventFinder {
 			return id;
 		}
 
+		/**
+		 * @param date the birthYear to set
+		 */
+		public void setBirthYear(int date) {
+			this.birthYear = date;
+		}
+
 		@Override
 		public String toString() {
 			return (id != null ? id.replace("I", "").replace("@", "") : "") + ";" + (givenName != null ? givenName : "")
-					+ ";" + (surName != null ? surName : "");
+					+ ";" + (surName != null ? surName : "") + ";" + (birthYear != 0 ? birthYear : "");
 		}
 
 	}
 
 	private static final String SELECT_CHILD_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.INDIVIDUAL WHERE FAMC IN "
 			+ "( SELECT ID FROM VEJBY.FAMILY WHERE HUSBAND = '%s' OR WIFE = '%s')";
+	private static final String SELECT_CHILDREN = "SELECT ID FROM VEJBY.INDIVIDUAL WHERE FAMC IN "
+			+ "(SELECT ID FROM VEJBY.FAMILY WHERE HUSBAND = '%s' OR WIFE = '%s')";
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
 	private static final String SELECT_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = '%s'";
-
-	private static final String HEADER = "Id;Fornavn;Efternavn;Antal børn";
+	private static final String HEADER = "Id;Fornavn;Efternavn;Født";
 	private static final Logger logger = Logger.getLogger("NoLocationEventFinder");
 
 	/**
@@ -90,8 +103,51 @@ public class NoLocationEventFinder {
 	}
 
 	/**
+	 * Check if any children are born or christened in the location
+	 *
+	 * @param statement
+	 * @param individual
+	 * @param location
+	 * @return
+	 * @throws SQLException
+	 */
+	private Boolean checkChildrenLocation(Connection conn, NvecIndividual individual, String location)
+			throws SQLException {
+		final List<String> ls = new ArrayList<>();
+		PreparedStatement ps;
+		ResultSet rs2;
+		String place = "";
+		String query = String.format(SELECT_CHILDREN, individual.getId(), individual.getId());
+		final Statement statement = conn.createStatement();
+		final ResultSet rs = statement.executeQuery(query);
+
+		while (rs.next()) {
+			ls.add(rs.getString("ID"));
+		}
+
+		for (final String childId : ls) {
+			query = String.format(SELECT_EVENT, childId);
+			ps = conn.prepareStatement(query);
+			rs2 = ps.executeQuery();
+
+			while (rs2.next()) {
+				if ((rs2.getString("TYPE").trim().equals("Birth"))
+						|| (rs2.getString("TYPE").trim().equals("Christening"))) {
+					place = rs2.getString("PLACE");
+
+					if ((place != null) && (place.toLowerCase().contains(location))) {
+						return true;
+					}
+				}
+
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Worker method
-	 * 
+	 *
 	 * @param args
 	 *
 	 * @throws SQLException
@@ -105,12 +161,14 @@ public class NoLocationEventFinder {
 		NvecIndividual individual = null;
 		final HashSet<NvecIndividual> hsni = new HashSet<>();
 		int counter = 0;
+		String note;
 
 		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn1 = DriverManager.getConnection(dbURL);
 		logger.info("Connected to database " + dbURL);
 		final Statement statement = conn1.createStatement();
-		String location = args[0].toLowerCase();
+		final String location = args[0].toLowerCase();
+		int year = 0;
 
 		// Get all individuals
 
@@ -130,9 +188,28 @@ public class NoLocationEventFinder {
 			rs2 = ps.executeQuery();
 
 			while (rs2.next()) {
+				// Add birth year to individual
+				if (rs2.getString("TYPE").trim().equals("Birth")) {
+					year = rs2.getDate("DATE").toLocalDate().getYear();
+
+					if ((year < 1789) || checkChildrenLocation(conn1, individual, location)) {
+						hsni.remove(individual);
+						break;
+					}
+
+					individual.setBirthYear(year);
+				}
+
 				place = rs2.getString("PLACE");
 
 				if ((place != null) && (place.toLowerCase().contains(location))) {
+					hsni.remove(individual);
+					break;
+				}
+
+				note = rs2.getString("NOTE");
+
+				if ((note != null) && (note.toLowerCase().contains(location))) {
 					hsni.remove(individual);
 					break;
 				}
@@ -165,7 +242,7 @@ public class NoLocationEventFinder {
 			}
 
 			if (count < 2) {
-				writer.write(ni.toString() + ";" + count + "\n");
+				writer.write(ni.toString() + "\n");
 				counter++;
 			}
 		}

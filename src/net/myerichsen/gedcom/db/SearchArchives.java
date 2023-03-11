@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,6 +33,50 @@ import net.myerichsen.gedcom.db.models.Relocation;
 
 public class SearchArchives {
 	/**
+	 * Helper class implementing Comparator interface
+	 *
+	 * @author Michael Erichsen
+	 * @version 11. mar. 2023
+	 *
+	 */
+	public class CensusIndividualComparator implements Comparator<CensusIndividual> {
+
+		/**
+		 * Sort in ascending order of birth year and location
+		 */
+		@Override
+		public int compare(CensusIndividual o1, CensusIndividual o2) {
+			final String key1 = o1.getFTaar() + " " + o1.getAmt() + " " + o1.getHerred() + " " + o1.getSogn();
+			final String key2 = o2.getFTaar() + " " + o2.getAmt() + " " + o2.getHerred() + " " + o2.getSogn();
+
+			return key1.compareToIgnoreCase(key2);
+		}
+
+	}
+
+	/**
+	 * Helper class implementing Comparator interface
+	 *
+	 * @author Michael Erichsen
+	 * @version 11. mar. 2023
+	 *
+	 */
+	public class RelocationComparator implements Comparator<Relocation> {
+
+		/**
+		 * Sort in ascending order of given name
+		 */
+		@Override
+		public int compare(Relocation o1, Relocation o2) {
+			final String key1 = o1.getGivenName();
+			final String key2 = o2.getGivenName();
+
+			return key1.compareToIgnoreCase(key2);
+		}
+
+	}
+
+	/**
 	 * Constants and static fields
 	 */
 	private static final String PROBATE_SOURCE = "Kronborg";
@@ -46,11 +92,11 @@ public class SearchArchives {
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
 			+ "VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
+
 	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer";
-
 	private static final String DIGITS_ONLY = "\\d+";
-	private static final String FOUR_DIGITS = "\\d{4}";
 
+	private static final String FOUR_DIGITS = "\\d{4}";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = '%s'";
 	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = '%s' "
@@ -63,14 +109,15 @@ public class SearchArchives {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
+
 	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
 			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
 			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL "
 			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
 			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = '%s'";
-
 	private static BufferedWriter bw = null;
 	private static int counter = 0;
+
 	private static Logger logger;
 
 	/**
@@ -528,7 +575,9 @@ public class SearchArchives {
 			}
 		}
 
-		// Write out remaining records
+		// Sort and write out remaining records
+
+		Collections.sort(lr, new RelocationComparator());
 
 		for (final Relocation relocation2 : lr) {
 			if (counter == 0) {
@@ -565,6 +614,8 @@ public class SearchArchives {
 		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
 		Matcher matcher;
 		counter = 0;
+
+		Collections.sort(cil, new CensusIndividualComparator());
 
 		for (final CensusIndividual ci : cil) {
 			diff = 0;

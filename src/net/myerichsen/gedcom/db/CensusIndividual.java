@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 7. mar. 2023
+ * @version 11. mar. 2023
  *
  */
 public class CensusIndividual {

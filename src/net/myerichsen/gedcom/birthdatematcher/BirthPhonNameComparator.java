@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.birthdatematcher;
 import java.util.Comparator;
 
 /**
- * Helper class inplementing Comparator interface
+ * Helper class implementing Comparator interface
  *
  * @author Michael Erichsen
  * @version 30. nov. 2022
