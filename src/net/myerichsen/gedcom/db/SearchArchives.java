@@ -27,7 +27,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 8. mar. 2023
+ * @version 11. mar. 2023
  *
  */
 
@@ -80,6 +80,9 @@ public class SearchArchives {
 	 * Constants and static fields
 	 */
 	private static final String PROBATE_SOURCE = "Kronborg";
+	private static final String DIGITS_ONLY = "\\d+";
+	private static final String FOUR_DIGITS = "\\d{4}";
+
 	private static final String BURIAL_HEADER = "FIRSTNAMES;LASTNAME;DATEOFDEATH;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
 			+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
 			+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
@@ -92,11 +95,9 @@ public class SearchArchives {
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
 			+ "VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
+	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer;Fødeår";
 
-	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer";
-	private static final String DIGITS_ONLY = "\\d+";
-
-	private static final String FOUR_DIGITS = "\\d{4}";
+	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = '%s' AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = '%s'";
 	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = '%s' "
@@ -109,7 +110,6 @@ public class SearchArchives {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
-
 	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
 			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
 			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL "
@@ -180,7 +180,7 @@ public class SearchArchives {
 	private Statement connectToDB(String dbpath) throws SQLException {
 		final String dbURL = "jdbc:derby:" + dbpath;
 		final Connection conn1 = DriverManager.getConnection(dbURL);
-		logger.fine("Connected to database " + dbURL);
+		logger.info("Connected to database " + dbURL);
 		return conn1.createStatement();
 	}
 
@@ -274,7 +274,6 @@ public class SearchArchives {
 		final Statement stmt = connectToDB(args[2]);
 
 		final String query = String.format(SELECT_BURIAL_PERSON, individual.getPhonName());
-		logger.fine(query);
 		final ResultSet rs = stmt.executeQuery(query);
 
 		while (rs.next()) {
@@ -335,7 +334,6 @@ public class SearchArchives {
 		final Statement statement = connectToDB(args[0]);
 		String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(), individual.getBirthYear(),
 				individual.getDeathYear());
-		logger.fine(query);
 		ResultSet rs = statement.executeQuery(query);
 		String string = "";
 
@@ -384,7 +382,6 @@ public class SearchArchives {
 		final Statement stmt = connectToDB(args[2]);
 
 		String query = String.format(SELECT_POLICE_PERSON, individual.getPhonName());
-		logger.fine(query);
 		ResultSet rs = stmt.executeQuery(query);
 		ResultSet rs3;
 		final List<Integer> li = new ArrayList<>();
@@ -409,8 +406,6 @@ public class SearchArchives {
 
 		for (int i = 0; i < li.size(); i++) {
 			query3 = String.format(SELECT_POLICE_POSITION, li.get(i));
-			logger.fine(query);
-
 			rs3 = stmt.executeQuery(query3);
 
 			if (rs3.next()) {
@@ -422,8 +417,6 @@ public class SearchArchives {
 
 		for (int i = 0; i < li.size(); i++) {
 			query = String.format(SELECT_POLICE_ADDRESS, li.get(i));
-			logger.fine(query);
-
 			rs = stmt.executeQuery(query);
 
 			while (rs.next()) {
@@ -449,8 +442,6 @@ public class SearchArchives {
 						+ getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR") + ";"
 						+ getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";" + day + ";" + month + ";" + year
 						+ ";" + day + "-" + month + "-" + year + ";" + getField(rs, "FULL_ADDRESS") + "\n";
-
-				logger.fine(result);
 
 				if (counter == 0) {
 					bw = new BufferedWriter(new FileWriter(new File(outName)));
@@ -533,9 +524,8 @@ public class SearchArchives {
 		counter = 0;
 
 		final Statement statement = connectToDB(args[0]);
-		final String query = String.format(SELECT_RELOCATION, individual.getPhonName());
-		logger.fine(query);
-		final ResultSet rs = statement.executeQuery(query);
+		String query = String.format(SELECT_RELOCATION, individual.getPhonName());
+		ResultSet rs = statement.executeQuery(query);
 		Relocation relocation;
 		final List<Relocation> lr = new ArrayList<>();
 
@@ -551,14 +541,11 @@ public class SearchArchives {
 			lr.add(relocation);
 		}
 
-		statement.close();
-
 		// Find relocation dates outside the life span of the individual
 
 		final List<String> ls = new ArrayList<>();
 
 		for (final Relocation relocation2 : lr) {
-			logger.fine(individual.getBirthYear() + ", " + relocation2.getYear() + ", " + individual.getDeathYear());
 			if ((relocation2.getYear() < individual.getBirthYear())
 					|| (relocation2.getYear() > individual.getDeathYear())) {
 				ls.add(relocation2.getId());
@@ -579,14 +566,26 @@ public class SearchArchives {
 
 		Collections.sort(lr, new RelocationComparator());
 
+		String birthYear = "";
+
 		for (final Relocation relocation2 : lr) {
+
 			if (counter == 0) {
 				bw = new BufferedWriter(new FileWriter(new File(outName)));
 				bw.write(RELOCATION_HEADER + "\n");
 			}
 
-			bw.write(relocation2.toString() + "\n");
+			query = String.format(SELECT_BIRTHDATE, "@I" + relocation2.getId() + "@");
+
+			rs = statement.executeQuery(query);
+
+			if (rs.next()) {
+				birthYear = (rs.getDate("DATE") != null ? rs.getDate("DATE").toString() : "");
+			}
+
+			bw.write(relocation2.toString() + ";" + birthYear + "\n");
 			counter++;
+			birthYear = "";
 		}
 
 		if (counter > 0) {
@@ -596,6 +595,8 @@ public class SearchArchives {
 			logger.info(counter + " flytninger gemt i " + outName);
 			Desktop.getDesktop().open(new File(outName));
 		}
+
+		statement.close();
 
 	}
 
