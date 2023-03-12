@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
 
 /**

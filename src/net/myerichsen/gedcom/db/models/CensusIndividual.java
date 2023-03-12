@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db;
+package net.myerichsen.gedcom.db.models;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.myerichsen.gedcom.db.Fonkod;
 
 /**
  * Class representing an individual in the census table

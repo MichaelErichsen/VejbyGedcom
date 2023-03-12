@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.myerichsen.gedcom.db.CensusIndividual;
+import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.KipTextEntry;
 
 /**

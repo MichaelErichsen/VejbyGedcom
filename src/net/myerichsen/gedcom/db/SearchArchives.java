@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
 import net.myerichsen.gedcom.db.models.Relocation;
 
@@ -180,7 +181,6 @@ public class SearchArchives {
 	private Statement connectToDB(String dbpath) throws SQLException {
 		final String dbURL = "jdbc:derby:" + dbpath;
 		final Connection conn1 = DriverManager.getConnection(dbURL);
-		logger.info("Connected to database " + dbURL);
 		return conn1.createStatement();
 	}
 
