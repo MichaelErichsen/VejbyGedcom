@@ -28,7 +28,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 11. mar. 2023
+ * @version 13. mar. 2023
  *
  */
 
@@ -47,8 +47,8 @@ public class SearchArchives {
 		 */
 		@Override
 		public int compare(CensusIndividual o1, CensusIndividual o2) {
-			final String key1 = o1.getFTaar() + " " + o1.getAmt() + " " + o1.getHerred() + " " + o1.getSogn();
-			final String key2 = o2.getFTaar() + " " + o2.getAmt() + " " + o2.getHerred() + " " + o2.getSogn();
+			final String key1 = o1.getFTaar() + o1.getAmt() + o1.getHerred() + o1.getSogn();
+			final String key2 = o2.getFTaar() + o2.getAmt() + o2.getHerred() + o2.getSogn();
 
 			return key1.compareToIgnoreCase(key2);
 		}
@@ -59,18 +59,18 @@ public class SearchArchives {
 	 * Helper class implementing Comparator interface
 	 *
 	 * @author Michael Erichsen
-	 * @version 11. mar. 2023
+	 * @version 13. mar. 2023
 	 *
 	 */
 	public class RelocationComparator implements Comparator<Relocation> {
 
 		/**
-		 * Sort in ascending order of given name
+		 * Sort in ascending order of given name, birth date, and relocation date
 		 */
 		@Override
 		public int compare(Relocation o1, Relocation o2) {
-			final String key1 = o1.getGivenName();
-			final String key2 = o2.getGivenName();
+			final String key1 = o1.getGivenName() + o1.getBirthYear() + o1.getDate();
+			final String key2 = o2.getGivenName() + o2.getBirthYear() + o2.getDate();
 
 			return key1.compareToIgnoreCase(key2);
 		}
@@ -95,8 +95,8 @@ public class SearchArchives {
 	private static final String POLREG_HEADER = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;"
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
-			+ "VITALTYPE;COVERED_DATA;SOURCE;FONKOD";
-	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer;Fødeår";
+			+ "VITALTYPE;COVERED_DATA;SOURCE";
+	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer;Fødselsdato";
 
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = '%s' AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
@@ -496,8 +496,7 @@ public class SearchArchives {
 				singleLine = name + ";" + rs.getString("ID").trim() + ";" + rs.getString("FROMDATE").trim() + ";"
 						+ rs.getString("TODATE").trim() + ";" + rs.getString("PLACE").trim() + ";"
 						+ rs.getString("EVENTTYPE").trim() + ";" + rs.getString("VITALTYPE").trim() + ";"
-						+ coveredData.replace(";", ".").trim() + ";" + source.replace(";", ".").trim() + ";"
-						+ rs.getString("FONKOD").trim();
+						+ coveredData.replace(";", ".").trim() + ";" + source.replace(";", ".").trim();
 				singleLine = singleLine.replaceAll("\\r\\n", " ¤ ");
 				outLines.add(singleLine);
 				counter++;
@@ -562,11 +561,23 @@ public class SearchArchives {
 			}
 		}
 
+		// Add birth date to each record
+
+		for (final Relocation relocation2 : lr) {
+
+			query = String.format(SELECT_BIRTHDATE, "@I" + relocation2.getId() + "@");
+
+			rs = statement.executeQuery(query);
+
+			if (rs.next()) {
+				relocation2.setBirthYear((rs.getDate("DATE") != null ? rs.getDate("DATE").toString() : ""));
+			}
+
+		}
+
 		// Sort and write out remaining records
 
 		Collections.sort(lr, new RelocationComparator());
-
-		String birthYear = "";
 
 		for (final Relocation relocation2 : lr) {
 
@@ -575,17 +586,8 @@ public class SearchArchives {
 				bw.write(RELOCATION_HEADER + "\n");
 			}
 
-			query = String.format(SELECT_BIRTHDATE, "@I" + relocation2.getId() + "@");
-
-			rs = statement.executeQuery(query);
-
-			if (rs.next()) {
-				birthYear = (rs.getDate("DATE") != null ? rs.getDate("DATE").toString() : "");
-			}
-
-			bw.write(relocation2.toString() + ";" + birthYear + "\n");
+			bw.write(relocation2.toString() + "\n");
 			counter++;
-			birthYear = "";
 		}
 
 		if (counter > 0) {

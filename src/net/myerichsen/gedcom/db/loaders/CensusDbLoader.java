@@ -22,10 +22,10 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 1. mar. 2023
+ * @version 14. mar. 2023
  */
 public class CensusDbLoader {
-	// private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
+	private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.CENSUS WHERE KIPNR = '%s'";
 	private static Logger logger;
 	private static Statement statement;
@@ -61,6 +61,11 @@ public class CensusDbLoader {
 			e.printStackTrace();
 		}
 
+		// try {
+		// DriverManager.getConnection("jdbc:derby:;shutdown=true");
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	/**
@@ -73,6 +78,8 @@ public class CensusDbLoader {
 	 */
 	private void connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[2];
+		// final String dbURL =
+		// "jdbc:derby://localhost:1527/C:\\Users\\michael\\VEJBYDB";
 		final Connection conn = DriverManager.getConnection(dbURL);
 		conn.setAutoCommit(false);
 		logger.info("Connected to database " + dbURL);
@@ -86,11 +93,12 @@ public class CensusDbLoader {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
+
 		// Connect to Derby
 		connectToDB(args);
 
 		// Clear table
-		// statement.execute(CLEAR_TABLE);
+		statement.execute(CLEAR_TABLE);
 
 		// Find all census csv files from the index file
 		final List<KipTextEntry> lkte = parseKipText(args);
@@ -166,7 +174,8 @@ public class CensusDbLoader {
 			}
 		}
 
-		logger.info("Parsing " + kipTextEntry.getKipNr());
+		logger.info("Parsing " + kipTextEntry.getKipNr() + ", " + kipTextEntry.getAar() + ", " + kipTextEntry.getAmt()
+				+ ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn());
 		statement.getConnection().commit();
 
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
@@ -256,15 +265,11 @@ public class CensusDbLoader {
 				ci.setKildeerhverv(fields[Kildeerhverv]);
 			} catch (final Exception e11) {
 			}
-			try
-
-			{
+			try {
 				ci.setStilling_i_husstanden(fields[Stilling_i_husstanden]);
 			} catch (final Exception e12) {
 			}
-			try
-
-			{
+			try {
 				ci.setKildefoedested(fields[Kildefoedested]);
 			} catch (final Exception e13) {
 			}

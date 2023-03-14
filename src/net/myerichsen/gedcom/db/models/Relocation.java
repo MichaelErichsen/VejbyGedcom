@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * Class representing a relocation
  *
  * @author Michael Erichsen
- * @version 7. mar. 2023
+ * @version 13. mar. 2023
  *
  */
 public class Relocation {
@@ -19,6 +19,7 @@ public class Relocation {
 	private String note = "";
 	private String sourceDetail = "";
 	private int year = 0;
+	private String birthYear = "";
 
 	/**
 	 * Constructor
@@ -46,6 +47,13 @@ public class Relocation {
 		if (matcher.find()) {
 			year = Integer.parseInt(matcher.group(0));
 		}
+	}
+
+	/**
+	 * @return the birthYear
+	 */
+	public String getBirthYear() {
+		return birthYear;
 	}
 
 	/**
@@ -102,6 +110,13 @@ public class Relocation {
 	 */
 	public int getYear() {
 		return year;
+	}
+
+	/**
+	 * @param birthYear the birthYear to set
+	 */
+	public void setBirthYear(String birthYear) {
+		this.birthYear = birthYear;
 	}
 
 	/**
@@ -162,7 +177,8 @@ public class Relocation {
 
 	@Override
 	public String toString() {
-		return id + ";" + givenName + ";" + surName + ";" + date + ";" + place + ";" + note + ";" + sourceDetail;
+		return id + ";" + givenName + ";" + surName + ";" + date + ";" + place + ";" + note + ";" + sourceDetail + ";"
+				+ birthYear;
 
 	}
 }

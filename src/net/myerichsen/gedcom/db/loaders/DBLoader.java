@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.AbstractCitation;
 import org.gedcom4j.model.CitationWithSource;
+import org.gedcom4j.model.CustomFact;
 import org.gedcom4j.model.Family;
 import org.gedcom4j.model.FamilyChild;
 import org.gedcom4j.model.FamilyEvent;
@@ -35,10 +36,10 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 8. mar. 2023
+ * @version 14. mar. 2023
  */
 public class DBLoader {
-	private static final String INSERT_EVENT_START_I = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
+	private static final String INSERT_INDIVIDUAL_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
 			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES('";
 	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = '%s' WHERE ID = '%s'";
 	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
@@ -47,7 +48,7 @@ public class DBLoader {
 	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE='%s'	WHERE ID = '%s'";
 	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = '%s' WHERE ID = '%s'";
 	private static final String INSERT_INDIVIDUAL = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES ('%s', '%s', '%s', '%s', '%s')";
-	private static final String INSERT_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
+	private static final String INSERT_FAMILY_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
 			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES('";
 	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES ('%s', NULL, NULL)";
 	private static Logger logger;
@@ -82,6 +83,196 @@ public class DBLoader {
 	}
 
 	private Statement stmt;
+
+	/**
+	 * @param family
+	 * @param familyEvent
+	 * @return
+	 */
+	private StringBuilder buildFamilyEventQuery(Family family, final FamilyEvent familyEvent) {
+		StringBuilder sb;
+		StringWithCustomFacts subtype;
+		StringWithCustomFacts date;
+		List<NoteStructure> noteStructures;
+		List<AbstractCitation> citations;
+		CitationWithSource cfs;
+		StringWithCustomFacts whereInSource;
+		List<String> lines;
+		StringBuilder lineBuffer;
+		Place place;
+		List<CustomFact> customFacts;
+		StringBuffer sb2;
+		sb = new StringBuilder(INSERT_FAMILY_EVENT_START);
+		sb.append(familyEvent.getType());
+		subtype = familyEvent.getSubType();
+
+		if (subtype == null) {
+			sb.append("', NULL, ");
+		} else {
+			sb.append("', '" + subtype.getValue() + "', ");
+		}
+
+		date = familyEvent.getDate();
+
+		if (date == null) {
+			sb.append("NULL, '" + family.getXref());
+		} else {
+			sb.append("'" + formatDate(date.getValue()) + "', '" + family.getXref());
+		}
+
+		place = familyEvent.getPlace();
+
+		if (place == null) {
+			sb.append("', NULL, ");
+		} else {
+			sb.append("', '" + place.getPlaceName().replace("'", "") + "', ");
+		}
+
+		noteStructures = familyEvent.getNoteStructures();
+
+		if (noteStructures == null) {
+			sb.append("NULL, ");
+		} else {
+			lines = noteStructures.get(0).getLines();
+			lineBuffer = new StringBuilder();
+
+			for (final String string : lines) {
+				lineBuffer.append(string + " ");
+			}
+			sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
+		}
+
+		citations = familyEvent.getCitations();
+
+		if (citations == null) {
+			sb.append("NULL, '");
+		} else {
+			cfs = (CitationWithSource) citations.get(0);
+			whereInSource = cfs.getWhereInSource();
+
+			if (whereInSource == null) {
+				sb.append("NULL, '");
+			} else {
+				customFacts = whereInSource.getCustomFacts();
+
+				if (customFacts == null) {
+					if (whereInSource.getValue() != null) {
+						sb.append("'" + whereInSource.getValue() + "', '");
+					} else {
+						sb.append("NULL, '");
+					}
+				} else {
+					sb2 = new StringBuffer();
+
+					for (final CustomFact customFact : customFacts) {
+						sb2.append(customFact.getDescription().getValue());
+					}
+
+					sb.append("'" + (sb2.length() > 16000 ? sb2.toString().substring(0, 15999).replace("'", "¤")
+							: sb2.toString().replace("'", "¤")) + "', '");
+				}
+			}
+		}
+
+		return sb;
+	}
+
+	/**
+	 * @param individual
+	 * @param individualEvent
+	 * @return
+	 */
+	private StringBuilder buildIndividualEventQuery(Individual individual, final IndividualEvent individualEvent) {
+		StringBuilder sb;
+		StringWithCustomFacts subtype;
+		StringWithCustomFacts date;
+		Place place;
+		List<NoteStructure> noteStructures;
+		List<AbstractCitation> citations;
+		CitationWithSource cfs;
+		StringWithCustomFacts whereInSource;
+		List<String> lines;
+		StringBuilder lineBuffer;
+		List<CustomFact> customFacts;
+		StringBuffer sb2;
+		sb = new StringBuilder(INSERT_INDIVIDUAL_EVENT_START);
+		sb.append(individualEvent.getType());
+		subtype = individualEvent.getSubType();
+
+		if (subtype == null) {
+			sb.append("', NULL, ");
+		} else {
+			if (subtype.getValue().equals("Faeste1")) {
+				sb.append("', '" + "Lægdsrulle" + "', ");
+			} else {
+				sb.append("', '" + subtype.getValue() + "', ");
+			}
+		}
+
+		date = individualEvent.getDate();
+
+		if (date == null) {
+			sb.append("NULL, '" + individual.getXref() + "', NULL, ");
+		} else {
+			sb.append("'" + formatDate(date.getValue()) + "', '" + individual.getXref() + "', NULL, ");
+		}
+
+		place = individualEvent.getPlace();
+
+		if (place == null) {
+			sb.append("NULL, ");
+		} else {
+			sb.append("'" + place.getPlaceName().replace("'", "") + "', ");
+		}
+
+		noteStructures = individualEvent.getNoteStructures();
+
+		if (noteStructures == null) {
+			sb.append("NULL, ");
+		} else {
+			lines = noteStructures.get(0).getLines();
+			lineBuffer = new StringBuilder();
+
+			for (final String string : lines) {
+				lineBuffer.append(string + " ");
+			}
+			sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
+		}
+
+		citations = individualEvent.getCitations();
+
+		if (citations == null) {
+			sb.append("NULL)");
+		} else {
+			cfs = (CitationWithSource) citations.get(0);
+			whereInSource = cfs.getWhereInSource();
+
+			if (whereInSource == null) {
+				sb.append("NULL)");
+			} else {
+				customFacts = whereInSource.getCustomFacts();
+
+				if (customFacts == null) {
+					if (whereInSource.getValue() != null) {
+						sb.append("'" + whereInSource.getValue() + "')");
+					} else {
+						sb.append("NULL)");
+					}
+				} else {
+					sb2 = new StringBuffer();
+
+					for (final CustomFact customFact : customFacts) {
+						sb2.append(customFact.getDescription().getValue());
+					}
+
+					sb.append("'" + (sb2.length() > 16000 ? sb2.toString().substring(0, 15999).replace("'", "¤")
+							: sb2.toString()).replace("'", "¤") + "')");
+				}
+			}
+		}
+
+		return sb;
+	}
 
 	/**
 	 * Delete all rows from all tables
@@ -197,17 +388,7 @@ public class DBLoader {
 	 */
 	private void insertFamilyEvent(Family family) throws Exception {
 		StringBuilder sb;
-		StringWithCustomFacts subtype;
-		StringWithCustomFacts date;
-		List<NoteStructure> noteStructures;
-		List<AbstractCitation> citations;
-		CitationWithSource cfs;
-		StringWithCustomFacts whereInSource;
-		List<String> lines;
-		StringBuilder lineBuffer;
-		Place place;
 		String query;
-
 		final List<FamilyEvent> events = family.getEvents();
 
 		if (events == null) {
@@ -215,61 +396,7 @@ public class DBLoader {
 		}
 
 		for (final FamilyEvent familyEvent : events) {
-			sb = new StringBuilder(INSERT_EVENT_START);
-			sb.append(familyEvent.getType());
-			subtype = familyEvent.getSubType();
-
-			if (subtype == null) {
-				sb.append("', NULL, ");
-			} else {
-				sb.append("', '" + subtype.getValue() + "', ");
-			}
-
-			date = familyEvent.getDate();
-
-			if (date == null) {
-				sb.append("NULL, '" + family.getXref());
-			} else {
-				sb.append("'" + formatDate(date.getValue()) + "', '" + family.getXref());
-			}
-
-			place = familyEvent.getPlace();
-
-			if (place == null) {
-				sb.append("', NULL, ");
-			} else {
-				sb.append("', '" + place.getPlaceName().replace("'", "") + "', ");
-			}
-
-			noteStructures = familyEvent.getNoteStructures();
-
-			if (noteStructures == null) {
-				sb.append("NULL, ");
-			} else {
-				lines = noteStructures.get(0).getLines();
-				lineBuffer = new StringBuilder();
-
-				for (final String string : lines) {
-					lineBuffer.append(string + " ");
-				}
-				sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
-			}
-
-			citations = familyEvent.getCitations();
-
-			if (citations == null) {
-				sb.append("NULL, '");
-			} else {
-				cfs = (CitationWithSource) citations.get(0);
-				whereInSource = cfs.getWhereInSource();
-
-				if (whereInSource == null) {
-					sb.append("NULL, '");
-				} else {
-					sb.append("'" + cfs.getWhereInSource().getValue().replace("'", "¤") + "', '");
-				}
-
-			}
+			sb = buildFamilyEventQuery(family, familyEvent);
 
 			if (family.getHusband() != null) {
 				query = sb.toString() + family.getHusband().getIndividual().getXref() + "')";
@@ -340,17 +467,7 @@ public class DBLoader {
 	 */
 	private void insertIndividualEvent(Individual individual) throws Exception {
 		StringBuilder sb;
-		StringWithCustomFacts subtype;
-		StringWithCustomFacts date;
-		Place place;
-		List<NoteStructure> noteStructures;
-		List<AbstractCitation> citations;
-		CitationWithSource cfs;
-		StringWithCustomFacts whereInSource;
-		List<String> lines;
-		StringBuilder lineBuffer;
 		String query;
-
 		final List<IndividualEvent> events = individual.getEvents();
 
 		if (events == null) {
@@ -358,61 +475,7 @@ public class DBLoader {
 		}
 
 		for (final IndividualEvent individualEvent : events) {
-			sb = new StringBuilder(INSERT_EVENT_START_I);
-			sb.append(individualEvent.getType());
-			subtype = individualEvent.getSubType();
-
-			if (subtype == null) {
-				sb.append("', NULL, ");
-			} else {
-				sb.append("', '" + subtype.getValue() + "', ");
-			}
-
-			date = individualEvent.getDate();
-
-			if (date == null) {
-				sb.append("NULL, '" + individual.getXref() + "', NULL, ");
-			} else {
-				sb.append("'" + formatDate(date.getValue()) + "', '" + individual.getXref() + "', NULL, ");
-			}
-
-			place = individualEvent.getPlace();
-
-			if (place == null) {
-				sb.append("NULL, ");
-			} else {
-				sb.append("'" + place.getPlaceName().replace("'", "") + "', ");
-			}
-
-			noteStructures = individualEvent.getNoteStructures();
-
-			if (noteStructures == null) {
-				sb.append("NULL, ");
-			} else {
-				lines = noteStructures.get(0).getLines();
-				lineBuffer = new StringBuilder();
-
-				for (final String string : lines) {
-					lineBuffer.append(string + " ");
-				}
-				sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
-			}
-
-			citations = individualEvent.getCitations();
-
-			if (citations == null) {
-				sb.append("NULL)");
-			} else {
-				cfs = (CitationWithSource) citations.get(0);
-				whereInSource = cfs.getWhereInSource();
-
-				if (whereInSource == null) {
-					sb.append("NULL)");
-				} else {
-					sb.append("'" + cfs.getWhereInSource().getValue().replace("'", "¤") + "')");
-				}
-
-			}
+			sb = buildIndividualEventQuery(individual, individualEvent);
 
 			query = sb.toString();
 

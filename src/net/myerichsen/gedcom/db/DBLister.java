@@ -12,10 +12,10 @@ import java.util.logging.Logger;
 import org.gedcom4j.exception.GedcomParserException;
 
 /**
- * Class to list contents of a GEDCOM Derby database.
+ * Class to list contents of a VEJBY Derby database.
  *
  * @author Michael Erichsen
- * @version 27. feb. 2023
+ * @version 14. mar. 2023
  *
  */
 public class DBLister {
@@ -50,15 +50,17 @@ public class DBLister {
 
 	/**
 	 * Connect to the Derby database
+	 * 
+	 * @param args
 	 *
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB() throws SQLException {
-		final String dbURL1 = "jdbc:derby:C:/Users/michael/VejbyDB";
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		System.out.println("Connected to database " + dbURL1);
-		stmt = conn1.createStatement();
+	private void connectToDB(String[] args) throws SQLException {
+		final String dbURL = "jdbc:derby:" + args[0];
+		final Connection conn = DriverManager.getConnection(dbURL);
+		System.out.println("Connected to database " + dbURL);
+		stmt = conn.createStatement();
 	}
 
 	/**
@@ -70,7 +72,7 @@ public class DBLister {
 	 * @throws SQLException
 	 */
 	private void execute(String[] args) throws IOException, GedcomParserException, SQLException {
-		connectToDB();
+		connectToDB(args);
 
 		System.out.println("\nFamily");
 		String query = "SELECT * FROM VEJBY.FAMILY FETCH FIRST 20 ROWS ONLY";
@@ -96,17 +98,18 @@ public class DBLister {
 		while (rs.next()) {
 			System.out.println(rs.getInt("ID") + ";" + rs.getString("TYPE") + ";" + rs.getString("SUBTYPE") + ";"
 					+ rs.getString("DATE") + ";" + rs.getString("INDIVIDUAL") + ";" + rs.getString("FAMILY") + ";"
-					+ rs.getString("PLACE") + ";" + rs.getString("NOTE"));
+					+ rs.getString("PLACE") + ";" + rs.getString("NOTE") + ";" + rs.getString("SOURCEDETAIL"));
 		}
 
-		System.out.println("\nCitation");
+		System.out.println("\nCensus");
 		query = "SELECT * FROM VEJBY.CENSUS FETCH FIRST 20 ROWS ONLY";
 		rs = stmt.executeQuery(query);
 
 		while (rs.next()) {
 			System.out.println(rs.getString("KIPNR") + ";" + rs.getString("LOEBENR") + ";" + rs.getString("AMT") + ";"
 					+ rs.getString("HERRED") + ";" + rs.getString("SOGN") + ";" + rs.getString("KILDESTEDNAVN") + ";"
-					+ rs.getString("KILDENAVN"));
+					+ rs.getString("KILDENAVN") + ";" + rs.getString("KILDEHENVISNING") + ";"
+					+ rs.getString("KILDEKOMMENTAR"));
 		}
 
 		stmt.close();
