@@ -25,7 +25,6 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * @version 14. mar. 2023
  */
 public class CensusDbLoader {
-	private static final String CLEAR_TABLE = "DELETE FROM VEJBY.CENSUS";
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.CENSUS WHERE KIPNR = '%s'";
 	private static Logger logger;
 	private static Statement statement;
@@ -60,12 +59,6 @@ public class CensusDbLoader {
 
 			e.printStackTrace();
 		}
-
-		// try {
-		// DriverManager.getConnection("jdbc:derby:;shutdown=true");
-		// } catch (SQLException e) {
-		// e.printStackTrace();
-		// }
 	}
 
 	/**
@@ -78,8 +71,6 @@ public class CensusDbLoader {
 	 */
 	private void connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[2];
-		// final String dbURL =
-		// "jdbc:derby://localhost:1527/C:\\Users\\michael\\VEJBYDB";
 		final Connection conn = DriverManager.getConnection(dbURL);
 		conn.setAutoCommit(false);
 		logger.info("Connected to database " + dbURL);
@@ -96,9 +87,6 @@ public class CensusDbLoader {
 
 		// Connect to Derby
 		connectToDB(args);
-
-		// Clear table
-		statement.execute(CLEAR_TABLE);
 
 		// Find all census csv files from the index file
 		final List<KipTextEntry> lkte = parseKipText(args);
@@ -174,8 +162,8 @@ public class CensusDbLoader {
 			}
 		}
 
-		logger.info("Parsing " + kipTextEntry.getKipNr() + ", " + kipTextEntry.getAar() + ", " + kipTextEntry.getAmt()
-				+ ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn());
+		logger.info("Parsing " + kipTextEntry.getAmt() + ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn()
+				+ ", " + kipTextEntry.getAar() + ", " + kipTextEntry.getKipNr());
 		statement.getConnection().commit();
 
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());

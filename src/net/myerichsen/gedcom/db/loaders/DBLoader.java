@@ -168,7 +168,7 @@ public class DBLoader {
 						sb2.append(customFact.getDescription().getValue());
 					}
 
-					sb.append("'" + (sb2.length() > 16000 ? sb2.toString().substring(0, 15999).replace("'", "¤")
+					sb.append("'" + (sb2.length() > 80 ? sb2.toString().substring(0, 79).replace("'", "¤")
 							: sb2.toString().replace("'", "¤")) + "', '");
 				}
 			}

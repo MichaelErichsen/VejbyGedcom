@@ -7,52 +7,96 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Find primary census record for each census record for each individual in the
  * Derby database
  *
  * @author Michael Erichsen
- * @version 14. mar. 2023
+ * @version 16. mar. 2023
  *
  */
+
 public class CensusMerger {
+	/**
+	 * Class representing enriched data from the census table
+	 *
+	 * @author Michael Erichsen
+	 * @version 16. mar. 2023
+	 *
+	 */
 	private class CensusRecord {
 		private String kipNr = "";
 		private String husstandsFamilieNr = "";
-		private Date ftAar = null;
-		private String currentIndividual = "";
-		private String primaryIndividual = "";
+		private Date ftDato = null;
+		private String currentId = "";
+		private String primaryName = "";
 		private String place = "";
-		private String sourceDetail = "";
-		private String phonName = "";
+		private String currentPhonName = "";
 		private String name = "";
+		private int loebenr = 0;
+		private String matrNrAdresse = "";
+		private int foedeAar = 0;
+		private int primaryFoedeAar = 0;
 
 		/**
-		 * @return the currentIndividual
+		 * @return the currentId
 		 */
-		public String getCurrentIndividual() {
-			return currentIndividual;
+		public String getCurrentId() {
+			return currentId;
 		}
 
 		/**
-		 * @return the phonName
+		 * @return the ftDato
 		 */
-		public String getFonnavn() {
-			return phonName;
+		public Date getFtDato() {
+			return ftDato;
 		}
 
 		/**
-		 * @return the ftAar
+		 * @return the husstandsFamilieNr
 		 */
-		public Date getFtAar() {
-			return ftAar;
+		public String getHusstandsFamilieNr() {
+			return husstandsFamilieNr;
+		}
+
+		/**
+		 * @return the kipNr
+		 */
+		public String getKipNr() {
+			return kipNr;
+		}
+
+		/**
+		 * @return the loebenr
+		 */
+		public int getLoebenr() {
+			return loebenr;
+		}
+
+		/**
+		 * @return the matrNrAdresse
+		 */
+		public String getMatrNrAdresse() {
+			return matrNrAdresse;
+		}
+
+		/**
+		 * @return the currentPhonName
+		 */
+		public String getPhonName() {
+			return currentPhonName;
 		}
 
 		/**
@@ -63,31 +107,38 @@ public class CensusMerger {
 		}
 
 		/**
-		 * @return the sourceDetail
+		 * @return the primaryName
 		 */
-		public String getSourceDetail() {
-			return sourceDetail;
+		public String getPrimaryName() {
+			return primaryName;
 		}
 
 		/**
-		 * @param string the currentIndividual to set
+		 * @param string the currentId to set
 		 */
-		public void setCurrentIndividual(String string) {
-			this.currentIndividual = string.trim();
+		public void setCurrentId(String string) {
+			this.currentId = string.trim();
 		}
 
 		/**
-		 * @param phonName the phonName to set
+		 * @param currentPhonName the currentPhonName to set
 		 */
-		public void setFonnavn(String fonnavn) {
-			this.phonName = fonnavn.trim();
+		public void setCurrentPhonName(String fonnavn) {
+			this.currentPhonName = fonnavn.trim();
 		}
 
 		/**
-		 * @param date the ftAar to set
+		 * @param foedeAar the foedeAar to set
 		 */
-		public void setFtAar(Date date) {
-			this.ftAar = date;
+		public void setFoedeAar(int foedeAar) {
+			this.foedeAar = foedeAar;
+		}
+
+		/**
+		 * @param date the ftDato to set
+		 */
+		public void setFtDato(Date date) {
+			this.ftDato = date;
 		}
 
 		/**
@@ -105,6 +156,20 @@ public class CensusMerger {
 		}
 
 		/**
+		 * @param loebenr the loebenr to set
+		 */
+		public void setLoebenr(int loebenr) {
+			this.loebenr = loebenr;
+		}
+
+		/**
+		 * @param matrNrAdresse the matrNrAdresse to set
+		 */
+		public void setMatrNrAdresse(String matrNrAdresse) {
+			this.matrNrAdresse = matrNrAdresse;
+		}
+
+		/**
 		 * @param name the name to set
 		 */
 		public void setName(String name) {
@@ -119,34 +184,64 @@ public class CensusMerger {
 		}
 
 		/**
-		 * @param sourceDetail the sourceDetail to set
+		 * @param primaryFoedeAar the primaryFoedeAar to set
 		 */
-		public void setSourceDetail(String sourceDetail) {
-			this.sourceDetail = sourceDetail;
+		public void setPrimaryFoedeAar(int primaryFoedeAar) {
+			this.primaryFoedeAar = primaryFoedeAar;
+		}
+
+		/**
+		 * @param primaryName the primaryName to set
+		 */
+		public void setPrimaryName(String primaryIndividual) {
+			this.primaryName = primaryIndividual;
 		}
 
 		@Override
 		public String toString() {
-			return (name != null ? name : "") + ";" + (kipNr != null ? kipNr : "") + ";"
-					+ (husstandsFamilieNr != null ? husstandsFamilieNr : "") + ";" + (ftAar != null ? ftAar : "") + ";"
-					+ (currentIndividual != null ? currentIndividual : "") + ";"
-					+ (primaryIndividual != null ? primaryIndividual : "") + ";" + (place != null ? place : "") + ";"
-					+ (sourceDetail != null ? sourceDetail : "") + ";" + (phonName != null ? phonName : "");
+			return (currentId != null ? currentId : "") + ";" + (name != null ? name : "") + ";" + foedeAar + ";"
+					+ (ftDato != null ? ftDato : "") + ";" + loebenr + ";" + (place != null ? place : "") + ";"
+					+ (matrNrAdresse != null ? matrNrAdresse : "") + ";"
+					+ (husstandsFamilieNr != null ? husstandsFamilieNr : "") + ";"
+					+ (primaryName != null ? primaryName : "") + ";" + primaryFoedeAar + ";" + kipNr;
 		}
-
 	}
 
-	private static final String SELECT_FROM_VEJBY_INDIVIDUAL_WHERE_ID_S = "SELECT * FROM VEJBY.INDIVIDUAL WHERE ID = '%s'";
-	private static final String SELECT_INDIVIDUAL_FONNAVN = SELECT_FROM_VEJBY_INDIVIDUAL_WHERE_ID_S;
-	private static final String SELECT_EVENT = "SELECT * FROM VEJBY.EVENT WHERE TYPE ='Census' ORDER BY INDIVIDUAL";
-	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE AMT = '%s' AND HERRED = '%s' AND SOGN = '%s' and FTAAR = %d";
+	/**
+	 * Helper class implementing Comparator interface
+	 *
+	 * @author Michael Erichsen
+	 * @version 16. mar. 2023
+	 *
+	 */
+	public class CensusRecordComparator implements Comparator<CensusRecord> {
 
-	private static final String HEADER = "Navn;Kip nr.;familie nr.;FT år;Person;Hovedperson;Sted;Detaljer;Fonetisk navn";
+		/**
+		 * Sort in ascending order of id and census date
+		 */
+		@Override
+		public int compare(CensusRecord o1, CensusRecord o2) {
+			final String key1 = o1.getCurrentId() + o1.getFtDato().toLocalDate().getYear();
+			final String key2 = o2.getCurrentId() + o2.getFtDato().toLocalDate().getYear();
+
+			return key1.compareToIgnoreCase(key2);
+		}
+	}
+
+	private static final String FOUR_DIGITS = "\\d{4}";
+	private static final String SELECT_MIN_LOEBENR = "SELECT MIN(LOEBENR) AS MINLBNR "
+			+ "FROM VEJBY.CENSUS WHERE KIPNR = '%s' AND HUSSTANDS_FAMILIENR = '%s' " + "AND MATR_NR_ADRESSE = '%s'";
+	private static final String SELECT_PRIMARY_KILDENAVN = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = '%s' AND LOEBENR = %d";
+	private static final String SELECT_INDIVIDUAL_FONNAVN = "SELECT * FROM VEJBY.INDIVIDUAL WHERE ID = '%s'";
+	private static final String SELECT_EVENT = "SELECT * FROM VEJBY.EVENT WHERE TYPE ='Census'";
+	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE AMT = '%s' AND HERRED = '%s' AND SOGN = '%s' "
+			+ "AND FTAAR = %d AND FONNAVN = '%s'";
+	private static final String HEADER = "Id;Navn;Fødeår;FT år;Løbenr.;Sted;Adresse;Familie nr.;Hovedperson;Dennes fødeår;Kip nr.";
 	private static final Logger logger = Logger.getLogger("CensusMerger");
 
 	/**
 	 * Main method
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -159,66 +254,71 @@ public class CensusMerger {
 
 		try {
 			cm.execute(args);
-		} catch (final SQLException | IOException e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Add data from the individual table
-	 * 
-	 * @param statement
-	 * @param lcr
-	 * @throws SQLException
-	 */
-	private List<CensusRecord> addIndividualData(Statement statement, List<CensusRecord> lcr) throws SQLException {
-		String query;
-		ResultSet rs;
-
-		for (final CensusRecord cr : lcr) {
-			query = String.format(SELECT_INDIVIDUAL_FONNAVN, cr.getCurrentIndividual());
-			rs = statement.executeQuery(query);
-
-			if (rs.next()) {
-				cr.setName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
-				cr.setFonnavn(rs.getString("PHONNAME"));
-			}
-		}
-		return lcr;
-	}
-
-	/**
-	 * Connect to the Derby database
+	 * Return birth year
 	 *
-	 * @param url
+	 * @param rs
 	 * @return
 	 * @throws SQLException
 	 */
-	private Statement connectToDB(String[] args) throws SQLException {
-		final String dbURL1 = "jdbc:derby:" + args[0];
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		logger.info("Connected to database " + dbURL1);
-		return conn1.createStatement();
+	private int combineBirthFields(ResultSet rs) throws SQLException {
+		try {
+			if (rs.getInt("FOEDEAAR") > 0) {
+				return rs.getInt("FOEDEAAR");
+			}
+
+			final String string = rs.getString("FOEDT_KILDEDATO");
+
+			if ((string != null) && (string.length() > 0)) {
+				final Pattern p = Pattern.compile(FOUR_DIGITS);
+				final Matcher m = p.matcher(rs.getString("FOEDT_KILDEDATO"));
+
+				if (m.find()) {
+					return Integer.parseInt(m.group(0));
+				}
+			}
+
+			if (rs.getInt("ALDER") > 0) {
+				final Pattern p = Pattern.compile(FOUR_DIGITS);
+				final Matcher m = p.matcher(rs.getString("FTAAR"));
+
+				if (m.find()) {
+					return Integer.parseInt(m.group(0)) - rs.getInt("ALDER");
+				}
+			}
+		} catch (final SQLException e) {
+			logger.warning(e.getMessage() + e.getSQLState());
+			throw e;
+		}
+
+		return 0;
 	}
 
 	/**
 	 * Worker method
 	 *
 	 * @param args
-	 * @throws SQLException
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	private void execute(String[] args) throws SQLException, IOException {
-		final Statement statement = connectToDB(args);
+	private void execute(String[] args) throws Exception {
+		final String dbURL = "jdbc:derby:" + args[0];
+		final Connection conn = DriverManager.getConnection(dbURL);
+		logger.info("Connected to database " + dbURL);
+		final Statement statement = conn.createStatement();
 
 		logger.info("Fetch census events");
 		List<CensusRecord> lcr = fetchEvents(statement);
 
 		logger.info("Add names for each individual");
-		lcr = addIndividualData(statement, lcr);
+		lcr = fetchIndividualData(statement, lcr);
 
 		logger.info("Match events with census records");
-		fetchCensusData(statement, lcr);
+		fetchCensusData(conn, statement, lcr);
 		statement.close();
 
 		logger.info("Print output");
@@ -226,49 +326,24 @@ public class CensusMerger {
 	}
 
 	/**
-	 * Print the output to a .csv file
-	 * 
-	 * @param args
-	 * @param lcr
-	 * @throws IOException
-	 */
-	private void printOutput(String[] args, List<CensusRecord> lcr) throws IOException {
-		final String outfile = args[1] + "\\CensusMerger.csv";
-		final BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outfile)));
-		writer.write(HEADER + "\n");
-
-		for (CensusRecord cr : lcr) {
-			writer.write(cr.toString() + "\n");
-		}
-
-		writer.flush();
-		writer.close();
-		logger.info(lcr.size() + " census records written to " + outfile);
-	}
-
-	/**
-	 * Fetch data from the census table
-	 * 
+	 * Add data from the census table
+	 *
+	 * @param conn
 	 * @param statement
 	 * @param lcr
-	 * @throws SQLException
+	 * @throws Exception
 	 */
-	private List<CensusRecord> fetchCensusData(final Statement statement, List<CensusRecord> lcr) throws SQLException {
+	private List<CensusRecord> fetchCensusData(Connection conn, final Statement statement, List<CensusRecord> lcr)
+			throws Exception {
 		String[] placeParts;
-		int length;
-		String amt;
-		String herred;
-		String sogn;
-		int year;
-		String query;
-		ResultSet rs;
-		String[] detailParts;
-		String generateKey;
+		String amt, herred, sogn, query;
+		int year, length;
 		int counter = 0;
+		ResultSet rs, rs2, rs3;
+		PreparedStatement ps2, ps3;
+		final List<CensusRecord> lcrAdd = new ArrayList<>();
 
-		final Fonkod fk = new Fonkod();
-
-		logger.info("Found " + lcr.size() + " records");
+		logger.info("Found " + lcr.size() + " event records");
 
 		for (final CensusRecord cr : lcr) {
 			counter++;
@@ -287,43 +362,63 @@ public class CensusMerger {
 			amt = placeParts[length - 1];
 			herred = (length > 1 ? placeParts[length - 2] : "");
 			sogn = (length > 2 ? placeParts[length - 3] : "");
-			year = cr.getFtAar().toLocalDate().getYear();
+			year = cr.getFtDato().toLocalDate().getYear();
 
-			// Now find census record to match
+			// Find census record to match
 
-			query = String.format(SELECT_CENSUS, amt, herred, sogn, year);
+			query = String.format(SELECT_CENSUS, amt, herred, sogn, year, cr.getPhonName());
 			rs = statement.executeQuery(query);
 
-			if (rs.next()) {
-				// TODO If first person in family then add as primary individual
+			while (rs.next()) {
 				cr.setKipNr(rs.getString("KIPNR"));
+				cr.setLoebenr(rs.getInt("LOEBENR"));
+				cr.setMatrNrAdresse(rs.getString("MATR_NR_ADRESSE"));
+				cr.setHusstandsFamilieNr(rs.getString("HUSSTANDS_FAMILIENR"));
+				cr.setFoedeAar(combineBirthFields(rs));
 
-				if (cr.getSourceDetail() == null) {
-					continue;
-				}
+				// Find lowest loebenr with this familynr
 
-				detailParts = cr.getSourceDetail().split(", ");
+				final String query2 = String.format(SELECT_MIN_LOEBENR, cr.getKipNr(), cr.getHusstandsFamilieNr(),
+						cr.getMatrNrAdresse());
 
-				generateKey = "";
+				ps2 = conn.prepareStatement(query2);
+				rs2 = ps2.executeQuery();
 
-				try {
-					generateKey = fk.generateKey(detailParts[0]);
-				} catch (final Exception e) {
-				}
+				int minlbnr = 0;
+				boolean found = false;
 
-				if (generateKey.trim().equals(cr.getFonnavn().trim())) {
-					cr.setHusstandsFamilieNr(rs.getString("HUSSTANDS_FAMILIENR"));
+				if (rs2.next()) {
+					minlbnr = rs2.getInt("MINLBNR");
+
+					if (cr.getLoebenr() != minlbnr) {
+						final String query3 = String.format(SELECT_PRIMARY_KILDENAVN, cr.getKipNr(), minlbnr);
+						ps3 = conn.prepareStatement(query3);
+						rs3 = ps3.executeQuery();
+
+						while (rs3.next()) {
+							cr.setPrimaryName(rs3.getString("KILDENAVN"));
+							cr.setPrimaryFoedeAar(combineBirthFields(rs3));
+
+							if (found) {
+								lcrAdd.add(cr);
+							}
+
+							found = true;
+						}
+					}
 				}
 			}
-
-			logger.fine(cr.toString());
 		}
+
+		lcr.addAll(lcrAdd);
+
+		logger.info("Found " + lcr.size() + " records");
 		return lcr;
 	}
 
 	/**
-	 * Fetch events and store data in a list of records
-	 * 
+	 * Fetch census records from the EVENTS table
+	 *
 	 * @param lcr
 	 * @param rs
 	 * @return
@@ -332,23 +427,85 @@ public class CensusMerger {
 	private List<CensusRecord> fetchEvents(Statement statement) throws SQLException {
 		final ResultSet rs = statement.executeQuery(SELECT_EVENT);
 		final List<CensusRecord> lcr = new ArrayList<>();
-		int counter = 0;
 
 		while (rs.next()) {
 			final CensusRecord cr = new CensusRecord();
-			cr.setCurrentIndividual(rs.getString("INDIVIDUAL"));
-			cr.setFtAar(rs.getDate("DATE"));
+			cr.setCurrentId(rs.getString("INDIVIDUAL"));
+			cr.setFtDato(rs.getDate("DATE"));
 			cr.setPlace(rs.getString("PLACE"));
-			cr.setSourceDetail(rs.getString("SOURCEDETAIL"));
+
 			logger.fine(cr.toString());
 			lcr.add(cr);
+		}
 
-			counter++;
+		return lcr;
+	}
 
-			if (counter >= 50) {
-				return lcr;
+	/**
+	 * Add data from the individual table
+	 *
+	 * @param statement
+	 * @param lcr
+	 * @throws SQLException
+	 */
+	private List<CensusRecord> fetchIndividualData(Statement statement, List<CensusRecord> lcr) throws SQLException {
+		String query;
+		ResultSet rs;
+
+		for (final CensusRecord cr : lcr) {
+			query = String.format(SELECT_INDIVIDUAL_FONNAVN, cr.getCurrentId());
+			rs = statement.executeQuery(query);
+
+			while (rs.next()) {
+				cr.setName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
+				cr.setCurrentPhonName(rs.getString("PHONNAME"));
 			}
 		}
+
 		return lcr;
+	}
+
+//	/**
+//	 * Return all columns in a row from a query
+//	 *
+//	 * @param rs
+//	 * @return
+//	 * @throws SQLException
+//	 */
+//	private String getRow(ResultSet rs) throws SQLException {
+//		final StringBuffer sb = new StringBuffer();
+//
+//		for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+//			sb.append((rs.getString(i) != null ? rs.getString(i).trim() : "") + ";");
+//		}
+//
+//		return sb.toString();
+//	}
+
+	/**
+	 * Print the output to a .csv file
+	 *
+	 * @param args
+	 * @param lcr
+	 * @throws IOException
+	 */
+	private void printOutput(String[] args, List<CensusRecord> lcr) throws IOException {
+		final String outfile = args[1] + "\\CensusMerger.csv";
+		final BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outfile)));
+		writer.write(HEADER + "\n");
+		int counter = 0;
+
+		Collections.sort(lcr, new CensusRecordComparator());
+
+		for (final CensusRecord cr : lcr) {
+			if (cr.getPrimaryName().length() > 0) {
+				writer.write(cr.toString() + "\n");
+				counter++;
+			}
+		}
+
+		writer.flush();
+		writer.close();
+		logger.info(counter + " census records written to " + outfile);
 	}
 }
