@@ -22,7 +22,7 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 14. mar. 2023
+ * @version 17. mar. 2023
  */
 public class CensusDbLoader {
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.CENSUS WHERE KIPNR = '%s'";
@@ -154,9 +154,12 @@ public class CensusDbLoader {
 		final String query = String.format(SELECT_COUNT, kipTextEntry.getKipNr());
 		final ResultSet rs = statement.executeQuery(query);
 
+		int count = 0;
+
 		// Skip if already loaded
 		if (rs.next()) {
-			if (rs.getInt("COUNT") > 0) {
+			count = rs.getInt("COUNT");
+			if (count > 0) {
 				logger.info("Skipping " + kipTextEntry.getKipNr());
 				return;
 			}
@@ -169,6 +172,11 @@ public class CensusDbLoader {
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
 		CensusIndividual ci;
 		String[] fields;
+
+//		if (censusFileLines.size() > count) {
+//			logger.info("Skipping " + kipTextEntry.getKipNr());
+//			return;
+//		}
 
 		final String[] columnNames = censusFileLines.get(0).split(";");
 
