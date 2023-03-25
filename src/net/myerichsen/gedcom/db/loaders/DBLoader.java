@@ -36,7 +36,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 14. mar. 2023
+ * @version 25. mar. 2023
  */
 public class DBLoader {
 	private static final String INSERT_INDIVIDUAL_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
@@ -325,10 +325,46 @@ public class DBLoader {
 		logger.info("Parsing individuals");
 		parseAllIndividuals();
 
+		logger.info("Add birth and death data");
+		addBirthAndDeathData();
+
+		logger.info("Add parents");
+		addParents();
+
 		stmt.close();
 
 		logger.info("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
 				+ " individuals inserted.\n" + eventCounter + " events inserted");
+	}
+
+	/**
+	 * Add parents from tree or christening citation source detail
+	 */
+	private void addParents() {
+		// TODO @see ParentFinder
+
+		// Parents are either extracted from the family record or from the citation
+		// source detail for the Christening event
+
+	}
+
+	/**
+	 * Add birth and death dates and places
+	 */
+	private void addBirthAndDeathData() {
+		// TODO Read all individuals into a list
+		// @see FindLocationIndividuals
+
+		// For each individual fetch birth or christening event
+
+		// Store year and place
+
+		// Fetch death or burial events
+
+		// Store year
+
+		// Update all individual records in Derby
+
 	}
 
 	/**

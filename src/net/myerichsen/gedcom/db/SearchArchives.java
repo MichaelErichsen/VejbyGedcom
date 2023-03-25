@@ -28,7 +28,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 13. mar. 2023
+ * @version 25. mar. 2023
  *
  */
 

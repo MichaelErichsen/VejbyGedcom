@@ -12,7 +12,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Class representing some individual data
  *
  * @author Michael Erichsen
- * @version 3. mar. 2023
+ * @version 25. mar. 2023
  *
  */
 public class DBIndividual {
@@ -22,6 +22,7 @@ public class DBIndividual {
 	private int deathYear = 9999;
 	private String birthPlace = "";
 	private String phonName = "";
+	private String parents = "";
 
 	/**
 	 * Constructor from ID
@@ -106,6 +107,10 @@ public class DBIndividual {
 		return deathYear;
 	}
 
+	public String getHeader() {
+		return "Id;Navn;Fødeår;Dødsår;Fødested;Forældre;Fonetisk navn";
+	}
+
 	/**
 	 * @return the id
 	 */
@@ -118,6 +123,13 @@ public class DBIndividual {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return the parents
+	 */
+	public String getParents() {
+		return parents;
 	}
 
 	/**
@@ -180,6 +192,13 @@ public class DBIndividual {
 	}
 
 	/**
+	 * @param parents the parents to set
+	 */
+	public void setParents(String parents) {
+		this.parents = parents;
+	}
+
+	/**
 	 * @param phonName the phonName to set
 	 */
 	public void setPhonName(String phonName) {
@@ -194,6 +213,6 @@ public class DBIndividual {
 		}
 
 		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthYear + ";" + dy + ";" + birthPlace + ";"
-				+ phonName;
+				+ parents + ";" + phonName;
 	}
 }
