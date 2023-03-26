@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * Class representing a relocation
  *
  * @author Michael Erichsen
- * @version 13. mar. 2023
+ * @version 25. mar. 2023
  *
  */
 public class Relocation {
@@ -20,6 +20,7 @@ public class Relocation {
 	private String sourceDetail = "";
 	private int year = 0;
 	private String birthYear = "";
+	private String parents = "";
 
 	/**
 	 * Constructor
@@ -33,7 +34,7 @@ public class Relocation {
 	 * @param sourceDetail
 	 */
 	public Relocation(String id, String givenName, String surName, String date, String place, String note,
-			String sourceDetail) {
+			String sourceDetail, String parents) {
 		this.id = id;
 		this.givenName = givenName;
 		this.surName = surName;
@@ -41,6 +42,7 @@ public class Relocation {
 		this.place = place;
 		this.note = note;
 		this.sourceDetail = sourceDetail;
+		this.parents = parents;
 		final Pattern pattern = Pattern.compile("\\d{4}");
 		final Matcher matcher = pattern.matcher(date);
 
@@ -82,6 +84,13 @@ public class Relocation {
 	 */
 	public String getNote() {
 		return note;
+	}
+
+	/**
+	 * @return the parents
+	 */
+	public String getParents() {
+		return parents;
 	}
 
 	/**
@@ -148,6 +157,13 @@ public class Relocation {
 	}
 
 	/**
+	 * @param parents the parents to set
+	 */
+	public void setParents(String parents) {
+		this.parents = parents;
+	}
+
+	/**
 	 * @param place the place to set
 	 */
 	public void setPlace(String place) {
@@ -178,7 +194,7 @@ public class Relocation {
 	@Override
 	public String toString() {
 		return id + ";" + givenName + ";" + surName + ";" + date + ";" + place + ";" + note + ";" + sourceDetail + ";"
-				+ birthYear;
+				+ birthYear + ";" + parents;
 
 	}
 }

@@ -31,12 +31,13 @@ import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.parser.GedcomParser;
 
 import net.myerichsen.gedcom.db.Fonkod;
+import net.myerichsen.gedcom.db.models.DBIndividual;
 
 /**
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 25. mar. 2023
+ * @version 26. mar. 2023
  */
 public class DBLoader {
 	private static final String INSERT_INDIVIDUAL_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
@@ -83,6 +84,19 @@ public class DBLoader {
 	}
 
 	private Statement stmt;
+
+	/**
+	 * Add birth and death dates and places
+	 *
+	 * @throws SQLException
+	 */
+	private void updateBirthDeathParentsData() throws SQLException {
+		// Read all individuals into a list
+		final List<DBIndividual> ldbi = DBIndividual.loadFromDB(stmt);
+
+		// Update all individual records in Derby
+		updateIndividualsBDP(stmt, ldbi);
+	}
 
 	/**
 	 * @param family
@@ -168,7 +182,7 @@ public class DBLoader {
 						sb2.append(customFact.getDescription().getValue());
 					}
 
-					sb.append("'" + (sb2.length() > 80 ? sb2.toString().substring(0, 79).replace("'", "¤")
+					sb.append("'" + (sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
 							: sb2.toString().replace("'", "¤")) + "', '");
 				}
 			}
@@ -262,16 +276,19 @@ public class DBLoader {
 					sb2 = new StringBuffer();
 
 					for (final CustomFact customFact : customFacts) {
-						sb2.append(customFact.getDescription().getValue());
+						sb2.append(customFact.getDescription().getValue().replaceAll("\\s{2,}", " ").trim());
 					}
 
-					sb.append("'" + (sb2.length() > 16000 ? sb2.toString().substring(0, 15999).replace("'", "¤")
-							: sb2.toString()).replace("'", "¤") + "')");
+					sb.append("'"
+							+ (sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤") : sb2.toString())
+									.replace("'", "¤")
+							+ "')");
 				}
 			}
 		}
 
 		return sb;
+
 	}
 
 	/**
@@ -325,46 +342,13 @@ public class DBLoader {
 		logger.info("Parsing individuals");
 		parseAllIndividuals();
 
-		logger.info("Add birth and death data");
-		addBirthAndDeathData();
-
-		logger.info("Add parents");
-		addParents();
+		logger.info("Add birth and death data and parents");
+		updateBirthDeathParentsData();
 
 		stmt.close();
 
 		logger.info("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
 				+ " individuals inserted.\n" + eventCounter + " events inserted");
-	}
-
-	/**
-	 * Add parents from tree or christening citation source detail
-	 */
-	private void addParents() {
-		// TODO @see ParentFinder
-
-		// Parents are either extracted from the family record or from the citation
-		// source detail for the Christening event
-
-	}
-
-	/**
-	 * Add birth and death dates and places
-	 */
-	private void addBirthAndDeathData() {
-		// TODO Read all individuals into a list
-		// @see FindLocationIndividuals
-
-		// For each individual fetch birth or christening event
-
-		// Store year and place
-
-		// Fetch death or burial events
-
-		// Store year
-
-		// Update all individual records in Derby
-
 	}
 
 	/**
@@ -640,7 +624,6 @@ public class DBLoader {
 		for (final Entry<String, Individual> individualNode : individuals.entrySet()) {
 			individual = individualNode.getValue();
 			insertIndividualWithFamily(individual);
-
 			insertIndividualEvent(individual);
 		}
 
@@ -725,6 +708,36 @@ public class DBLoader {
 				logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + ", " + query);
 
 			}
+		}
+
+	}
+
+	/**
+	 * Update birth and death data and parents for all individuals
+	 *
+	 * @param statement
+	 * @param ldbi
+	 * @throws SQLException
+	 */
+	private void updateIndividualsBDP(Statement statement, List<DBIndividual> ldbi) throws SQLException {
+		final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHYEAR = %d, "
+				+ "BIRTHPLACE = '%s', DEATHYEAR = %d, DEATHPLACE = '%s', PARENTS = '%s' WHERE ID = '%s'";
+		String query;
+		String parents;
+
+		for (final DBIndividual dbi : ldbi) {
+			parents = dbi.getParents();
+
+			if (parents == null) {
+				parents = "";
+			} else {
+				parents = (parents.length() > 256 ? parents.substring(0, 255) : parents);
+			}
+
+			query = String.format(UPDATE_INDIVIDUAL_BDP, dbi.getBirthYear(), dbi.getBirthPlace(), dbi.getDeathYear(),
+					dbi.getDeathPlace(), parents, dbi.getId());
+
+			statement.executeUpdate(query);
 		}
 
 	}

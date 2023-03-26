@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -15,7 +16,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * Class to list contents of a VEJBY Derby database.
  *
  * @author Michael Erichsen
- * @version 14. mar. 2023
+ * @version 26. mar. 2023
  *
  */
 public class DBLister {
@@ -50,7 +51,7 @@ public class DBLister {
 
 	/**
 	 * Connect to the Derby database
-	 * 
+	 *
 	 * @param args
 	 *
 	 * @throws SQLException
@@ -75,45 +76,53 @@ public class DBLister {
 		connectToDB(args);
 
 		System.out.println("\nFamily");
-		String query = "SELECT * FROM VEJBY.FAMILY FETCH FIRST 20 ROWS ONLY";
-		ResultSet rs = stmt.executeQuery(query);
-
-		while (rs.next()) {
-			System.out.println(rs.getString("ID") + ";" + rs.getString("HUSBAND") + ";" + rs.getString("WIFE"));
-		}
+		getTableRows(stmt, "VEJBY.FAMILY");
 
 		System.out.println("\nIndividual");
-		query = "SELECT * FROM VEJBY.INDIVIDUAL FETCH FIRST 20 ROWS ONLY";
-		rs = stmt.executeQuery(query);
-
-		while (rs.next()) {
-			System.out.println(rs.getString("ID") + ";" + rs.getString("GIVENNAME") + ";" + rs.getString("SURNAME")
-					+ ";" + rs.getString("SEX") + ";" + rs.getString("PHONNAME") + ";" + rs.getString("FAMC"));
-		}
+		getTableRows(stmt, "VEJBY.INDIVIDUAL");
 
 		System.out.println("\nEvent");
-		query = "SELECT * FROM VEJBY.EVENT FETCH FIRST 20 ROWS ONLY";
-		rs = stmt.executeQuery(query);
-
-		while (rs.next()) {
-			System.out.println(rs.getInt("ID") + ";" + rs.getString("TYPE") + ";" + rs.getString("SUBTYPE") + ";"
-					+ rs.getString("DATE") + ";" + rs.getString("INDIVIDUAL") + ";" + rs.getString("FAMILY") + ";"
-					+ rs.getString("PLACE") + ";" + rs.getString("NOTE") + ";" + rs.getString("SOURCEDETAIL"));
-		}
+		getTableRows(stmt, "VEJBY.EVENT");
 
 		System.out.println("\nCensus");
-		query = "SELECT * FROM VEJBY.CENSUS FETCH FIRST 20 ROWS ONLY";
-		rs = stmt.executeQuery(query);
-
-		while (rs.next()) {
-			System.out.println(rs.getString("KIPNR") + ";" + rs.getString("LOEBENR") + ";" + rs.getString("AMT") + ";"
-					+ rs.getString("HERRED") + ";" + rs.getString("SOGN") + ";" + rs.getString("KILDESTEDNAVN") + ";"
-					+ rs.getString("KILDENAVN") + ";" + rs.getString("KILDEHENVISNING") + ";"
-					+ rs.getString("KILDEKOMMENTAR"));
-		}
+		getTableRows(stmt, "VEJBY.CENSUS");
 
 		stmt.close();
 		System.out.println("Program ended.");
 	}
 
+	/**
+	 * @param statement
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+	private void getTableRows(Statement statement, String tableName) throws SQLException {
+		final String SELECT_METADATA = "SELECT * FROM %s FETCH FIRST 20 ROWS ONLY";
+		final String query = String.format(SELECT_METADATA, tableName);
+		final ResultSet rs = statement.executeQuery(query);
+		final ResultSetMetaData rsmd = rs.getMetaData();
+		StringBuffer sb = new StringBuffer();
+		int columnCount = rsmd.getColumnCount();
+
+		for (int i = 1; i < (columnCount + 1); i++) {
+			sb.append(rsmd.getColumnName(i).trim() + ";");
+		}
+
+		System.out.println(sb.toString());
+
+		while (rs.next()) {
+			sb = new StringBuffer();
+
+			for (int i = 1; i < (columnCount + 1); i++) {
+				if (rs.getString(i) == null) {
+					sb.append(";");
+				} else {
+					sb.append(rs.getString(i).trim() + ";");
+				}
+			}
+
+			System.out.println(sb.toString());
+		}
+	}
 }

@@ -28,7 +28,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 25. mar. 2023
+ * @version 26. mar. 2023
  *
  */
 
@@ -96,7 +96,7 @@ public class SearchArchives {
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
 			+ "VITALTYPE;COVERED_DATA;SOURCE";
-	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer;Fødselsdato";
+	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer;Fødselsdato;Forældre";
 
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = '%s' AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
@@ -113,7 +113,7 @@ public class SearchArchives {
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
 	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
 			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
-			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL "
+			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL, VEJBY.INDIVIDUAL.PARENTS "
 			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
 			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = '%s'";
 	private static BufferedWriter bw = null;
@@ -536,7 +536,8 @@ public class SearchArchives {
 					(rs.getString(4) == null ? "" : rs.getString(4).trim()),
 					(rs.getString(5) == null ? "" : rs.getString(5).trim()),
 					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
-					(rs.getString(7) == null ? "" : rs.getString(7).trim()));
+					(rs.getString(7) == null ? "" : rs.getString(7).trim()),
+					(rs.getString(8) == null ? "" : rs.getString(8).trim()));
 			lr.add(relocation);
 		}
 
