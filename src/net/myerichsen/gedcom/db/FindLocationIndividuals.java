@@ -230,13 +230,8 @@ public class FindLocationIndividuals {
 				// Add if any note matches
 				note = rs2.getString("NOTE");
 
-				if ((note != null) && (note.toLowerCase().contains(location))) {
-					hsni.add(individual);
-					break;
-				}
-
 				// Add if birth of any children matches
-				if (checkChildrenLocation(conn1, individual, location)) {
+				if (((note != null) && (note.toLowerCase().contains(location))) || checkChildrenLocation(conn1, individual, location)) {
 					hsni.add(individual);
 					break;
 				}

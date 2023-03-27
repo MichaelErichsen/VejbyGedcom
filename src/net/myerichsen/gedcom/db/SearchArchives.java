@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +29,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 26. mar. 2023
+ * @version 27. mar. 2023
  *
  */
 
@@ -59,7 +60,7 @@ public class SearchArchives {
 	 * Helper class implementing Comparator interface
 	 *
 	 * @author Michael Erichsen
-	 * @version 13. mar. 2023
+	 * @version 27. mar. 2023
 	 *
 	 */
 	public class RelocationComparator implements Comparator<Relocation> {
@@ -69,8 +70,8 @@ public class SearchArchives {
 		 */
 		@Override
 		public int compare(Relocation o1, Relocation o2) {
-			final String key1 = o1.getGivenName() + o1.getBirthYear() + o1.getDate();
-			final String key2 = o2.getGivenName() + o2.getBirthYear() + o2.getDate();
+			final String key1 = o1.getGivenName() + o1.getBirthDate().toString() + o1.getDate();
+			final String key2 = o2.getGivenName() + o2.getBirthDate().toString() + o2.getDate();
 
 			return key1.compareToIgnoreCase(key2);
 		}
@@ -92,7 +93,7 @@ public class SearchArchives {
 			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Koen;Alder;Civilstand;"
 			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
 			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar;KIPnr;Loebenr;Fonnavn;Kildedetaljer\n";
-	private static final String POLREG_HEADER = "NAME;BIRTHYEAR;OCCUPATION;STREET;NUMBER;LETTER;"
+	private static final String POLREG_HEADER = "NAME;BirthDate;OCCUPATION;STREET;NUMBER;LETTER;"
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
 			+ "VITALTYPE;COVERED_DATA;SOURCE";
@@ -102,7 +103,7 @@ public class SearchArchives {
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = '%s'";
 	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = '%s' "
-			+ "AND FTAAR >= %s AND FTAAR <= %s";
+			+ "AND FTAAR >= %d AND FTAAR <= %d";
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = '%s' "
 			+ "AND HUSSTANDS_FAMILIENR = '%s' ORDER BY LOEBENR";
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
@@ -129,7 +130,7 @@ public class SearchArchives {
 	public static void main(String[] args) {
 		if ((args.length < 5) || (args.length > 7)) {
 			System.out.println("Usage: SearchArchives censusdatabasepath probatedatabasepath "
-					+ "cphdatabasepath outputdirectory [id | name] [birthyear [deathyear]]");
+					+ "cphdatabasepath outputdirectory [id | name] [BirthDate [DeathDate]]");
 			System.exit(4);
 		}
 
@@ -205,9 +206,9 @@ public class SearchArchives {
 				System.exit(4);
 			}
 		} else {
-			final String birthYear = ((args.length >= 6) ? args[5] : "0001");
-			final String deathYear = ((args.length >= 7) ? args[6] : "9999");
-			individual = new DBIndividual(args[4], birthYear, deathYear);
+			final String BirthYear = ((args.length >= 6) ? args[5] : "0001");
+			final String DeathYear = ((args.length >= 7) ? args[6] : "9999");
+			individual = new DBIndividual(args[4], BirthYear, DeathYear);
 		}
 
 		// Search for similar relocations
@@ -277,11 +278,11 @@ public class SearchArchives {
 		final ResultSet rs = stmt.executeQuery(query);
 
 		while (rs.next()) {
-			if (individual.getBirthYear() < 1000) {
+			if ((individual.getBirthDate() == null) || (individual.getBirthDate().before(Date.valueOf("1000-01-01")))) {
 				calcYear = 0;
 			} else {
 				try {
-					calcYear = individual.getBirthYear() - rs.getInt("YEAROFBIRTH");
+					calcYear = individual.getBirthDate().toLocalDate().getYear() - rs.getInt("YEAROFBIRTH");
 				} catch (final Exception e) {
 					calcYear = 0;
 				}
@@ -332,8 +333,10 @@ public class SearchArchives {
 
 	private void searchCensusTable(String[] args, DBIndividual individual) throws Exception {
 		final Statement statement = connectToDB(args[0]);
-		String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(), individual.getBirthYear(),
-				individual.getDeathYear());
+
+		final int dd = (individual.getDeathDate() == null ? 9999 : individual.getDeathDate().toLocalDate().getYear());
+		String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(),
+				individual.getBirthDate().toLocalDate().getYear(), dd);
 		ResultSet rs = statement.executeQuery(query);
 		String string = "";
 
@@ -398,7 +401,7 @@ public class SearchArchives {
 			li.add(rs.getInt("ID"));
 			ls.add(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
 			try {
-				lb.add(rs.getInt("BIRTHYEAR"));
+				lb.add(rs.getInt("BirthDate"));
 			} catch (final Exception e) {
 				lb.add(0);
 			}
@@ -420,11 +423,11 @@ public class SearchArchives {
 			rs = stmt.executeQuery(query);
 
 			while (rs.next()) {
-				if (individual.getBirthYear() < 1000) {
+				if (individual.getBirthDate().before(Date.valueOf("1000-01-01"))) {
 					calcYear = 0;
 				} else {
 					try {
-						calcYear = individual.getBirthYear() - lb.get(i);
+						calcYear = individual.getBirthDate().toLocalDate().getYear() - lb.get(i);
 					} catch (final Exception e) {
 						calcYear = 0;
 					}
@@ -475,9 +478,9 @@ public class SearchArchives {
 		final Statement statement = connectToDB(args[1]);
 
 		final String phonName = new Fonkod().generateKey(args[4]);
-		final String birthYear = (args.length < 6 ? "0001" : args[5]);
-		final String deathYear = (args.length < 7 ? "9999" : args[6]);
-		final String query = String.format(SELECT_PROBATE, phonName, birthYear + "-01-01", deathYear + "-12-31");
+		final String BirthDate = (args.length < 6 ? "0001" : args[5]);
+		final String DeathDate = (args.length < 7 ? "9999" : args[6]);
+		final String query = String.format(SELECT_PROBATE, phonName, BirthDate + "-01-01", DeathDate + "-12-31");
 		final ResultSet rs = statement.executeQuery(query);
 
 		String singleLine;
@@ -532,8 +535,7 @@ public class SearchArchives {
 			relocation = new Relocation(
 					(rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim()),
 					(rs.getString(2) == null ? "" : rs.getString(2).trim()),
-					(rs.getString(3) == null ? "" : rs.getString(3).trim()),
-					(rs.getString(4) == null ? "" : rs.getString(4).trim()),
+					(rs.getString(3) == null ? "" : rs.getString(3).trim()), rs.getDate(4),
 					(rs.getString(5) == null ? "" : rs.getString(5).trim()),
 					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
 					(rs.getString(7) == null ? "" : rs.getString(7).trim()),
@@ -546,8 +548,11 @@ public class SearchArchives {
 		final List<String> ls = new ArrayList<>();
 
 		for (final Relocation relocation2 : lr) {
-			if ((relocation2.getYear() < individual.getBirthYear())
-					|| (relocation2.getYear() > individual.getDeathYear())) {
+			if (relocation2.getRelocationDate() == null) {
+				ls.add(relocation2.getId());
+			} else if ((relocation2.getRelocationDate().before(individual.getBirthDate()))
+					|| ((individual.getDeathDate() != null)
+							&& (relocation2.getRelocationDate().after(individual.getDeathDate())))) {
 				ls.add(relocation2.getId());
 			}
 		}
@@ -571,7 +576,7 @@ public class SearchArchives {
 			rs = statement.executeQuery(query);
 
 			if (rs.next()) {
-				relocation2.setBirthYear((rs.getDate("DATE") != null ? rs.getDate("DATE").toString() : ""));
+				relocation2.setBirthDate(rs.getDate("DATE"));
 			}
 
 		}
@@ -625,17 +630,17 @@ public class SearchArchives {
 			diff = 0;
 
 			if (ci.getFoedeaar() > 0) {
-				diff = individual.getBirthYear() - ci.getFoedeaar();
+				diff = individual.getBirthDate().toLocalDate().getYear() - ci.getFoedeaar();
 			} else {
 				if (ci.getFoedt_kildedato().length() > 0) {
 					matcher = pattern.matcher(ci.getFoedt_kildedato());
 
 					if (matcher.find()) {
-						diff = individual.getBirthYear() - Integer.parseInt(matcher.group(0));
+						diff = individual.getBirthDate().toLocalDate().getYear() - Integer.parseInt(matcher.group(0));
 					}
 				} else {
 					if (ci.getAlder() > 0) {
-						diff = ci.getFTaar() - individual.getBirthYear() - ci.getAlder();
+						diff = ci.getFTaar() - individual.getBirthDate().toLocalDate().getYear() - ci.getAlder();
 					}
 				}
 			}

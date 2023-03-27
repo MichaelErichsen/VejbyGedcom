@@ -1,5 +1,6 @@
 package net.myerichsen.gedcom.db.models;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,7 +13,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 26. mar. 2023
+ * @version 27. mar. 2023
  *
  */
 public class DBIndividual {
@@ -34,8 +35,8 @@ public class DBIndividual {
 	 * @throws SQLException
 	 */
 	private static String findParentsFromChristeningEvent(Statement statement, String id) throws SQLException {
-		String query = String.format(SELECT_PARENTS_FROM_CHRISTENING, id);
-		ResultSet rs = statement.executeQuery(query);
+		final String query = String.format(SELECT_PARENTS_FROM_CHRISTENING, id);
+		final ResultSet rs = statement.executeQuery(query);
 
 		if (rs.next()) {
 			return rs.getString("SOURCEDETAIL");
@@ -116,7 +117,7 @@ public class DBIndividual {
 
 			if (rs.next()) {
 				if (rs.getDate("DATE") != null) {
-					dbi.setBirthYear(rs.getDate("DATE").toLocalDate().getYear());
+					dbi.setBirthDate(rs.getDate("DATE"));
 				}
 				if (rs.getString("PLACE") != null) {
 					dbi.setBirthPlace(rs.getString("PLACE"));
@@ -131,7 +132,7 @@ public class DBIndividual {
 
 			if (rs.next()) {
 				if (rs.getDate("DATE") != null) {
-					dbi.setDeathYear(rs.getDate("DATE").toLocalDate().getYear());
+					dbi.setDeathDate(rs.getDate("DATE"));
 				}
 				if (rs.getString("PLACE") != null) {
 					dbi.setDeathPlace(rs.getString("PLACE"));
@@ -172,9 +173,9 @@ public class DBIndividual {
 	private String sex = "";
 	private String famc = "";
 	private String phonName = "";
-	private int birthYear = 0;
+	private Date birthDate = null;
 	private String birthPlace = "";
-	private int deathYear = 9999;
+	private Date deathDate = null;
 	private String deathPlace = "";
 	private String parents = "";
 
@@ -214,7 +215,7 @@ public class DBIndividual {
 		rs = statement.executeQuery(query);
 
 		if (rs.next()) {
-			birthYear = rs.getDate("DATE").toLocalDate().getYear();
+			birthDate = rs.getDate("DATE");
 			birthPlace = rs.getString("PLACE");
 		}
 
@@ -224,27 +225,33 @@ public class DBIndividual {
 		rs = statement.executeQuery(query);
 
 		if (rs.next()) {
-			deathYear = rs.getDate("DATE").toLocalDate().getYear();
+			deathDate = rs.getDate("DATE");
 			deathPlace = rs.getString("PLACE");
 		}
 	}
 
 	/**
-	 * Constructor from name
 	 *
 	 * @param string
-	 * @param birthYear2
-	 * @param deathYear2
+	 * @param birthYear
+	 * @param deathYear
 	 */
 	public DBIndividual(String name, String birthYear, String deathYear) {
 		this.name = name;
-		this.birthYear = Integer.parseInt(birthYear);
-		this.deathYear = Integer.parseInt(deathYear);
+		this.birthDate = Date.valueOf(birthYear + "01-01");
+		this.deathDate = Date.valueOf(deathYear + "12-31");
 		try {
 			this.phonName = new Fonkod().generateKey(name).trim();
 		} catch (final Exception e) {
 		}
 
+	}
+
+	/**
+	 * @return the birthDate
+	 */
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
 	/**
@@ -255,10 +262,10 @@ public class DBIndividual {
 	}
 
 	/**
-	 * @return the birthYear
+	 * @return the deathDate
 	 */
-	public int getBirthYear() {
-		return birthYear;
+	public Date getDeathDate() {
+		return deathDate;
 	}
 
 	/**
@@ -266,13 +273,6 @@ public class DBIndividual {
 	 */
 	public String getDeathPlace() {
 		return deathPlace;
-	}
-
-	/**
-	 * @return the deathYear
-	 */
-	public int getDeathYear() {
-		return deathYear;
 	}
 
 	/**
@@ -322,6 +322,13 @@ public class DBIndividual {
 	}
 
 	/**
+	 * @param birthDate the birthDeat to set
+	 */
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	/**
 	 * @param birthPlace the birthPlace to set
 	 */
 	public void setBirthPlace(String birthPlace) {
@@ -329,10 +336,10 @@ public class DBIndividual {
 	}
 
 	/**
-	 * @param birthYear the birthYear to set
+	 * @param deathdater the deathdate to set
 	 */
-	public void setBirthYear(int birthYear) {
-		this.birthYear = birthYear;
+	public void setDeathDate(Date deathDate) {
+		this.deathDate = deathDate;
 	}
 
 	/**
@@ -340,13 +347,6 @@ public class DBIndividual {
 	 */
 	public void setDeathPlace(String deathPlace) {
 		this.deathPlace = deathPlace;
-	}
-
-	/**
-	 * @param deathYear the deathYear to set
-	 */
-	public void setDeathYear(int deathYear) {
-		this.deathYear = deathYear;
 	}
 
 	/**
@@ -393,12 +393,9 @@ public class DBIndividual {
 
 	@Override
 	public String toString() {
-		String dy = "";
-		if (deathYear < 9999) {
-			dy = Integer.toString(deathYear);
-		}
+		final String dy = (deathDate.before(Date.valueOf("31-12-9999")) ? deathDate.toString() : "");
 
-		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthYear + ";" + dy + ";" + birthPlace + ";"
+		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthDate + ";" + dy + ";" + birthPlace + ";"
 				+ parents + ";" + phonName;
 	}
 }

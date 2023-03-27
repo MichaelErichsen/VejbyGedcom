@@ -1,25 +1,24 @@
 package net.myerichsen.gedcom.db.models;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.sql.Date;
 
 /**
- * Class representing a relocation
+ * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 25. mar. 2023
+ * @version 27. mar. 2023
  *
  */
 public class Relocation {
 	private String id = "";
 	private String givenName = "";
 	private String surName = "";
-	private String date = "";
+	private Date relocationDate = null;
 	private String place = "";
 	private String note = "";
 	private String sourceDetail = "";
-	private int year = 0;
-	private String birthYear = "";
+	private int relocationYear = 0;
+	private Date birthDate = null;
 	private String parents = "";
 
 	/**
@@ -28,41 +27,39 @@ public class Relocation {
 	 * @param id
 	 * @param givenName
 	 * @param surName
-	 * @param date
+	 * @param relocationDate
 	 * @param place
 	 * @param note
 	 * @param sourceDetail
 	 */
-	public Relocation(String id, String givenName, String surName, String date, String place, String note,
+	public Relocation(String id, String givenName, String surName, Date relocationDate, String place, String note,
 			String sourceDetail, String parents) {
 		this.id = id;
 		this.givenName = givenName;
 		this.surName = surName;
-		this.date = date;
+		this.relocationDate = relocationDate;
 		this.place = place;
 		this.note = note;
 		this.sourceDetail = sourceDetail;
 		this.parents = parents;
-		final Pattern pattern = Pattern.compile("\\d{4}");
-		final Matcher matcher = pattern.matcher(date);
 
-		if (matcher.find()) {
-			year = Integer.parseInt(matcher.group(0));
+		if (relocationDate != null) {
+			relocationYear = relocationDate.toLocalDate().getYear();
 		}
 	}
 
 	/**
-	 * @return the birthYear
+	 * @return the birthDate
 	 */
-	public String getBirthYear() {
-		return birthYear;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
 	/**
-	 * @return the date
+	 * @return the relocationDate
 	 */
-	public String getDate() {
-		return date;
+	public Date getDate() {
+		return relocationDate;
 	}
 
 	/**
@@ -101,6 +98,20 @@ public class Relocation {
 	}
 
 	/**
+	 * @return the relocationDate
+	 */
+	public Date getRelocationDate() {
+		return relocationDate;
+	}
+
+	/**
+	 * @return the relocationYear
+	 */
+	public int getRelocationYear() {
+		return relocationYear;
+	}
+
+	/**
 	 * @return the sourceDetail
 	 */
 	public String getSourceDetail() {
@@ -115,24 +126,17 @@ public class Relocation {
 	}
 
 	/**
-	 * @return the year
+	 * @param birthDate the birthDate to set
 	 */
-	public int getYear() {
-		return year;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	/**
-	 * @param birthYear the birthYear to set
+	 * @param relocationDate the relocationDate to set
 	 */
-	public void setBirthYear(String birthYear) {
-		this.birthYear = birthYear;
-	}
-
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(String date) {
-		this.date = date;
+	public void setDate(Date date) {
+		this.relocationDate = date;
 	}
 
 	/**
@@ -171,6 +175,20 @@ public class Relocation {
 	}
 
 	/**
+	 * @param relocationDate the relocationDate to set
+	 */
+	public void setRelocationDate(Date relocationDate) {
+		this.relocationDate = relocationDate;
+	}
+
+	/**
+	 * @param relocationYear the relocationYear to set
+	 */
+	public void setRelocationYear(int year) {
+		this.relocationYear = year;
+	}
+
+	/**
 	 * @param sourceDetail the sourceDetail to set
 	 */
 	public void setSourceDetail(String sourceDetail) {
@@ -184,17 +202,10 @@ public class Relocation {
 		this.surName = surName;
 	}
 
-	/**
-	 * @param year the year to set
-	 */
-	public void setYear(int year) {
-		this.year = year;
-	}
-
 	@Override
 	public String toString() {
-		return id + ";" + givenName + ";" + surName + ";" + date + ";" + place + ";" + note + ";" + sourceDetail + ";"
-				+ birthYear + ";" + parents;
+		return id + ";" + givenName + ";" + surName + ";" + relocationDate + ";" + place + ";" + note + ";"
+				+ sourceDetail + ";" + birthDate + ";" + parents;
 
 	}
 }

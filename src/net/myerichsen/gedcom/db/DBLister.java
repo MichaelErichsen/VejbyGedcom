@@ -103,7 +103,7 @@ public class DBLister {
 		final ResultSet rs = statement.executeQuery(query);
 		final ResultSetMetaData rsmd = rs.getMetaData();
 		StringBuffer sb = new StringBuffer();
-		int columnCount = rsmd.getColumnCount();
+		final int columnCount = rsmd.getColumnCount();
 
 		for (int i = 1; i < (columnCount + 1); i++) {
 			sb.append(rsmd.getColumnName(i).trim() + ";");

@@ -2,6 +2,7 @@ package net.myerichsen.gedcom.db.loaders;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -37,7 +38,7 @@ import net.myerichsen.gedcom.db.models.DBIndividual;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 26. mar. 2023
+ * @version 27. mar. 2023
  */
 public class DBLoader {
 	private static final String INSERT_INDIVIDUAL_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
@@ -84,19 +85,6 @@ public class DBLoader {
 	}
 
 	private Statement stmt;
-
-	/**
-	 * Add birth and death dates and places
-	 *
-	 * @throws SQLException
-	 */
-	private void updateBirthDeathParentsData() throws SQLException {
-		// Read all individuals into a list
-		final List<DBIndividual> ldbi = DBIndividual.loadFromDB(stmt);
-
-		// Update all individual records in Derby
-		updateIndividualsBDP(stmt, ldbi);
-	}
 
 	/**
 	 * @param family
@@ -643,6 +631,19 @@ public class DBLoader {
 	}
 
 	/**
+	 * Add birth and death dates and places
+	 *
+	 * @throws SQLException
+	 */
+	private void updateBirthDeathParentsData() throws SQLException {
+		// Read all individuals into a list
+		final List<DBIndividual> ldbi = DBIndividual.loadFromDB(stmt);
+
+		// Update all individual records in Derby
+		updateIndividualsBDP(stmt, ldbi);
+	}
+
+	/**
 	 * UPDATE VEJBY.FAMILY SET HUSBAND = '' WHERE ID = ''
 	 *
 	 * @param husband
@@ -720,9 +721,13 @@ public class DBLoader {
 	 * @throws SQLException
 	 */
 	private void updateIndividualsBDP(Statement statement, List<DBIndividual> ldbi) throws SQLException {
-		final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHYEAR = %d, "
-				+ "BIRTHPLACE = '%s', DEATHYEAR = %d, DEATHPLACE = '%s', PARENTS = '%s' WHERE ID = '%s'";
+		final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHDATE = %s, "
+				+ "BIRTHPLACE = '%s', DEATHDATE = %s, DEATHPLACE = '%s', PARENTS = '%s' WHERE ID = '%s'";
 		String query;
+		Date bd;
+		String bds;
+		Date dd;
+		String dds;
 		String parents;
 
 		for (final DBIndividual dbi : ldbi) {
@@ -734,8 +739,13 @@ public class DBLoader {
 				parents = (parents.length() > 256 ? parents.substring(0, 255) : parents);
 			}
 
-			query = String.format(UPDATE_INDIVIDUAL_BDP, dbi.getBirthYear(), dbi.getBirthPlace(), dbi.getDeathYear(),
-					dbi.getDeathPlace(), parents, dbi.getId());
+			bd = dbi.getBirthDate();
+			bds = (bd == null ? "NULL" : "'" + bd.toString() + "'");
+			dd = dbi.getDeathDate();
+			dds = (dd == null ? "NULL" : "'" + dd.toString() + "'");
+
+			query = String.format(UPDATE_INDIVIDUAL_BDP, bds, dbi.getBirthPlace(), dds, dbi.getDeathPlace(), parents,
+					dbi.getId());
 
 			statement.executeUpdate(query);
 		}
