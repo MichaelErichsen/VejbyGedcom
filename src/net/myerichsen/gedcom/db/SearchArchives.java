@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +38,7 @@ public class SearchArchives {
 	 * Helper class implementing Comparator interface
 	 *
 	 * @author Michael Erichsen
-	 * @version 11. mar. 2023
+	 * @version 27. mar. 2023
 	 *
 	 */
 	public class CensusIndividualComparator implements Comparator<CensusIndividual> {
@@ -48,12 +48,10 @@ public class SearchArchives {
 		 */
 		@Override
 		public int compare(CensusIndividual o1, CensusIndividual o2) {
-			final String key1 = o1.getFTaar() + o1.getAmt() + o1.getHerred() + o1.getSogn();
-			final String key2 = o2.getFTaar() + o2.getAmt() + o2.getHerred() + o2.getSogn();
-
+			final String key1 = o1.getCompString();
+			final String key2 = o2.getCompString();
 			return key1.compareToIgnoreCase(key2);
 		}
-
 	}
 
 	/**
@@ -66,16 +64,15 @@ public class SearchArchives {
 	public class RelocationComparator implements Comparator<Relocation> {
 
 		/**
-		 * Sort in ascending order of given name, birth date, and relocation date
+		 * Sort in ascending order of given name, surname, birth date, and relocation
+		 * date
 		 */
 		@Override
 		public int compare(Relocation o1, Relocation o2) {
-			final String key1 = o1.getGivenName() + o1.getBirthDate().toString() + o1.getDate();
-			final String key2 = o2.getGivenName() + o2.getBirthDate().toString() + o2.getDate();
-
+			final String key1 = o1.getGivenName() + o1.getSurName() + o1.getBirthDate().toString() + o1.getDate();
+			final String key2 = o2.getGivenName() + o1.getSurName() + o2.getBirthDate().toString() + o2.getDate();
 			return key1.compareToIgnoreCase(key2);
 		}
-
 	}
 
 	/**
@@ -99,24 +96,24 @@ public class SearchArchives {
 			+ "VITALTYPE;COVERED_DATA;SOURCE";
 	private static final String RELOCATION_HEADER = "ID;Fornavn;Efternavn;Flyttedato;Til;Fra;Detaljer;Fødselsdato;Forældre";
 
-	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = '%s' AND (TYPE = 'Birth' OR TYPE = 'Christening')";
+	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = ? AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
-			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = '%s'";
-	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = '%s' "
-			+ "AND FTAAR >= %d AND FTAAR <= %d";
-	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = '%s' "
-			+ "AND HUSSTANDS_FAMILIENR = '%s' ORDER BY LOEBENR";
-	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = %d";
-	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = '%s'";
-	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = %d";
+			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = ?";
+	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = ? "
+			+ "AND FTAAR >= ? AND FTAAR <= ?";
+	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = ? "
+			+ "AND HUSSTANDS_FAMILIENR = ? ORDER BY LOEBENR";
+	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = ?";
+	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = ?";
+	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = ?";
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
-			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = '%s' AND GEDCOM.EVENT.FROMDATE >= '%s' AND TODATE <= '%s'";
+			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
 	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
 			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
 			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL, VEJBY.INDIVIDUAL.PARENTS "
 			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
-			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = '%s'";
+			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = ?";
 	private static BufferedWriter bw = null;
 	private static int counter = 0;
 
@@ -173,19 +170,6 @@ public class SearchArchives {
 	}
 
 	/**
-	 * Connect to the Derby database
-	 *
-	 * @param dbpath
-	 * @return
-	 * @throws SQLException
-	 */
-	private Statement connectToDB(String dbpath) throws SQLException {
-		final String dbURL = "jdbc:derby:" + dbpath;
-		final Connection conn1 = DriverManager.getConnection(dbURL);
-		return conn1.createStatement();
-	}
-
-	/**
 	 * Worker method
 	 *
 	 * @param args
@@ -197,9 +181,8 @@ public class SearchArchives {
 		DBIndividual individual;
 
 		if (args[4].matches(DIGITS_ONLY)) {
-			final Statement statement = connectToDB(args[0]);
-			individual = new DBIndividual(statement, args[4]);
-			statement.close();
+			Connection conn = DriverManager.getConnection("jdbc:derby:" + args[0]);
+			individual = new DBIndividual(conn, args[4]);
 
 			if (individual.getName().length() == 0) {
 				logger.warning("Individual " + args[4] + " findes ikke i tabellen");
@@ -213,23 +196,26 @@ public class SearchArchives {
 
 		// Search for similar relocations
 		logger.info("Search for similar relocations for " + individual.getName());
-		searchRelocations(args, individual);
+		final Connection conn1 = DriverManager.getConnection("jdbc:derby:" + args[0]);
+		searchRelocations(args, conn1, individual);
 
 		// Search Census Derby table
 		logger.info("Search for censuses for " + individual.getName());
-		searchCensusTable(args, individual);
+		searchCensusTable(args, conn1, individual);
 
 		// Search Probates Derby table
 		logger.info("Search for probates for " + individual.getName() + " in " + PROBATE_SOURCE);
-		searchProbates(args, individual);
+		final Connection conn2 = DriverManager.getConnection("jdbc:derby:" + args[1]);
+		searchProbates(args, conn2, individual);
 
 		// Search Copenhagen Police Registry
 		logger.info("Search Police Registry");
-		searchPoliceRegistry(args, individual);
+		final Connection conn3 = DriverManager.getConnection("jdbc:derby:" + args[2]);
+		searchPoliceRegistry(args, conn3, individual);
 
 		// Search Copenhagen burial registry
 		logger.info("Search Copenhagen burial registry");
-		searchBurialRegistry(args, individual);
+		searchBurialRegistry(args, conn3, individual);
 
 		logger.info("Program ended");
 	}
@@ -265,17 +251,16 @@ public class SearchArchives {
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void searchBurialRegistry(String[] args, DBIndividual individual) throws Exception {
+	private void searchBurialRegistry(String[] args, Connection conn, DBIndividual individual) throws Exception {
 		final String outName = args[3] + "/" + individual.getName() + "_burreg.csv";
 
 		String result = "";
 		int calcYear = 0;
 		counter = 0;
 
-		final Statement stmt = connectToDB(args[2]);
-
-		final String query = String.format(SELECT_BURIAL_PERSON, individual.getPhonName());
-		final ResultSet rs = stmt.executeQuery(query);
+		PreparedStatement statement = conn.prepareStatement(SELECT_BURIAL_PERSON);
+		statement.setString(1, individual.getPhonName());
+		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			if ((individual.getBirthDate() == null) || (individual.getBirthDate().before(Date.valueOf("1000-01-01")))) {
@@ -311,7 +296,7 @@ public class SearchArchives {
 			counter++;
 		}
 
-		stmt.close();
+		statement.close();
 
 		if (counter > 0) {
 			bw.flush();
@@ -327,31 +312,38 @@ public class SearchArchives {
 	 * Search the census table for the individual
 	 *
 	 * @param args
+	 * @param conn
 	 * @param individual
 	 * @throws Exception
 	 */
 
-	private void searchCensusTable(String[] args, DBIndividual individual) throws Exception {
-		final Statement statement = connectToDB(args[0]);
-
+	private void searchCensusTable(String[] args, Connection conn, DBIndividual individual) throws Exception {
+		PreparedStatement statement1 = conn.prepareStatement(SELECT_CENSUS);
+		statement1.setString(1, individual.getPhonName().trim());
+		statement1.setLong(2, individual.getBirthDate().toLocalDate().getYear());
 		final int dd = (individual.getDeathDate() == null ? 9999 : individual.getDeathDate().toLocalDate().getYear());
-		String query = String.format(SELECT_CENSUS, individual.getPhonName().trim(),
-				individual.getBirthDate().toLocalDate().getYear(), dd);
-		ResultSet rs = statement.executeQuery(query);
+		statement1.setLong(3, dd);
+		ResultSet rs1 = statement1.executeQuery();
+		ResultSet rs2;
 		String string = "";
 
 		List<CensusIndividual> cil = null;
-		cil = CensusIndividual.getFromDb(rs);
+		cil = CensusIndividual.getFromDb(rs1);
 
 		// Add all household members as source details
+		PreparedStatement statement2 = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
+
 		for (final CensusIndividual ci : cil) {
-			query = String.format(SELECT_CENSUS_HOUSEHOLD, ci.getKIPnr(), ci.getHusstands_familienr());
-			rs = statement.executeQuery(query);
+			statement2.setString(1, ci.getKIPnr());
+			statement2.setString(2, ci.getHusstands_familienr());
+			rs2 = statement2.executeQuery();
+
 			final StringBuffer sb = new StringBuffer();
 
-			while (rs.next()) {
-				sb.append(rs.getString("KILDENAVN") + ", " + rs.getString("ALDER") + ", " + rs.getString("CIVILSTAND")
-						+ ", " + rs.getString("KILDEERHVERV") + ", " + rs.getString("STILLING_I_HUSSTANDEN") + " - ");
+			while (rs2.next()) {
+				sb.append(rs2.getString("KILDENAVN") + ", " + rs2.getString("ALDER") + ", "
+						+ rs2.getString("CIVILSTAND") + ", " + rs2.getString("KILDEERHVERV") + ", "
+						+ rs2.getString("STILLING_I_HUSSTANDEN") + " - ");
 			}
 
 			string = sb.toString();
@@ -363,7 +355,7 @@ public class SearchArchives {
 			ci.setKildedetaljer(string);
 		}
 
-		statement.close();
+		statement2.close();
 
 		if ((cil != null) && (cil.size() > 0)) {
 			writeCensusOutput(cil, args, individual);
@@ -374,55 +366,58 @@ public class SearchArchives {
 	 * Search Police Registry
 	 *
 	 * @param args
+	 * @param conn
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void searchPoliceRegistry(String[] args, DBIndividual individual) throws Exception {
+	private void searchPoliceRegistry(String[] args, Connection conn, DBIndividual individual) throws Exception {
 		final String outName = args[3] + "/" + individual.getName() + "_polreg.csv";
 		String result = "";
 		int calcYear = 0;
 
-		final Statement stmt = connectToDB(args[2]);
-
-		String query = String.format(SELECT_POLICE_PERSON, individual.getPhonName());
-		ResultSet rs = stmt.executeQuery(query);
-		ResultSet rs3;
+		PreparedStatement statement1 = conn.prepareStatement(SELECT_POLICE_PERSON);
+		statement1.setString(1, individual.getPhonName());
+		ResultSet rs1 = statement1.executeQuery();
+		ResultSet rs2, rs3;
 		final List<Integer> li = new ArrayList<>();
 		final List<Integer> lb = new ArrayList<>();
 		final List<String> ls = new ArrayList<>();
 		final List<String> lp = new ArrayList<>();
-		String query3;
 		String day;
 		String month;
 		String year;
 		counter = 0;
 
-		while (rs.next()) {
-			li.add(rs.getInt("ID"));
-			ls.add(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
+		while (rs1.next()) {
+			li.add(rs1.getInt("ID"));
+			ls.add(getField(rs1, "FIRSTNAMES") + " " + getField(rs1, "LASTNAME"));
 			try {
-				lb.add(rs.getInt("BirthDate"));
+				lb.add(rs1.getInt("BirthDate"));
 			} catch (final Exception e) {
 				lb.add(0);
 			}
 		}
 
-		for (int i = 0; i < li.size(); i++) {
-			query3 = String.format(SELECT_POLICE_POSITION, li.get(i));
-			rs3 = stmt.executeQuery(query3);
+		PreparedStatement statement2 = conn.prepareStatement(SELECT_POLICE_POSITION);
 
-			if (rs3.next()) {
-				lp.add(getField(rs3, "POSITION_DANISH"));
+		for (int i = 0; i < li.size(); i++) {
+			statement2.setLong(1, li.get(i));
+			rs2 = statement2.executeQuery();
+
+			if (rs2.next()) {
+				lp.add(getField(rs2, "POSITION_DANISH"));
 			} else {
 				lp.add(" ");
 			}
 		}
 
-		for (int i = 0; i < li.size(); i++) {
-			query = String.format(SELECT_POLICE_ADDRESS, li.get(i));
-			rs = stmt.executeQuery(query);
+		PreparedStatement statement3 = conn.prepareStatement(SELECT_POLICE_ADDRESS);
 
-			while (rs.next()) {
+		for (int i = 0; i < li.size(); i++) {
+			statement3.setLong(1, li.get(i));
+			rs3 = statement3.executeQuery();
+
+			while (rs3.next()) {
 				if (individual.getBirthDate().before(Date.valueOf("1000-01-01"))) {
 					calcYear = 0;
 				} else {
@@ -437,14 +432,14 @@ public class SearchArchives {
 					continue;
 				}
 
-				day = getFieldInt(rs, "DAY");
-				month = getFieldInt(rs, "MONTH");
-				year = getFieldInt(rs, "XYEAR");
+				day = getFieldInt(rs3, "DAY");
+				month = getFieldInt(rs3, "MONTH");
+				year = getFieldInt(rs3, "XYEAR");
 
-				result = ls.get(i) + ";" + lb.get(i) + ";" + lp.get(i) + ";" + getField(rs, "STREET") + ";"
-						+ getField(rs, "NUMBER") + ";" + getField(rs, "LETTER") + ";" + getField(rs, "FLOOR") + ";"
-						+ getField(rs, "PLACE") + ";" + getField(rs, "HOST") + ";" + day + ";" + month + ";" + year
-						+ ";" + day + "-" + month + "-" + year + ";" + getField(rs, "FULL_ADDRESS") + "\n";
+				result = ls.get(i) + ";" + lb.get(i) + ";" + lp.get(i) + ";" + getField(rs3, "STREET") + ";"
+						+ getField(rs3, "NUMBER") + ";" + getField(rs3, "LETTER") + ";" + getField(rs3, "FLOOR") + ";"
+						+ getField(rs3, "PLACE") + ";" + getField(rs3, "HOST") + ";" + day + ";" + month + ";" + year
+						+ ";" + day + "-" + month + "-" + year + ";" + getField(rs3, "FULL_ADDRESS") + "\n";
 
 				if (counter == 0) {
 					bw = new BufferedWriter(new FileWriter(new File(outName)));
@@ -456,7 +451,9 @@ public class SearchArchives {
 			}
 		}
 
-		stmt.close();
+		statement3.close();
+		statement2.close();
+		statement1.close();
 
 		if (counter > 0) {
 			bw.flush();
@@ -472,23 +469,26 @@ public class SearchArchives {
 	 *
 	 * @param individual
 	 * @param args
+	 * @param conn
 	 * @throws Exception
 	 */
-	private void searchProbates(String[] args, DBIndividual individual) throws Exception {
-		final Statement statement = connectToDB(args[1]);
-
-		final String phonName = new Fonkod().generateKey(args[4]);
-		final String BirthDate = (args.length < 6 ? "0001" : args[5]);
-		final String DeathDate = (args.length < 7 ? "9999" : args[6]);
-		final String query = String.format(SELECT_PROBATE, phonName, BirthDate + "-01-01", DeathDate + "-12-31");
-		final ResultSet rs = statement.executeQuery(query);
-
+	private void searchProbates(String[] args, Connection conn, DBIndividual individual) throws Exception {
 		String singleLine;
 		final HashSet<String> outLines = new HashSet<>();
 		String coveredData;
 		String source;
 		String name;
 		int counter = 0;
+
+		final String phonName = new Fonkod().generateKey(args[4]);
+		final String BirthDate = (args.length < 6 ? "0001" : args[5]);
+		final String DeathDate = (args.length < 7 ? "9999" : args[6]);
+
+		PreparedStatement statement = conn.prepareStatement(SELECT_PROBATE);
+		statement.setString(1, phonName);
+		statement.setString(2, BirthDate + "-01-01");
+		statement.setString(3, DeathDate + "-12-31");
+		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			coveredData = rs.getString("COVERED_DATA");
@@ -506,6 +506,7 @@ public class SearchArchives {
 			}
 		}
 
+		rs.close();
 		statement.close();
 
 		if (counter > 0) {
@@ -521,15 +522,16 @@ public class SearchArchives {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	private void searchRelocations(String[] args, DBIndividual individual) throws SQLException, IOException {
+	private void searchRelocations(String[] args, Connection conn, DBIndividual individual)
+			throws SQLException, IOException {
 		final String outName = args[3] + "/" + individual.getName() + "_flyt.csv";
 		counter = 0;
-
-		final Statement statement = connectToDB(args[0]);
-		String query = String.format(SELECT_RELOCATION, individual.getPhonName());
-		ResultSet rs = statement.executeQuery(query);
 		Relocation relocation;
 		final List<Relocation> lr = new ArrayList<>();
+
+		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
+		statement.setString(1, individual.getPhonName());
+		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			relocation = new Relocation(
@@ -543,14 +545,16 @@ public class SearchArchives {
 			lr.add(relocation);
 		}
 
-		// Find relocation dates outside the life span of the individual
+		rs.close();
+		statement.close();
+
+		// Find relocation dates outside the life span of the individual to
+		// eliminate
 
 		final List<String> ls = new ArrayList<>();
 
 		for (final Relocation relocation2 : lr) {
-			if (relocation2.getRelocationDate() == null) {
-				ls.add(relocation2.getId());
-			} else if ((relocation2.getRelocationDate().before(individual.getBirthDate()))
+			if ((relocation2.getRelocationDate().before(individual.getBirthDate()))
 					|| ((individual.getDeathDate() != null)
 							&& (relocation2.getRelocationDate().after(individual.getDeathDate())))) {
 				ls.add(relocation2.getId());
@@ -569,17 +573,20 @@ public class SearchArchives {
 
 		// Add birth date to each record
 
+		statement = conn.prepareStatement(SELECT_BIRTHDATE);
+
 		for (final Relocation relocation2 : lr) {
-
-			query = String.format(SELECT_BIRTHDATE, "@I" + relocation2.getId() + "@");
-
-			rs = statement.executeQuery(query);
+			statement.setString(1, "@I" + relocation2.getId() + "@");
+			rs = statement.executeQuery();
 
 			if (rs.next()) {
 				relocation2.setBirthDate(rs.getDate("DATE"));
 			}
 
 		}
+
+		rs.close();
+		statement.close();
 
 		// Sort and write out remaining records
 

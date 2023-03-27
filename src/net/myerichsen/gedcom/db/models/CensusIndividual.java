@@ -15,7 +15,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 11. mar. 2023
+ * @version 27. mar. 2023
  *
  */
 public class CensusIndividual {
@@ -67,6 +67,7 @@ public class CensusIndividual {
 			ci.setFTaar(rs.getInt("FTaar"));
 			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
+			ci.setCompString(ci.getFTaar() + ci.getAmt() + ci.getHerred() + ci.getSogn());
 			logger.fine(ci.toString());
 			cil.add(ci);
 		}
@@ -74,7 +75,9 @@ public class CensusIndividual {
 	}
 
 	private String KIPnr = "";
+
 	private int Loebenr = 0;
+
 	private String Amt = "";
 	private String Herred = "";
 	private String Sogn = "";
@@ -98,6 +101,7 @@ public class CensusIndividual {
 	private String Kildehenvisning = "";
 	private String Kildekommentar = "";
 	private String Kildedetaljer = "";
+	private String compString = "";
 
 	/**
 	 * @return the adresse
@@ -125,6 +129,13 @@ public class CensusIndividual {
 	 */
 	public String getCivilstand() {
 		return Civilstand;
+	}
+
+	/**
+	 * @return the compString
+	 */
+	public String getCompString() {
+		return compString;
 	}
 
 	/**
@@ -290,21 +301,24 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param adresse the adresse to set
+	 * @param adresse
+	 *            the adresse to set
 	 */
 	public void setAdresse(String adresse) {
 		Adresse = adresse.replace("'", "").trim();
 	}
 
 	/**
-	 * @param alder the alder to set
+	 * @param alder
+	 *            the alder to set
 	 */
 	private void setAlder(int alder) {
 		Alder = alder;
 	}
 
 	/**
-	 * @param alder the alder to set
+	 * @param alder
+	 *            the alder to set
 	 */
 	public void setAlder(String alder) {
 		final Pattern pattern = Pattern.compile(DIGITS_ONLY);
@@ -316,28 +330,40 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param amt the amt to set
+	 * @param amt
+	 *            the amt to set
 	 */
 	public void setAmt(String amt) {
 		Amt = amt;
 	}
 
 	/**
-	 * @param civilstand the civilstand to set
+	 * @param civilstand
+	 *            the civilstand to set
 	 */
 	public void setCivilstand(String civilstand) {
 		Civilstand = civilstand.replace("'", "").trim();
 	}
 
 	/**
-	 * @param aar the foedeaar to set
+	 * @param compString
+	 *            the compString to set
+	 */
+	public void setCompString(String compString) {
+		this.compString = compString;
+	}
+
+	/**
+	 * @param aar
+	 *            the foedeaar to set
 	 */
 	public void setFoedeaar(int aar) {
 		Foedeaar = aar;
 	}
 
 	/**
-	 * @param aar the foedeaar to set
+	 * @param aar
+	 *            the foedeaar to set
 	 */
 	public void setFoedeaar(String aar) {
 		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
@@ -349,7 +375,8 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param foedt_kildedato the foedt_kildedato to set
+	 * @param foedt_kildedato
+	 *            the foedt_kildedato to set
 	 */
 	public void setFoedt_kildedato(String foedt_kildedato) {
 		Foedt_kildedato = foedt_kildedato.replace("'", "").trim();
@@ -376,7 +403,8 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param fTaar the fTaar to set
+	 * @param fTaar
+	 *            the fTaar to set
 	 */
 	public void setFTaar(int fTaar) {
 		FTaar = fTaar;
@@ -384,7 +412,8 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param fTaar the fTaar to set
+	 * @param fTaar
+	 *            the fTaar to set
 	 */
 	public void setFTaar(String fTaar) {
 		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
@@ -396,63 +425,72 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param gade_nr the gade_nr to set
+	 * @param gade_nr
+	 *            the gade_nr to set
 	 */
 	public void setGade_nr(String gade_nr) {
 		Gade_nr = gade_nr.replace("'", "").trim();
 	}
 
 	/**
-	 * @param herred the herred to set
+	 * @param herred
+	 *            the herred to set
 	 */
 	public void setHerred(String herred) {
 		Herred = herred;
 	}
 
 	/**
-	 * @param husstands_familienr the husstands_familienr to set
+	 * @param husstands_familienr
+	 *            the husstands_familienr to set
 	 */
 	public void setHusstands_familienr(String husstands_familienr) {
 		Husstands_familienr = husstands_familienr.replace("'", "").trim();
 	}
 
 	/**
-	 * @param kildedetaljer the kildedetaljer to set
+	 * @param kildedetaljer
+	 *            the kildedetaljer to set
 	 */
 	public void setKildedetaljer(String kildedetaljer) {
 		Kildedetaljer = kildedetaljer;
 	}
 
 	/**
-	 * @param kildeerhverv the kildeerhverv to set
+	 * @param kildeerhverv
+	 *            the kildeerhverv to set
 	 */
 	public void setKildeerhverv(String kildeerhverv) {
 		Kildeerhverv = kildeerhverv.replace("'", "").trim();
 	}
 
 	/**
-	 * @param kildefoedested the kildefoedested to set
+	 * @param kildefoedested
+	 *            the kildefoedested to set
 	 */
 	public void setKildefoedested(String kildefoedested) {
 		Kildefoedested = kildefoedested.replace("'", "").trim();
 	}
 
 	/**
-	 * @param kildehenvisning the kildehenvisning to set
+	 * @param kildehenvisning
+	 *            the kildehenvisning to set
 	 */
 	public void setKildehenvisning(String kildehenvisning) {
 		Kildehenvisning = kildehenvisning.replace("'", "").trim();
 	}
 
 	/**
-	 * @param kildekommentar the kildekommentar to set
+	 * @param kildekommentar
+	 *            the kildekommentar to set
 	 */
 	public void setKildekommentar(String kildekommentar) {
 		Kildekommentar = kildekommentar.replace("'", "").trim();
 	}
 
 	/**
-	 * @param kildenavn the kildenavn to set
+	 * @param kildenavn
+	 *            the kildenavn to set
 	 */
 	public void setKildenavn(String kildenavn) {
 		Kildenavn = kildenavn.replace("'", "").trim();
@@ -464,35 +502,40 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param kildestednavn the kildestednavn to set
+	 * @param kildestednavn
+	 *            the kildestednavn to set
 	 */
 	public void setKildestednavn(String kildestednavn) {
 		Kildestednavn = kildestednavn.replace("'", "").trim();
 	}
 
 	/**
-	 * @param kIPnr the kIPnr to set
+	 * @param kIPnr
+	 *            the kIPnr to set
 	 */
 	public void setKIPnr(String kIPnr) {
 		KIPnr = kIPnr.replace("'", "").trim();
 	}
 
 	/**
-	 * @param koen the koen to set
+	 * @param koen
+	 *            the koen to set
 	 */
 	public void setKoen(String koen) {
 		Koen = koen.replace("'", "").trim();
 	}
 
 	/**
-	 * @param loebenr the loebenr to set
+	 * @param loebenr
+	 *            the loebenr to set
 	 */
 	private void setLoebenr(int loebenr) {
 		Loebenr = loebenr;
 	}
 
 	/**
-	 * @param loebenr the loebenr to set
+	 * @param loebenr
+	 *            the loebenr to set
 	 */
 	public void setLoebenr(String loebenr) {
 		final Pattern pattern = Pattern.compile(DIGITS_ONLY);
@@ -504,28 +547,32 @@ public class CensusIndividual {
 	}
 
 	/**
-	 * @param matr_nr_Adresse the matr_nr_Adresse to set
+	 * @param matr_nr_Adresse
+	 *            the matr_nr_Adresse to set
 	 */
 	public void setMatr_nr_Adresse(String matr_nr_Adresse) {
 		Matr_nr_Adresse = matr_nr_Adresse.replace("'", "").trim();
 	}
 
 	/**
-	 * @param matrikel the matrikel to set
+	 * @param matrikel
+	 *            the matrikel to set
 	 */
 	public void setMatrikel(String matrikel) {
 		Matrikel = matrikel.replace("'", "").trim();
 	}
 
 	/**
-	 * @param sogn the sogn to set
+	 * @param sogn
+	 *            the sogn to set
 	 */
 	public void setSogn(String sogn) {
 		Sogn = sogn;
 	}
 
 	/**
-	 * @param stilling_i_husstanden the stilling_i_husstanden to set
+	 * @param stilling_i_husstanden
+	 *            the stilling_i_husstanden to set
 	 */
 	public void setStilling_i_husstanden(String stilling_i_husstanden) {
 		Stilling_i_husstanden = stilling_i_husstanden.replace("'", "").trim();
