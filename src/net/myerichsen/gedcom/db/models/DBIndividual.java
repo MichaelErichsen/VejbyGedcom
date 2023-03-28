@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 27. mar. 2023
+ * @version 28. mar. 2023
  *
  */
 public class DBIndividual {
@@ -246,8 +246,8 @@ public class DBIndividual {
 	 */
 	public DBIndividual(String name, String birthYear, String deathYear) {
 		this.name = name;
-		this.birthDate = Date.valueOf(birthYear + "01-01");
-		this.deathDate = Date.valueOf(deathYear + "12-31");
+		this.birthDate = Date.valueOf(birthYear + "-01-01");
+		this.deathDate = Date.valueOf(deathYear + "-12-31");
 		try {
 			this.phonName = new Fonkod().generateKey(name).trim();
 		} catch (final Exception e) {

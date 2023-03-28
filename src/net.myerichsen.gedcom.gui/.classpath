@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gedcom4j"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/VejbyGedcom"/>
+	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64_3.110.0.v20190305-0602.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64.source_3.110.0.v20190305-0602.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="swing2swt.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

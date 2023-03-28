@@ -32,8 +32,7 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * @version 28. mar. 2023
  *
  */
-// TODO Parents in relocations from christening missing
-// TODO "NULL" String in relocations details
+
 public class SearchArchives {
 	/**
 	 * Helper class implementing Comparator interface
@@ -600,7 +599,7 @@ public class SearchArchives {
 				bw.write(RELOCATION_HEADER + "\n");
 			}
 
-			bw.write(relocation2.toString() + "\n");
+			bw.write(relocation2.toString().replace("NULL", "") + "\n");
 			counter++;
 		}
 

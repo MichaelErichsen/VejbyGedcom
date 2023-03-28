@@ -41,6 +41,9 @@ import net.myerichsen.gedcom.db.models.DBIndividual;
  * @version 28. mar. 2023
  */
 public class DBLoader {
+
+	// TODO Parents in relocations from christening missing
+
 	/**
 	 * Static constants and variables
 	 */
