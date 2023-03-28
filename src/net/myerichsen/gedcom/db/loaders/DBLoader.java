@@ -38,16 +38,16 @@ import net.myerichsen.gedcom.db.models.DBIndividual;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 27. mar. 2023
+ * @version 28. mar. 2023
  */
 public class DBLoader {
 	/**
-	 *
+	 * Static constants and variables
 	 */
 	private static final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHDATE = ?, "
 			+ "BIRTHPLACE = ?, DEATHDATE = ?, DEATHPLACE = ?, PARENTS = ? WHERE ID = ?";
-	private static final String INSERT_INDIVIDUAL_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
-			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES('";
+	private static final String INSERT_INDIVIDUAL_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
+			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = ? WHERE ID = ?";
 	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM VEJBY.INDIVIDUAL";
@@ -55,9 +55,18 @@ public class DBLoader {
 	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE=? WHERE ID = ?";
 	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = ? WHERE ID = ?";
 	private static final String INSERT_INDIVIDUAL = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES (?, ?, ?, ?, ?)";
-	private static final String INSERT_FAMILY_EVENT_START = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
-			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES('";
+	private static final String INSERT_FAMILY_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
+			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES (?, NULL, NULL)";
+
+	private static PreparedStatement psUPDATE_INDIVIDUAL_BDP;
+	private static PreparedStatement psINSERT_INDIVIDUAL_EVENT;
+	private static PreparedStatement psUPDATE_INDIVIDUAL_FAMC;
+	private static PreparedStatement psUPDATE_FAMILY_WIFE;
+	private static PreparedStatement psUPDATE_FAMILY_HUSBAND;
+	private static PreparedStatement psINSERT_INDIVIDUAL;
+	private static PreparedStatement psINSERT_FAMILY_EVENT;
+	private static PreparedStatement psINSERT_FAMILY;
 	private static Logger logger;
 	private static Fonkod fonkod = new Fonkod();
 	private static Gedcom gedcom;
@@ -90,199 +99,6 @@ public class DBLoader {
 	}
 
 	/**
-	 * @param family
-	 * @param familyEvent
-	 * @return
-	 */
-	private StringBuilder buildFamilyEventQuery(Family family, final FamilyEvent familyEvent) {
-		StringBuilder sb;
-		StringWithCustomFacts subtype;
-		StringWithCustomFacts date;
-		List<NoteStructure> noteStructures;
-		List<AbstractCitation> citations;
-		CitationWithSource cfs;
-		StringWithCustomFacts whereInSource;
-		List<String> lines;
-		StringBuilder lineBuffer;
-		Place place;
-		List<CustomFact> customFacts;
-		StringBuffer sb2;
-		sb = new StringBuilder(INSERT_FAMILY_EVENT_START);
-		sb.append(familyEvent.getType());
-		subtype = familyEvent.getSubType();
-
-		if (subtype == null) {
-			sb.append("', NULL, ");
-		} else {
-			sb.append("', '" + subtype.getValue() + "', ");
-		}
-
-		date = familyEvent.getDate();
-
-		if (date == null) {
-			sb.append("NULL, '" + family.getXref());
-		} else {
-			sb.append("'" + formatDate(date.getValue()) + "', '" + family.getXref());
-		}
-
-		place = familyEvent.getPlace();
-
-		if (place == null) {
-			sb.append("', NULL, ");
-		} else {
-			sb.append("', '" + place.getPlaceName().replace("'", "") + "', ");
-		}
-
-		noteStructures = familyEvent.getNoteStructures();
-
-		if (noteStructures == null) {
-			sb.append("NULL, ");
-		} else {
-			lines = noteStructures.get(0).getLines();
-			lineBuffer = new StringBuilder();
-
-			for (final String string : lines) {
-				lineBuffer.append(string + " ");
-			}
-			sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
-		}
-
-		citations = familyEvent.getCitations();
-
-		if (citations == null) {
-			sb.append("NULL, '");
-		} else {
-			cfs = (CitationWithSource) citations.get(0);
-			whereInSource = cfs.getWhereInSource();
-
-			if (whereInSource == null) {
-				sb.append("NULL, '");
-			} else {
-				customFacts = whereInSource.getCustomFacts();
-
-				if (customFacts == null) {
-					if (whereInSource.getValue() != null) {
-						sb.append("'" + whereInSource.getValue() + "', '");
-					} else {
-						sb.append("NULL, '");
-					}
-				} else {
-					sb2 = new StringBuffer();
-
-					for (final CustomFact customFact : customFacts) {
-						sb2.append(customFact.getDescription().getValue());
-					}
-
-					sb.append("'" + (sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
-							: sb2.toString().replace("'", "¤")) + "', '");
-				}
-			}
-		}
-
-		return sb;
-	}
-
-	/**
-	 * @param individual
-	 * @param individualEvent
-	 * @return
-	 */
-	private StringBuilder buildIndividualEventQuery(Individual individual, final IndividualEvent individualEvent) {
-		StringBuilder sb;
-		StringWithCustomFacts subtype;
-		StringWithCustomFacts date;
-		Place place;
-		List<NoteStructure> noteStructures;
-		List<AbstractCitation> citations;
-		CitationWithSource cfs;
-		StringWithCustomFacts whereInSource;
-		List<String> lines;
-		StringBuilder lineBuffer;
-		List<CustomFact> customFacts;
-		StringBuffer sb2;
-		sb = new StringBuilder(INSERT_INDIVIDUAL_EVENT_START);
-		sb.append(individualEvent.getType());
-		subtype = individualEvent.getSubType();
-
-		if (subtype == null) {
-			sb.append("', NULL, ");
-		} else {
-			if (subtype.getValue().equals("Faeste1")) {
-				sb.append("', '" + "Lægdsrulle" + "', ");
-			} else {
-				sb.append("', '" + subtype.getValue() + "', ");
-			}
-		}
-
-		date = individualEvent.getDate();
-
-		if (date == null) {
-			sb.append("NULL, '" + individual.getXref() + "', NULL, ");
-		} else {
-			sb.append("'" + formatDate(date.getValue()) + "', '" + individual.getXref() + "', NULL, ");
-		}
-
-		place = individualEvent.getPlace();
-
-		if (place == null) {
-			sb.append("NULL, ");
-		} else {
-			sb.append("'" + place.getPlaceName().replace("'", "") + "', ");
-		}
-
-		noteStructures = individualEvent.getNoteStructures();
-
-		if (noteStructures == null) {
-			sb.append("NULL, ");
-		} else {
-			lines = noteStructures.get(0).getLines();
-			lineBuffer = new StringBuilder();
-
-			for (final String string : lines) {
-				lineBuffer.append(string + " ");
-			}
-			sb.append("'" + lineBuffer.toString().replace("'", "¤") + "', ");
-		}
-
-		citations = individualEvent.getCitations();
-
-		if (citations == null) {
-			sb.append("NULL)");
-		} else {
-			cfs = (CitationWithSource) citations.get(0);
-			whereInSource = cfs.getWhereInSource();
-
-			if (whereInSource == null) {
-				sb.append("NULL)");
-			} else {
-				customFacts = whereInSource.getCustomFacts();
-
-				if (customFacts == null) {
-					if (whereInSource.getValue() != null) {
-						sb.append("'" + whereInSource.getValue() + "')");
-					} else {
-						sb.append("NULL)");
-					}
-				} else {
-					sb2 = new StringBuffer();
-
-					for (final CustomFact customFact : customFacts) {
-						sb2.append(customFact.getDescription().getValue().replaceAll("\\s{2,}", " ").trim());
-					}
-
-					sb.append("'"
-							+ (sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤") : sb2.toString())
-									.replace("'", "¤")
-							+ "')");
-				}
-			}
-		}
-
-		return sb;
-
-	}
-
-	/**
 	 * Delete all rows from all tables
 	 *
 	 * @param conn
@@ -303,9 +119,8 @@ public class DBLoader {
 	 * Connect to the Derby database
 	 *
 	 * @param args
-	 *
+	 * @return
 	 * @throws SQLException
-	 *
 	 */
 	private Connection connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[1];
@@ -323,6 +138,9 @@ public class DBLoader {
 	private void execute(String[] args) throws Exception {
 		final Connection conn = connectToDB(args);
 
+		logger.info("Preparing SQL statements");
+		prepareStatements(conn);
+
 		logger.info("Reading " + args[0]);
 		readGedcom(args[0]);
 
@@ -330,10 +148,10 @@ public class DBLoader {
 		clearTables(conn);
 
 		logger.info("Parsing families");
-		parseAllFamilies(conn);
+		parseAllFamilies();
 
 		logger.info("Parsing individuals");
-		parseAllIndividuals(conn);
+		parseAllIndividuals();
 
 		logger.info("Add birth and death data and parents");
 		updateBirthDeathParentsData(conn);
@@ -345,12 +163,50 @@ public class DBLoader {
 	}
 
 	/**
+	 * Insert a family event into Derby for husband and wife
+	 *
+	 * @param family
+	 * @throws SQLException
+	 */
+	private void findFamilyEvents(Family family) throws SQLException {
+		final List<FamilyEvent> events = family.getEvents();
+
+		if (events == null) {
+			return;
+		}
+
+		for (final FamilyEvent familyEvent : events) {
+			insertFamilyEvents(family, familyEvent);
+		}
+	}
+
+	/**
+	 * Insert an individual event into Derby
+	 *
+	 * @param individual
+	 * @throws SQLException
+	 */
+	private void findIndividualEvents(Individual individual) throws SQLException {
+		final List<IndividualEvent> events = individual.getEvents();
+
+		if (events == null) {
+			return;
+		}
+
+		for (final IndividualEvent individualEvent : events) {
+			insertIndividualEvent(individual, individualEvent);
+			eventCounter++;
+		}
+	}
+
+	/**
 	 * Format a GEDCOM date into Derby format
 	 *
-	 * @param date
+	 * @param swcf
 	 * @return
 	 */
-	private String formatDate(String date) {
+	private Date formatDate(StringWithCustomFacts swcf) {
+		String date = swcf.getValue();
 		DateTimeFormatter formatter;
 		LocalDate localDate;
 		String outDate;
@@ -377,7 +233,7 @@ public class DBLoader {
 		} catch (final Exception e) {
 			outDate = date + "-01-01";
 		}
-		return outDate;
+		return Date.valueOf(outDate);
 	}
 
 	/**
@@ -386,97 +242,100 @@ public class DBLoader {
 	 * @param key
 	 * @throws SQLException
 	 */
-	private void insertFamily(Connection conn, String key) throws SQLException {
-		final PreparedStatement statement = conn.prepareStatement(INSERT_FAMILY);
-		statement.setString(1, key);
-		statement.execute();
+	private void insertFamily(String key) throws SQLException {
+		psINSERT_FAMILY.setString(1, key);
+		psINSERT_FAMILY.execute();
 		familyCounter++;
 	}
 
 	/**
-	 * Insert a family event into Derby for husband and wife
+	 * Insert family events
 	 *
 	 * @param family
-	 * @throws Exception
-	 */
-	private void insertFamilyEvent(Connection conn, Family family) throws Exception {
-		StringBuilder sb;
-		String query;
-		final List<FamilyEvent> events = family.getEvents();
-
-		if (events == null) {
-			return;
-		}
-
-		for (final FamilyEvent familyEvent : events) {
-			sb = buildFamilyEventQuery(family, familyEvent);
-
-			if (family.getHusband() != null) {
-				query = sb.toString() + family.getHusband().getIndividual().getXref() + "')";
-				final PreparedStatement statement = conn.prepareStatement(query);
-				statement.execute();
-				eventCounter++;
-			}
-
-			if (family.getWife() != null) {
-				query = sb.toString() + family.getWife().getIndividual().getXref() + "')";
-				final PreparedStatement statement = conn.prepareStatement(query);
-				statement.execute();
-				eventCounter++;
-			}
-		}
-
-	}
-
-	/**
-	 * Insert an individual into Derby
-	 *
-	 * @param individual
-	 * @throws Exception
+	 * @param familyEvent
+	 * @return
 	 * @throws SQLException
 	 */
-	private void insertIndividual(Connection conn, Individual individual) throws Exception {
-		try {
-			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
-			final String given = split[0].trim();
-			final String surname = split[1];
+	private void insertFamilyEvents(Family family, final FamilyEvent familyEvent) throws SQLException {
+		psINSERT_FAMILY_EVENT.setString(1, familyEvent.getType().toString());
 
-			final PreparedStatement statement = conn.prepareStatement(INSERT_INDIVIDUAL);
-			statement.setString(1, individual.getXref());
-			statement.setString(2, given);
-			statement.setString(3, surname);
-			statement.setString(4, individual.getSex().getValue());
-			statement.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
-			statement.execute();
-			individualCounter++;
-		} catch (final SQLException e) {
-			// Handle duplicates
-			if (!e.getSQLState().equals("23505")) {
-				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+		final StringWithCustomFacts subtype = familyEvent.getSubType();
+		if (subtype == null) {
+			psINSERT_FAMILY_EVENT.setString(2, "NULL");
+		} else {
+			psINSERT_FAMILY_EVENT.setString(2, subtype.getValue());
+		}
+
+		final StringWithCustomFacts date = familyEvent.getDate();
+		if (date == null) {
+			psINSERT_FAMILY_EVENT.setObject(3, null);
+		} else {
+			psINSERT_FAMILY_EVENT.setDate(3, formatDate(date));
+		}
+
+		psINSERT_FAMILY_EVENT.setString(4, family.getXref());
+
+		final Place place = familyEvent.getPlace();
+		if (place == null) {
+			psINSERT_FAMILY_EVENT.setString(5, "NULL");
+		} else {
+			psINSERT_FAMILY_EVENT.setString(5, place.getPlaceName().replace("'", ""));
+		}
+
+		final List<NoteStructure> noteStructures = familyEvent.getNoteStructures();
+		if (noteStructures == null) {
+			psINSERT_FAMILY_EVENT.setString(6, "NULL");
+		} else {
+			final List<String> lines = noteStructures.get(0).getLines();
+			final StringBuilder lineBuffer = new StringBuilder();
+
+			for (final String string : lines) {
+				lineBuffer.append(string + " ");
 			}
-			logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
-			updateIndividual(conn, individual);
-		}
-	}
-
-	/**
-	 * Insert an individual event into Derby
-	 *
-	 * @param individual
-	 * @throws Exception
-	 */
-	private void insertIndividualEvent(Connection conn, Individual individual) throws Exception {
-		StringBuilder sb;
-		final List<IndividualEvent> events = individual.getEvents();
-
-		if (events == null) {
-			return;
+			psINSERT_FAMILY_EVENT.setString(6, lineBuffer.toString().replace("'", "¤"));
 		}
 
-		for (final IndividualEvent individualEvent : events) {
-			sb = buildIndividualEventQuery(individual, individualEvent);
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.execute();
+		final List<AbstractCitation> citations = familyEvent.getCitations();
+		if (citations == null) {
+			psINSERT_FAMILY_EVENT.setString(7, "NULL");
+		} else {
+			final CitationWithSource cfs = (CitationWithSource) citations.get(0);
+			final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
+
+			if (whereInSource == null) {
+				psINSERT_FAMILY_EVENT.setString(7, "NULL");
+			} else {
+				final List<CustomFact> customFacts = whereInSource.getCustomFacts();
+
+				if (customFacts == null) {
+					if (whereInSource.getValue() != null) {
+						psINSERT_FAMILY_EVENT.setString(7, whereInSource.getValue());
+					} else {
+						psINSERT_FAMILY_EVENT.setString(7, "NULL");
+					}
+				} else {
+					final StringBuffer sb2 = new StringBuffer();
+
+					for (final CustomFact customFact : customFacts) {
+						sb2.append(customFact.getDescription().getValue());
+					}
+
+					psINSERT_FAMILY_EVENT.setString(7,
+							(sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
+									: sb2.toString().replace("'", "¤")) + "', '");
+				}
+			}
+		}
+
+		if (family.getHusband() != null) {
+			psINSERT_FAMILY_EVENT.setString(8, family.getHusband().getIndividual().getXref());
+			psINSERT_FAMILY_EVENT.executeUpdate();
+			eventCounter++;
+		}
+
+		if (family.getWife() != null) {
+			psINSERT_FAMILY_EVENT.setString(8, family.getWife().getIndividual().getXref());
+			psINSERT_FAMILY_EVENT.executeUpdate();
 			eventCounter++;
 		}
 	}
@@ -486,26 +345,139 @@ public class DBLoader {
 	 *
 	 * @param individual
 	 * @throws Exception
-	 * @throws SQLException
 	 */
-	private void insertIndividualWithFamily(Connection conn, Individual individual) throws Exception {
+	private void insertIndividual(Individual individual) throws Exception {
 		try {
 			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
 			final String given = split[0].trim();
 			final String surname = split[1];
 
-			final PreparedStatement statement = conn.prepareStatement(INSERT_INDIVIDUAL);
-			statement.setString(1, individual.getXref());
-			statement.setString(2, given);
-			statement.setString(3, surname);
-			statement.setString(4, individual.getSex().getValue());
-			statement.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
+			psINSERT_INDIVIDUAL.setString(1, individual.getXref());
+			psINSERT_INDIVIDUAL.setString(2, given);
+			psINSERT_INDIVIDUAL.setString(3, surname);
+			psINSERT_INDIVIDUAL.setString(4, individual.getSex().getValue());
+			psINSERT_INDIVIDUAL.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
+			psINSERT_INDIVIDUAL.execute();
+			individualCounter++;
+		} catch (final SQLException e) {
+			// Handle duplicates
+			if (!e.getSQLState().equals("23505")) {
+				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+			}
+			logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+			updateIndividual(individual);
+		}
+	}
+
+	/**
+	 * Insert an individual event
+	 *
+	 * @param individual
+	 * @param individualEvent
+	 * @return
+	 * @throws SQLException
+	 */
+	private void insertIndividualEvent(Individual individual, final IndividualEvent individualEvent)
+			throws SQLException {
+
+		psINSERT_INDIVIDUAL_EVENT.setString(1, individualEvent.getType().toString());
+
+		final StringWithCustomFacts subtype = individualEvent.getSubType();
+		if (subtype == null) {
+			psINSERT_INDIVIDUAL_EVENT.setString(2, "NULL");
+		} else {
+			psINSERT_INDIVIDUAL_EVENT.setString(2, subtype.getValue());
+		}
+
+		final StringWithCustomFacts date = individualEvent.getDate();
+		if (date == null) {
+			psINSERT_INDIVIDUAL_EVENT.setObject(3, null);
+		} else {
+			psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(date));
+		}
+
+		psINSERT_INDIVIDUAL_EVENT.setString(4, individual.getXref());
+
+		psINSERT_INDIVIDUAL_EVENT.setString(5, "NULL");
+
+		final Place place = individualEvent.getPlace();
+		if (place == null) {
+			psINSERT_INDIVIDUAL_EVENT.setString(6, "NULL");
+		} else {
+			psINSERT_INDIVIDUAL_EVENT.setString(6, place.getPlaceName().replace("'", ""));
+		}
+
+		final List<NoteStructure> noteStructures = individualEvent.getNoteStructures();
+		if (noteStructures == null) {
+			psINSERT_INDIVIDUAL_EVENT.setString(7, "NULL");
+		} else {
+			final List<String> lines = noteStructures.get(0).getLines();
+			final StringBuilder lineBuffer = new StringBuilder();
+
+			for (final String string : lines) {
+				lineBuffer.append(string + " ");
+			}
+			psINSERT_INDIVIDUAL_EVENT.setString(7, lineBuffer.toString().replace("'", "¤"));
+		}
+
+		final List<AbstractCitation> citations = individualEvent.getCitations();
+		if (citations == null) {
+			psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
+		} else {
+			final CitationWithSource cfs = (CitationWithSource) citations.get(0);
+			final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
+
+			if (whereInSource == null) {
+				psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
+			} else {
+				final List<CustomFact> customFacts = whereInSource.getCustomFacts();
+
+				if (customFacts == null) {
+					if (whereInSource.getValue() != null) {
+						psINSERT_INDIVIDUAL_EVENT.setString(7, whereInSource.getValue());
+					} else {
+						psINSERT_INDIVIDUAL_EVENT.setString(7, "NULL");
+					}
+				} else {
+					final StringBuffer sb2 = new StringBuffer();
+
+					for (final CustomFact customFact : customFacts) {
+						sb2.append(customFact.getDescription().getValue());
+					}
+
+					psINSERT_INDIVIDUAL_EVENT.setString(7,
+							(sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
+									: sb2.toString().replace("'", "¤")) + "', '");
+				}
+			}
+		}
+
+		psINSERT_INDIVIDUAL_EVENT.executeUpdate();
+	}
+
+	/**
+	 * Insert an individual into Derby
+	 *
+	 * @param individual
+	 * @throws Exception
+	 */
+	private void insertIndividualWithFamily(Individual individual) throws Exception {
+		try {
+			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
+			final String given = split[0].trim();
+			final String surname = split[1];
+
+			psINSERT_INDIVIDUAL.setString(1, individual.getXref());
+			psINSERT_INDIVIDUAL.setString(2, given);
+			psINSERT_INDIVIDUAL.setString(3, surname);
+			psINSERT_INDIVIDUAL.setString(4, individual.getSex().getValue());
+			psINSERT_INDIVIDUAL.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
 
 			if (individual.getFamiliesWhereChild() == null) {
-				updateIndividual(conn, individual);
+				updateIndividual(individual);
 			}
 
-			statement.execute();
+			psINSERT_INDIVIDUAL.execute();
 			individualCounter++;
 		} catch (final SQLException e) {
 			// Handle duplicates
@@ -513,7 +485,7 @@ public class DBLoader {
 				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 			}
 
-			updateIndividual(conn, individual);
+			updateIndividual(individual);
 		}
 	}
 
@@ -528,11 +500,9 @@ public class DBLoader {
 	 * <li>Insert all family evenst</li>
 	 * </ul>
 	 *
-	 * @param conn
-	 *
 	 * @throws Exception
 	 */
-	private void parseAllFamilies(Connection conn) throws Exception {
+	private void parseAllFamilies() throws Exception {
 		String key;
 		Family family;
 		Individual husband, wife;
@@ -541,22 +511,22 @@ public class DBLoader {
 
 		for (final Entry<String, Family> familyNode : families.entrySet()) {
 			key = familyNode.getKey();
-			insertFamily(conn, key);
+			insertFamily(key);
 
 			family = familyNode.getValue();
 
 			try {
 				husband = family.getHusband().getIndividual();
-				insertIndividual(conn, husband);
-				updateFamilyHusband(conn, key, husband);
+				insertIndividual(husband);
+				updateFamilyHusband(key, husband);
 			} catch (final NullPointerException e) {
 				logger.fine(e.getMessage());
 			}
 
 			try {
 				wife = family.getWife().getIndividual();
-				insertIndividual(conn, wife);
-				updateFamilyWife(conn, key, wife);
+				insertIndividual(wife);
+				updateFamilyWife(key, wife);
 			} catch (final NullPointerException e) {
 				logger.fine(e.getMessage());
 			}
@@ -565,11 +535,11 @@ public class DBLoader {
 
 			if (children != null) {
 				for (final IndividualReference individualReference : children) {
-					insertIndividualWithFamily(conn, individualReference.getIndividual());
+					insertIndividualWithFamily(individualReference.getIndividual());
 				}
 			}
 
-			insertFamilyEvent(conn, family);
+			findFamilyEvents(family);
 		}
 	}
 
@@ -581,22 +551,34 @@ public class DBLoader {
 	 * <li>Insert all events for the individual</li>
 	 * </ul>
 	 *
-	 * @param conn
-	 *
 	 * @throws Exception
-	 *
 	 */
-	private void parseAllIndividuals(Connection conn) throws Exception {
+	private void parseAllIndividuals() throws Exception {
 		Individual individual;
 
 		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
 		for (final Entry<String, Individual> individualNode : individuals.entrySet()) {
 			individual = individualNode.getValue();
-			insertIndividualWithFamily(conn, individual);
-			insertIndividualEvent(conn, individual);
+			insertIndividualWithFamily(individual);
+			findIndividualEvents(individual);
 		}
 
+	}
+
+	/**
+	 * @param conn
+	 * @throws SQLException
+	 */
+	private void prepareStatements(Connection conn) throws SQLException {
+		psUPDATE_INDIVIDUAL_BDP = conn.prepareStatement(UPDATE_INDIVIDUAL_BDP);
+		psINSERT_INDIVIDUAL_EVENT = conn.prepareStatement(INSERT_INDIVIDUAL_EVENT);
+		psUPDATE_INDIVIDUAL_FAMC = conn.prepareStatement(UPDATE_INDIVIDUAL_FAMC);
+		psUPDATE_FAMILY_WIFE = conn.prepareStatement(UPDATE_FAMILY_WIFE);
+		psUPDATE_FAMILY_HUSBAND = conn.prepareStatement(UPDATE_FAMILY_HUSBAND);
+		psINSERT_INDIVIDUAL = conn.prepareStatement(INSERT_INDIVIDUAL);
+		psINSERT_FAMILY_EVENT = conn.prepareStatement(INSERT_FAMILY_EVENT);
+		psINSERT_FAMILY = conn.prepareStatement(INSERT_FAMILY);
 	}
 
 	/**
@@ -624,7 +606,7 @@ public class DBLoader {
 		final List<DBIndividual> ldbi = DBIndividual.loadFromDB(conn);
 
 		// Update all individual records in Derby
-		updateIndividualsBDP(conn, ldbi);
+		updateIndividualsBDP(ldbi);
 	}
 
 	/**
@@ -634,25 +616,24 @@ public class DBLoader {
 	 * @throws Exception
 	 * @throws SQLException
 	 */
-	private void updateFamilyHusband(Connection conn, String ID, Individual husband) throws SQLException {
-		final PreparedStatement statement = conn.prepareStatement(UPDATE_FAMILY_HUSBAND);
-		statement.setString(1, husband.getXref());
-		statement.setString(2, ID);
-		statement.executeUpdate();
+	private void updateFamilyHusband(String ID, Individual husband) throws SQLException {
+		psUPDATE_FAMILY_HUSBAND.setString(1, husband.getXref());
+		psUPDATE_FAMILY_HUSBAND.setString(2, ID);
+		psUPDATE_FAMILY_HUSBAND.executeUpdate();
 	}
 
 	/**
 	 * UPDATE VEJBY.FAMILY SET WIFE = '' WHERE ID = ''
 	 *
-	 * @param husband
+	 * @param statement
+	 * @param ID
 	 * @param wife
 	 * @throws SQLException
 	 */
-	private void updateFamilyWife(Connection conn, String ID, Individual wife) throws SQLException {
-		final PreparedStatement statement = conn.prepareStatement(UPDATE_FAMILY_WIFE);
-		statement.setString(1, wife.getXref());
-		statement.setString(2, ID);
-		statement.executeUpdate();
+	private void updateFamilyWife(String ID, Individual wife) throws SQLException {
+		psUPDATE_FAMILY_WIFE.setString(1, wife.getXref());
+		psUPDATE_FAMILY_WIFE.setString(2, ID);
+		psUPDATE_FAMILY_WIFE.executeUpdate();
 	}
 
 	/**
@@ -661,16 +642,15 @@ public class DBLoader {
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void updateIndividual(Connection conn, Individual individual) throws Exception {
+	private void updateIndividual(Individual individual) throws Exception {
 		final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
 
 		if (familiesWhereChild != null) {
-			final PreparedStatement statement = conn.prepareStatement(UPDATE_INDIVIDUAL_FAMC);
-			statement.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
-			statement.setString(2, individual.getXref());
+			psUPDATE_INDIVIDUAL_FAMC.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
+			psUPDATE_INDIVIDUAL_FAMC.setString(2, individual.getXref());
 
 			try {
-				statement.execute();
+				psUPDATE_INDIVIDUAL_FAMC.execute();
 			} catch (final SQLException e) {
 				// Handle family not yet inserted
 				if (!e.getSQLState().equals("23503")) {
@@ -686,16 +666,13 @@ public class DBLoader {
 	/**
 	 * Update birth and death data and parents for all individuals
 	 *
-	 * @param conn
 	 * @param ldbi
 	 * @throws SQLException
 	 */
-	private void updateIndividualsBDP(Connection conn, List<DBIndividual> ldbi) throws SQLException {
+	private void updateIndividualsBDP(List<DBIndividual> ldbi) throws SQLException {
 		Date bd;
 		Date dd;
 		String parents;
-
-		final PreparedStatement statement = conn.prepareStatement(UPDATE_INDIVIDUAL_BDP);
 
 		for (final DBIndividual dbi : ldbi) {
 			parents = dbi.getParents();
@@ -709,13 +686,24 @@ public class DBLoader {
 			bd = dbi.getBirthDate();
 			dd = dbi.getDeathDate();
 
-			statement.setString(1, (bd == null ? "NULL" : "'" + bd.toString() + "'"));
-			statement.setString(2, dbi.getBirthPlace());
-			statement.setString(3, (dd == null ? "NULL" : "'" + dd.toString() + "'"));
-			statement.setString(4, dbi.getDeathPlace());
-			statement.setString(5, parents);
-			statement.setString(6, dbi.getId());
-			statement.executeUpdate();
+			if (bd == null) {
+				psUPDATE_INDIVIDUAL_BDP.setObject(1, null);
+			} else {
+				psUPDATE_INDIVIDUAL_BDP.setString(1, bd.toString());
+			}
+
+			psUPDATE_INDIVIDUAL_BDP.setString(2, dbi.getBirthPlace());
+
+			if (dd == null) {
+				psUPDATE_INDIVIDUAL_BDP.setObject(3, null);
+			} else {
+				psUPDATE_INDIVIDUAL_BDP.setString(3, dd.toString());
+			}
+
+			psUPDATE_INDIVIDUAL_BDP.setString(4, dbi.getDeathPlace());
+			psUPDATE_INDIVIDUAL_BDP.setString(5, parents);
+			psUPDATE_INDIVIDUAL_BDP.setString(6, dbi.getId());
+			psUPDATE_INDIVIDUAL_BDP.executeUpdate();
 		}
 	}
 }

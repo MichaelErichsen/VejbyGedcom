@@ -29,10 +29,11 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 27. mar. 2023
+ * @version 28. mar. 2023
  *
  */
-
+// TODO Parents in relocations from christening missing
+// TODO "NULL" String in relocations details
 public class SearchArchives {
 	/**
 	 * Helper class implementing Comparator interface
