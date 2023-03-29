@@ -13,13 +13,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.myerichsen.gedcom.db.comparators.CensusIndividualComparator;
+import net.myerichsen.gedcom.db.comparators.RelocationComparator;
 import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
 import net.myerichsen.gedcom.db.models.Relocation;
@@ -29,51 +30,11 @@ import net.myerichsen.gedcom.db.models.Relocation;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 28. mar. 2023
+ * @version 29. mar. 2023
  *
  */
 
 public class SearchArchives {
-	/**
-	 * Helper class implementing Comparator interface
-	 *
-	 * @author Michael Erichsen
-	 * @version 27. mar. 2023
-	 *
-	 */
-	public class CensusIndividualComparator implements Comparator<CensusIndividual> {
-
-		/**
-		 * Sort in ascending order of birth year and location
-		 */
-		@Override
-		public int compare(CensusIndividual o1, CensusIndividual o2) {
-			final String key1 = o1.getCompString();
-			final String key2 = o2.getCompString();
-			return key1.compareToIgnoreCase(key2);
-		}
-	}
-
-	/**
-	 * Helper class implementing Comparator interface
-	 *
-	 * @author Michael Erichsen
-	 * @version 27. mar. 2023
-	 *
-	 */
-	public class RelocationComparator implements Comparator<Relocation> {
-
-		/**
-		 * Sort in ascending order of given name, surname, birth date, and relocation
-		 * date
-		 */
-		@Override
-		public int compare(Relocation o1, Relocation o2) {
-			final String key1 = o1.getGivenName() + o1.getSurName() + o1.getBirthDate().toString() + o1.getDate();
-			final String key2 = o2.getGivenName() + o1.getSurName() + o2.getBirthDate().toString() + o2.getDate();
-			return key1.compareToIgnoreCase(key2);
-		}
-	}
 
 	/**
 	 * Constants and static fields
@@ -178,21 +139,7 @@ public class SearchArchives {
 	private void execute(String[] args) throws Exception {
 		// Get a DBIndividual object
 		logger.info("Get individual " + args[4]);
-		DBIndividual individual;
-
-		if (args[4].matches(DIGITS_ONLY)) {
-			Connection conn = DriverManager.getConnection("jdbc:derby:" + args[0]);
-			individual = new DBIndividual(conn, args[4]);
-
-			if (individual.getName().length() == 0) {
-				logger.warning("Individual " + args[4] + " findes ikke i tabellen");
-				System.exit(4);
-			}
-		} else {
-			final String BirthYear = ((args.length >= 6) ? args[5] : "0001");
-			final String DeathYear = ((args.length >= 7) ? args[6] : "9999");
-			individual = new DBIndividual(args[4], BirthYear, DeathYear);
-		}
+		DBIndividual individual = getIndividual(args);
 
 		// Search for similar relocations
 		logger.info("Search for similar relocations for " + individual.getName());
@@ -218,6 +165,30 @@ public class SearchArchives {
 		searchBurialRegistry(args, conn3, individual);
 
 		logger.info("Program ended");
+	}
+
+	/**
+	 * @param args
+	 * @return
+	 * @throws SQLException
+	 */
+	private DBIndividual getIndividual(String[] args) throws SQLException {
+		DBIndividual individual;
+
+		if (args[4].matches(DIGITS_ONLY)) {
+			Connection conn = DriverManager.getConnection("jdbc:derby:" + args[0]);
+			individual = new DBIndividual(conn, args[4]);
+
+			if (individual.getName().length() == 0) {
+				logger.warning("Individual " + args[4] + " findes ikke i tabellen");
+				System.exit(4);
+			}
+		} else {
+			final String BirthYear = ((args.length >= 6) ? args[5] : "0001");
+			final String DeathYear = ((args.length >= 7) ? args[6] : "9999");
+			individual = new DBIndividual(args[4], BirthYear, DeathYear);
+		}
+		return individual;
 	}
 
 	/**
@@ -323,12 +294,12 @@ public class SearchArchives {
 		statement1.setLong(2, individual.getBirthDate().toLocalDate().getYear());
 		final int dd = (individual.getDeathDate() == null ? 9999 : individual.getDeathDate().toLocalDate().getYear());
 		statement1.setLong(3, dd);
-		ResultSet rs1 = statement1.executeQuery();
+//		ResultSet rs1 = statement1.executeQuery();
 		ResultSet rs2;
 		String string = "";
 
 		List<CensusIndividual> cil = null;
-		cil = CensusIndividual.getFromDb(rs1);
+		cil = CensusIndividual.loadFromDatabase(string, string, string, string);
 
 		// Add all household members as source details
 		PreparedStatement statement2 = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);

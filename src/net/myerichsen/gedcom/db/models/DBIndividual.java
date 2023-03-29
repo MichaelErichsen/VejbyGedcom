@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.db.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 28. mar. 2023
+ * @version 29. mar. 2023
  *
  */
 public class DBIndividual {

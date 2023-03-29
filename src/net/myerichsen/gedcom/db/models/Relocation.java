@@ -1,15 +1,97 @@
 package net.myerichsen.gedcom.db.models;
 
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 27. mar. 2023
+ * @version 29. mar. 2023
  *
  */
 public class Relocation {
+	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
+			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
+			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL, VEJBY.INDIVIDUAL.PARENTS "
+			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
+			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = ?";
+	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = ? "
+			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
+
+	public static List<Relocation> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+			throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		Relocation relocation;
+		final List<Relocation> lr = new ArrayList<>();
+
+		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
+		statement.setString(1, phonName);
+		ResultSet rs = statement.executeQuery();
+
+		while (rs.next()) {
+			relocation = new Relocation(
+					(rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim()),
+					(rs.getString(2) == null ? "" : rs.getString(2).trim()),
+					(rs.getString(3) == null ? "" : rs.getString(3).trim()), rs.getDate(4),
+					(rs.getString(5) == null ? "" : rs.getString(5).trim()),
+					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
+					(rs.getString(7) == null ? "" : rs.getString(7).trim()),
+					(rs.getString(8) == null ? "" : rs.getString(8).trim()));
+			lr.add(relocation);
+		}
+
+		statement.close();
+
+		// Find relocation dates outside the life span of the individual to
+		// eliminate
+
+		final Date bd = (birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate));
+		final Date dd = (deathDate.equals("") ? Date.valueOf("9999-12-31") : Date.valueOf(deathDate));
+
+		final List<String> ls = new ArrayList<>();
+
+		for (final Relocation relocation2 : lr) {
+			if ((relocation2.getRelocationDate().before(bd)) || (relocation2.getRelocationDate().after(dd))) {
+				ls.add(relocation2.getId());
+			}
+		}
+
+		// Eliminate individuals with relocation dates outside their life span
+
+		for (int j = 0; j < lr.size(); j++) {
+			for (final String id : ls) {
+				if (lr.get(j).getId().equals(id)) {
+					lr.remove(j);
+				}
+			}
+		}
+
+		// Add birth date to each record
+
+		statement = conn.prepareStatement(SELECT_BIRTHDATE);
+
+		for (final Relocation relocation2 : lr) {
+			statement.setString(1, "@I" + relocation2.getId() + "@");
+			rs = statement.executeQuery();
+
+			if (rs.next()) {
+				relocation2.setBirthDate(rs.getDate("DATE"));
+			}
+
+		}
+
+		statement.close();
+
+		return lr;
+	}
+
 	private String id = "";
 	private String givenName = "";
 	private String surName = "";
@@ -207,5 +289,24 @@ public class Relocation {
 		return id + ";" + givenName + ";" + surName + ";" + relocationDate + ";" + place + ";" + note + ";"
 				+ sourceDetail + ";" + birthDate + ";" + parents;
 
+	}
+
+	/**
+	 * Return the object as a String Array
+	 *
+	 * @return
+	 */
+	public String[] toStringArray() {
+		final String[] sa = new String[9];
+		sa[0] = id;
+		sa[1] = givenName;
+		sa[2] = surName;
+		sa[3] = relocationDate.toString();
+		sa[4] = place;
+		sa[5] = note;
+		sa[6] = (sourceDetail.equals("NULL") ? "" : sourceDetail);
+		sa[7] = birthDate.toString();
+		sa[8] = (parents.equals("NULL") ? "" : parents);
+		return sa;
 	}
 }
