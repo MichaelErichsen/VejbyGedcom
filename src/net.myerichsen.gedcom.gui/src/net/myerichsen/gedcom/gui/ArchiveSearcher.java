@@ -40,6 +40,7 @@ import net.myerichsen.gedcom.db.comparators.CensusIndividualComparator;
 import net.myerichsen.gedcom.db.comparators.RelocationComparator;
 import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
+import net.myerichsen.gedcom.db.models.Probate;
 import net.myerichsen.gedcom.db.models.Relocation;
 
 /**
@@ -60,6 +61,7 @@ public class ArchiveSearcher extends Shell {
 	private static final String PROBATEDB_PATH = "c:/DerbyDB/gedcom";
 	private static final String VEJBYDB_PATH = "c:/Users/michael/VEJBYDB";
 	private static final String PROPERTIES_PATH = "c:/Users/michael/ArchiveSearcher.properties";
+	private static final String PROBATE_SOURCE = "Kronborg";
 
 	/**
 	 * Launch the application.
@@ -88,7 +90,7 @@ public class ArchiveSearcher extends Shell {
 	private Text searchDeath;
 	private Table relocationTable;
 	private Table censusTable;
-	private final Table probateTable;
+	private Table probateTable;
 	private final Table polregTable;
 	private Text vejbyPath;
 	private Text probatePath;
@@ -96,9 +98,19 @@ public class ArchiveSearcher extends Shell {
 	private Text outputDirectory;
 	private final Logger logger = Logger.getLogger("ArchiveSearcher");
 	private Properties props;
+	private Text probateSource;
 
-	// TODO Make tabs visible/invisible
+	// TODO Make tabs visible/invisible. To hide the tab item you call
+	// TabItem.dispose(). To show it again, create a
+//	new TabItem at the appropriate index.
+//
+//	Note: When you dispose a TabItem, this does not dispose the control that was
+//	the content of the TabItem. The content control just becomes invisible.
+//	Therefore, when you create the new TabItem, you can set the same content
+//	control into it.
 
+	// TODO Polreg tab
+	// TODO Burreg tab
 	/**
 	 * Create the shell.
 	 *
@@ -109,44 +121,20 @@ public class ArchiveSearcher extends Shell {
 		setLayout(new GridLayout(1, false));
 
 		getProperties();
-
 		createMenuBar();
-
-		createSearchComposite();
+		createSearchBar();
 
 		final TabFolder tabFolder = new TabFolder(this, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		createRelocationTab(tabFolder);
-
 		createCensusTab(tabFolder);
-
-		/**
-		 * FTaar Amt Herred Sogn Kildestednavn Husstands_familienr Matr_nr_Adresse
-		 * Kildenavn Koen Alder Civilstand Kildeerhverv Stilling_i_husstanden
-		 * Kildefoedested Foedt_kildedato Foedeaar Adresse Matrikel Gade_nr
-		 * Kildehenvisning Kildekommentar KIPnr Loebenr Fonnavn Kildedetaljer
-		 */
+		createProbateTab(tabFolder);
 
 		/**
 		 * GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;
 		 * VITALTYPE;COVERED_DATA;SOURCE";
 		 */
-
-		final TabItem tbtmProbate = new TabItem(tabFolder, SWT.NONE);
-		tbtmProbate.setText("Skifter");
-
-		final ScrolledComposite probateScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmProbate.setControl(probateScroller);
-		probateScroller.setExpandHorizontal(true);
-		probateScroller.setExpandVertical(true);
-
-		probateTable = new Table(probateScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		probateTable.setHeaderVisible(true);
-		probateTable.setLinesVisible(true);
-		probateScroller.setContent(probateTable);
-		probateScroller.setMinSize(probateTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		/**
 		 *
@@ -195,97 +183,6 @@ public class ArchiveSearcher extends Shell {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
-	}
-
-	/**
-	 * Create contents of the shell
-	 */
-	protected void createContents() {
-		setText("ArchiveSearcher");
-		setSize(1116, 580);
-
-	}
-
-	/**
-	 * Create the menu bar
-	 */
-	private void createMenuBar() {
-		final Menu menu = new Menu(this, SWT.BAR);
-		setMenuBar(menu);
-
-		final MenuItem mntmFiler = new MenuItem(menu, SWT.CASCADE);
-		mntmFiler.setText("Filer");
-
-		final Menu menu_1 = new Menu(mntmFiler);
-		mntmFiler.setMenu(menu_1);
-
-		final MenuItem mntmAfslut = new MenuItem(menu_1, SWT.NONE);
-		mntmAfslut.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				e.display.dispose();
-			}
-		});
-		mntmAfslut.setText("Afslut");
-	}
-
-	/**
-	 * Create the relocation tab
-	 *
-	 * @param tabFolder
-	 */
-	private void createRelocationTab(final TabFolder tabFolder) {
-		final TabItem tbtmRelocation = new TabItem(tabFolder, SWT.NONE);
-		tbtmRelocation.setText("Flytninger");
-
-		final ScrolledComposite relocationScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmRelocation.setControl(relocationScroller);
-		relocationScroller.setExpandHorizontal(true);
-		relocationScroller.setExpandVertical(true);
-
-		relocationTable = new Table(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		relocationTable.setHeaderVisible(true);
-		relocationTable.setLinesVisible(true);
-
-		final TableColumn relocationIdColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationIdColumn.setWidth(100);
-		relocationIdColumn.setText("ID");
-
-		final TableColumn relocationGivenColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationGivenColumn.setWidth(100);
-		relocationGivenColumn.setText("Fornavn");
-
-		final TableColumn relocationSurnameColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationSurnameColumn.setWidth(100);
-		relocationSurnameColumn.setText("Efternavn");
-
-		final TableColumn relocationDateColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationDateColumn.setWidth(100);
-		relocationDateColumn.setText("Flyttedato");
-
-		final TableColumn relocationToColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationToColumn.setWidth(183);
-		relocationToColumn.setText("Til");
-
-		final TableColumn relocationFromColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationFromColumn.setWidth(100);
-		relocationFromColumn.setText("Fra");
-
-		final TableColumn relocationDetailsColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationDetailsColumn.setWidth(100);
-		relocationDetailsColumn.setText("Detaljer");
-
-		final TableColumn relocationBirthDateColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationBirthDateColumn.setWidth(100);
-		relocationBirthDateColumn.setText("F\u00F8dselsdato");
-
-		final TableColumn relocationParentsColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationParentsColumn.setWidth(100);
-		relocationParentsColumn.setText("For\u00E6ldre");
-
-		relocationScroller.setContent(relocationTable);
-		relocationScroller.setMinSize(relocationTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	/**
@@ -406,9 +303,147 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Create contents of the shell
+	 */
+	protected void createContents() {
+		setText("ArchiveSearcher");
+		setSize(1116, 580);
+
+	}
+
+	/**
+	 * Create the menu bar
+	 */
+	private void createMenuBar() {
+		final Menu menu = new Menu(this, SWT.BAR);
+		setMenuBar(menu);
+
+		final MenuItem mntmFiler = new MenuItem(menu, SWT.CASCADE);
+		mntmFiler.setText("Filer");
+
+		final Menu menu_1 = new Menu(mntmFiler);
+		mntmFiler.setMenu(menu_1);
+
+		final MenuItem mntmAfslut = new MenuItem(menu_1, SWT.NONE);
+		mntmAfslut.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				e.display.dispose();
+			}
+		});
+		mntmAfslut.setText("Afslut");
+	}
+
+	/**
+	 * Create census tab
+	 *
+	 * @param tabFolder
+	 */
+	private void createProbateTab(TabFolder tabFolder) {
+		final TabItem tbtmProbate = new TabItem(tabFolder, SWT.NONE);
+		tbtmProbate.setText("Skifter");
+
+		final ScrolledComposite probateScroller = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmProbate.setControl(probateScroller);
+		probateScroller.setExpandHorizontal(true);
+		probateScroller.setExpandVertical(true);
+
+		probateTable = new Table(probateScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		probateTable.setHeaderVisible(true);
+		probateTable.setLinesVisible(true);
+
+		final TableColumn tblclmnName = new TableColumn(probateTable, SWT.NONE);
+		tblclmnName.setWidth(100);
+		tblclmnName.setText("Navn");
+
+		final TableColumn tblclmnFra = new TableColumn(probateTable, SWT.NONE);
+		tblclmnFra.setWidth(100);
+		tblclmnFra.setText("Fra");
+
+		final TableColumn tblclmnTil = new TableColumn(probateTable, SWT.NONE);
+		tblclmnTil.setWidth(100);
+		tblclmnTil.setText("Til");
+
+		final TableColumn tblclmnSted = new TableColumn(probateTable, SWT.NONE);
+		tblclmnSted.setWidth(100);
+		tblclmnSted.setText("Sted");
+
+		final TableColumn tblclmnData = new TableColumn(probateTable, SWT.NONE);
+		tblclmnData.setWidth(100);
+		tblclmnData.setText("Data");
+
+		final TableColumn tblclmnKilde = new TableColumn(probateTable, SWT.NONE);
+		tblclmnKilde.setWidth(100);
+		tblclmnKilde.setText("Kilde");
+
+		probateScroller.setContent(probateTable);
+		probateScroller.setMinSize(probateTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+
+	/**
+	 * Create the relocation tab
+	 *
+	 * @param tabFolder
+	 */
+	private void createRelocationTab(final TabFolder tabFolder) {
+		final TabItem tbtmRelocation = new TabItem(tabFolder, SWT.NONE);
+		tbtmRelocation.setText("Flytninger");
+
+		final ScrolledComposite relocationScroller = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmRelocation.setControl(relocationScroller);
+		relocationScroller.setExpandHorizontal(true);
+		relocationScroller.setExpandVertical(true);
+
+		relocationTable = new Table(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		relocationTable.setHeaderVisible(true);
+		relocationTable.setLinesVisible(true);
+
+		final TableColumn relocationIdColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationIdColumn.setWidth(100);
+		relocationIdColumn.setText("ID");
+
+		final TableColumn relocationGivenColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationGivenColumn.setWidth(100);
+		relocationGivenColumn.setText("Fornavn");
+
+		final TableColumn relocationSurnameColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationSurnameColumn.setWidth(100);
+		relocationSurnameColumn.setText("Efternavn");
+
+		final TableColumn relocationDateColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationDateColumn.setWidth(100);
+		relocationDateColumn.setText("Flyttedato");
+
+		final TableColumn relocationToColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationToColumn.setWidth(183);
+		relocationToColumn.setText("Til");
+
+		final TableColumn relocationFromColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationFromColumn.setWidth(100);
+		relocationFromColumn.setText("Fra");
+
+		final TableColumn relocationDetailsColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationDetailsColumn.setWidth(100);
+		relocationDetailsColumn.setText("Detaljer");
+
+		final TableColumn relocationBirthDateColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationBirthDateColumn.setWidth(100);
+		relocationBirthDateColumn.setText("F\u00F8dselsdato");
+
+		final TableColumn relocationParentsColumn = new TableColumn(relocationTable, SWT.NONE);
+		relocationParentsColumn.setWidth(100);
+		relocationParentsColumn.setText("For\u00E6ldre");
+
+		relocationScroller.setContent(relocationTable);
+		relocationScroller.setMinSize(relocationTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+
+	/**
 	 * Create the search composite
 	 */
-	private void createSearchComposite() {
+	private void createSearchBar() {
 		final Composite searchComposite = new Composite(this, SWT.NONE);
 		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		searchComposite.setLayout(new GridLayout(6, false));
@@ -505,6 +540,13 @@ public class ArchiveSearcher extends Shell {
 		probatePath.setText(props.getProperty("probatePath"));
 		probatePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
+		Label lblSkiftekilde = new Label(compositeOpstning, SWT.NONE);
+		lblSkiftekilde.setText("Skiftekilde");
+
+		probateSource = new Text(compositeOpstning, SWT.BORDER);
+		probateSource.setText(props.getProperty("probateSource"));
+		probateSource.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
 		final Label lblNewLabel = new Label(compositeOpstning, SWT.NONE);
 		lblNewLabel.setText("K\u00F8benhavnsdatabase sti");
 
@@ -529,6 +571,7 @@ public class ArchiveSearcher extends Shell {
 			public void widgetSelected(SelectionEvent e) {
 				props.setProperty("vejbyPath", vejbyPath.getText());
 				props.setProperty("probatePath", probatePath.getText());
+				props.setProperty("probateSource", probateSource.getText());
 				props.setProperty("cphPath", cphPath.getText());
 				props.setProperty("outputDirectory", outputDirectory.getText());
 				storeProperties();
@@ -542,6 +585,7 @@ public class ArchiveSearcher extends Shell {
 			public void widgetSelected(SelectionEvent e) {
 				vejbyPath.setText(props.getProperty("vejbyPath"));
 				probatePath.setText(props.getProperty("probatePath"));
+				probateSource.setText(props.getProperty("probateSource"));
 				cphPath.setText(props.getProperty("cphPath"));
 				outputDirectory.setText(props.getProperty("outputDirectory"));
 			}
@@ -561,6 +605,7 @@ public class ArchiveSearcher extends Shell {
 		} catch (final Exception e) {
 			props.setProperty("vejbyPath", VEJBYDB_PATH);
 			props.setProperty("probatePath", PROBATEDB_PATH);
+			props.setProperty("probateSource", PROBATE_SOURCE);
 			props.setProperty("cphPath", CPHDB_PATH);
 			props.setProperty("outputDirectory", OUTPUT_PATH);
 
@@ -569,30 +614,8 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @throws SQLException
-	 */
-	private void populateRelocationTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		final List<Relocation> relocations = Relocation.loadFromDatabase(props.getProperty("vejbyPath"), phonName,
-				birthDate, deathDate);
-
-		Collections.sort(relocations, new RelocationComparator());
-
-		relocationTable.removeAll();
-		TableItem ti;
-
-		for (final Relocation relocation : relocations) {
-			ti = new TableItem(relocationTable, SWT.NONE);
-			ti.setText(relocation.toStringArray());
-		}
-		relocationTable.redraw();
-	}
-
-	/**
 	 * Populate census table
-	 * 
+	 *
 	 * @param phonName
 	 * @param birthDate
 	 * @param deathDate
@@ -601,7 +624,7 @@ public class ArchiveSearcher extends Shell {
 	private void populateCensusTable(String phonName, String birthDate, String deathDate) throws SQLException {
 		final List<CensusIndividual> censuses = CensusIndividual.loadFromDatabase(props.getProperty("vejbyPath"),
 				phonName, birthDate.substring(0, 4), deathDate.substring(0, 4));
-
+		logger.info("Populate census table");
 		Collections.sort(censuses, new CensusIndividualComparator());
 
 		// TODO Add all household members as source details
@@ -642,6 +665,57 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Populate probate table
+	 * 
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	private void populateProbateTable(String phonName, String birthDate, String deathDate) throws SQLException {
+		logger.info("Populate probate table");
+		String path = props.getProperty("probatePath");
+		String probateSource = props.getProperty("probateSource");
+
+		List<Probate> lp = Probate.loadFromDatabase(path, phonName, birthDate, deathDate, probateSource);
+
+		probateTable.removeAll();
+		TableItem ti;
+
+		for (final Probate probate : lp) {
+			ti = new TableItem(probateTable, SWT.NONE);
+			ti.setText(probate.toStringArray());
+		}
+		probateTable.redraw();
+
+	}
+
+	/**
+	 * Populate relocation table
+	 * 
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	private void populateRelocationTable(String phonName, String birthDate, String deathDate) throws SQLException {
+		logger.info("Populate relocation table");
+		final List<Relocation> relocations = Relocation.loadFromDatabase(props.getProperty("vejbyPath"), phonName,
+				birthDate, deathDate);
+
+		Collections.sort(relocations, new RelocationComparator());
+
+		relocationTable.removeAll();
+		TableItem ti;
+
+		for (final Relocation relocation : relocations) {
+			ti = new TableItem(relocationTable, SWT.NONE);
+			ti.setText(relocation.toStringArray());
+		}
+		relocationTable.redraw();
+	}
+
+	/**
 	 * Populate the relocation table from the database
 	 *
 	 * @param e
@@ -672,6 +746,7 @@ public class ArchiveSearcher extends Shell {
 
 			populateRelocationTable(phonName, birthDate, deathDate);
 			populateCensusTable(phonName, birthDate, deathDate);
+			populateProbateTable(phonName, birthDate, deathDate);
 		} catch (final SQLException e1) {
 			e1.printStackTrace();
 		}
@@ -723,6 +798,7 @@ public class ArchiveSearcher extends Shell {
 
 			populateRelocationTable(phonName, birthDate, deathDate);
 			populateCensusTable(phonName, birthDate, deathDate);
+			populateProbateTable(phonName, birthDate, deathDate);
 		} catch (final Exception e1) {
 			e1.printStackTrace();
 		}
