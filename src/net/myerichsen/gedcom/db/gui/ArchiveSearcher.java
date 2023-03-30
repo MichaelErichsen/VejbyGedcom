@@ -20,7 +20,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -35,8 +37,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
+import net.myerichsen.gedcom.db.loaders.DBLoader;
 import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
+import net.myerichsen.gedcom.db.models.PolregRecord;
 import net.myerichsen.gedcom.db.models.Probate;
 import net.myerichsen.gedcom.db.models.Relocation;
 import net.myerichsen.gedcom.db.util.CensusIndividualComparator;
@@ -50,8 +54,12 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 30. mar. 2023
  *
  */
+
 // TODO Make database schemas configurable
 // TODO Add parents tab
+// TODO Run populate as background tasks
+// TODO Run Derby multithreaded
+
 public class ArchiveSearcher extends Shell {
 
 	/**
@@ -111,10 +119,11 @@ public class ArchiveSearcher extends Shell {
 	private TabItem tbtmRelocation;
 	private Text gedcomFilePath;
 	private Text kipTextFilename;
+	private Text vejbySchema;
+	private Text probateSchema;
+	private Text cphSchema;
 	private Text csvFileDirectory;
-	private Text vejbyDbSchema;
-	private Text probateDbSchema;
-	private Text cphDbSchema;
+	private Text cphDbPath;
 
 	// TODO Make tabs visible/invisible. To hide the tab item you call
 	// TabItem.dispose(). To show it again, create a
@@ -125,7 +134,6 @@ public class ArchiveSearcher extends Shell {
 //	Therefore, when you create the new TabItem, you can set the same content
 //	control into it.
 
-	// TODO Polreg tab
 	// TODO Burreg tab
 	/**
 	 * Create the shell.
@@ -148,12 +156,8 @@ public class ArchiveSearcher extends Shell {
 		createProbateTab(tabFolder);
 
 		/**
-		 * GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;
-		 * VITALTYPE;COVERED_DATA;SOURCE";
-		 */
-
-		/**
-		 *
+		 * Create police registry tab
+		 * 
 		 * NAME;BirthDate;OCCUPATION;STREET;NUMBER;LETTER;
 		 * FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS
 		 *
@@ -171,6 +175,58 @@ public class ArchiveSearcher extends Shell {
 		polregTable = new Table(polregScroller, SWT.BORDER | SWT.FULL_SELECTION);
 		polregTable.setHeaderVisible(true);
 		polregTable.setLinesVisible(true);
+
+		TableColumn tblclmnNavn_1 = new TableColumn(polregTable, SWT.NONE);
+		tblclmnNavn_1.setWidth(50);
+		tblclmnNavn_1.setText("Navn");
+
+		TableColumn tblclmnFdedag = new TableColumn(polregTable, SWT.NONE);
+		tblclmnFdedag.setWidth(100);
+		tblclmnFdedag.setText("F\u00F8dedag");
+
+		TableColumn tblclmnErhverv_1 = new TableColumn(polregTable, SWT.NONE);
+		tblclmnErhverv_1.setWidth(100);
+		tblclmnErhverv_1.setText("Erhverv");
+
+		TableColumn tblclmnGade = new TableColumn(polregTable, SWT.NONE);
+		tblclmnGade.setWidth(100);
+		tblclmnGade.setText("Gade");
+
+		TableColumn tblclmnNr_1 = new TableColumn(polregTable, SWT.NONE);
+		tblclmnNr_1.setWidth(50);
+		tblclmnNr_1.setText("Nr.");
+
+		TableColumn tblclmnBogstav = new TableColumn(polregTable, SWT.NONE);
+		tblclmnBogstav.setWidth(50);
+		tblclmnBogstav.setText("Bogstav");
+
+		TableColumn tblclmnEtage = new TableColumn(polregTable, SWT.NONE);
+		tblclmnEtage.setWidth(50);
+		tblclmnEtage.setText("Etage");
+
+		TableColumn tblclmnSted_1 = new TableColumn(polregTable, SWT.NONE);
+		tblclmnSted_1.setWidth(100);
+		tblclmnSted_1.setText("Sted");
+
+		TableColumn tblclmnVrt = new TableColumn(polregTable, SWT.NONE);
+		tblclmnVrt.setWidth(100);
+		tblclmnVrt.setText("V\u00E6rt");
+
+		TableColumn tblclmnDag = new TableColumn(polregTable, SWT.NONE);
+		tblclmnDag.setWidth(48);
+		tblclmnDag.setText("Dag");
+
+		TableColumn tblclmnMned = new TableColumn(polregTable, SWT.NONE);
+		tblclmnMned.setWidth(49);
+		tblclmnMned.setText("M\u00E5ned");
+
+		TableColumn tblclmnr = new TableColumn(polregTable, SWT.NONE);
+		tblclmnr.setWidth(49);
+		tblclmnr.setText("\u00C5r");
+
+		TableColumn tblclmnAdresse_1 = new TableColumn(polregTable, SWT.NONE);
+		tblclmnAdresse_1.setWidth(100);
+		tblclmnAdresse_1.setText("Adresse");
 		polregScroller.setContent(polregTable);
 		polregScroller.setMinSize(polregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
@@ -343,22 +399,26 @@ public class ArchiveSearcher extends Shell {
 		final Menu menu_1 = new Menu(mntmFiler);
 		mntmFiler.setMenu(menu_1);
 
-		MenuItem mntmLoadGedcom = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmLoadGedcom = new MenuItem(menu_1, SWT.NONE);
 		mntmLoadGedcom.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final Shell[] shells = e.widget.getDisplay().getShells();
-				MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 				messageBox.setText("Advarsel");
 				messageBox.setMessage("Dette valg sletter indholdet i tabellerne før opdatering!");
-				int buttonID = messageBox.open();
+				final int buttonID = messageBox.open();
+
 				switch (buttonID) {
 				case SWT.OK:
 					setMessage("Data hentes fra " + props.getProperty("gedcomFilePath") + " ind i tabellerne i "
 							+ props.getProperty("vejbyPath"));
-					String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath") };
-					System.out.println(props.getProperty("gedcomFilePath") + "; " + props.getProperty("vejbyPath"));
-					// DBLoader.main(sa);
+
+					new Thread(() -> {
+						final String[] sa = new String[] { props.getProperty("gedcomFilePath"),
+								props.getProperty("vejbyPath") };
+						DBLoader.main(sa);
+					}).start();
 					break;
 				case SWT.CANCEL:
 					break;
@@ -367,26 +427,29 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmLoadGedcom.setText("Indl\u00E6s GEDCOM i databasen");
 
-		MenuItem mntmLoadKip = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmLoadKip = new MenuItem(menu_1, SWT.NONE);
 		mntmLoadKip.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final Shell[] shells = e.widget.getDisplay().getShells();
-				MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 				messageBox.setText("Advarsel");
 				messageBox.setMessage("Dette tager lang tid!");
-				int buttonID = messageBox.open();
+				final int buttonID = messageBox.open();
+
 				switch (buttonID) {
 				case SWT.OK:
 					setMessage("Data hentes fra KIP-filerne " + props.getProperty("csvFileDirectory")
 							+ " ind i tabellen i " + props.getProperty("vejbyPath"));
 
-					String[] sa = new String[] { props.getProperty("kipTextFilename"),
-							props.getProperty("csvFileDirectory"), props.getProperty("vejbyPath") };
-					System.out.println(props.getProperty("kipTextFilename") + ", "
-							+ props.getProperty("csvFileDirectory") + ", " + props.getProperty("vejbyPath"));
-					CensusDbLoader.main(sa);
+					new Thread(() -> {
+						final String[] sa = new String[] { props.getProperty("kipTextFilename"),
+								props.getProperty("csvFileDirectory"), props.getProperty("vejbyPath") };
+						System.out.println(props.getProperty("kipTextFilename") + ", "
+								+ props.getProperty("csvFileDirectory") + ", " + props.getProperty("vejbyPath"));
+						CensusDbLoader.main(sa);
+					}).start();
 
 					break;
 				case SWT.CANCEL:
@@ -591,12 +654,13 @@ public class ArchiveSearcher extends Shell {
 	 * @param tabFolder
 	 */
 	private void createSettingsTab(final TabFolder tabFolder) {
-		final TabItem tbtmOpstning = new TabItem(tabFolder, SWT.NONE);
-		tbtmOpstning.setText("Ops\u00E6tning");
+
+		final TabItem tbtmSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtmSettings.setText("Ops\u00E6tning");
 
 		final Composite compositeOpstning = new Composite(tabFolder, SWT.NONE);
-		tbtmOpstning.setControl(compositeOpstning);
-		compositeOpstning.setLayout(new GridLayout(4, false));
+		tbtmSettings.setControl(compositeOpstning);
+		compositeOpstning.setLayout(new GridLayout(6, false));
 
 		final Label lblVejbyDatabaseSti = new Label(compositeOpstning, SWT.NONE);
 		lblVejbyDatabaseSti.setText("Vejby database sti");
@@ -605,14 +669,33 @@ public class ArchiveSearcher extends Shell {
 		vejbyPath.setText(props.getProperty("vejbyPath"));
 		vejbyPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Label lblVejbyDatabaseSchema = new Label(compositeOpstning, SWT.NONE);
-		lblVejbyDatabaseSchema.setText("Vejby database schema");
+		final Button btnFindVejbyPath = new Button(compositeOpstning, SWT.NONE);
+		btnFindVejbyPath.setText("Find");
+		btnFindVejbyPath.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
 
-		vejbyDbSchema = new Text(compositeOpstning, SWT.BORDER);
-		vejbyDbSchema.setEnabled(false);
-		vejbyDbSchema.setEditable(false);
-		vejbyDbSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		vejbyDbSchema.setText(props.getProperty("vejbyDbSchema"));
+				directoryDialog.setFilterPath(vejbyPath.getText());
+				directoryDialog.setText("Vælg venligst en folder og klik OK");
+
+				final String dir = directoryDialog.open();
+				if (dir != null) {
+					vejbyPath.setText(dir);
+					props.setProperty("vejbyPath", dir);
+				}
+			}
+		});
+		final Label lblVejbySchema = new Label(compositeOpstning, SWT.NONE);
+		lblVejbySchema.setText("Vejby database schema");
+
+		vejbySchema = new Text(compositeOpstning, SWT.BORDER);
+		vejbySchema.setEnabled(false);
+		vejbySchema.setEditable(false);
+		vejbySchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		vejbySchema.setText(props.getProperty("vejbySchema"));
+		new Label(compositeOpstning, SWT.NONE);
 
 		final Label lblSkifteDatabaseSti = new Label(compositeOpstning, SWT.NONE);
 		lblSkifteDatabaseSti.setText("Skifte database sti");
@@ -621,6 +704,34 @@ public class ArchiveSearcher extends Shell {
 		probatePath.setText(props.getProperty("probatePath"));
 		probatePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
+		final Button btnFindProbatePath = new Button(compositeOpstning, SWT.NONE);
+		btnFindProbatePath.setText("Find");
+		btnFindProbatePath.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
+
+				directoryDialog.setFilterPath(probatePath.getText());
+				directoryDialog.setText("Vælg venligst en folder og klik OK");
+
+				final String dir = directoryDialog.open();
+				if (dir != null) {
+					probatePath.setText(dir);
+					props.setProperty("probatePath", dir);
+				}
+			}
+		});
+		final Label lblProbateDatabaseSchema = new Label(compositeOpstning, SWT.NONE);
+		lblProbateDatabaseSchema.setText("Skifte database schema");
+
+		probateSchema = new Text(compositeOpstning, SWT.BORDER);
+		probateSchema.setEnabled(false);
+		probateSchema.setEditable(false);
+		probateSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		probateSchema.setText(props.getProperty("probateSchema"));
+		new Label(compositeOpstning, SWT.NONE);
+
 		final Label lblSkiftekilde = new Label(compositeOpstning, SWT.NONE);
 		lblSkiftekilde.setText("Skiftekilde");
 
@@ -628,30 +739,82 @@ public class ArchiveSearcher extends Shell {
 		probateSource.setText(props.getProperty("probateSource"));
 		probateSource.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Label lblProbateDatabaseSchema = new Label(compositeOpstning, SWT.NONE);
-		lblProbateDatabaseSchema.setText("Skifte database schema");
-
-		probateDbSchema = new Text(compositeOpstning, SWT.BORDER);
-		probateDbSchema.setEnabled(false);
-		probateDbSchema.setEditable(false);
-		probateDbSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		probateDbSchema.setText(props.getProperty("probateDbSchema"));
-
-		final Label lblNewLabel = new Label(compositeOpstning, SWT.NONE);
-		lblNewLabel.setText("K\u00F8benhavnsdatabase sti");
+		new Label(compositeOpstning, SWT.NONE);
+		new Label(compositeOpstning, SWT.NONE);
+		new Label(compositeOpstning, SWT.NONE);
 
 		cphPath = new Text(compositeOpstning, SWT.BORDER);
-		cphPath.setText(props.getProperty("cphPath"));
+		cphPath.setText(props.getProperty("cphDbPath"));
 		cphPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Label lblCphDatabaseSchema = new Label(compositeOpstning, SWT.NONE);
+		final Label lblNewLabel = new Label(compositeOpstning, SWT.NONE);
+		lblNewLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNewLabel.setText("K\u00F8benhavnsdatabase sti");
+
+		cphDbPath = new Text(compositeOpstning, SWT.BORDER);
+		cphDbPath.setText(props.getProperty("cphDbPath"));
+		cphDbPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Button btnFindCphPath = new Button(compositeOpstning, SWT.NONE);
+		btnFindCphPath.setText("Find");
+		btnFindCphPath.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
+
+				directoryDialog.setFilterPath(cphDbPath.getText());
+				directoryDialog.setText("Vælg venligst en folder og klik OK");
+
+				final String dir = directoryDialog.open();
+				if (dir != null) {
+					cphDbPath.setText(dir);
+					props.setProperty("cphDbPath", dir);
+				}
+			}
+		});
+		final Label lblCphDatabaseSchema = new Label(compositeOpstning, SWT.NONE);
 		lblCphDatabaseSchema.setText("K\u00F8benhavnsdatabase database schema");
 
-		cphDbSchema = new Text(compositeOpstning, SWT.BORDER);
-		cphDbSchema.setEnabled(false);
-		cphDbSchema.setEditable(false);
-		cphDbSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		cphDbSchema.setText(props.getProperty("cphDbSchema"));
+		cphSchema = new Text(compositeOpstning, SWT.BORDER);
+		cphSchema.setEnabled(false);
+		cphSchema.setEditable(false);
+		cphSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		cphSchema.setText(props.getProperty("cphSchema"));
+		new Label(compositeOpstning, SWT.NONE);
+
+		final Label lblKipCsvFil = new Label(compositeOpstning, SWT.NONE);
+		lblKipCsvFil.setText("KIP csv fil sti");
+
+		csvFileDirectory = new Text(compositeOpstning, SWT.BORDER);
+		csvFileDirectory.setText(props.getProperty("csvFileDirectory"));
+		csvFileDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Button btnFindCsvPath = new Button(compositeOpstning, SWT.NONE);
+		btnFindCsvPath.setText("Find");
+		btnFindCsvPath.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
+
+				directoryDialog.setFilterPath(csvFileDirectory.getText());
+				directoryDialog.setText("Vælg venligst en folder og klik OK");
+
+				final String dir = directoryDialog.open();
+				if (dir != null) {
+					csvFileDirectory.setText(dir);
+					props.setProperty("csvFileDirectory", dir);
+				}
+			}
+		});
+		final Label lblKipTextFilnavn = new Label(compositeOpstning, SWT.NONE);
+		lblKipTextFilnavn.setText("KIP cphDbPath filnavn uden sti");
+
+		kipTextFilename = new Text(compositeOpstning, SWT.BORDER);
+		kipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		kipTextFilename.setText(props.getProperty("kipTextFilename"));
+		new Label(compositeOpstning, SWT.NONE);
 
 		final Label lblUddatasti = new Label(compositeOpstning, SWT.NONE);
 		lblUddatasti.setText("Uddatasti");
@@ -660,66 +823,99 @@ public class ArchiveSearcher extends Shell {
 		outputDirectory.setText(props.getProperty("outputDirectory"));
 		outputDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		Label lblGedcomFilSti = new Label(compositeOpstning, SWT.NONE);
+		final Button btnFindOutpath = new Button(compositeOpstning, SWT.NONE);
+		btnFindOutpath.setText("Find");
+		btnFindOutpath.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
+
+				directoryDialog.setFilterPath(outputDirectory.getText());
+				directoryDialog.setText("Vælg venligst en folder og klik OK");
+
+				final String dir = directoryDialog.open();
+				if (dir != null) {
+					outputDirectory.setText(dir);
+					props.setProperty("outputDirectory", dir);
+				}
+			}
+		});
+		new Label(compositeOpstning, SWT.NONE);
+		new Label(compositeOpstning, SWT.NONE);
+		new Label(compositeOpstning, SWT.NONE);
+
+		final Label lblGedcomFilSti = new Label(compositeOpstning, SWT.NONE);
 		lblGedcomFilSti.setText("GEDCOM fil sti");
 
 		gedcomFilePath = new Text(compositeOpstning, SWT.BORDER);
 		gedcomFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		gedcomFilePath.setText(props.getProperty("gedcomFilePath"));
 
-		Label lblKipTextFilnavn = new Label(compositeOpstning, SWT.NONE);
-		lblKipTextFilnavn.setText("KIP text filnavn uden sti");
+		final Button btnFindKipCsv = new Button(compositeOpstning, SWT.NONE);
+		btnFindKipCsv.setText("Find");
+		btnFindKipCsv.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final FileDialog fileDialog = new FileDialog(shells[0]);
 
-		kipTextFilename = new Text(compositeOpstning, SWT.BORDER);
-		kipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		kipTextFilename.setText(props.getProperty("kipTextFilename"));
+				System.out.println(gedcomFilePath.getText());
 
-		Label lblKipCsvFil = new Label(compositeOpstning, SWT.NONE);
-		lblKipCsvFil.setText("KIP csv fil sti");
+				fileDialog.setFilterPath(gedcomFilePath.getText());
+				fileDialog.setText("Vælg en GEDCOM fil");
+				String[] filterExt = { "*.ged", "*.*" };
+				fileDialog.setFilterExtensions(filterExt);
 
-		csvFileDirectory = new Text(compositeOpstning, SWT.BORDER);
-		csvFileDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		csvFileDirectory.setText(props.getProperty("csvFileDirectory"));
+				final String file = fileDialog.open();
 
+				if (file != null) {
+					gedcomFilePath.setText(file);
+					props.setProperty("gedcomFilePath", file);
+				}
+			}
+		});
 		new Label(compositeOpstning, SWT.NONE);
 		new Label(compositeOpstning, SWT.NONE);
+		new Label(compositeOpstning, SWT.NONE);
 
-		Composite composite = new Composite(compositeOpstning, SWT.BORDER);
-		GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1);
-		gd_composite.widthHint = 1071;
-		composite.setLayoutData(gd_composite);
-		composite.setLayout(new GridLayout(7, false));
+		final Composite checkButtoncomposite = new Composite(compositeOpstning, SWT.BORDER);
+		final GridData gd_checkButtoncomposite = new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1);
+		gd_checkButtoncomposite.widthHint = 1071;
+		checkButtoncomposite.setLayoutData(gd_checkButtoncomposite);
+		checkButtoncomposite.setLayout(new GridLayout(7, false));
 
-		Label lblAktiveSgninger = new Label(composite, SWT.NONE);
+		final Label lblAktiveSgninger = new Label(checkButtoncomposite, SWT.NONE);
 		lblAktiveSgninger.setText("Aktive s\u00F8gninger:");
 
-		Button btnRelocationTab = new Button(composite, SWT.CHECK);
+		final Button btnRelocationTab = new Button(checkButtoncomposite, SWT.CHECK);
 		btnRelocationTab.setSelection(Boolean.parseBoolean(props.getProperty("relocationSearch")));
 		btnRelocationTab.setText("Flytninger");
 
-		Button btnCensusTab = new Button(composite, SWT.CHECK);
+		final Button btnCensusTab = new Button(checkButtoncomposite, SWT.CHECK);
 		btnCensusTab.setSelection(Boolean.parseBoolean(props.getProperty("censusSearch")));
 		btnCensusTab.setText("Folket\u00E6llinger");
 
-		Button btnProbateTab = new Button(composite, SWT.CHECK);
+		final Button btnProbateTab = new Button(checkButtoncomposite, SWT.CHECK);
 		btnProbateTab.setSelection(Boolean.parseBoolean(props.getProperty("probateSearch")));
 		btnProbateTab.setText("Skifter");
 
-		Button btnPolitietsRegisterblade = new Button(composite, SWT.CHECK);
+		final Button btnPolitietsRegisterblade = new Button(checkButtoncomposite, SWT.CHECK);
 		btnPolitietsRegisterblade.setSelection(Boolean.parseBoolean(props.getProperty("polregSearch")));
 		btnPolitietsRegisterblade.setText("Politiets registerblade");
 
-		Button btnBegravelsesregistret = new Button(composite, SWT.CHECK);
+		final Button btnBegravelsesregistret = new Button(checkButtoncomposite, SWT.CHECK);
 		btnBegravelsesregistret.setSelection(Boolean.parseBoolean(props.getProperty("burregSearch")));
 		btnBegravelsesregistret.setText("Begravelsesregistret");
 
-		Button btnForldre = new Button(composite, SWT.CHECK);
+		final Button btnForldre = new Button(checkButtoncomposite, SWT.CHECK);
 		btnForldre.setEnabled(Boolean.parseBoolean(props.getProperty("parentSearch")));
 		btnForldre.setText("For\u00E6ldre");
+		new Label(compositeOpstning, SWT.NONE);
 
 		final Composite settingsButtonComposite = new Composite(compositeOpstning, SWT.NONE);
 		settingsButtonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
-		settingsButtonComposite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 4, 1));
+		settingsButtonComposite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 5, 1));
 
 		final Button settingsUpdateButton = new Button(settingsButtonComposite, SWT.NONE);
 		settingsUpdateButton.addSelectionListener(new SelectionAdapter() {
@@ -733,9 +929,9 @@ public class ArchiveSearcher extends Shell {
 				props.setProperty("gedcomFilePath", gedcomFilePath.getText());
 				props.setProperty("kipTextFilename", kipTextFilename.getText());
 				props.setProperty("csvFileDirectory", csvFileDirectory.getText());
-				props.setProperty("vejbyDbSchema", vejbyDbSchema.getText());
-				props.setProperty("probateDbSchema", probateDbSchema.getText());
-				props.setProperty("cphDbSchema", cphDbSchema.getText());
+				props.setProperty("vejbySchema", vejbySchema.getText());
+				props.setProperty("probateSchema", probateSchema.getText());
+				props.setProperty("cphSchema", cphSchema.getText());
 				props.setProperty("relocationSearch", String.valueOf(btnRelocationTab.getSelection()));
 				props.setProperty("censusSearch", String.valueOf(btnCensusTab.getSelection()));
 				props.setProperty("probateSearch", String.valueOf(btnProbateTab.getSelection()));
@@ -746,20 +942,36 @@ public class ArchiveSearcher extends Shell {
 				storeProperties();
 			}
 		});
+
 		settingsUpdateButton.setText("Opdater");
 
-		final Button settingsCancelButton = new Button(settingsButtonComposite, SWT.NONE);
-		settingsCancelButton.addSelectionListener(new SelectionAdapter() {
+		final Button btnCancel = new Button(settingsButtonComposite, SWT.NONE);
+		btnCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				vejbyPath.setText(props.getProperty("vejbyPath"));
 				probatePath.setText(props.getProperty("probatePath"));
 				probateSource.setText(props.getProperty("probateSource"));
-				cphPath.setText(props.getProperty("cphPath"));
+				cphPath.setText(props.getProperty("cphDbPath"));
 				outputDirectory.setText(props.getProperty("outputDirectory"));
+				gedcomFilePath.setText(props.getProperty("gedcomFilePath"));
+				kipTextFilename.setText(props.getProperty("kipTextFilename"));
+				csvFileDirectory.setText(props.getProperty("csvFileDirectory"));
+				vejbySchema.setText(props.getProperty("vejbySchema"));
+				probateSchema.setText(props.getProperty("probateSchema"));
+				cphSchema.setText(props.getProperty("cphSchema"));
+				btnRelocationTab.setSelection(Boolean.parseBoolean(props.getProperty("relocationSearch")));
+				btnCensusTab.setSelection(Boolean.parseBoolean(props.getProperty("censusSearch")));
+				btnProbateTab.setSelection(Boolean.parseBoolean(props.getProperty("probateSearch")));
+				btnPolitietsRegisterblade.setSelection(Boolean.parseBoolean(props.getProperty("polregSearch")));
+				btnBegravelsesregistret.setSelection(Boolean.parseBoolean(props.getProperty("burregSearch")));
+				btnForldre.setSelection(Boolean.parseBoolean(props.getProperty("parentSearch")));
+
 			}
 		});
-		settingsCancelButton.setText("Fortryd");
+		btnCancel.setText("Fortryd");
+		new Label(compositeOpstning, SWT.NONE);
+
 	}
 
 	/**
@@ -775,14 +987,14 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("vejbyPath", VEJBYDB_PATH);
 			props.setProperty("probatePath", PROBATEDB_PATH);
 			props.setProperty("probateSource", PROBATE_SOURCE);
-			props.setProperty("cphPath", CPHDB_PATH);
+			props.setProperty("cphDbPath", CPHDB_PATH);
 			props.setProperty("outputDirectory", OUTPUT_PATH);
 			props.setProperty("gedcomFilePath", GEDCOM_FILE_PATH);
 			props.setProperty("kipTextFilename", KIP_TEXT_FILENAME);
 			props.setProperty("csvFileDirectory", CSV_FILE_DIRECTORY);
-			props.setProperty("vejbyDbSchema", VEJBYDB_SCHEMA);
-			props.setProperty("probateDbSchema", PROBATEDB_SCHEMA);
-			props.setProperty("cphDbSchema", CPHDB_SCHEMA);
+			props.setProperty("vejbySchema", VEJBYDB_SCHEMA);
+			props.setProperty("probateSchema", PROBATEDB_SCHEMA);
+			props.setProperty("cphSchema", CPHDB_SCHEMA);
 			props.setProperty("relocationSearch", "true");
 			props.setProperty("censusSearch", "true");
 			props.setProperty("probateSearch", "true");
@@ -919,6 +1131,35 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Populate police registry table
+	 *
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	private void populatePolregTable(String phonName, String birthDate, String deathDate) throws SQLException {
+		if (!props.getProperty("polregSearch").equals("true")) {
+			return;
+		}
+
+		setMessage("Politiregister hentes");
+		polregTable.removeAll();
+
+		final List<PolregRecord> lpr = PolregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
+				birthDate, deathDate);
+
+		TableItem ti;
+
+		for (final PolregRecord pr : lpr) {
+			ti = new TableItem(polregTable, SWT.NONE);
+			ti.setText(pr.toStringArray());
+		}
+		polregTable.redraw();
+		polregTable.update();
+	}
+
+	/**
 	 * Populate the relocation table from the database
 	 *
 	 * @param e
@@ -951,6 +1192,7 @@ public class ArchiveSearcher extends Shell {
 			populateRelocationTable(phonName, birthDate, deathDate);
 			populateCensusTable(phonName, birthDate, deathDate);
 			populateProbateTable(phonName, birthDate, deathDate);
+			populatePolregTable(phonName, birthDate, deathDate);
 			setMessage("Klar");
 		} catch (final SQLException e1) {
 			messageField.setText(e1.getMessage());
@@ -1005,6 +1247,7 @@ public class ArchiveSearcher extends Shell {
 			populateRelocationTable(phonName, birthDate, deathDate);
 			populateCensusTable(phonName, birthDate, deathDate);
 			populateProbateTable(phonName, birthDate, deathDate);
+			populatePolregTable(phonName, birthDate, deathDate);
 			setMessage("Klar");
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());

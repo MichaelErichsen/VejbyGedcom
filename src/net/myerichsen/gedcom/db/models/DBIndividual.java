@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 29. mar. 2023
+ * @version 30. mar. 2023
  *
  */
 public class DBIndividual {
@@ -36,12 +36,18 @@ public class DBIndividual {
 	 * @throws SQLException
 	 */
 	private static String findParentsFromChristeningEvent(Connection conn, String id) throws SQLException {
-		PreparedStatement statement = conn.prepareStatement(SELECT_PARENTS_FROM_CHRISTENING);
+		final PreparedStatement statement = conn.prepareStatement(SELECT_PARENTS_FROM_CHRISTENING);
 		statement.setString(1, id);
 		final ResultSet rs = statement.executeQuery();
 
 		if (rs.next()) {
-			return rs.getString("SOURCEDETAIL");
+			final String string = rs.getString("NOTE");
+
+			if (string == null) {
+				return "";
+			} else {
+				return string;
+			}
 		}
 
 		return "";
@@ -56,7 +62,7 @@ public class DBIndividual {
 	 * @throws SQLException
 	 */
 	private static String getNameFromId(Connection conn, String id) throws SQLException {
-		PreparedStatement statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
+		final PreparedStatement statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
 		statement.setString(1, id);
 		final ResultSet rs = statement.executeQuery();
 
@@ -85,7 +91,7 @@ public class DBIndividual {
 		String wifeName = "";
 
 		// Read all individuals into a list
-		PreparedStatement statement1 = conn.prepareStatement(SELECT_INDIVIDUAL);
+		final PreparedStatement statement1 = conn.prepareStatement(SELECT_INDIVIDUAL);
 		ResultSet rs = statement1.executeQuery();
 
 		while (rs.next()) {
@@ -95,7 +101,7 @@ public class DBIndividual {
 				individual.setId(rs.getString("ID"));
 			}
 			if (rs.getString("GIVENNAME") != null) {
-				givenName = rs.getString("GIVENNAME");
+				givenName = rs.getString("GIVENNAME").trim();
 			}
 			if (rs.getString("SURNAME") != null) {
 				surName = rs.getString("SURNAME");
@@ -117,7 +123,7 @@ public class DBIndividual {
 
 		// Add birth data
 		for (final DBIndividual dbi : ldbi) {
-			PreparedStatement statement2 = conn.prepareStatement(SELECT_BIRTH_EVENT);
+			final PreparedStatement statement2 = conn.prepareStatement(SELECT_BIRTH_EVENT);
 			statement2.setString(1, dbi.getId());
 			rs = statement2.executeQuery();
 
@@ -133,7 +139,7 @@ public class DBIndividual {
 
 		// Add death data
 		for (final DBIndividual dbi : ldbi) {
-			PreparedStatement statement3 = conn.prepareStatement(SELECT_DEATH_EVENT);
+			final PreparedStatement statement3 = conn.prepareStatement(SELECT_DEATH_EVENT);
 			statement3.setString(1, dbi.getId());
 			rs = statement3.executeQuery();
 
@@ -149,7 +155,8 @@ public class DBIndividual {
 
 		// Add parents
 		for (final DBIndividual dbi : ldbi) {
-			PreparedStatement statement4 = conn.prepareStatement(SELECT_PARENTS);
+			// Try to find from FAMC record
+			final PreparedStatement statement4 = conn.prepareStatement(SELECT_PARENTS);
 			statement4.setString(1, dbi.getFamc());
 			rs = statement4.executeQuery();
 

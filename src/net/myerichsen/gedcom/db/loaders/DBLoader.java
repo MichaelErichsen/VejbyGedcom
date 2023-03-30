@@ -38,12 +38,9 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 28. mar. 2023
+ * @version 30. mar. 2023
  */
 public class DBLoader {
-
-	// TODO Parents in relocations from christening missing
-
 	/**
 	 * Static constants and variables
 	 */

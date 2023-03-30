@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 29. mar. 2023
+ * @version 30. mar. 2023
  *
  */
 public class Relocation {
@@ -25,6 +25,14 @@ public class Relocation {
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = ? "
 			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 
+	/**
+	 * @param dbPath
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @return
+	 * @throws SQLException
+	 */
 	public static List<Relocation> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
