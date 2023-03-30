@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 29. mar. 2023
+ * @version 30. mar. 2023
  *
  */
 public class Probate {
@@ -44,11 +44,10 @@ public class Probate {
 
 			if ((source.contains(probateSource) && (data.contains(name)))) {
 				probate.setFromDate(rs.getString("FROMDATE").trim());
-				probate.setToDate(rs.getString("FROMDATE").trim());
+				probate.setToDate(rs.getString("TODATE").trim());
 				probate.setPlace(rs.getString("PLACE").trim());
+				lp.add(probate);
 			}
-
-			lp.add(probate);
 		}
 
 		statement.close();
@@ -158,13 +157,13 @@ public class Probate {
 	 * @return
 	 */
 	public String[] toStringArray() {
-		final String[] sa = new String[9];
+		final String[] sa = new String[6];
 		sa[0] = name;
-		sa[2] = fromDate;
-		sa[3] = toDate;
-		sa[4] = place;
-		sa[5] = data;
-		sa[6] = source;
+		sa[1] = fromDate;
+		sa[2] = toDate;
+		sa[3] = place;
+		sa[4] = data;
+		sa[5] = source;
 		return sa;
 	}
 }

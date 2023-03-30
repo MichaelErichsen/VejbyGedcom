@@ -8,6 +8,8 @@ import org.gedcom4j.model.IndividualEvent;
 import org.gedcom4j.model.PersonalName;
 import org.gedcom4j.model.enumerations.IndividualEventType;
 
+import net.myerichsen.gedcom.util.Fonkod;
+
 /**
  * A class to represent a person to be matched
  *

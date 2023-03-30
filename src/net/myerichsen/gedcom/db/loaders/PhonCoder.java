@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
-import net.myerichsen.gedcom.db.Fonkod;
+import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Read each individual in a table. Insert phonetic coding of FIRSTNAMES and

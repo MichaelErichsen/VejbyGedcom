@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.myerichsen.gedcom.db.Fonkod;
+import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Class representing the individual data

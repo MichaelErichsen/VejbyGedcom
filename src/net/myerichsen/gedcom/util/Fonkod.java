@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.birthdatematcher;
+package net.myerichsen.gedcom.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * This class encodes a Danish name phonetically
  *
  * @author Michael Erichsen
- * @version 29-11-2022
+ * @version 3. mar. 2023
  */
 public class Fonkod {
 
@@ -37,6 +37,10 @@ public class Fonkod {
 		if (!m.find()) {
 			return out;
 		}
+
+		// æøå etc
+//		out = out.replace("Ã¸", "ø").replace("Ã¥", "å").replace("Ã«", "ë").replace("Ã¼", "ü");
+		out = out.replace("Ã¸", "ø").replace("Ã¥", "å").replace("Ã«", "e").replace("Ã¼", "u");
 
 		// _n/l/r jC -> _n/l/r j
 		out = out.replaceFirst("\\b([nlr]j)[^aeiouyæøå]", "$1");
@@ -138,11 +142,12 @@ public class Fonkod {
 		Pattern p = Pattern.compile("([a-zæøåäçéëöüÿ]|/|-|\\.|\\s)+");
 		Matcher m = p.matcher(out);
 		if (!m.matches()) {
-			throw new Exception("Ugyldigt slægtsnavn: " + slaegtsNavn);
+			// throw new Exception("Ugyldigt slægtsnavn: " + slaegtsNavn);
+			return "";
 		}
 
 		if (out.length() == 1) {
-			return out;
+			return out.trim();
 		}
 
 		/**

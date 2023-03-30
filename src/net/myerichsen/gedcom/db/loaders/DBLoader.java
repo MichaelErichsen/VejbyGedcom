@@ -31,8 +31,8 @@ import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.parser.GedcomParser;
 
-import net.myerichsen.gedcom.db.Fonkod;
 import net.myerichsen.gedcom.db.models.DBIndividual;
+import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Read a GEDCOM and load data into a Derby database to use for analysis.

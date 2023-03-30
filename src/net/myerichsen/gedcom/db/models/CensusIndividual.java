@@ -12,13 +12,13 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.myerichsen.gedcom.db.Fonkod;
+import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 29. mar. 2023
+ * @version 30. mar. 2023
  *
  */
 public class CensusIndividual {
@@ -575,33 +575,33 @@ public class CensusIndividual {
 	 * @return
 	 */
 	public String[] toStringArray() {
-		final String[] sa = new String[25];
+		final String[] sa = new String[24];
 
-		sa[0] = KIPnr;
-		sa[1] = Loebenr + "";
-		sa[2] = Amt;
-		sa[3] = Herred;
-		sa[4] = Sogn;
-		sa[5] = Kildestednavn;
-		sa[6] = Husstands_familienr;
-		sa[7] = Matr_nr_Adresse;
-		sa[8] = Kildenavn;
-		sa[9] = Fonnavn;
-		sa[10] = Koen;
-		sa[11] = Alder + "";
-		sa[12] = Civilstand;
-		sa[13] = Kildeerhverv;
-		sa[14] = Stilling_i_husstanden;
-		sa[15] = Kildefoedested;
-		sa[16] = Foedt_kildedato;
-		sa[17] = Foedeaar + "";
-		sa[18] = Adresse;
-		sa[19] = Matrikel;
-		sa[20] = Gade_nr;
-		sa[21] = FTaar + "";
-		sa[22] = Kildehenvisning;
-		sa[23] = Kildekommentar;
-		sa[24] = Kildedetaljer;
+		sa[0] = FTaar + "";
+		sa[1] = Amt;
+		sa[2] = Herred;
+		sa[3] = Sogn;
+		sa[4] = Kildestednavn;
+		sa[5] = Husstands_familienr;
+		sa[6] = Matr_nr_Adresse;
+		sa[7] = Kildenavn;
+		sa[8] = Koen;
+		sa[9] = Alder + "";
+		sa[10] = Civilstand;
+		sa[11] = Kildeerhverv;
+		sa[12] = Stilling_i_husstanden;
+		sa[13] = Kildefoedested;
+		sa[14] = Foedt_kildedato;
+		sa[15] = Foedeaar + "";
+		sa[16] = Adresse;
+		sa[17] = Matrikel;
+		sa[18] = Gade_nr;
+		sa[19] = Kildehenvisning;
+		sa[20] = Kildekommentar;
+		sa[21] = KIPnr;
+		sa[22] = Loebenr + "";
+		sa[23] = Kildedetaljer;
+
 		return sa;
 	}
 }

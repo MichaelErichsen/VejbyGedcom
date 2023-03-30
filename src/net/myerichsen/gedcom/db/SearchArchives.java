@@ -19,11 +19,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.myerichsen.gedcom.db.comparators.CensusIndividualComparator;
-import net.myerichsen.gedcom.db.comparators.RelocationComparator;
 import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
 import net.myerichsen.gedcom.db.models.Relocation;
+import net.myerichsen.gedcom.db.util.CensusIndividualComparator;
+import net.myerichsen.gedcom.db.util.RelocationComparator;
+import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Find all registry entries that match the phonetic name and life span of a

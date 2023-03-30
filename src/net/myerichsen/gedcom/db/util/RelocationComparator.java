@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.comparators;
+package net.myerichsen.gedcom.db.util;
 
 import java.util.Comparator;
 
