@@ -18,10 +18,10 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 31. mar. 2023
  *
  */
-public class CensusIndividual {
+public class CensusIndividual extends ASModel {
 	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
@@ -574,6 +574,7 @@ public class CensusIndividual {
 	 *
 	 * @return
 	 */
+	@Override
 	public String[] toStringArray() {
 		final String[] sa = new String[24];
 

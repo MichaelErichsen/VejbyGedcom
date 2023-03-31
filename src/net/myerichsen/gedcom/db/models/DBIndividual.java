@@ -14,10 +14,10 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 31. mar. 2023
  *
  */
-public class DBIndividual {
+public class DBIndividual extends ASModel {
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
 	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
@@ -408,5 +408,11 @@ public class DBIndividual {
 
 		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthDate + ";" + dy + ";" + birthPlace + ";"
 				+ parents + ";" + phonName;
+	}
+
+	@Override
+	public String[] toStringArray() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

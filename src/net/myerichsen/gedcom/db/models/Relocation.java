@@ -16,7 +16,7 @@ import java.util.List;
  * @version 30. mar. 2023
  *
  */
-public class Relocation {
+public class Relocation extends ASModel {
 	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
 			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
 			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL, VEJBY.INDIVIDUAL.PARENTS "
@@ -124,6 +124,7 @@ public class Relocation {
 	 */
 	public Relocation(String id, String givenName, String surName, Date relocationDate, String place, String note,
 			String sourceDetail, String parents) {
+		super();
 		this.id = id;
 		this.givenName = givenName;
 		this.surName = surName;

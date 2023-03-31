@@ -10,10 +10,10 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 31. mar. 2023
  *
  */
-public class Probate {
+public class Probate extends ASModel {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
@@ -156,6 +156,7 @@ public class Probate {
 	 * 
 	 * @return
 	 */
+	@Override
 	public String[] toStringArray() {
 		final String[] sa = new String[6];
 		sa[0] = name;

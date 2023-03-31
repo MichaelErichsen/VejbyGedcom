@@ -4,10 +4,10 @@ package net.myerichsen.gedcom.db.models;
  * Class representing an event in the derby database
  *
  * @author Michael Erichsen
- * @version 19. feb. 2023
+ * @version 31. mar. 2023
  *
  */
-public class DBEvent {
+public class DBEvent extends ASModel {
 	private final int id;
 	private final String individual;
 	private final String place;
@@ -78,5 +78,11 @@ public class DBEvent {
 		}
 
 		return false;
+	}
+
+	@Override
+	public String[] toStringArray() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

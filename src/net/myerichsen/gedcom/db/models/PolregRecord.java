@@ -13,25 +13,13 @@ import java.util.List;
  * Class representing a police registry event
  * 
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 31. mar. 2023
  *
  */
-public class PolregRecord {
+public class PolregRecord extends ASModel {
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = ?";
 	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = ?";
 	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = ?";
-
-	/**
-	 * @param string
-	 * @return
-	 */
-	private static String getField(ResultSet rs, String field) {
-		try {
-			return rs.getString(field).trim();
-		} catch (final Exception e) {
-			return "";
-		}
-	}
 
 	/**
 	 * Get a list of objects from the database
@@ -385,10 +373,10 @@ public class PolregRecord {
 	 *
 	 * @return
 	 */
+	@Override
 	public String[] toStringArray() {
 		final String[] sa = new String[15];
 
-//		sa[0] = id + "";
 		sa[0] = name;
 		sa[1] = birthDate.toString();
 		sa[2] = occupation;

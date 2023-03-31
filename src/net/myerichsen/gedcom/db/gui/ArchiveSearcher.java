@@ -38,6 +38,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
 import net.myerichsen.gedcom.db.loaders.DBLoader;
+import net.myerichsen.gedcom.db.models.BurregRecord;
 import net.myerichsen.gedcom.db.models.CensusIndividual;
 import net.myerichsen.gedcom.db.models.DBIndividual;
 import net.myerichsen.gedcom.db.models.PolregRecord;
@@ -59,6 +60,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 // TODO Add parents tab
 // TODO Run populate as background tasks
 // TODO Run Derby multithreaded
+// FIXME Find why FLOOR column missing in Polreg
 
 public class ArchiveSearcher extends Shell {
 
@@ -106,7 +108,7 @@ public class ArchiveSearcher extends Shell {
 	private Table relocationTable;
 	private Table censusTable;
 	private Table probateTable;
-	private final Table polregTable;
+	private Table polregTable;
 	private Text vejbyPath;
 	private Text probatePath;
 	private Text cphPath;
@@ -124,6 +126,7 @@ public class ArchiveSearcher extends Shell {
 	private Text cphSchema;
 	private Text csvFileDirectory;
 	private Text cphDbPath;
+	private Table burregTable;
 
 	// TODO Make tabs visible/invisible. To hide the tab item you call
 	// TabItem.dispose(). To show it again, create a
@@ -134,7 +137,6 @@ public class ArchiveSearcher extends Shell {
 //	Therefore, when you create the new TabItem, you can set the same content
 //	control into it.
 
-	// TODO Burreg tab
 	/**
 	 * Create the shell.
 	 *
@@ -154,15 +156,146 @@ public class ArchiveSearcher extends Shell {
 		createRelocationTab(tabFolder);
 		createCensusTab(tabFolder);
 		createProbateTab(tabFolder);
+		createPolregRab(tabFolder);
+		createBurregTab(tabFolder);
 
-		/**
-		 * Create police registry tab
-		 * 
-		 * NAME;BirthDate;OCCUPATION;STREET;NUMBER;LETTER;
-		 * FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS
-		 *
-		 */
+		createSettingsTab(tabFolder);
 
+		messageField = new Text(this, SWT.BORDER);
+		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		createContents();
+	}
+
+	/**
+	 * Create burial registry tab
+	 * 
+	 * @param tabFolder
+	 */
+	private void createBurregTab(TabFolder tabFolder) {
+		final TabItem tbtmBurreg = new TabItem(tabFolder, SWT.NONE);
+		tbtmBurreg.setText("Begravelser i Kbhvn.");
+
+		final ScrolledComposite burregScroller = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmBurreg.setControl(burregScroller);
+		burregScroller.setExpandHorizontal(true);
+		burregScroller.setExpandVertical(true);
+
+		burregTable = new Table(burregScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		burregTable.setHeaderVisible(true);
+		burregTable.setLinesVisible(true);
+
+		final TableColumn tblclmnbrFornavn = new TableColumn(burregTable, SWT.NONE);
+		tblclmnbrFornavn.setWidth(48);
+		tblclmnbrFornavn.setText("Fornavne");
+
+		TableColumn tblclmnEfternavn = new TableColumn(burregTable, SWT.NONE);
+		tblclmnEfternavn.setWidth(29);
+		tblclmnEfternavn.setText("Efternavn");
+
+		TableColumn tblclmnDdsdato = new TableColumn(burregTable, SWT.NONE);
+		tblclmnDdsdato.setWidth(45);
+		tblclmnDdsdato.setText("D\u00F8dsdato");
+
+		TableColumn tblclmnFder = new TableColumn(burregTable, SWT.NONE);
+		tblclmnFder.setWidth(40);
+		tblclmnFder.setText("F\u00F8de\u00E5r");
+
+		TableColumn tblclmnDdssted = new TableColumn(burregTable, SWT.NONE);
+		tblclmnDdssted.setWidth(59);
+		tblclmnDdssted.setText("D\u00F8dssted");
+
+		TableColumn tblclmnCivilstand_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnCivilstand_1.setWidth(37);
+		tblclmnCivilstand_1.setText("Civilstand");
+
+		TableColumn tblclmnAdrUdfKbhvn = new TableColumn(burregTable, SWT.NONE);
+		tblclmnAdrUdfKbhvn.setWidth(57);
+		tblclmnAdrUdfKbhvn.setText("Adr. udf. Kbhvn.");
+
+		TableColumn tblclmnKn_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnKn_1.setWidth(34);
+		tblclmnKn_1.setText("K\u00F8n");
+
+		TableColumn tblclmnKommentar_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnKommentar_1.setWidth(34);
+		tblclmnKommentar_1.setText("Kommentar");
+
+		TableColumn tblclmnKirkegrd = new TableColumn(burregTable, SWT.NONE);
+		tblclmnKirkegrd.setWidth(43);
+		tblclmnKirkegrd.setText("Kirkeg\u00E5rd");
+
+		TableColumn tblclmnKapel = new TableColumn(burregTable, SWT.NONE);
+		tblclmnKapel.setWidth(49);
+		tblclmnKapel.setText("Kapel");
+
+		TableColumn tblclmnSogn_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnSogn_1.setWidth(45);
+		tblclmnSogn_1.setText("Sogn");
+
+		TableColumn tblclmnGade_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnGade_1.setWidth(48);
+		tblclmnGade_1.setText("Gade");
+
+		TableColumn tblclmnKvarter = new TableColumn(burregTable, SWT.NONE);
+		tblclmnKvarter.setWidth(47);
+		tblclmnKvarter.setText("Kvarter");
+
+		TableColumn tblclmnGadenr_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnGadenr_1.setWidth(39);
+		tblclmnGadenr_1.setText("Gadenr.");
+
+		TableColumn tblclmnBogstav_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnBogstav_1.setWidth(49);
+		tblclmnBogstav_1.setText("Bogstav");
+
+		TableColumn tblclmnEtage_1 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnEtage_1.setWidth(39);
+		tblclmnEtage_1.setText("Etage");
+
+		TableColumn tblclmnInstitution = new TableColumn(burregTable, SWT.NONE);
+		tblclmnInstitution.setWidth(44);
+		tblclmnInstitution.setText("Institution");
+
+		TableColumn tblclmnInstGade = new TableColumn(burregTable, SWT.NONE);
+		tblclmnInstGade.setWidth(53);
+		tblclmnInstGade.setText("Inst. gade");
+
+		TableColumn tblclmnInstKvarter = new TableColumn(burregTable, SWT.NONE);
+		tblclmnInstKvarter.setWidth(30);
+		tblclmnInstKvarter.setText("Inst. kvarter");
+
+		TableColumn tblclmnInstGadenr = new TableColumn(burregTable, SWT.NONE);
+		tblclmnInstGadenr.setWidth(34);
+		tblclmnInstGadenr.setText("Inst. gadenr.");
+
+		TableColumn tblclmnErhverv_2 = new TableColumn(burregTable, SWT.NONE);
+		tblclmnErhverv_2.setWidth(25);
+		tblclmnErhverv_2.setText("Erhverv");
+
+		TableColumn tblclmnErhvforhtyper = new TableColumn(burregTable, SWT.NONE);
+		tblclmnErhvforhtyper.setWidth(24);
+		tblclmnErhvforhtyper.setText("Erhv.forh.typer");
+
+		TableColumn tblclmnDdsrsager = new TableColumn(burregTable, SWT.NONE);
+		tblclmnDdsrsager.setWidth(100);
+		tblclmnDdsrsager.setText("D\u00F8ds\u00E5rsager");
+
+		TableColumn tblclmnDdsrsDansk = new TableColumn(burregTable, SWT.NONE);
+		tblclmnDdsrsDansk.setWidth(100);
+		tblclmnDdsrsDansk.setText("D\u00F8ds\u00E5rs. dansk");
+
+		burregScroller.setContent(burregTable);
+		burregScroller.setMinSize(burregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+	}
+
+	/**
+	 * Create police registry tab
+	 * 
+	 * @param tabFolder
+	 */
+	private void createPolregRab(TabFolder tabFolder) {
 		final TabItem tbtmPolreg = new TabItem(tabFolder, SWT.NONE);
 		tbtmPolreg.setText("Politiets Registerblade");
 
@@ -176,83 +309,59 @@ public class ArchiveSearcher extends Shell {
 		polregTable.setHeaderVisible(true);
 		polregTable.setLinesVisible(true);
 
-		TableColumn tblclmnNavn_1 = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnNavn_1 = new TableColumn(polregTable, SWT.NONE);
 		tblclmnNavn_1.setWidth(50);
 		tblclmnNavn_1.setText("Navn");
 
-		TableColumn tblclmnFdedag = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnFdedag = new TableColumn(polregTable, SWT.NONE);
 		tblclmnFdedag.setWidth(100);
 		tblclmnFdedag.setText("F\u00F8dedag");
 
-		TableColumn tblclmnErhverv_1 = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnErhverv_1 = new TableColumn(polregTable, SWT.NONE);
 		tblclmnErhverv_1.setWidth(100);
 		tblclmnErhverv_1.setText("Erhverv");
 
-		TableColumn tblclmnGade = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnGade = new TableColumn(polregTable, SWT.NONE);
 		tblclmnGade.setWidth(100);
 		tblclmnGade.setText("Gade");
 
-		TableColumn tblclmnNr_1 = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnNr_1 = new TableColumn(polregTable, SWT.NONE);
 		tblclmnNr_1.setWidth(50);
 		tblclmnNr_1.setText("Nr.");
 
-		TableColumn tblclmnBogstav = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnBogstav = new TableColumn(polregTable, SWT.NONE);
 		tblclmnBogstav.setWidth(50);
 		tblclmnBogstav.setText("Bogstav");
 
-		TableColumn tblclmnEtage = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnEtage = new TableColumn(polregTable, SWT.NONE);
 		tblclmnEtage.setWidth(50);
 		tblclmnEtage.setText("Etage");
 
-		TableColumn tblclmnSted_1 = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnSted_1 = new TableColumn(polregTable, SWT.NONE);
 		tblclmnSted_1.setWidth(100);
 		tblclmnSted_1.setText("Sted");
 
-		TableColumn tblclmnVrt = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnVrt = new TableColumn(polregTable, SWT.NONE);
 		tblclmnVrt.setWidth(100);
 		tblclmnVrt.setText("V\u00E6rt");
 
-		TableColumn tblclmnDag = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnDag = new TableColumn(polregTable, SWT.NONE);
 		tblclmnDag.setWidth(48);
 		tblclmnDag.setText("Dag");
 
-		TableColumn tblclmnMned = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnMned = new TableColumn(polregTable, SWT.NONE);
 		tblclmnMned.setWidth(49);
 		tblclmnMned.setText("M\u00E5ned");
 
-		TableColumn tblclmnr = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnr = new TableColumn(polregTable, SWT.NONE);
 		tblclmnr.setWidth(49);
 		tblclmnr.setText("\u00C5r");
 
-		TableColumn tblclmnAdresse_1 = new TableColumn(polregTable, SWT.NONE);
+		final TableColumn tblclmnAdresse_1 = new TableColumn(polregTable, SWT.NONE);
 		tblclmnAdresse_1.setWidth(100);
 		tblclmnAdresse_1.setText("Adresse");
 		polregScroller.setContent(polregTable);
 		polregScroller.setMinSize(polregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-		/**
-		 * FIRSTNAMES LASTNAME DATEOFDEATH YEAROFBIRTH DEATHPLACE CIVILSTATUS
-		 * ADRESSOUTSIDECPH SEX COMMENT CEMETARY CHAPEL PARISH STREET HOOD STREET_NUMBER
-		 * LETTER FLOOR INSTITUTION INSTITUTION_STREET INSTITUTION_HOOD
-		 * INSTITUTION_STREET_NUMBER OCCUPTATIONS OCCUPATION_RELATION_TYPES DEATHCAUSES
-		 * DEATHCAUSES_DANISH
-		 *
-		 */
-
-		final TabItem tbtmBurreg = new TabItem(tabFolder, SWT.NONE);
-		tbtmBurreg.setText("Begravelser i Kbhvn.");
-
-		final ScrolledComposite burregScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmBurreg.setControl(burregScroller);
-		burregScroller.setExpandHorizontal(true);
-		burregScroller.setExpandVertical(true);
-
-		createSettingsTab(tabFolder);
-
-		messageField = new Text(this, SWT.BORDER);
-		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		createContents();
 	}
 
 	@Override
@@ -864,7 +973,7 @@ public class ArchiveSearcher extends Shell {
 
 				fileDialog.setFilterPath(gedcomFilePath.getText());
 				fileDialog.setText("Vælg en GEDCOM fil");
-				String[] filterExt = { "*.ged", "*.*" };
+				final String[] filterExt = { "*.ged", "*.*" };
 				fileDialog.setFilterExtensions(filterExt);
 
 				final String file = fileDialog.open();
@@ -1008,6 +1117,36 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Populate the burial registry tab from the database
+	 *
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	private void populateBurregTable(String phonName, String birthDate, String deathDate) throws SQLException {
+		if (!props.getProperty("burregSearch").equals("true")) {
+			return;
+		}
+
+		setMessage("Bregravelsesregister hentes");
+		burregTable.removeAll();
+
+		final List<BurregRecord> lbr = BurregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
+				birthDate, deathDate);
+
+		TableItem ti;
+
+		for (final BurregRecord br : lbr) {
+			ti = new TableItem(burregTable, SWT.NONE);
+			ti.setText(br.toStringArray());
+		}
+		burregTable.redraw();
+		burregTable.update();
+
+	}
+
+	/**
 	 * Populate census table
 	 *
 	 * @param phonName
@@ -1064,6 +1203,35 @@ public class ArchiveSearcher extends Shell {
 		censusTable.redraw();
 		censusTable.update();
 		tbtmCensus.getControl().setFocus();
+	}
+
+	/**
+	 * Populate police registry table
+	 *
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	private void populatePolregTable(String phonName, String birthDate, String deathDate) throws SQLException {
+		if (!props.getProperty("polregSearch").equals("true")) {
+			return;
+		}
+
+		setMessage("Politiregister hentes");
+		polregTable.removeAll();
+
+		final List<PolregRecord> lpr = PolregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
+				birthDate, deathDate);
+
+		TableItem ti;
+
+		for (final PolregRecord pr : lpr) {
+			ti = new TableItem(polregTable, SWT.NONE);
+			ti.setText(pr.toStringArray());
+		}
+		polregTable.redraw();
+		polregTable.update();
 	}
 
 	/**
@@ -1131,32 +1299,21 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Populate police registry table
+	 * Populate all tables
 	 *
 	 * @param phonName
 	 * @param birthDate
 	 * @param deathDate
 	 * @throws SQLException
 	 */
-	private void populatePolregTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		if (!props.getProperty("polregSearch").equals("true")) {
-			return;
-		}
-
-		setMessage("Politiregister hentes");
-		polregTable.removeAll();
-
-		final List<PolregRecord> lpr = PolregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
-				birthDate, deathDate);
-
-		TableItem ti;
-
-		for (final PolregRecord pr : lpr) {
-			ti = new TableItem(polregTable, SWT.NONE);
-			ti.setText(pr.toStringArray());
-		}
-		polregTable.redraw();
-		polregTable.update();
+	private void populateTables(final String phonName, final String birthDate, final String deathDate)
+			throws SQLException {
+		populateRelocationTable(phonName, birthDate, deathDate);
+		populateCensusTable(phonName, birthDate, deathDate);
+		populateProbateTable(phonName, birthDate, deathDate);
+		populatePolregTable(phonName, birthDate, deathDate);
+		populateBurregTable(phonName, birthDate, deathDate);
+		setMessage("Klar");
 	}
 
 	/**
@@ -1189,11 +1346,7 @@ public class ArchiveSearcher extends Shell {
 					: individual.getDeathDate().toString());
 			searchDeath.setText(deathDate);
 
-			populateRelocationTable(phonName, birthDate, deathDate);
-			populateCensusTable(phonName, birthDate, deathDate);
-			populateProbateTable(phonName, birthDate, deathDate);
-			populatePolregTable(phonName, birthDate, deathDate);
-			setMessage("Klar");
+			populateTables(phonName, birthDate, deathDate);
 		} catch (final SQLException e1) {
 			messageField.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -1244,11 +1397,7 @@ public class ArchiveSearcher extends Shell {
 				}
 			}
 
-			populateRelocationTable(phonName, birthDate, deathDate);
-			populateCensusTable(phonName, birthDate, deathDate);
-			populateProbateTable(phonName, birthDate, deathDate);
-			populatePolregTable(phonName, birthDate, deathDate);
-			setMessage("Klar");
+			populateTables(phonName, birthDate, deathDate);
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
