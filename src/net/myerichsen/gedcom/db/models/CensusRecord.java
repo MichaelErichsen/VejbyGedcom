@@ -21,7 +21,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 31. mar. 2023
  *
  */
-public class CensusIndividual extends ASModel {
+public class CensusRecord extends ASModel {
 	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
@@ -34,7 +34,7 @@ public class CensusIndividual extends ASModel {
 			+ "'%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
 	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = ? "
 			+ "AND FTAAR >= ? AND FTAAR <= ?";
-	private static Logger logger = Logger.getLogger("CensusIndividual");
+	private static Logger logger = Logger.getLogger("CensusRecord");
 
 	/**
 	 * Get a list of census records from the Derby table
@@ -43,10 +43,10 @@ public class CensusIndividual extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusIndividual> loadFromDatabase(String dbPath, String phonName, String birthYear,
+	public static List<CensusRecord> loadFromDatabase(String dbPath, String phonName, String birthYear,
 			String deathYear) throws SQLException {
-		CensusIndividual ci;
-		final List<CensusIndividual> cil = new ArrayList<>();
+		CensusRecord ci;
+		final List<CensusRecord> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS);
@@ -56,7 +56,7 @@ public class CensusIndividual extends ASModel {
 		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			ci = new CensusIndividual();
+			ci = new CensusRecord();
 			ci.setKIPnr(rs.getString("kipNr"));
 			ci.setLoebenr(rs.getInt("Loebenr"));
 			ci.setKildestednavn(rs.getString("Kildestednavn"));

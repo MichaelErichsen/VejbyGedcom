@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Abstract superclass for ArchiveSearcher model classes
+ * Abstract superclass for ArchiveSearcherX model classes
  * 
  * @author Michael Erichsen
  * @version 31. mar. 2023

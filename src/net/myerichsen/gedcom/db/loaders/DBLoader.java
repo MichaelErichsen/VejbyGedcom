@@ -31,7 +31,7 @@ import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.parser.GedcomParser;
 
-import net.myerichsen.gedcom.db.models.DBIndividual;
+import net.myerichsen.gedcom.db.models.IndividualRecord;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
@@ -41,6 +41,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 30. mar. 2023
  */
 public class DBLoader {
+	// TODO Parents not correct
 	/**
 	 * Static constants and variables
 	 */
@@ -603,7 +604,7 @@ public class DBLoader {
 	 */
 	private void updateBirthDeathParentsData(Connection conn) throws SQLException {
 		// Read all individuals into a list
-		final List<DBIndividual> ldbi = DBIndividual.loadFromDB(conn);
+		final List<IndividualRecord> ldbi = IndividualRecord.loadFromDB(conn);
 
 		// Update all individual records in Derby
 		updateIndividualsBDP(ldbi);
@@ -669,12 +670,12 @@ public class DBLoader {
 	 * @param ldbi
 	 * @throws SQLException
 	 */
-	private void updateIndividualsBDP(List<DBIndividual> ldbi) throws SQLException {
+	private void updateIndividualsBDP(List<IndividualRecord> ldbi) throws SQLException {
 		Date bd;
 		Date dd;
 		String parents;
 
-		for (final DBIndividual dbi : ldbi) {
+		for (final IndividualRecord dbi : ldbi) {
 			parents = dbi.getParents();
 
 			if (parents == null) {

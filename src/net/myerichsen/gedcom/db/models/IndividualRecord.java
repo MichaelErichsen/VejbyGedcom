@@ -17,7 +17,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 31. mar. 2023
  *
  */
-public class DBIndividual extends ASModel {
+public class IndividualRecord extends ASModel {
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
 	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
@@ -80,9 +80,9 @@ public class DBIndividual extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<DBIndividual> loadFromDB(Connection conn) throws SQLException {
-		DBIndividual individual;
-		final List<DBIndividual> ldbi = new ArrayList<>();
+	public static List<IndividualRecord> loadFromDB(Connection conn) throws SQLException {
+		IndividualRecord individual;
+		final List<IndividualRecord> ldbi = new ArrayList<>();
 		String givenName = "";
 		String surName = "";
 		String husbandId = "";
@@ -95,7 +95,7 @@ public class DBIndividual extends ASModel {
 		ResultSet rs = statement1.executeQuery();
 
 		while (rs.next()) {
-			individual = new DBIndividual();
+			individual = new IndividualRecord();
 
 			if (rs.getString("ID") != null) {
 				individual.setId(rs.getString("ID"));
@@ -122,7 +122,7 @@ public class DBIndividual extends ASModel {
 		}
 
 		// Add birth data
-		for (final DBIndividual dbi : ldbi) {
+		for (final IndividualRecord dbi : ldbi) {
 			final PreparedStatement statement2 = conn.prepareStatement(SELECT_BIRTH_EVENT);
 			statement2.setString(1, dbi.getId());
 			rs = statement2.executeQuery();
@@ -138,7 +138,7 @@ public class DBIndividual extends ASModel {
 		}
 
 		// Add death data
-		for (final DBIndividual dbi : ldbi) {
+		for (final IndividualRecord dbi : ldbi) {
 			final PreparedStatement statement3 = conn.prepareStatement(SELECT_DEATH_EVENT);
 			statement3.setString(1, dbi.getId());
 			rs = statement3.executeQuery();
@@ -154,7 +154,7 @@ public class DBIndividual extends ASModel {
 		}
 
 		// Add parents
-		for (final DBIndividual dbi : ldbi) {
+		for (final IndividualRecord dbi : ldbi) {
 			// Try to find from FAMC record
 			final PreparedStatement statement4 = conn.prepareStatement(SELECT_PARENTS);
 			statement4.setString(1, dbi.getFamc());
@@ -197,7 +197,7 @@ public class DBIndividual extends ASModel {
 	 * No-arg constructor
 	 *
 	 */
-	private DBIndividual() {
+	private IndividualRecord() {
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class DBIndividual extends ASModel {
 	 * @param id
 	 * @throws SQLException
 	 */
-	public DBIndividual(Connection conn, String id) throws SQLException {
+	public IndividualRecord(Connection conn, String id) throws SQLException {
 		if (id.contains("@")) {
 			this.setId(id);
 		} else {
@@ -251,7 +251,7 @@ public class DBIndividual extends ASModel {
 	 * @param birthYear
 	 * @param deathYear
 	 */
-	public DBIndividual(String name, String birthYear, String deathYear) {
+	public IndividualRecord(String name, String birthYear, String deathYear) {
 		this.name = name;
 		this.birthDate = Date.valueOf(birthYear + "-01-01");
 		this.deathDate = Date.valueOf(deathYear + "-12-31");

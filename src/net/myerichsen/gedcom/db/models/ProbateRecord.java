@@ -13,15 +13,15 @@ import java.util.List;
  * @version 31. mar. 2023
  *
  */
-public class Probate extends ASModel {
+public class ProbateRecord extends ASModel {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
 
-	public static List<Probate> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
+	public static List<ProbateRecord> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
 			String probateSource) throws SQLException {
-		Probate probate;
-		final List<Probate> lp = new ArrayList<>();
+		ProbateRecord probateRecord;
+		final List<ProbateRecord> lp = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement = conn.prepareStatement(SELECT_PROBATE);
@@ -34,19 +34,19 @@ public class Probate extends ASModel {
 		String data;
 
 		while (rs.next()) {
-			probate = new Probate();
+			probateRecord = new ProbateRecord();
 			name = rs.getString("NAME").trim();
-			probate.setName(name);
+			probateRecord.setName(name);
 			data = rs.getString("COVERED_DATA").replaceAll("\\r\\n", " ¤ ");
-			probate.setData(data);
+			probateRecord.setData(data);
 			source = rs.getString("SOURCE");
-			probate.setSource(source);
+			probateRecord.setSource(source);
 
 			if ((source.contains(probateSource) && (data.contains(name)))) {
-				probate.setFromDate(rs.getString("FROMDATE").trim());
-				probate.setToDate(rs.getString("TODATE").trim());
-				probate.setPlace(rs.getString("PLACE").trim());
-				lp.add(probate);
+				probateRecord.setFromDate(rs.getString("FROMDATE").trim());
+				probateRecord.setToDate(rs.getString("TODATE").trim());
+				probateRecord.setPlace(rs.getString("PLACE").trim());
+				lp.add(probateRecord);
 			}
 		}
 

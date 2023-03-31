@@ -19,9 +19,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.myerichsen.gedcom.db.models.CensusIndividual;
-import net.myerichsen.gedcom.db.models.DBIndividual;
-import net.myerichsen.gedcom.db.models.Relocation;
+import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.IndividualRecord;
+import net.myerichsen.gedcom.db.models.RelocationRecord;
 import net.myerichsen.gedcom.db.util.CensusIndividualComparator;
 import net.myerichsen.gedcom.db.util.RelocationComparator;
 import net.myerichsen.gedcom.util.Fonkod;
@@ -112,7 +112,7 @@ public class SearchArchives {
 	 * @param location
 	 * @return
 	 */
-	private boolean compareLocation(CensusIndividual ci, String location) {
+	private boolean compareLocation(CensusRecord ci, String location) {
 		if (ci.getKildefoedested().length() == 0) {
 			return true;
 		}
@@ -138,9 +138,9 @@ public class SearchArchives {
 	 * @throws Exception
 	 */
 	private void execute(String[] args) throws Exception {
-		// Get a DBIndividual object
+		// Get a IndividualRecord object
 		logger.info("Get individual " + args[4]);
-		DBIndividual individual = getIndividual(args);
+		IndividualRecord individual = getIndividual(args);
 
 		// Search for similar relocations
 		logger.info("Search for similar relocations for " + individual.getName());
@@ -173,12 +173,12 @@ public class SearchArchives {
 	 * @return
 	 * @throws SQLException
 	 */
-	private DBIndividual getIndividual(String[] args) throws SQLException {
-		DBIndividual individual;
+	private IndividualRecord getIndividual(String[] args) throws SQLException {
+		IndividualRecord individual;
 
 		if (args[4].matches(DIGITS_ONLY)) {
 			Connection conn = DriverManager.getConnection("jdbc:derby:" + args[0]);
-			individual = new DBIndividual(conn, args[4]);
+			individual = new IndividualRecord(conn, args[4]);
 
 			if (individual.getName().length() == 0) {
 				logger.warning("Individual " + args[4] + " findes ikke i tabellen");
@@ -187,7 +187,7 @@ public class SearchArchives {
 		} else {
 			final String BirthYear = ((args.length >= 6) ? args[5] : "0001");
 			final String DeathYear = ((args.length >= 7) ? args[6] : "9999");
-			individual = new DBIndividual(args[4], BirthYear, DeathYear);
+			individual = new IndividualRecord(args[4], BirthYear, DeathYear);
 		}
 		return individual;
 	}
@@ -223,7 +223,7 @@ public class SearchArchives {
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void searchBurialRegistry(String[] args, Connection conn, DBIndividual individual) throws Exception {
+	private void searchBurialRegistry(String[] args, Connection conn, IndividualRecord individual) throws Exception {
 		final String outName = args[3] + "/" + individual.getName() + "_burreg.csv";
 
 		String result = "";
@@ -289,7 +289,7 @@ public class SearchArchives {
 	 * @throws Exception
 	 */
 
-	private void searchCensusTable(String[] args, Connection conn, DBIndividual individual) throws Exception {
+	private void searchCensusTable(String[] args, Connection conn, IndividualRecord individual) throws Exception {
 		PreparedStatement statement1 = conn.prepareStatement(SELECT_CENSUS);
 		statement1.setString(1, individual.getPhonName().trim());
 		statement1.setLong(2, individual.getBirthDate().toLocalDate().getYear());
@@ -299,13 +299,13 @@ public class SearchArchives {
 		ResultSet rs2;
 		String string = "";
 
-		List<CensusIndividual> cil = null;
-		cil = CensusIndividual.loadFromDatabase(string, string, string, string);
+		List<CensusRecord> cil = null;
+		cil = CensusRecord.loadFromDatabase(string, string, string, string);
 
 		// Add all household members as source details
 		PreparedStatement statement2 = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
 
-		for (final CensusIndividual ci : cil) {
+		for (final CensusRecord ci : cil) {
 			statement2.setString(1, ci.getKIPnr());
 			statement2.setString(2, ci.getHusstands_familienr());
 			rs2 = statement2.executeQuery();
@@ -342,7 +342,7 @@ public class SearchArchives {
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void searchPoliceRegistry(String[] args, Connection conn, DBIndividual individual) throws Exception {
+	private void searchPoliceRegistry(String[] args, Connection conn, IndividualRecord individual) throws Exception {
 		final String outName = args[3] + "/" + individual.getName() + "_polreg.csv";
 		String result = "";
 		int calcYear = 0;
@@ -444,7 +444,7 @@ public class SearchArchives {
 	 * @param conn
 	 * @throws Exception
 	 */
-	private void searchProbates(String[] args, Connection conn, DBIndividual individual) throws Exception {
+	private void searchProbates(String[] args, Connection conn, IndividualRecord individual) throws Exception {
 		String singleLine;
 		final HashSet<String> outLines = new HashSet<>();
 		String coveredData;
@@ -494,19 +494,19 @@ public class SearchArchives {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	private void searchRelocations(String[] args, Connection conn, DBIndividual individual)
+	private void searchRelocations(String[] args, Connection conn, IndividualRecord individual)
 			throws SQLException, IOException {
 		final String outName = args[3] + "/" + individual.getName() + "_flyt.csv";
 		counter = 0;
-		Relocation relocation;
-		final List<Relocation> lr = new ArrayList<>();
+		RelocationRecord relocationRecord;
+		final List<RelocationRecord> lr = new ArrayList<>();
 
 		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, individual.getPhonName());
 		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			relocation = new Relocation(
+			relocationRecord = new RelocationRecord(
 					(rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim()),
 					(rs.getString(2) == null ? "" : rs.getString(2).trim()),
 					(rs.getString(3) == null ? "" : rs.getString(3).trim()), rs.getDate(4),
@@ -514,7 +514,7 @@ public class SearchArchives {
 					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
 					(rs.getString(7) == null ? "" : rs.getString(7).trim()),
 					(rs.getString(8) == null ? "" : rs.getString(8).trim()));
-			lr.add(relocation);
+			lr.add(relocationRecord);
 		}
 
 		rs.close();
@@ -525,7 +525,7 @@ public class SearchArchives {
 
 		final List<String> ls = new ArrayList<>();
 
-		for (final Relocation relocation2 : lr) {
+		for (final RelocationRecord relocation2 : lr) {
 			if ((relocation2.getRelocationDate().before(individual.getBirthDate()))
 					|| ((individual.getDeathDate() != null)
 							&& (relocation2.getRelocationDate().after(individual.getDeathDate())))) {
@@ -547,7 +547,7 @@ public class SearchArchives {
 
 		statement = conn.prepareStatement(SELECT_BIRTHDATE);
 
-		for (final Relocation relocation2 : lr) {
+		for (final RelocationRecord relocation2 : lr) {
 			statement.setString(1, "@I" + relocation2.getId() + "@");
 			rs = statement.executeQuery();
 
@@ -564,7 +564,7 @@ public class SearchArchives {
 
 		Collections.sort(lr, new RelocationComparator());
 
-		for (final Relocation relocation2 : lr) {
+		for (final RelocationRecord relocation2 : lr) {
 
 			if (counter == 0) {
 				bw = new BufferedWriter(new FileWriter(new File(outName)));
@@ -595,7 +595,7 @@ public class SearchArchives {
 	 * @param individual
 	 * @throws IOException
 	 */
-	private void writeCensusOutput(List<CensusIndividual> cil, String[] args, DBIndividual individual)
+	private void writeCensusOutput(List<CensusRecord> cil, String[] args, IndividualRecord individual)
 			throws IOException {
 		final String outName = args[3] + "/" + individual.getName() + "_census.csv";
 		int diff = 0;
@@ -605,7 +605,7 @@ public class SearchArchives {
 
 		Collections.sort(cil, new CensusIndividualComparator());
 
-		for (final CensusIndividual ci : cil) {
+		for (final CensusRecord ci : cil) {
 			diff = 0;
 
 			if (ci.getFoedeaar() > 0) {
@@ -656,7 +656,7 @@ public class SearchArchives {
 	 * @param counter
 	 * @throws IOException
 	 */
-	private void writeProbateOutput(String[] args, final HashSet<String> outLines, DBIndividual individual)
+	private void writeProbateOutput(String[] args, final HashSet<String> outLines, IndividualRecord individual)
 			throws IOException {
 		final String outName = args[3] + "/" + individual.getName() + "_probates.csv";
 		bw = new BufferedWriter(new FileWriter(outName));

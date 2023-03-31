@@ -16,7 +16,7 @@ import java.util.List;
  * @version 30. mar. 2023
  *
  */
-public class Relocation extends ASModel {
+public class RelocationRecord extends ASModel {
 	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
 			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
 			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL, VEJBY.INDIVIDUAL.PARENTS "
@@ -33,18 +33,18 @@ public class Relocation extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Relocation> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+	public static List<RelocationRecord> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		Relocation relocation;
-		final List<Relocation> lr = new ArrayList<>();
+		RelocationRecord relocationRecord;
+		final List<RelocationRecord> lr = new ArrayList<>();
 
 		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
 		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			relocation = new Relocation(
+			relocationRecord = new RelocationRecord(
 					(rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim()),
 					(rs.getString(2) == null ? "" : rs.getString(2).trim()),
 					(rs.getString(3) == null ? "" : rs.getString(3).trim()), rs.getDate(4),
@@ -52,7 +52,7 @@ public class Relocation extends ASModel {
 					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
 					(rs.getString(7) == null ? "" : rs.getString(7).trim()),
 					(rs.getString(8) == null ? "" : rs.getString(8).trim()));
-			lr.add(relocation);
+			lr.add(relocationRecord);
 		}
 
 		statement.close();
@@ -65,7 +65,7 @@ public class Relocation extends ASModel {
 
 		final List<String> ls = new ArrayList<>();
 
-		for (final Relocation relocation2 : lr) {
+		for (final RelocationRecord relocation2 : lr) {
 			if ((relocation2.getRelocationDate().before(bd)) || (relocation2.getRelocationDate().after(dd))) {
 				ls.add(relocation2.getId());
 			}
@@ -85,7 +85,7 @@ public class Relocation extends ASModel {
 
 		statement = conn.prepareStatement(SELECT_BIRTHDATE);
 
-		for (final Relocation relocation2 : lr) {
+		for (final RelocationRecord relocation2 : lr) {
 			statement.setString(1, "@I" + relocation2.getId() + "@");
 			rs = statement.executeQuery();
 
@@ -122,7 +122,7 @@ public class Relocation extends ASModel {
 	 * @param note
 	 * @param sourceDetail
 	 */
-	public Relocation(String id, String givenName, String surName, Date relocationDate, String place, String note,
+	public RelocationRecord(String id, String givenName, String surName, Date relocationDate, String place, String note,
 			String sourceDetail, String parents) {
 		super();
 		this.id = id;

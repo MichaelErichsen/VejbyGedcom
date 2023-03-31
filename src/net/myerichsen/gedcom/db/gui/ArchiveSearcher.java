@@ -11,6 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,32 +42,38 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
 import net.myerichsen.gedcom.db.loaders.DBLoader;
-import net.myerichsen.gedcom.db.models.BurregRecord;
-import net.myerichsen.gedcom.db.models.CensusIndividual;
-import net.myerichsen.gedcom.db.models.DBIndividual;
-import net.myerichsen.gedcom.db.models.PolregRecord;
-import net.myerichsen.gedcom.db.models.Probate;
-import net.myerichsen.gedcom.db.models.Relocation;
+import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.IndividualRecord;
+import net.myerichsen.gedcom.db.models.RelocationRecord;
 import net.myerichsen.gedcom.db.util.CensusIndividualComparator;
 import net.myerichsen.gedcom.db.util.RelocationComparator;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
- * GUI program to search archive copies in Derby databases
- *
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 31. mar. 2023
  *
  */
-
-// TODO Make database schemas configurable
-// TODO Add parents tab
-// TODO Run populate as background tasks
-// TODO Run Derby multithreaded
-// FIXME Find why FLOOR column missing in Polreg
-
 public class ArchiveSearcher extends Shell {
-
+	// TODO Make database schemas configurable
+	// TODO Run populate as background tasks
+	// TODO Run Derby multithreaded
+	// FIXME Find why FLOOR column missing in Polreg
+	// FIXME RelocationRecord and census scrolls differently from each other
+	// TODO Double click on a table row should display a pop up with the contents
+	// and copy it to clipboard
+	// TODO Filter for census table
+	// FIXME Burial table is empty
+	// TODO Add all household members as source details
+	// TODO Make database schemas configurable
+	// TODO Run populate as background tasks
+	// TODO Run Derby multithreaded
+	// FIXME Find why FLOOR column missing in Polreg
+	// FIXME RelocationRecord and census scrolls differently from each other
+	// TODO Double click on a table row should display a pop up with the contents
+	// and copy it to clipboard
+	// TODO Filter for census table
+	// FIXME Burial table is empty
 	/**
 	 * Static constants used to initalize properties file
 	 */
@@ -76,9 +86,10 @@ public class ArchiveSearcher extends Shell {
 	private static final String PROBATE_SOURCE = "Kronborg";
 	private static final String PROBATEDB_PATH = "c:/DerbyDB/gedcom";
 	private static final String PROBATEDB_SCHEMA = "GEDCOM";
-	private static final String PROPERTIES_PATH = "c:/Users/michael/ArchiveSearcher.properties";
+	private static final String PROPERTIES_PATH = "c:/Users/michael/ArchiveSearcherX.properties";
 	private static final String VEJBYDB_PATH = "c:/Users/michael/VEJBYDB";
 	private static final String VEJBYDB_SCHEMA = "VEJBY";
+	private static Display display;
 
 	/**
 	 * Launch the application.
@@ -87,7 +98,7 @@ public class ArchiveSearcher extends Shell {
 	 */
 	public static void main(String args[]) {
 		try {
-			final Display display = Display.getDefault();
+			display = Display.getDefault();
 			final ArchiveSearcher shell = new ArchiveSearcher(display);
 			shell.open();
 			shell.layout();
@@ -101,41 +112,32 @@ public class ArchiveSearcher extends Shell {
 		}
 	}
 
-	private Text searchId;
-	private Text searchName;
-	private Text searchBirth;
-	private Text searchDeath;
-	private Table relocationTable;
-	private Table censusTable;
-	private Table probateTable;
-	private Table polregTable;
-	private Text vejbyPath;
-	private Text probatePath;
-	private Text cphPath;
-	private Text outputDirectory;
 	private Properties props;
-	private Text probateSource;
 	private final Text messageField;
-	private TabItem tbtmCensus;
-	private TabItem tbtmProbate;
-	private TabItem tbtmRelocation;
-	private Text gedcomFilePath;
-	private Text kipTextFilename;
+	private final Text searchId;
+	private final Text searchName;
+	private final Text searchBirth;
+	private final Text searchDeath;
+	private final Table relocationTable;
+	private Button btnRelocationTab;
+	private Text vejbyPath;
 	private Text vejbySchema;
+	private Text probatePath;
 	private Text probateSchema;
+	private Text probateSource;
+	private Text cphPath;
+	private Text cphDbPath;
 	private Text cphSchema;
 	private Text csvFileDirectory;
-	private Text cphDbPath;
-	private Table burregTable;
-
-	// TODO Make tabs visible/invisible. To hide the tab item you call
-	// TabItem.dispose(). To show it again, create a
-//	new TabItem at the appropriate index.
-//
-//	Note: When you dispose a TabItem, this does not dispose the control that was
-//	the content of the TabItem. The content control just becomes invisible.
-//	Therefore, when you create the new TabItem, you can set the same content
-//	control into it.
+	private Text kipTextFilename;
+	private Text outputDirectory;
+	private Text gedcomFilePath;
+	private Button btnCensusTab;
+	private Button btnProbateTab;
+	private Button btnPolitietsRegisterblade;
+	private Button btnBegravelsesregistret;
+	private Button btnForldre;
+	private Table censusTable;
 
 	/**
 	 * Create the shell.
@@ -144,372 +146,20 @@ public class ArchiveSearcher extends Shell {
 	 */
 	public ArchiveSearcher(Display display) {
 		super(display, SWT.SHELL_TRIM);
-		setLayout(new GridLayout(1, false));
-
 		getProperties();
-		createMenuBar();
-		createSearchBar();
-
-		final TabFolder tabFolder = new TabFolder(this, SWT.NONE);
-		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-		createRelocationTab(tabFolder);
-		createCensusTab(tabFolder);
-		createProbateTab(tabFolder);
-		createPolregRab(tabFolder);
-		createBurregTab(tabFolder);
-
-		createSettingsTab(tabFolder);
-
-		messageField = new Text(this, SWT.BORDER);
-		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		createContents();
-	}
-
-	/**
-	 * Create burial registry tab
-	 * 
-	 * @param tabFolder
-	 */
-	private void createBurregTab(TabFolder tabFolder) {
-		final TabItem tbtmBurreg = new TabItem(tabFolder, SWT.NONE);
-		tbtmBurreg.setText("Begravelser i Kbhvn.");
-
-		final ScrolledComposite burregScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmBurreg.setControl(burregScroller);
-		burregScroller.setExpandHorizontal(true);
-		burregScroller.setExpandVertical(true);
-
-		burregTable = new Table(burregScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		burregTable.setHeaderVisible(true);
-		burregTable.setLinesVisible(true);
-
-		final TableColumn tblclmnbrFornavn = new TableColumn(burregTable, SWT.NONE);
-		tblclmnbrFornavn.setWidth(48);
-		tblclmnbrFornavn.setText("Fornavne");
-
-		TableColumn tblclmnEfternavn = new TableColumn(burregTable, SWT.NONE);
-		tblclmnEfternavn.setWidth(29);
-		tblclmnEfternavn.setText("Efternavn");
-
-		TableColumn tblclmnDdsdato = new TableColumn(burregTable, SWT.NONE);
-		tblclmnDdsdato.setWidth(45);
-		tblclmnDdsdato.setText("D\u00F8dsdato");
-
-		TableColumn tblclmnFder = new TableColumn(burregTable, SWT.NONE);
-		tblclmnFder.setWidth(40);
-		tblclmnFder.setText("F\u00F8de\u00E5r");
-
-		TableColumn tblclmnDdssted = new TableColumn(burregTable, SWT.NONE);
-		tblclmnDdssted.setWidth(59);
-		tblclmnDdssted.setText("D\u00F8dssted");
-
-		TableColumn tblclmnCivilstand_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnCivilstand_1.setWidth(37);
-		tblclmnCivilstand_1.setText("Civilstand");
-
-		TableColumn tblclmnAdrUdfKbhvn = new TableColumn(burregTable, SWT.NONE);
-		tblclmnAdrUdfKbhvn.setWidth(57);
-		tblclmnAdrUdfKbhvn.setText("Adr. udf. Kbhvn.");
-
-		TableColumn tblclmnKn_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnKn_1.setWidth(34);
-		tblclmnKn_1.setText("K\u00F8n");
-
-		TableColumn tblclmnKommentar_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnKommentar_1.setWidth(34);
-		tblclmnKommentar_1.setText("Kommentar");
-
-		TableColumn tblclmnKirkegrd = new TableColumn(burregTable, SWT.NONE);
-		tblclmnKirkegrd.setWidth(43);
-		tblclmnKirkegrd.setText("Kirkeg\u00E5rd");
-
-		TableColumn tblclmnKapel = new TableColumn(burregTable, SWT.NONE);
-		tblclmnKapel.setWidth(49);
-		tblclmnKapel.setText("Kapel");
-
-		TableColumn tblclmnSogn_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnSogn_1.setWidth(45);
-		tblclmnSogn_1.setText("Sogn");
-
-		TableColumn tblclmnGade_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnGade_1.setWidth(48);
-		tblclmnGade_1.setText("Gade");
-
-		TableColumn tblclmnKvarter = new TableColumn(burregTable, SWT.NONE);
-		tblclmnKvarter.setWidth(47);
-		tblclmnKvarter.setText("Kvarter");
-
-		TableColumn tblclmnGadenr_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnGadenr_1.setWidth(39);
-		tblclmnGadenr_1.setText("Gadenr.");
-
-		TableColumn tblclmnBogstav_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnBogstav_1.setWidth(49);
-		tblclmnBogstav_1.setText("Bogstav");
-
-		TableColumn tblclmnEtage_1 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnEtage_1.setWidth(39);
-		tblclmnEtage_1.setText("Etage");
-
-		TableColumn tblclmnInstitution = new TableColumn(burregTable, SWT.NONE);
-		tblclmnInstitution.setWidth(44);
-		tblclmnInstitution.setText("Institution");
-
-		TableColumn tblclmnInstGade = new TableColumn(burregTable, SWT.NONE);
-		tblclmnInstGade.setWidth(53);
-		tblclmnInstGade.setText("Inst. gade");
-
-		TableColumn tblclmnInstKvarter = new TableColumn(burregTable, SWT.NONE);
-		tblclmnInstKvarter.setWidth(30);
-		tblclmnInstKvarter.setText("Inst. kvarter");
-
-		TableColumn tblclmnInstGadenr = new TableColumn(burregTable, SWT.NONE);
-		tblclmnInstGadenr.setWidth(34);
-		tblclmnInstGadenr.setText("Inst. gadenr.");
-
-		TableColumn tblclmnErhverv_2 = new TableColumn(burregTable, SWT.NONE);
-		tblclmnErhverv_2.setWidth(25);
-		tblclmnErhverv_2.setText("Erhverv");
-
-		TableColumn tblclmnErhvforhtyper = new TableColumn(burregTable, SWT.NONE);
-		tblclmnErhvforhtyper.setWidth(24);
-		tblclmnErhvforhtyper.setText("Erhv.forh.typer");
-
-		TableColumn tblclmnDdsrsager = new TableColumn(burregTable, SWT.NONE);
-		tblclmnDdsrsager.setWidth(100);
-		tblclmnDdsrsager.setText("D\u00F8ds\u00E5rsager");
-
-		TableColumn tblclmnDdsrsDansk = new TableColumn(burregTable, SWT.NONE);
-		tblclmnDdsrsDansk.setWidth(100);
-		tblclmnDdsrsDansk.setText("D\u00F8ds\u00E5rs. dansk");
-
-		burregScroller.setContent(burregTable);
-		burregScroller.setMinSize(burregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-	}
-
-	/**
-	 * Create police registry tab
-	 * 
-	 * @param tabFolder
-	 */
-	private void createPolregRab(TabFolder tabFolder) {
-		final TabItem tbtmPolreg = new TabItem(tabFolder, SWT.NONE);
-		tbtmPolreg.setText("Politiets Registerblade");
-
-		final ScrolledComposite polregScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmPolreg.setControl(polregScroller);
-		polregScroller.setExpandHorizontal(true);
-		polregScroller.setExpandVertical(true);
-
-		polregTable = new Table(polregScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		polregTable.setHeaderVisible(true);
-		polregTable.setLinesVisible(true);
-
-		final TableColumn tblclmnNavn_1 = new TableColumn(polregTable, SWT.NONE);
-		tblclmnNavn_1.setWidth(50);
-		tblclmnNavn_1.setText("Navn");
-
-		final TableColumn tblclmnFdedag = new TableColumn(polregTable, SWT.NONE);
-		tblclmnFdedag.setWidth(100);
-		tblclmnFdedag.setText("F\u00F8dedag");
-
-		final TableColumn tblclmnErhverv_1 = new TableColumn(polregTable, SWT.NONE);
-		tblclmnErhverv_1.setWidth(100);
-		tblclmnErhverv_1.setText("Erhverv");
-
-		final TableColumn tblclmnGade = new TableColumn(polregTable, SWT.NONE);
-		tblclmnGade.setWidth(100);
-		tblclmnGade.setText("Gade");
-
-		final TableColumn tblclmnNr_1 = new TableColumn(polregTable, SWT.NONE);
-		tblclmnNr_1.setWidth(50);
-		tblclmnNr_1.setText("Nr.");
-
-		final TableColumn tblclmnBogstav = new TableColumn(polregTable, SWT.NONE);
-		tblclmnBogstav.setWidth(50);
-		tblclmnBogstav.setText("Bogstav");
-
-		final TableColumn tblclmnEtage = new TableColumn(polregTable, SWT.NONE);
-		tblclmnEtage.setWidth(50);
-		tblclmnEtage.setText("Etage");
-
-		final TableColumn tblclmnSted_1 = new TableColumn(polregTable, SWT.NONE);
-		tblclmnSted_1.setWidth(100);
-		tblclmnSted_1.setText("Sted");
-
-		final TableColumn tblclmnVrt = new TableColumn(polregTable, SWT.NONE);
-		tblclmnVrt.setWidth(100);
-		tblclmnVrt.setText("V\u00E6rt");
-
-		final TableColumn tblclmnDag = new TableColumn(polregTable, SWT.NONE);
-		tblclmnDag.setWidth(48);
-		tblclmnDag.setText("Dag");
-
-		final TableColumn tblclmnMned = new TableColumn(polregTable, SWT.NONE);
-		tblclmnMned.setWidth(49);
-		tblclmnMned.setText("M\u00E5ned");
-
-		final TableColumn tblclmnr = new TableColumn(polregTable, SWT.NONE);
-		tblclmnr.setWidth(49);
-		tblclmnr.setText("\u00C5r");
-
-		final TableColumn tblclmnAdresse_1 = new TableColumn(polregTable, SWT.NONE);
-		tblclmnAdresse_1.setWidth(100);
-		tblclmnAdresse_1.setText("Adresse");
-		polregScroller.setContent(polregTable);
-		polregScroller.setMinSize(polregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	}
-
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
-
-	/**
-	 * @param tabFolder
-	 */
-	private void createCensusTab(TabFolder tabFolder) {
-		tbtmCensus = new TabItem(tabFolder, SWT.NONE);
-		tbtmCensus.setText("Folket\u00E6llinger");
-
-		final ScrolledComposite censusScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmCensus.setControl(censusScroller);
-		censusScroller.setExpandHorizontal(true);
-		censusScroller.setExpandVertical(true);
-
-		censusTable = new Table(censusScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		censusTable.setHeaderVisible(true);
-		censusTable.setLinesVisible(true);
-
-		final TableColumn tblclmnAar = new TableColumn(censusTable, SWT.NONE);
-		tblclmnAar.setWidth(50);
-		tblclmnAar.setText("År");
-
-		final TableColumn tblclmnAmt = new TableColumn(censusTable, SWT.NONE);
-		tblclmnAmt.setWidth(75);
-		tblclmnAmt.setText("Amt");
-
-		final TableColumn tblclmnHerred = new TableColumn(censusTable, SWT.NONE);
-		tblclmnHerred.setWidth(75);
-		tblclmnHerred.setText("Herred");
-
-		final TableColumn tblclmnSogn = new TableColumn(censusTable, SWT.NONE);
-		tblclmnSogn.setWidth(75);
-		tblclmnSogn.setText("Sogn");
-
-		final TableColumn tblclmnKildestednavn = new TableColumn(censusTable, SWT.NONE);
-		tblclmnKildestednavn.setWidth(100);
-		tblclmnKildestednavn.setText("Kildestednavn");
-
-		final TableColumn tblclmnNr = new TableColumn(censusTable, SWT.NONE);
-		tblclmnNr.setWidth(50);
-		tblclmnNr.setText("Nr.");
-
-		final TableColumn tblclmnMatrAdr = new TableColumn(censusTable, SWT.NONE);
-		tblclmnMatrAdr.setWidth(100);
-		tblclmnMatrAdr.setText("Matrikel/adresse");
-
-		final TableColumn tblclmnNavn = new TableColumn(censusTable, SWT.NONE);
-		tblclmnNavn.setWidth(100);
-		tblclmnNavn.setText("Navn");
-
-		final TableColumn tblclmnKn = new TableColumn(censusTable, SWT.NONE);
-		tblclmnKn.setWidth(35);
-		tblclmnKn.setText("K\u00F8n");
-
-		final TableColumn tblclmnAlder = new TableColumn(censusTable, SWT.NONE);
-		tblclmnAlder.setWidth(35);
-		tblclmnAlder.setText("Alder");
-
-		final TableColumn tblclmnCivilstand = new TableColumn(censusTable, SWT.NONE);
-		tblclmnCivilstand.setWidth(100);
-		tblclmnCivilstand.setText("Civilstand");
-
-		final TableColumn tblclmnErhverv = new TableColumn(censusTable, SWT.NONE);
-		tblclmnErhverv.setWidth(100);
-		tblclmnErhverv.setText("Erhverv");
-
-		final TableColumn tblclmnStilling = new TableColumn(censusTable, SWT.NONE);
-		tblclmnStilling.setWidth(100);
-		tblclmnStilling.setText("Stilling i husstanden");
-
-		final TableColumn tblclmnFoedested = new TableColumn(censusTable, SWT.NONE);
-		tblclmnFoedested.setWidth(100);
-		tblclmnFoedested.setText("Fødested");
-
-		final TableColumn tblclmnFoededato = new TableColumn(censusTable, SWT.NONE);
-		tblclmnFoededato.setWidth(100);
-		tblclmnFoededato.setText("Fødedato");
-
-		final TableColumn tblclmnFoedeaar = new TableColumn(censusTable, SWT.NONE);
-		tblclmnFoedeaar.setWidth(50);
-		tblclmnFoedeaar.setText("Fødeår");
-
-		final TableColumn tblclmnAdresse = new TableColumn(censusTable, SWT.NONE);
-		tblclmnAdresse.setWidth(100);
-		tblclmnAdresse.setText("Adresse");
-
-		final TableColumn tblclmnMatrikel = new TableColumn(censusTable, SWT.NONE);
-		tblclmnMatrikel.setWidth(100);
-		tblclmnMatrikel.setText("Matrikel");
-
-		final TableColumn tblclmnGadenr = new TableColumn(censusTable, SWT.NONE);
-		tblclmnGadenr.setWidth(100);
-		tblclmnGadenr.setText("Gade nr.");
-
-		final TableColumn tblclmnHenvisning = new TableColumn(censusTable, SWT.NONE);
-		tblclmnHenvisning.setWidth(100);
-		tblclmnHenvisning.setText("Henvisning");
-
-		final TableColumn tblclmnKommentar = new TableColumn(censusTable, SWT.NONE);
-		tblclmnKommentar.setWidth(100);
-		tblclmnKommentar.setText("Kommentar");
-
-		final TableColumn tblclmnKipNr = new TableColumn(censusTable, SWT.NONE);
-		tblclmnKipNr.setWidth(50);
-		tblclmnKipNr.setText("KIP nr.");
-
-		final TableColumn tblclmnLoebenr = new TableColumn(censusTable, SWT.NONE);
-		tblclmnLoebenr.setWidth(50);
-		tblclmnLoebenr.setText("Løbenr.");
-
-		final TableColumn tblclmnDetaljer = new TableColumn(censusTable, SWT.NONE);
-		tblclmnDetaljer.setWidth(100);
-		tblclmnDetaljer.setText("Detaljer");
-
-		censusScroller.setContent(censusTable);
-		censusScroller.setMinSize(censusTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	}
-
-	/**
-	 * Create contents of the shell
-	 */
-	protected void createContents() {
-		setText("ArchiveSearcher");
-		setSize(1116, 580);
-
-	}
-
-	/**
-	 * Create the menu bar
-	 */
-	private void createMenuBar() {
+		setLayout(new GridLayout(1, false));
 		final Menu menu = new Menu(this, SWT.BAR);
 		setMenuBar(menu);
 
 		final MenuItem mntmFiler = new MenuItem(menu, SWT.CASCADE);
 		mntmFiler.setText("Filer");
-
 		final Menu menu_1 = new Menu(mntmFiler);
 		mntmFiler.setMenu(menu_1);
 
-		final MenuItem mntmLoadGedcom = new MenuItem(menu_1, SWT.NONE);
-		mntmLoadGedcom.addSelectionListener(new SelectionAdapter() {
+		final MenuItem mntmL = new MenuItem(menu_1, SWT.NONE);
+		mntmL.addSelectionListener(new SelectionAdapter() {
+			private Properties props;
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final Shell[] shells = e.widget.getDisplay().getShells();
@@ -534,11 +184,10 @@ public class ArchiveSearcher extends Shell {
 				}
 			}
 		});
-		mntmLoadGedcom.setText("Indl\u00E6s GEDCOM i databasen");
+		mntmL.setText("Indl\u00E6s GEDCOM i databasen");
 
-		final MenuItem mntmLoadKip = new MenuItem(menu_1, SWT.NONE);
-		mntmLoadKip.addSelectionListener(new SelectionAdapter() {
-
+		final MenuItem mntmIndlsKipFiler = new MenuItem(menu_1, SWT.NONE);
+		mntmIndlsKipFiler.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final Shell[] shells = e.widget.getDisplay().getShells();
@@ -566,7 +215,7 @@ public class ArchiveSearcher extends Shell {
 				}
 			}
 		});
-		mntmLoadKip.setText("Indl\u00E6s KIP filer i databasen");
+		mntmIndlsKipFiler.setText("Indl\u00E6s KIP filer i databasen");
 
 		final MenuItem mntmAfslut = new MenuItem(menu_1, SWT.NONE);
 		mntmAfslut.addSelectionListener(new SelectionAdapter() {
@@ -576,122 +225,9 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		mntmAfslut.setText("Afslut");
-	}
-
-	/**
-	 * Create census tab
-	 *
-	 * @param tabFolder
-	 */
-	private void createProbateTab(TabFolder tabFolder) {
-		tbtmProbate = new TabItem(tabFolder, SWT.NONE);
-		tbtmProbate.setText("Skifter");
-
-		final ScrolledComposite probateScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmProbate.setControl(probateScroller);
-		probateScroller.setExpandHorizontal(true);
-		probateScroller.setExpandVertical(true);
-
-		probateTable = new Table(probateScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		probateTable.setHeaderVisible(true);
-		probateTable.setLinesVisible(true);
-
-		final TableColumn tblclmnName = new TableColumn(probateTable, SWT.NONE);
-		tblclmnName.setWidth(200);
-		tblclmnName.setText("Navn");
-
-		final TableColumn tblclmnFra = new TableColumn(probateTable, SWT.NONE);
-		tblclmnFra.setWidth(100);
-		tblclmnFra.setText("Fra");
-
-		final TableColumn tblclmnTil = new TableColumn(probateTable, SWT.NONE);
-		tblclmnTil.setWidth(100);
-		tblclmnTil.setText("Til");
-
-		final TableColumn tblclmnSted = new TableColumn(probateTable, SWT.NONE);
-		tblclmnSted.setWidth(100);
-		tblclmnSted.setText("Sted");
-
-		final TableColumn tblclmnData = new TableColumn(probateTable, SWT.NONE);
-		tblclmnData.setWidth(300);
-		tblclmnData.setText("Data");
-
-		final TableColumn tblclmnKilde = new TableColumn(probateTable, SWT.NONE);
-		tblclmnKilde.setWidth(300);
-		tblclmnKilde.setText("Kilde");
-
-		probateScroller.setContent(probateTable);
-		probateScroller.setMinSize(probateTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	}
-
-	/**
-	 * Create the relocation tab
-	 *
-	 * @param tabFolder
-	 */
-	private void createRelocationTab(final TabFolder tabFolder) {
-		tbtmRelocation = new TabItem(tabFolder, SWT.NONE);
-		tbtmRelocation.setText("Flytninger");
-
-		final ScrolledComposite relocationScroller = new ScrolledComposite(tabFolder,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmRelocation.setControl(relocationScroller);
-		relocationScroller.setExpandHorizontal(true);
-		relocationScroller.setExpandVertical(true);
-
-		relocationTable = new Table(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION);
-		relocationTable.setHeaderVisible(true);
-		relocationTable.setLinesVisible(true);
-
-		final TableColumn relocationIdColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationIdColumn.setWidth(50);
-		relocationIdColumn.setText("ID");
-
-		final TableColumn relocationGivenColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationGivenColumn.setWidth(100);
-		relocationGivenColumn.setText("Fornavn");
-
-		final TableColumn relocationSurnameColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationSurnameColumn.setWidth(100);
-		relocationSurnameColumn.setText("Efternavn");
-
-		final TableColumn relocationDateColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationDateColumn.setWidth(80);
-		relocationDateColumn.setText("Flyttedato");
-
-		final TableColumn relocationToColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationToColumn.setWidth(183);
-		relocationToColumn.setText("Til");
-
-		final TableColumn relocationFromColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationFromColumn.setWidth(100);
-		relocationFromColumn.setText("Fra");
-
-		final TableColumn relocationDetailsColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationDetailsColumn.setWidth(100);
-		relocationDetailsColumn.setText("Detaljer");
-
-		final TableColumn relocationBirthDateColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationBirthDateColumn.setWidth(100);
-		relocationBirthDateColumn.setText("F\u00F8dselsdato");
-
-		final TableColumn relocationParentsColumn = new TableColumn(relocationTable, SWT.NONE);
-		relocationParentsColumn.setWidth(200);
-		relocationParentsColumn.setText("For\u00E6ldre");
-
-		relocationScroller.setContent(relocationTable);
-		relocationScroller.setMinSize(relocationTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-	}
-
-	/**
-	 * Create the search composite
-	 */
-	private void createSearchBar() {
 		final Composite searchComposite = new Composite(this, SWT.NONE);
 		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		searchComposite.setLayout(new GridLayout(6, false));
-
 		final Label lblVlgEntenId = new Label(searchComposite, SWT.NONE);
 		lblVlgEntenId.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
 		lblVlgEntenId.setText(
@@ -755,14 +291,124 @@ public class ArchiveSearcher extends Shell {
 		btnSearchName.setText("S\u00F8g navn");
 		new Label(searchComposite, SWT.NONE);
 		new Label(searchComposite, SWT.NONE);
-	}
 
-	/**
-	 * Create the settings tab
-	 *
-	 * @param tabFolder
-	 */
-	private void createSettingsTab(final TabFolder tabFolder) {
+		final TabFolder tabFolder = new TabFolder(this, SWT.NONE);
+		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+
+		final TabItem tbtmFlytninger = new TabItem(tabFolder, SWT.NONE);
+		tbtmFlytninger.setText("Flytninger");
+
+		final ScrolledComposite relocationScroller = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmFlytninger.setControl(relocationScroller);
+		relocationScroller.setExpandHorizontal(true);
+		relocationScroller.setExpandVertical(true);
+
+		final TableViewer relocationTableViewer = new TableViewer(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		relocationTableViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				TableItem[] tia = relocationTable.getSelection();
+				TableItem ti = tia[0];
+
+				StringBuffer sb = new StringBuffer();
+				for (int i = 0; i < 9; i++)
+					sb.append(ti.getText(i) + ",\n");
+				Shell[] shells = display.getShells();
+				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_INFORMATION | SWT.OK);
+				messageBox.setText("Flytning");
+				messageBox.setMessage(sb.toString());
+				messageBox.open();
+			}
+		});
+		relocationTable = relocationTableViewer.getTable();
+		relocationTable.setLinesVisible(true);
+		relocationTable.setHeaderVisible(true);
+
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnId = tableViewerColumn.getColumn();
+		tblclmnId.setWidth(100);
+		tblclmnId.setText("ID");
+
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnFornavn = tableViewerColumn_1.getColumn();
+		tblclmnFornavn.setWidth(100);
+		tblclmnFornavn.setText("Fornavn");
+
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnEfternavn = tableViewerColumn_2.getColumn();
+		tblclmnEfternavn.setWidth(100);
+		tblclmnEfternavn.setText("Efternavn");
+
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnFlyttedato = tableViewerColumn_3.getColumn();
+		tblclmnFlyttedato.setWidth(100);
+		tblclmnFlyttedato.setText("Flyttedato");
+
+		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnTil = tableViewerColumn_4.getColumn();
+		tblclmnTil.setWidth(100);
+		tblclmnTil.setText("Til");
+
+		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnFra = tableViewerColumn_5.getColumn();
+		tblclmnFra.setWidth(100);
+		tblclmnFra.setText("Fra");
+
+		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnDetaljer = tableViewerColumn_6.getColumn();
+		tblclmnDetaljer.setWidth(100);
+		tblclmnDetaljer.setText("Detaljer");
+
+		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnFdselsdato = tableViewerColumn_7.getColumn();
+		tblclmnFdselsdato.setWidth(100);
+		tblclmnFdselsdato.setText("F\u00F8dselsdato");
+
+		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableColumn tblclmnForldre = tableViewerColumn_8.getColumn();
+		tblclmnForldre.setWidth(100);
+		tblclmnForldre.setText("For\u00E6ldre");
+		relocationScroller.setContent(relocationTable);
+		relocationScroller.setMinSize(relocationTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+		createSettingsTab(tabFolder);
+
+		TabItem tbtmSkifter = new TabItem(tabFolder, SWT.NONE);
+		tbtmSkifter.setText("Skifter");
+
+		ScrolledComposite scrolledComposite = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmSkifter.setControl(scrolledComposite);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
+
+		TabItem tbtmPoliietsRegisterblade = new TabItem(tabFolder, SWT.NONE);
+		tbtmPoliietsRegisterblade.setText("Poliiets Registerblade");
+
+		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmPoliietsRegisterblade.setControl(scrolledComposite_1);
+		scrolledComposite_1.setExpandHorizontal(true);
+		scrolledComposite_1.setExpandVertical(true);
+
+		TabItem tbtmKbhvnBegravelsesregister = new TabItem(tabFolder, SWT.NONE);
+		tbtmKbhvnBegravelsesregister.setText("Kbhvn. begravelsesregister");
+
+		ScrolledComposite scrolledComposite_2 = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmKbhvnBegravelsesregister.setControl(scrolledComposite_2);
+		scrolledComposite_2.setExpandHorizontal(true);
+		scrolledComposite_2.setExpandVertical(true);
+
+		TabItem tbtmForldre = new TabItem(tabFolder, SWT.NONE);
+		tbtmForldre.setText("For\u00E6ldre");
+
+		ScrolledComposite scrolledComposite_3 = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmForldre.setControl(scrolledComposite_3);
+		scrolledComposite_3.setExpandHorizontal(true);
+		scrolledComposite_3.setExpandVertical(true);
 
 		final TabItem tbtmSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmSettings.setText("Ops\u00E6tning");
@@ -997,28 +643,28 @@ public class ArchiveSearcher extends Shell {
 		final Label lblAktiveSgninger = new Label(checkButtoncomposite, SWT.NONE);
 		lblAktiveSgninger.setText("Aktive s\u00F8gninger:");
 
-		final Button btnRelocationTab = new Button(checkButtoncomposite, SWT.CHECK);
+		btnRelocationTab = new Button(checkButtoncomposite, SWT.CHECK);
 		btnRelocationTab.setSelection(Boolean.parseBoolean(props.getProperty("relocationSearch")));
 		btnRelocationTab.setText("Flytninger");
 
-		final Button btnCensusTab = new Button(checkButtoncomposite, SWT.CHECK);
+		btnCensusTab = new Button(checkButtoncomposite, SWT.CHECK);
 		btnCensusTab.setSelection(Boolean.parseBoolean(props.getProperty("censusSearch")));
 		btnCensusTab.setText("Folket\u00E6llinger");
 
-		final Button btnProbateTab = new Button(checkButtoncomposite, SWT.CHECK);
+		btnProbateTab = new Button(checkButtoncomposite, SWT.CHECK);
 		btnProbateTab.setSelection(Boolean.parseBoolean(props.getProperty("probateSearch")));
 		btnProbateTab.setText("Skifter");
 
-		final Button btnPolitietsRegisterblade = new Button(checkButtoncomposite, SWT.CHECK);
+		btnPolitietsRegisterblade = new Button(checkButtoncomposite, SWT.CHECK);
 		btnPolitietsRegisterblade.setSelection(Boolean.parseBoolean(props.getProperty("polregSearch")));
 		btnPolitietsRegisterblade.setText("Politiets registerblade");
 
-		final Button btnBegravelsesregistret = new Button(checkButtoncomposite, SWT.CHECK);
+		btnBegravelsesregistret = new Button(checkButtoncomposite, SWT.CHECK);
 		btnBegravelsesregistret.setSelection(Boolean.parseBoolean(props.getProperty("burregSearch")));
 		btnBegravelsesregistret.setText("Begravelsesregistret");
 
-		final Button btnForldre = new Button(checkButtoncomposite, SWT.CHECK);
-		btnForldre.setEnabled(Boolean.parseBoolean(props.getProperty("parentSearch")));
+		btnForldre = new Button(checkButtoncomposite, SWT.CHECK);
+		btnForldre.setSelection(true);
 		btnForldre.setText("For\u00E6ldre");
 		new Label(compositeOpstning, SWT.NONE);
 
@@ -1081,6 +727,185 @@ public class ArchiveSearcher extends Shell {
 		btnCancel.setText("Fortryd");
 		new Label(compositeOpstning, SWT.NONE);
 
+		messageField = new Text(this, SWT.BORDER);
+		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		createContents();
+	}
+
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Create contents of the shell.
+	 */
+	protected void createContents() {
+		setText("SWT Application");
+		setSize(1112, 625);
+
+	}
+
+	/**
+	 * Create the settings tab
+	 *
+	 * @param tabFolder
+	 */
+	private void createSettingsTab(final TabFolder tabFolder) {
+
+		TabItem tbtmFolketlling = new TabItem(tabFolder, SWT.NONE);
+		tbtmFolketlling.setText("Folket\u00E6lling");
+
+		ScrolledComposite scrolledComposite = new ScrolledComposite(tabFolder,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmFolketlling.setControl(scrolledComposite);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
+
+		TableViewer tableViewer = new TableViewer(scrolledComposite, SWT.BORDER | SWT.FULL_SELECTION);
+		tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				TableItem[] tia = censusTable.getSelection();
+				TableItem ti = tia[0];
+
+				StringBuffer sb = new StringBuffer();
+				for (int i = 0; i < 24; i++)
+					sb.append(ti.getText(i) + ",\n");
+				Shell[] shells = display.getShells();
+				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_INFORMATION | SWT.OK);
+				messageBox.setText("Folketælling");
+				messageBox.setMessage(sb.toString());
+				messageBox.open();
+			}
+		});
+		censusTable = tableViewer.getTable();
+		censusTable.setLinesVisible(true);
+		censusTable.setHeaderVisible(true);
+
+		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnr = tableViewerColumn.getColumn();
+		tblclmnr.setWidth(40);
+		tblclmnr.setText("\u00C5r");
+
+		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnAmt = tableViewerColumn_1.getColumn();
+		tblclmnAmt.setWidth(40);
+		tblclmnAmt.setText("Amt");
+
+		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnHerred = tableViewerColumn_2.getColumn();
+		tblclmnHerred.setWidth(40);
+		tblclmnHerred.setText("Herred");
+
+		TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnSogn = tableViewerColumn_3.getColumn();
+		tblclmnSogn.setWidth(40);
+		tblclmnSogn.setText("Sogn");
+
+		TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnKildestednavn = tableViewerColumn_4.getColumn();
+		tblclmnKildestednavn.setWidth(40);
+		tblclmnKildestednavn.setText("Kildestednavn");
+
+		TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnHusstfamnr = tableViewerColumn_5.getColumn();
+		tblclmnHusstfamnr.setWidth(40);
+		tblclmnHusstfamnr.setText("Husst./fam.nr.");
+
+		TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnMatrnraddr = tableViewerColumn_6.getColumn();
+		tblclmnMatrnraddr.setWidth(40);
+		tblclmnMatrnraddr.setText("Matr.nr.addr.");
+
+		TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnKildenavn = tableViewerColumn_7.getColumn();
+		tblclmnKildenavn.setWidth(40);
+		tblclmnKildenavn.setText("Kildenavn");
+
+		TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnKn = tableViewerColumn_8.getColumn();
+		tblclmnKn.setWidth(40);
+		tblclmnKn.setText("K\u00F8n");
+
+		TableViewerColumn tableViewerColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnAlder = tableViewerColumn_9.getColumn();
+		tblclmnAlder.setWidth(40);
+		tblclmnAlder.setText("Alder");
+
+		TableViewerColumn tableViewerColumn_10 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnCivilstand = tableViewerColumn_10.getColumn();
+		tblclmnCivilstand.setWidth(40);
+		tblclmnCivilstand.setText("Civilstand");
+
+		TableViewerColumn tableViewerColumn_11 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnErhverv = tableViewerColumn_11.getColumn();
+		tblclmnErhverv.setWidth(40);
+		tblclmnErhverv.setText("Erhverv");
+
+		TableViewerColumn tableViewerColumn_12 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnStillHusst = tableViewerColumn_12.getColumn();
+		tblclmnStillHusst.setWidth(40);
+		tblclmnStillHusst.setText("Still. husst.");
+
+		TableViewerColumn tableViewerColumn_13 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnFdested = tableViewerColumn_13.getColumn();
+		tblclmnFdested.setWidth(40);
+		tblclmnFdested.setText("F\u00F8dested");
+
+		TableViewerColumn tableViewerColumn_14 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnFdedato = tableViewerColumn_14.getColumn();
+		tblclmnFdedato.setWidth(40);
+		tblclmnFdedato.setText("F\u00F8dedato");
+
+		TableViewerColumn tableViewerColumn_15 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnFder = tableViewerColumn_15.getColumn();
+		tblclmnFder.setWidth(40);
+		tblclmnFder.setText("F\u00F8de\u00E5r");
+
+		TableViewerColumn tableViewerColumn_16 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnAdresse = tableViewerColumn_16.getColumn();
+		tblclmnAdresse.setWidth(40);
+		tblclmnAdresse.setText("Adresse");
+
+		TableViewerColumn tableViewerColumn_17 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnMatrikel = tableViewerColumn_17.getColumn();
+		tblclmnMatrikel.setWidth(40);
+		tblclmnMatrikel.setText("Matrikel");
+
+		TableViewerColumn tableViewerColumn_18 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnGadenr = tableViewerColumn_18.getColumn();
+		tblclmnGadenr.setWidth(52);
+		tblclmnGadenr.setText("Gadenr.");
+
+		TableViewerColumn tableViewerColumn_19 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnHenvisning = tableViewerColumn_19.getColumn();
+		tblclmnHenvisning.setWidth(40);
+		tblclmnHenvisning.setText("Henvisning");
+
+		TableViewerColumn tableViewerColumn_20 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnKommentar = tableViewerColumn_20.getColumn();
+		tblclmnKommentar.setWidth(47);
+		tblclmnKommentar.setText("Kommentar");
+
+		TableViewerColumn tableViewerColumn_21 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnKipNr = tableViewerColumn_21.getColumn();
+		tblclmnKipNr.setWidth(58);
+		tblclmnKipNr.setText("KIP nr.");
+
+		TableViewerColumn tableViewerColumn_22 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnLbenr = tableViewerColumn_22.getColumn();
+		tblclmnLbenr.setWidth(67);
+		tblclmnLbenr.setText("L\u00F8benr.");
+
+		TableViewerColumn tableViewerColumn_23 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnDetaljer_1 = tableViewerColumn_23.getColumn();
+		tblclmnDetaljer_1.setWidth(100);
+		tblclmnDetaljer_1.setText("Detaljer");
+		scrolledComposite.setContent(censusTable);
+		scrolledComposite.setMinSize(censusTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
 	}
 
 	/**
@@ -1109,7 +934,7 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("probateSearch", "true");
 			props.setProperty("polregSearch", "true");
 			props.setProperty("burregSearch", "true");
-			props.setProperty("parentSearch", "false");
+			props.setProperty("parentSearch", "true");
 
 			storeProperties();
 			System.out.println("Egenskaber gemt i " + PROPERTIES_PATH);
@@ -1125,24 +950,25 @@ public class ArchiveSearcher extends Shell {
 	 * @throws SQLException
 	 */
 	private void populateBurregTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		if (!props.getProperty("burregSearch").equals("true")) {
-			return;
-		}
-
-		setMessage("Bregravelsesregister hentes");
-		burregTable.removeAll();
-
-		final List<BurregRecord> lbr = BurregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
-				birthDate, deathDate);
-
-		TableItem ti;
-
-		for (final BurregRecord br : lbr) {
-			ti = new TableItem(burregTable, SWT.NONE);
-			ti.setText(br.toStringArray());
-		}
-		burregTable.redraw();
-		burregTable.update();
+//		burregTable.removeAll();
+//
+//		if (!btnBegravelsesregistret.getSelection()) {
+//			return;
+//		}
+//
+//		setMessage("Begravelsesregister hentes");
+//
+//		final List<BurregRecord> lbr = BurregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
+//				birthDate, deathDate);
+//
+//		TableItem ti;
+//
+//		for (final BurregRecord br : lbr) {
+//			ti = new TableItem(burregTable, SWT.NONE);
+//			ti.setText(br.toStringArray());
+//		}
+//		burregTable.redraw();
+//		burregTable.update();
 
 	}
 
@@ -1155,22 +981,22 @@ public class ArchiveSearcher extends Shell {
 	 * @throws SQLException
 	 */
 	private void populateCensusTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		if (!props.getProperty("censusSearch").equals("true")) {
+		censusTable.removeAll();
+
+		if (!btnCensusTab.getSelection()) {
 			return;
 		}
 
 		setMessage("Folketællinger hentes");
 
-		censusTable.removeAll();
-
-		final List<CensusIndividual> censuses = CensusIndividual.loadFromDatabase(props.getProperty("vejbyPath"),
-				phonName, birthDate.substring(0, 4), deathDate.substring(0, 4));
+		final List<CensusRecord> censuses = CensusRecord.loadFromDatabase(props.getProperty("vejbyPath"), phonName,
+				birthDate.substring(0, 4), deathDate.substring(0, 4));
 		Collections.sort(censuses, new CensusIndividualComparator());
 
 		// TODO Add all household members as source details
 //		PreparedStatement statement2 = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
 //
-//		for (final CensusIndividual ci : cil) {
+//		for (final CensusRecord ci : cil) {
 //			statement2.setString(1, ci.getKIPnr());
 //			statement2.setString(2, ci.getHusstands_familienr());
 //			rs2 = statement2.executeQuery();
@@ -1196,13 +1022,49 @@ public class ArchiveSearcher extends Shell {
 
 		TableItem ti;
 
-		for (final CensusIndividual ci : censuses) {
+		for (final CensusRecord ci : censuses) {
 			ti = new TableItem(censusTable, SWT.NONE);
 			ti.setText(ci.toStringArray());
 		}
 		censusTable.redraw();
 		censusTable.update();
-		tbtmCensus.getControl().setFocus();
+	}
+
+	/**
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	private void populateParentsTable(String id) throws SQLException {
+//		parentsTable.removeAll();
+//
+//		if (!btnForldre.getSelection()) {
+//			return;
+//		}
+//
+//		setMessage("Forældre hentes");
+//
+//		final List<ParentRecord> lpr = ParentRecord.loadFromDatabase(props.getProperty("vejbyPath"), id);
+//
+//		TableItem ti;
+//
+//		for (final ParentRecord pr : lpr) {
+//			ti = new TableItem(parentsTable, SWT.NONE);
+//			ti.setText(pr.toStringArray());
+//		}
+//		parentsTable.redraw();
+//		parentsTable.update();
+	}
+
+	/**
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 */
+	private void populateParentsTable(String phonName, String birthDate, String deathDate) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -1214,24 +1076,25 @@ public class ArchiveSearcher extends Shell {
 	 * @throws SQLException
 	 */
 	private void populatePolregTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		if (!props.getProperty("polregSearch").equals("true")) {
-			return;
-		}
-
-		setMessage("Politiregister hentes");
-		polregTable.removeAll();
-
-		final List<PolregRecord> lpr = PolregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
-				birthDate, deathDate);
-
-		TableItem ti;
-
-		for (final PolregRecord pr : lpr) {
-			ti = new TableItem(polregTable, SWT.NONE);
-			ti.setText(pr.toStringArray());
-		}
-		polregTable.redraw();
-		polregTable.update();
+//		polregTable.removeAll();
+//
+//		if (!btnPolitietsRegisterblade.getSelection()) {
+//			return;
+//		}
+//
+//		setMessage("Politiregister hentes");
+//
+//		final List<PolregRecord> lpr = PolregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName,
+//				birthDate, deathDate);
+//
+//		TableItem ti;
+//
+//		for (final PolregRecord pr : lpr) {
+//			ti = new TableItem(polregTable, SWT.NONE);
+//			ti.setText(pr.toStringArray());
+//		}
+//		polregTable.redraw();
+//		polregTable.update();
 	}
 
 	/**
@@ -1243,27 +1106,28 @@ public class ArchiveSearcher extends Shell {
 	 * @throws SQLException
 	 */
 	private void populateProbateTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		if (!props.getProperty("probateSearch").equals("true")) {
-			return;
-		}
-
-		setMessage("Skifter hentes");
-		probateTable.removeAll();
-
-		final String path = props.getProperty("probatePath");
-		final String probateSource = props.getProperty("probateSource");
-
-		final List<Probate> lp = Probate.loadFromDatabase(path, phonName, birthDate, deathDate, probateSource);
-
-		TableItem ti;
-
-		for (final Probate probate : lp) {
-			ti = new TableItem(probateTable, SWT.NONE);
-			ti.setText(probate.toStringArray());
-		}
-		probateTable.redraw();
-		probateTable.update();
-		tbtmProbate.getControl().setFocus();
+//		probateTable.removeAll();
+//
+//		if (!btnProbateTab.getSelection()) {
+//			return;
+//		}
+//
+//		setMessage("Skifter hentes");
+//
+//		final String path = props.getProperty("probatePath");
+//		final String probateSource = props.getProperty("probateSource");
+//
+//		final List<ProbateRecord> lp = ProbateRecord.loadFromDatabase(path, phonName, birthDate, deathDate,
+//				probateSource);
+//
+//		TableItem ti;
+//
+//		for (final ProbateRecord probateRecord : lp) {
+//			ti = new TableItem(probateTable, SWT.NONE);
+//			ti.setText(probateRecord.toStringArray());
+//		}
+//		probateTable.redraw();
+//		probateTable.update();
 	}
 
 	/**
@@ -1275,49 +1139,31 @@ public class ArchiveSearcher extends Shell {
 	 * @throws SQLException
 	 */
 	private void populateRelocationTable(String phonName, String birthDate, String deathDate) throws SQLException {
-		if (!props.getProperty("relocationSearch").equals("true")) {
+		relocationTable.removeAll();
+
+		if (!btnRelocationTab.getSelection()) {
 			return;
 		}
 
 		setMessage("Flytninger hentes");
-		relocationTable.removeAll();
 
-		final List<Relocation> relocations = Relocation.loadFromDatabase(props.getProperty("vejbyPath"), phonName,
-				birthDate, deathDate);
+		final List<RelocationRecord> relocationRecords = RelocationRecord
+				.loadFromDatabase(props.getProperty("vejbyPath"), phonName, birthDate, deathDate);
 
-		Collections.sort(relocations, new RelocationComparator());
+		Collections.sort(relocationRecords, new RelocationComparator());
 
 		TableItem ti;
 
-		for (final Relocation relocation : relocations) {
+		for (final RelocationRecord relocationRecord : relocationRecords) {
 			ti = new TableItem(relocationTable, SWT.NONE);
-			ti.setText(relocation.toStringArray());
+			ti.setText(relocationRecord.toStringArray());
 		}
 		relocationTable.redraw();
 		relocationTable.update();
-		tbtmRelocation.getControl().setFocus();
 	}
 
 	/**
-	 * Populate all tables
-	 *
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @throws SQLException
-	 */
-	private void populateTables(final String phonName, final String birthDate, final String deathDate)
-			throws SQLException {
-		populateRelocationTable(phonName, birthDate, deathDate);
-		populateCensusTable(phonName, birthDate, deathDate);
-		populateProbateTable(phonName, birthDate, deathDate);
-		populatePolregTable(phonName, birthDate, deathDate);
-		populateBurregTable(phonName, birthDate, deathDate);
-		setMessage("Klar");
-	}
-
-	/**
-	 * Populate the relocation table from the database
+	 * Search by ID
 	 *
 	 * @param e
 	 */
@@ -1325,7 +1171,7 @@ public class ArchiveSearcher extends Shell {
 		final String Id = "@I" + searchId.getText() + "@";
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-			final DBIndividual individual = new DBIndividual(conn, Id);
+			final IndividualRecord individual = new IndividualRecord(conn, Id);
 
 			if (individual.getName().equals("")) {
 				setMessage("ID " + Id + " findes ikke i databasen");
@@ -1346,7 +1192,12 @@ public class ArchiveSearcher extends Shell {
 					: individual.getDeathDate().toString());
 			searchDeath.setText(deathDate);
 
-			populateTables(phonName, birthDate, deathDate);
+			populateRelocationTable(phonName, birthDate, deathDate);
+			populateCensusTable(phonName, birthDate, deathDate);
+			populateProbateTable(phonName, birthDate, deathDate);
+			populatePolregTable(phonName, birthDate, deathDate);
+			populateBurregTable(phonName, birthDate, deathDate);
+			populateParentsTable(Id);
 		} catch (final SQLException e1) {
 			messageField.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -1397,7 +1248,13 @@ public class ArchiveSearcher extends Shell {
 				}
 			}
 
-			populateTables(phonName, birthDate, deathDate);
+			populateRelocationTable(phonName, birthDate, deathDate);
+			populateCensusTable(phonName, birthDate, deathDate);
+			populateProbateTable(phonName, birthDate, deathDate);
+			populatePolregTable(phonName, birthDate, deathDate);
+			populateBurregTable(phonName, birthDate, deathDate);
+			populateParentsTable(phonName, birthDate, deathDate);
+			setMessage("Klar");
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();

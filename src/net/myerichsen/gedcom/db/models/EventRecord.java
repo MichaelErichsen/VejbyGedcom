@@ -7,7 +7,7 @@ package net.myerichsen.gedcom.db.models;
  * @version 31. mar. 2023
  *
  */
-public class DBEvent extends ASModel {
+public class EventRecord extends ASModel {
 	private final int id;
 	private final String individual;
 	private final String place;
@@ -23,7 +23,7 @@ public class DBEvent extends ASModel {
 	 * @param subType
 	 * @param note
 	 */
-	public DBEvent(int id, String individual, String place, String subType, String note) {
+	public EventRecord(int id, String individual, String place, String subType, String note) {
 		this.id = id;
 		this.individual = individual;
 		this.place = place;

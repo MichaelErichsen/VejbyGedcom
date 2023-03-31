@@ -9,6 +9,11 @@
 	<classpathentry kind="lib" path="C:/Workspaces/log4j-api-2.19.0.jar"/>
 	<classpathentry kind="lib" path="C:/Workspaces/log4j-1.2-api-2.19.0.jar"/>
 	<classpathentry kind="lib" path="lib/swing2swt.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.10.300.v20190218-2100.jar" sourcepath="lib/org.eclipse.equinox.common.source_3.10.300.v20190218-2100.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.13.300.v20190218-1622.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench_3.113.0.v20190219-1432.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface_3.15.100.v20190222-1334.jar" sourcepath="lib/org.eclipse.jface.source_3.15.100.v20190222-1334.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.commands_3.10.200.v20220512-0851.jar"/>
 	<classpathentry kind="src" path="/gedcom4j"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4.jar" sourcepath="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4-sources.jar">
 		<attributes>
