@@ -18,7 +18,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 31. mar. 2023
+ * @version 1. apr. 2023
  *
  */
 public class CensusRecord extends ASModel {
@@ -49,11 +49,11 @@ public class CensusRecord extends ASModel {
 		final List<CensusRecord> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS);
+		final PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS);
 		statement.setString(1, phonName);
 		statement.setString(2, birthYear);
 		statement.setString(3, deathYear);
-		ResultSet rs = statement.executeQuery();
+		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			ci = new CensusRecord();
@@ -321,7 +321,7 @@ public class CensusRecord extends ASModel {
 	/**
 	 * @param alder the alder to set
 	 */
-	private void setAlder(int alder) {
+	public void setAlder(int alder) {
 		Alder = alder;
 	}
 
@@ -516,7 +516,7 @@ public class CensusRecord extends ASModel {
 	/**
 	 * @param loebenr the loebenr to set
 	 */
-	private void setLoebenr(int loebenr) {
+	public void setLoebenr(int loebenr) {
 		Loebenr = loebenr;
 	}
 
@@ -562,11 +562,23 @@ public class CensusRecord extends ASModel {
 
 	@Override
 	public String toString() {
-		return FTaar + ";" + Amt + ";" + Herred + ";" + Sogn + ";" + Kildestednavn + ";" + Husstands_familienr + ";"
-				+ Matr_nr_Adresse + ";" + Kildenavn + ";" + Koen + ";" + Alder + ";" + Civilstand + ";" + Kildeerhverv
-				+ ";" + Stilling_i_husstanden + ";" + Kildefoedested + ";" + Foedt_kildedato + ";" + Foedeaar + ";"
-				+ Adresse + ";" + Matrikel + ";" + Gade_nr + ";" + Kildehenvisning + ";" + Kildekommentar + ";" + KIPnr
-				+ ";" + Loebenr + ";" + Fonnavn + ";" + Kildedetaljer + "\n";
+		return (KIPnr.length() > 0 ? KIPnr + ", " : "") + (Loebenr > 0 ? Loebenr + ", " : "")
+				+ (Amt.length() > 0 ? Amt + ", " : "") + (Herred.length() > 0 ? Herred + ", " : "")
+				+ (Sogn.length() > 0 ? Sogn + ", " : "") + (Kildestednavn.length() > 0 ? Kildestednavn + ", " : "")
+				+ (Husstands_familienr.length() > 0 ? Husstands_familienr + ", " : "")
+				+ (Matr_nr_Adresse.length() > 0 ? Matr_nr_Adresse + ", " : "")
+				+ (Kildenavn.length() > 0 ? Kildenavn + ", " : "") + (Fonnavn.length() > 0 ? Fonnavn + ", " : "")
+				+ (Koen.length() > 0 ? Koen + ", " : "") + (Alder > 0 ? Alder + ", " : "")
+				+ (Civilstand.length() > 0 ? Civilstand + ", " : "")
+				+ (Kildeerhverv.length() > 0 ? Kildeerhverv + ", " : "")
+				+ (Stilling_i_husstanden.length() > 0 ? Stilling_i_husstanden + ", " : "")
+				+ (Kildefoedested.length() > 0 ? Kildefoedested + ", " : "")
+				+ (Foedt_kildedato.length() > 0 ? Foedt_kildedato + ", " : "") + (Foedeaar > 0 ? Foedeaar + ", " : "")
+				+ (Adresse.length() > 0 ? Adresse + ", " : "") + (Matrikel.length() > 0 ? Matrikel + ", " : "")
+				+ (Gade_nr.length() > 0 ? Gade_nr + ", " : "") + (FTaar > 0 ? FTaar + ", " : "")
+				+ (Kildehenvisning.length() > 0 ? Kildehenvisning + ", " : "")
+				+ (Kildekommentar.length() > 0 ? Kildekommentar + ", " : "")
+				+ (Kildedetaljer.length() > 0 ? Kildedetaljer + ", " : "");
 	}
 
 	/**

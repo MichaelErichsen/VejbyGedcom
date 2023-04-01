@@ -47,7 +47,7 @@ public class BurregRecord extends ASModel {
 
 		// TODO Test birth date
 		while (rs.next()) {
-			name = rs.getString("FIRSTNAMES") + " " + rs.getString("LASTNAME");
+			name = rs.getString("FIRSTNAMES").trim() + " " + rs.getString("LASTNAME").trim();
 
 			try {
 				if (!fk.generateKey(name).equals(phonName)) {
