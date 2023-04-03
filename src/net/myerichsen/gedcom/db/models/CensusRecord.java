@@ -18,7 +18,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 1. apr. 2023
+ * @version 3. apr. 2023
  *
  */
 public class CensusRecord extends ASModel {
@@ -43,8 +43,8 @@ public class CensusRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusRecord> loadFromDatabase(String dbPath, String phonName, String birthYear,
-			String deathYear) throws SQLException {
+	public static CensusRecord[] loadFromDatabase(String dbPath, String phonName, String birthYear, String deathYear)
+			throws SQLException {
 		CensusRecord ci;
 		final List<CensusRecord> cil = new ArrayList<>();
 
@@ -84,7 +84,14 @@ public class CensusRecord extends ASModel {
 			logger.fine(ci.toString());
 			cil.add(ci);
 		}
-		return cil;
+
+		CensusRecord[] cra = new CensusRecord[cil.size()];
+
+		for (int i = 0; i < cra.length; i++) {
+			cra[i] = cil.get(i);
+		}
+
+		return cra;
 	}
 
 	private String KIPnr = "";
@@ -567,9 +574,8 @@ public class CensusRecord extends ASModel {
 				+ (Sogn.length() > 0 ? Sogn + ", " : "") + (Kildestednavn.length() > 0 ? Kildestednavn + ", " : "")
 				+ (Husstands_familienr.length() > 0 ? Husstands_familienr + ", " : "")
 				+ (Matr_nr_Adresse.length() > 0 ? Matr_nr_Adresse + ", " : "")
-				+ (Kildenavn.length() > 0 ? Kildenavn + ", " : "") + (Fonnavn.length() > 0 ? Fonnavn + ", " : "")
-				+ (Koen.length() > 0 ? Koen + ", " : "") + (Alder > 0 ? Alder + ", " : "")
-				+ (Civilstand.length() > 0 ? Civilstand + ", " : "")
+				+ (Kildenavn.length() > 0 ? Kildenavn + ", " : "") + (Koen.length() > 0 ? Koen + ", " : "")
+				+ (Alder > 0 ? Alder + ", " : "") + (Civilstand.length() > 0 ? Civilstand + ", " : "")
 				+ (Kildeerhverv.length() > 0 ? Kildeerhverv + ", " : "")
 				+ (Stilling_i_husstanden.length() > 0 ? Stilling_i_husstanden + ", " : "")
 				+ (Kildefoedested.length() > 0 ? Kildefoedested + ", " : "")

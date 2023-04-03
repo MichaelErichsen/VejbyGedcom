@@ -34,7 +34,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * The panel supports manual changes to the generated family structure by
  * definitions of up to four families.
  *
- * @version 05-09-2020
+ * @version 02-04-2023
  * @author Michael Erichsen
  *
  */
@@ -375,7 +375,7 @@ public class HouseholdPanel extends JPanel {
 	 * @param dataVector
 	 * @param family0
 	 */
-	public void rebuildSinglesList(Vector<Vector<String>> dataVector, Family family0) {
+	public void rebuildSinglesList(Vector<Vector> dataVector, Family family0) {
 		Individual individual;
 
 		// Read all rows and add unassigned to singles list
@@ -403,7 +403,7 @@ public class HouseholdPanel extends JPanel {
 		final Family family1 = new Family(selectedHousehold.getId(), 1);
 
 		@SuppressWarnings("unchecked")
-		final Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
 		for (int i = 0; i < dataVector.size(); i++) {
@@ -456,7 +456,7 @@ public class HouseholdPanel extends JPanel {
 
 		// Read all rows and add to family 2
 		@SuppressWarnings("unchecked")
-		final Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
 		for (int i = 0; i < dataVector.size(); i++) {
@@ -514,7 +514,7 @@ public class HouseholdPanel extends JPanel {
 
 		// Read all rows and add to family 3
 		@SuppressWarnings("unchecked")
-		final Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
 		for (int i = 0; i < dataVector.size(); i++) {
@@ -572,7 +572,7 @@ public class HouseholdPanel extends JPanel {
 
 		// Read all rows and add to family 3
 		@SuppressWarnings("unchecked")
-		final Vector<Vector<String>> dataVector = householdTableModel.getDataVector();
+		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
 		for (int i = 0; i < dataVector.size(); i++) {

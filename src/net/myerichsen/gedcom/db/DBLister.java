@@ -16,7 +16,7 @@ import org.gedcom4j.exception.GedcomParserException;
  * Class to list contents of a VEJBY Derby database.
  *
  * @author Michael Erichsen
- * @version 26. mar. 2023
+ * @version 2. apr. 2023
  *
  */
 public class DBLister {
@@ -86,6 +86,9 @@ public class DBLister {
 
 		System.out.println("\nCensus");
 		getTableRows(stmt, "VEJBY.CENSUS");
+
+		System.out.println("\nParents");
+		getTableRows(stmt, "VEJBY.PARENTS");
 
 		stmt.close();
 		System.out.println("Program ended.");

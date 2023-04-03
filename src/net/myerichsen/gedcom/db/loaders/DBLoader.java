@@ -5,10 +5,12 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,16 +34,16 @@ import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.parser.GedcomParser;
 
 import net.myerichsen.gedcom.db.models.IndividualRecord;
+import net.myerichsen.gedcom.db.models.SiblingRecord;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 2. apr. 2023
  */
 public class DBLoader {
-	// TODO Parents not correct
 	/**
 	 * Static constants and variables
 	 */
@@ -49,16 +51,20 @@ public class DBLoader {
 			+ "BIRTHPLACE = ?, DEATHDATE = ?, DEATHPLACE = ?, PARENTS = ? WHERE ID = ?";
 	private static final String INSERT_INDIVIDUAL_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
 			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = ? WHERE ID = ?";
+	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = ?, PARENTS = ? WHERE ID = ?";
 	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM VEJBY.INDIVIDUAL";
 	private static final String DELETE_FAMILY = "DELETE FROM VEJBY.FAMILY";
+	private static final String DELETE_PARENTS = "DELETE FROM VEJBY.PARENTS";
 	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE=? WHERE ID = ?";
 	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = ? WHERE ID = ?";
 	private static final String INSERT_INDIVIDUAL = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT_FAMILY_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
 			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES (?, NULL, NULL)";
+	private static final String INSERT_PARENTS = "INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, "
+			+ "PARENTS, FATHERPHONETIC, MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)";
+	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
 
 	private static PreparedStatement psUPDATE_INDIVIDUAL_BDP;
 	private static PreparedStatement psINSERT_INDIVIDUAL_EVENT;
@@ -68,12 +74,16 @@ public class DBLoader {
 	private static PreparedStatement psINSERT_INDIVIDUAL;
 	private static PreparedStatement psINSERT_FAMILY_EVENT;
 	private static PreparedStatement psINSERT_FAMILY;
+	private static PreparedStatement psINSERT_PARENTS;
+	private static PreparedStatement psSELECT_INDIVIDUAL;
+
 	private static Logger logger;
 	private static Fonkod fonkod = new Fonkod();
 	private static Gedcom gedcom;
 	private static int familyCounter = 0;
 	private static int individualCounter = 0;
 	private static int eventCounter = 0;
+	private static int parentsCounter = 0;
 
 	/**
 	 * Main method
@@ -113,6 +123,10 @@ public class DBLoader {
 		statement = conn.prepareStatement(DELETE_INDIVIDUAL);
 		statement.execute();
 		statement = conn.prepareStatement(DELETE_EVENT);
+		statement.execute();
+		statement = conn.prepareStatement(DELETE_FAMILY);
+		statement.execute();
+		statement = conn.prepareStatement(DELETE_PARENTS);
 		statement.execute();
 	}
 
@@ -157,10 +171,14 @@ public class DBLoader {
 		logger.info("Add birth and death data and parents");
 		updateBirthDeathParentsData(conn);
 
+		logger.info("Parsing parents");
+		parseParents();
+
 		conn.close();
 
 		logger.info("Program ended.\n" + familyCounter + " families inserted.\n" + individualCounter
-				+ " individuals inserted.\n" + eventCounter + " events inserted");
+				+ " individuals inserted.\n" + eventCounter + " events inserted\n" + parentsCounter
+				+ " parent pairs inserted");
 	}
 
 	/**
@@ -568,6 +586,84 @@ public class DBLoader {
 	}
 
 	/**
+	 * @throws SQLException
+	 *
+	 */
+	private void parseParents() throws SQLException {
+		final List<SiblingRecord> lpr = new ArrayList<>();
+		SiblingRecord pr;
+		String parents;
+		final Fonkod fk = new Fonkod();
+
+		final ResultSet rs = psSELECT_INDIVIDUAL.executeQuery();
+
+		while (rs.next()) {
+			pr = new SiblingRecord();
+			pr.setIndividualKey(rs.getString("ID"));
+			pr.setBirthDate(rs.getDate("BIRTHDATE"));
+			pr.setName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
+
+			parents = rs.getString("PARENTS");
+			pr.setParents(parents);
+
+			if (parents.length() == 0) {
+
+			}
+
+			final String[] sa = splitParents(parents);
+
+			try {
+				pr.setFatherPhonetic(fk.generateKey(sa[0]));
+			} catch (final Exception e) {
+				continue;
+			}
+			try {
+				pr.setMotherPhonetic(fk.generateKey(sa[1]));
+			} catch (final Exception e) {
+				continue;
+			}
+			pr.setPlace(rs.getString("BIRTHPLACE"));
+
+			lpr.add(pr);
+		}
+
+		logger.info("Parent records: " + lpr.size());
+
+		parentsCounter = 0;
+		String fatherPhonetic;
+		String motherPhonetic;
+
+		for (final SiblingRecord pr2 : lpr) {
+			psINSERT_PARENTS.setString(1, pr2.getIndividualKey());
+			psINSERT_PARENTS.setDate(2, pr2.getBirthDate());
+			psINSERT_PARENTS.setString(3, pr2.getName());
+			psINSERT_PARENTS.setString(4, pr2.getParents());
+			fatherPhonetic = pr2.getFatherPhonetic();
+
+			if (fatherPhonetic.length() > 64) {
+				fatherPhonetic = fatherPhonetic.substring(0, 63);
+			}
+
+			psINSERT_PARENTS.setString(5, fatherPhonetic);
+			motherPhonetic = pr2.getMotherPhonetic();
+
+			if (motherPhonetic.length() > 64) {
+				motherPhonetic = motherPhonetic.substring(0, 63);
+			}
+
+			psINSERT_PARENTS.setString(6, motherPhonetic);
+			psINSERT_PARENTS.setString(7, pr2.getPlace());
+			psINSERT_PARENTS.executeUpdate();
+			parentsCounter++;
+
+			if ((parentsCounter % 100) == 0) {
+				logger.info("Parent records inserted: " + parentsCounter);
+			}
+		}
+
+	}
+
+	/**
 	 * @param conn
 	 * @throws SQLException
 	 */
@@ -580,6 +676,8 @@ public class DBLoader {
 		psINSERT_INDIVIDUAL = conn.prepareStatement(INSERT_INDIVIDUAL);
 		psINSERT_FAMILY_EVENT = conn.prepareStatement(INSERT_FAMILY_EVENT);
 		psINSERT_FAMILY = conn.prepareStatement(INSERT_FAMILY);
+		psINSERT_PARENTS = conn.prepareStatement(INSERT_PARENTS);
+		psSELECT_INDIVIDUAL = conn.prepareStatement(SELECT_INDIVIDUAL);
 	}
 
 	/**
@@ -593,6 +691,34 @@ public class DBLoader {
 		final GedcomParser gp = new GedcomParser();
 		gp.load(filename);
 		gedcom = gp.getGedcom();
+	}
+
+	private String[] splitParents(String parents2) {
+		String s = parents2.replaceAll("\\d", "").replaceAll("\\.", "").toLowerCase();
+		s = s.replace(", f.", "");
+		String[] sa = s.split(",");
+		final String[] words = sa[0].split(" ");
+
+		final String[] filter = new String[] { "af", "bager", "gamle", "gmd", "i", "inds", "junior", "kirkesanger",
+				"pige", "pigen", "portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed",
+				"smedesvend", "snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
+
+		final StringBuffer sb = new StringBuffer();
+
+		for (final String word : words) {
+			for (final String element : filter) {
+				if (element.equals(word)) {
+					break;
+				}
+			}
+			sb.append(word + " ");
+		}
+
+		s = sb.toString();
+
+		sa = s.split(" og ");
+
+		return sa;
 	}
 
 	/**
@@ -646,9 +772,35 @@ public class DBLoader {
 	private void updateIndividual(Individual individual) throws Exception {
 		final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
 
+		String father;
+		String mother;
+		String parents;
+
 		if (familiesWhereChild != null) {
+
+			try {
+				father = familiesWhereChild.get(0).getFamily().getHusband().getIndividual().getFormattedName()
+						.replace("/", "");
+			} catch (final Exception e1) {
+				father = "";
+			}
+			try {
+				mother = familiesWhereChild.get(0).getFamily().getWife().getIndividual().getFormattedName().replace("/",
+						"");
+			} catch (final Exception e1) {
+				mother = "";
+			}
+
+			if ((father.length() > 0) && (mother.length() > 0)) {
+				parents = father + " og " + mother;
+				parentsCounter++;
+			} else {
+				parents = (father + mother).trim();
+			}
+
 			psUPDATE_INDIVIDUAL_FAMC.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
-			psUPDATE_INDIVIDUAL_FAMC.setString(2, individual.getXref());
+			psUPDATE_INDIVIDUAL_FAMC.setString(2, parents);
+			psUPDATE_INDIVIDUAL_FAMC.setString(3, individual.getXref());
 
 			try {
 				psUPDATE_INDIVIDUAL_FAMC.execute();
