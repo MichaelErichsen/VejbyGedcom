@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 2. apr. 2023
+ * @version 4. apr. 2023
  */
 public class DBLoader {
 	/**
@@ -453,9 +453,9 @@ public class DBLoader {
 
 				if (customFacts == null) {
 					if (whereInSource.getValue() != null) {
-						psINSERT_INDIVIDUAL_EVENT.setString(7, whereInSource.getValue());
+						psINSERT_INDIVIDUAL_EVENT.setString(8, whereInSource.getValue());
 					} else {
-						psINSERT_INDIVIDUAL_EVENT.setString(7, "NULL");
+						psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
 					}
 				} else {
 					final StringBuffer sb2 = new StringBuffer();
@@ -464,7 +464,7 @@ public class DBLoader {
 						sb2.append(customFact.getDescription().getValue());
 					}
 
-					psINSERT_INDIVIDUAL_EVENT.setString(7,
+					psINSERT_INDIVIDUAL_EVENT.setString(8,
 							(sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
 									: sb2.toString().replace("'", "¤")) + "', '");
 				}

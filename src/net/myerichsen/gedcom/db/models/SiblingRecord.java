@@ -13,7 +13,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 4. apr. 2023
  *
  */
 public class SiblingRecord extends ASModel {
@@ -95,10 +95,8 @@ public class SiblingRecord extends ASModel {
 
 			for (int i = 0; i < dpp.length; i++) {
 				try {
-					System.out.println(dpp[i]);
 					dpp[i] = fk.generateKey(dpp[i]);
 				} catch (final Exception e) {
-					System.out.println("Failed: " + dpp[i]);
 					e.printStackTrace();
 				}
 			}
@@ -111,7 +109,7 @@ public class SiblingRecord extends ASModel {
 
 			pr.setIndividualKey(dbi.getId());
 			pr.setName(dbi.getName());
-			pr.setLocation(dbi.getBirthPlace());
+			pr.setLocation((dbi.getBirthPlace().equals("NULL") ? "" : dbi.getBirthPlace()));
 			pr.setParents(dbi.getParents());
 			pr.setBirthDate(dbi.getBirthDate());
 

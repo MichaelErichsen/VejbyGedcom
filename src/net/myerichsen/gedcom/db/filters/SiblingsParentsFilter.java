@@ -12,15 +12,15 @@ import net.myerichsen.gedcom.db.models.SiblingRecord;
  * @version 4. apr. 2023
  *
  */
-public class SiblingsPlaceFilter extends ViewerFilter {
-	private static SiblingsPlaceFilter filter = null;
+public class SiblingsParentsFilter extends ViewerFilter {
+	private static SiblingsParentsFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static SiblingsPlaceFilter getInstance() {
+	public static SiblingsParentsFilter getInstance() {
 		if (filter == null) {
-			filter = new SiblingsPlaceFilter();
+			filter = new SiblingsParentsFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class SiblingsPlaceFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private SiblingsPlaceFilter() {
+	private SiblingsParentsFilter() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class SiblingsPlaceFilter extends ViewerFilter {
 
 		final SiblingRecord cr = (SiblingRecord) element;
 
-		if (cr.getPlace().toLowerCase().matches(searchString)) {
+		if (cr.getParents().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

@@ -13,7 +13,6 @@ import java.util.Properties;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -63,6 +62,7 @@ import net.myerichsen.gedcom.db.filters.PolregBirthdateFilter;
 import net.myerichsen.gedcom.db.filters.ProbatePlaceFilter;
 import net.myerichsen.gedcom.db.filters.RelocationGivenFilter;
 import net.myerichsen.gedcom.db.filters.RelocationSurnameFilter;
+import net.myerichsen.gedcom.db.filters.SiblingsParentsFilter;
 import net.myerichsen.gedcom.db.filters.SiblingsPlaceFilter;
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
 import net.myerichsen.gedcom.db.loaders.DBLoader;
@@ -93,7 +93,13 @@ public class ArchiveSearcher extends Shell {
 	// FIXME Census table missing scrollbar
 	// TODO Add shortcuts for "Copy" on popups
 	// FIXME Parents ID search not using parents names
-	// FIXME Siblings place NULL
+	// FIXME Setting tab label wrong
+	// TODO Test probate for individual life span
+	// TODO Siblings should also find individuals with only one parent
+	// TODO Find all relocations to and from an individual
+	// FIXME Relocation parents "NULL", but existed in Christening event
+	// TODO Rightclick to remove items from table
+	// TODO Census age filter
 
 	/**
 	 * Static constants used to initalize properties file
@@ -189,6 +195,7 @@ public class ArchiveSearcher extends Shell {
 	private Text txtBurregGiven;
 	private Text txtBurregSurname;
 	private Text txtBurregBirthYear;
+	private Text txtSiblingsParents;
 
 	/**
 	 * Create the shell.
@@ -732,11 +739,11 @@ public class ArchiveSearcher extends Shell {
 	 * @param tabFolder
 	 */
 	private void createCensusTab(final TabFolder tabFolder) {
-		final TabItem tbtmFolketlling = new TabItem(tabFolder, SWT.NONE);
-		tbtmFolketlling.setText("Folket\u00E6llinger");
+		final TabItem tbtmCensus = new TabItem(tabFolder, SWT.NONE);
+		tbtmCensus.setText("Folket\u00E6llinger");
 
 		final Composite censusComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmFolketlling.setControl(censusComposite);
+		tbtmCensus.setControl(censusComposite);
 		censusComposite.setLayout(new GridLayout(1, false));
 
 		final Composite censusFilterComposite = new Composite(censusComposite, SWT.BORDER);
@@ -834,7 +841,7 @@ public class ArchiveSearcher extends Shell {
 		censusScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		censusScroller.setSize(0, 0);
 
-		tbtmFolketlling.setControl(censusComposite);
+		tbtmCensus.setControl(censusComposite);
 		censusScroller.setExpandHorizontal(true);
 		censusScroller.setExpandVertical(true);
 
@@ -1236,11 +1243,11 @@ public class ArchiveSearcher extends Shell {
 	 */
 
 	private void createPolregTab(final TabFolder tabFolder) {
-		final TabItem tbtmPolitietsRegisterblade = new TabItem(tabFolder, SWT.NONE);
-		tbtmPolitietsRegisterblade.setText("Politiets Registerblade");
+		final TabItem tbtmPolreg = new TabItem(tabFolder, SWT.NONE);
+		tbtmPolreg.setText("Politiets Registerblade");
 
 		final Composite PolregComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmPolitietsRegisterblade.setControl(PolregComposite);
+		tbtmPolreg.setControl(PolregComposite);
 		PolregComposite.setLayout(new GridLayout(1, false));
 
 		final Composite PolregFilterComposite = new Composite(PolregComposite, SWT.BORDER);
@@ -1260,7 +1267,7 @@ public class ArchiveSearcher extends Shell {
 		});
 
 		final Label lblprdb = new Label(PolregFilterComposite, SWT.NONE);
-		lblprdb.setText("Fødedato");
+		lblprdb.setText("Fødselsdato");
 
 		txtPolregBirthDate = new Text(PolregFilterComposite, SWT.BORDER);
 		txtPolregBirthDate.addKeyListener(new KeyAdapter() {
@@ -1321,7 +1328,7 @@ public class ArchiveSearcher extends Shell {
 		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(polregTableViewer, SWT.NONE);
 		final TableColumn tblclmnFdedag = tableViewerColumn_1.getColumn();
 		tblclmnFdedag.setWidth(100);
-		tblclmnFdedag.setText("F\u00F8dedag");
+		tblclmnFdedag.setText("F\u00F8dselsdato");
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
@@ -1486,11 +1493,11 @@ public class ArchiveSearcher extends Shell {
 	 */
 
 	private void createProbateTab(Display display, final TabFolder tabFolder) {
-		final TabItem tbtmSkifter = new TabItem(tabFolder, SWT.NONE);
-		tbtmSkifter.setText("Skifter");
+		final TabItem tbtmProbates = new TabItem(tabFolder, SWT.NONE);
+		tbtmProbates.setText("Skifter");
 
 		final Composite ProbateComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmSkifter.setControl(ProbateComposite);
+		tbtmProbates.setControl(ProbateComposite);
 		ProbateComposite.setLayout(new GridLayout(1, false));
 
 		final Composite ProbateFilterComposite = new Composite(ProbateComposite, SWT.BORDER);
@@ -1627,11 +1634,11 @@ public class ArchiveSearcher extends Shell {
 	 * @param tabFolder
 	 */
 	private void createRelocationTab(final TabFolder tabFolder) {
-		final TabItem tbtmFlytninger = new TabItem(tabFolder, SWT.NONE);
-		tbtmFlytninger.setText("Flytninger");
+		final TabItem tbtmRelocations = new TabItem(tabFolder, SWT.NONE);
+		tbtmRelocations.setText("Flytninger");
 
 		final Composite relocationComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmFlytninger.setControl(relocationComposite);
+		tbtmRelocations.setControl(relocationComposite);
 		relocationComposite.setLayout(new GridLayout(1, false));
 
 		final Composite relocationFilterComposite = new Composite(relocationComposite, SWT.BORDER);
@@ -1643,13 +1650,9 @@ public class ArchiveSearcher extends Shell {
 
 		txtRelocationGiven = new Text(relocationFilterComposite, SWT.BORDER);
 		txtRelocationGiven.addKeyListener(new KeyAdapter() {
-			private StructuredViewer relocationTableViewer;
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// FIXME java.lang.NullPointerException: Cannot invoke
-				// "org.eclipse.jface.viewers.StructuredViewer.refresh()" because
-				// "this.relocationTableViewer" is null
 				RelocationGivenFilter.getInstance().setSearchText(txtRelocationGiven.getText());
 				relocationTableViewer.refresh();
 			}
@@ -1672,7 +1675,6 @@ public class ArchiveSearcher extends Shell {
 		btnRydFelterneRelocation.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// FIXME Edit
 				RelocationGivenFilter.getInstance().setSearchText("");
 				RelocationSurnameFilter.getInstance().setSearchText("");
 				txtRelocationGiven.setText("");
@@ -1779,7 +1781,6 @@ public class ArchiveSearcher extends Shell {
 		tblclmnDetaljer.setWidth(100);
 		tblclmnDetaljer.setText("Detaljer");
 		relocationTableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
-// FIXME Detail is null???
 			@Override
 			public String getText(Object element) {
 				final RelocationRecord rr = (RelocationRecord) element;
@@ -1833,6 +1834,7 @@ public class ArchiveSearcher extends Shell {
 		lblId.setText("ID");
 
 		searchId = new Text(searchComposite, SWT.BORDER);
+		searchId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		searchId.setBounds(0, 0, 56, 21);
 
 		final Button btnSearchId = new Button(searchComposite, SWT.NONE);
@@ -2241,22 +2243,19 @@ public class ArchiveSearcher extends Shell {
 	 * @param tabFolder
 	 */
 	private void createSiblingsTab(final TabFolder tabFolder) {
-		final TabItem tbtmForldre = new TabItem(tabFolder, SWT.NONE);
-		tbtmForldre.setText("S\u00F8skende");
+		final TabItem tbtmSiblings = new TabItem(tabFolder, SWT.NONE);
+		tbtmSiblings.setText("S\u00F8skende");
 
 		final Composite SiblingsComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmForldre.setControl(SiblingsComposite);
+		tbtmSiblings.setControl(SiblingsComposite);
 		SiblingsComposite.setLayout(new GridLayout(1, false));
 
 		final Composite SiblingsFilterComposite = new Composite(SiblingsComposite, SWT.BORDER);
 		SiblingsFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		SiblingsFilterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		final Label aLabel = new Label(SiblingsFilterComposite, SWT.NONE);
-		aLabel.setText("Filtre: \u00C5r");
-
 		final Label lblSted = new Label(SiblingsFilterComposite, SWT.NONE);
-		lblSted.setText("Sted");
+		lblSted.setText("Filter: Sted");
 
 		txtSiblingsPlace = new Text(SiblingsFilterComposite, SWT.BORDER);
 		txtSiblingsPlace.addKeyListener(new KeyAdapter() {
@@ -2267,16 +2266,30 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 
+		final Label lblparents = new Label(SiblingsFilterComposite, SWT.NONE);
+		lblparents.setText("Forældre");
+
+		txtSiblingsParents = new Text(SiblingsFilterComposite, SWT.BORDER);
+		txtSiblingsParents.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				SiblingsParentsFilter.getInstance().setSearchText(txtSiblingsParents.getText());
+				siblingsTableViewer.refresh();
+			}
+		});
+
 		final Button btnRydFelterneSiblings = new Button(SiblingsFilterComposite, SWT.NONE);
 		btnRydFelterneSiblings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				SiblingsPlaceFilter.getInstance().setSearchText("");
+				SiblingsParentsFilter.getInstance().setSearchText("");
 				txtSiblingsPlace.setText("");
+				txtSiblingsParents.setText("");
 				siblingsTableViewer.refresh();
 			}
 		});
-		btnRydFelterneSiblings.setText("Ryd feltet");
+		btnRydFelterneSiblings.setText("Ryd felterne");
 
 		final ScrolledComposite siblingsScroller = new ScrolledComposite(SiblingsComposite,
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -2286,16 +2299,21 @@ public class ArchiveSearcher extends Shell {
 		siblingsScroller.setSize(0, 0);
 
 		siblingsTableViewer = new TableViewer(siblingsScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		siblingsTableViewer.addDoubleClickListener(event -> siblingsPopup(display));
 		siblingsTable = siblingsTableViewer.getTable();
 
 		siblingsTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		final ViewerFilter[] filters = new ViewerFilter[2];
+		filters[0] = SiblingsParentsFilter.getInstance();
+		filters[1] = SiblingsPlaceFilter.getInstance();
+		siblingsTableViewer.setFilters(filters);
 
 		siblingsTable.setHeaderVisible(true);
 		siblingsTable.setLinesVisible(true);
 
 		final TableViewerColumn tableViewerColumn = new TableViewerColumn(siblingsTableViewer, SWT.NONE);
 		final TableColumn tblclmnId_1 = tableViewerColumn.getColumn();
-		tblclmnId_1.setWidth(69);
+		tblclmnId_1.setWidth(91);
 		tblclmnId_1.setText("ID");
 		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 
@@ -2705,6 +2723,7 @@ public class ArchiveSearcher extends Shell {
 	/**
 	 *
 	 */
+	// FIXME Parents can be "NULL"
 	private void relocationPopup() {
 		final TableItem[] tia = relocationTable.getSelection();
 		final TableItem ti = tia[0];
@@ -2724,7 +2743,7 @@ public class ArchiveSearcher extends Shell {
 		if (open == 1) {
 			final Clipboard clipboard = new Clipboard(display);
 			final TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[] { tia[0].getText(5) }, new Transfer[] { textTransfer });
+			clipboard.setContents(new String[] { tia[0].getText(6) }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		}
 	}
@@ -2844,6 +2863,39 @@ public class ArchiveSearcher extends Shell {
 		messageField.setText(string);
 		messageField.redraw();
 		messageField.update();
+	}
+
+	/**
+	 * @param display
+	 */
+	private void siblingsPopup(Display display) {
+		final TableItem[] tia = siblingsTable.getSelection();
+		final TableItem ti = tia[0];
+
+		final StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < 25; i++) {
+			if (ti.getText(i).length() > 0) {
+				if (ti.getText(i).length() > 0) {
+					sb.append(ti.getText(i).trim() + ", ");
+				}
+			}
+		}
+
+		sb.append("\n");
+
+		final String string = sb.toString();
+
+		final MessageDialog dialog = new MessageDialog(shell, "Søskende", null, string, MessageDialog.INFORMATION,
+				new String[] { "OK", "Kopier" }, 0);
+		final int open = dialog.open();
+
+		if (open == 1) {
+			final Clipboard clipboard = new Clipboard(display);
+			final TextTransfer textTransfer = TextTransfer.getInstance();
+			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
+			clipboard.dispose();
+		}
 	}
 
 	/**

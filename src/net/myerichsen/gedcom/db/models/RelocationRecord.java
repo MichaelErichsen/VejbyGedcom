@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 4. apr. 2023
  *
  */
 public class RelocationRecord extends ASModel {
@@ -38,6 +38,8 @@ public class RelocationRecord extends ASModel {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		RelocationRecord relocationRecord;
 		final List<RelocationRecord> lr = new ArrayList<>();
+
+		// FIUXME VEJBY.EVENT.NOTE is null - should be note
 
 		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
@@ -212,7 +214,7 @@ public class RelocationRecord extends ASModel {
 	 * @return the sourceDetail
 	 */
 	public String getSourceDetail() {
-		return sourceDetail;
+		return (sourceDetail.equals("NULL") ? "" : sourceDetail);
 	}
 
 	/**
