@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.RelocationRecord;
+import net.myerichsen.gedcom.db.models.PolregRecord;
 
 /**
- * Filter for given name column in relocation table (Singleton)
+ * Filter for birth date column in polreg table (Singleton)
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 4. apr. 2023
  *
  */
-public class RelocationGivenFilter extends ViewerFilter {
-	private static RelocationGivenFilter filter = null;
+public class PolregBirthdateFilter extends ViewerFilter {
+	private static PolregBirthdateFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static RelocationGivenFilter getInstance() {
+	public static PolregBirthdateFilter getInstance() {
 		if (filter == null) {
-			filter = new RelocationGivenFilter();
+			filter = new PolregBirthdateFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class RelocationGivenFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private RelocationGivenFilter() {
+	private PolregBirthdateFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class RelocationGivenFilter extends ViewerFilter {
 			return true;
 		}
 
-		final RelocationRecord cr = (RelocationRecord) element;
+		final PolregRecord cr = (PolregRecord) element;
 
-		if (cr.getGivenName().toLowerCase().matches(searchString)) {
+		if (cr.getBirthDate().toString().matches(searchString)) {
 			return true;
 		}
 

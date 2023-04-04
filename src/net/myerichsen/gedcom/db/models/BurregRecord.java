@@ -45,7 +45,7 @@ public class BurregRecord extends ASModel {
 		String name;
 		final Fonkod fk = new Fonkod();
 
-		// TODO Test birth date
+		// TODO Test birth date "YEAROFBIRTH"
 		while (rs.next()) {
 			name = rs.getString("FIRSTNAMES").trim() + " " + rs.getString("LASTNAME").trim();
 

@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;

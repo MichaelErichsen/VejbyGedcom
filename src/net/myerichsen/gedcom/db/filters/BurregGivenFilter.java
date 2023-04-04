@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -6,21 +6,21 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import net.myerichsen.gedcom.db.models.BurregRecord;
 
 /**
- * Filter for surname column in burreg table (Singleton)
+ * Filter for given name column in burreg table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class BurregSurnameFilter extends ViewerFilter {
-	private static BurregSurnameFilter filter = null;
+public class BurregGivenFilter extends ViewerFilter {
+	private static BurregGivenFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static BurregSurnameFilter getInstance() {
+	public static BurregGivenFilter getInstance() {
 		if (filter == null) {
-			filter = new BurregSurnameFilter();
+			filter = new BurregGivenFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class BurregSurnameFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private BurregSurnameFilter() {
+	private BurregGivenFilter() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class BurregSurnameFilter extends ViewerFilter {
 
 		final BurregRecord cr = (BurregRecord) element;
 
-		if (cr.getLastName().toLowerCase().matches(searchString)) {
+		if (cr.getFirstNames().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

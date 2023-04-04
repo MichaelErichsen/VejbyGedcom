@@ -95,8 +95,10 @@ public class SiblingRecord extends ASModel {
 
 			for (int i = 0; i < dpp.length; i++) {
 				try {
+					System.out.println(dpp[i]);
 					dpp[i] = fk.generateKey(dpp[i]);
 				} catch (final Exception e) {
+					System.out.println("Failed: " + dpp[i]);
 					e.printStackTrace();
 				}
 			}

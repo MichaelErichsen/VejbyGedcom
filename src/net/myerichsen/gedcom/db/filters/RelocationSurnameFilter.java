@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.BurregRecord;
+import net.myerichsen.gedcom.db.models.RelocationRecord;
 
 /**
- * Filter for birth date column in burreg table (Singleton)
+ * Filter for surname column in relocation table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class BurregBirthDateFilter extends ViewerFilter {
-	private static BurregBirthDateFilter filter = null;
+public class RelocationSurnameFilter extends ViewerFilter {
+	private static RelocationSurnameFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static BurregBirthDateFilter getInstance() {
+	public static RelocationSurnameFilter getInstance() {
 		if (filter == null) {
-			filter = new BurregBirthDateFilter();
+			filter = new RelocationSurnameFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class BurregBirthDateFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private BurregBirthDateFilter() {
+	private RelocationSurnameFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class BurregBirthDateFilter extends ViewerFilter {
 			return true;
 		}
 
-		final BurregRecord cr = (BurregRecord) element;
+		final RelocationRecord cr = (RelocationRecord) element;
 
-		if (cr.getYearOfBirth().toLowerCase().matches(searchString)) {
+		if (cr.getSurName().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

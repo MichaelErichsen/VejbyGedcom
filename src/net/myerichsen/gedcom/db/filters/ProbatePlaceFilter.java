@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.ProbateRecord;
 
 /**
- * Filter for county column in census table (Singleton)
+ * Filter for place column in probate table (Singleton)
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 4. apr. 2023
  *
  */
-public class CensusCountyFilter extends ViewerFilter {
-	private static CensusCountyFilter filter = null;
+public class ProbatePlaceFilter extends ViewerFilter {
+	private static ProbatePlaceFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static CensusCountyFilter getInstance() {
+	public static ProbatePlaceFilter getInstance() {
 		if (filter == null) {
-			filter = new CensusCountyFilter();
+			filter = new ProbatePlaceFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class CensusCountyFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private CensusCountyFilter() {
+	private ProbatePlaceFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class CensusCountyFilter extends ViewerFilter {
 			return true;
 		}
 
-		final CensusRecord cr = (CensusRecord) element;
+		final ProbateRecord cr = (ProbateRecord) element;
 
-		if (cr.getAmt().toLowerCase().matches(searchString)) {
+		if (cr.getPlace().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -6,21 +6,21 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import net.myerichsen.gedcom.db.models.CensusRecord;
 
 /**
- * Filter for sex column in census table (Singleton)
+ * Filter for parish column in census table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class CensusSexFilter extends ViewerFilter {
-	private static CensusSexFilter filter = null;
+public class CensusParishFilter extends ViewerFilter {
+	private static CensusParishFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static CensusSexFilter getInstance() {
+	public static CensusParishFilter getInstance() {
 		if (filter == null) {
-			filter = new CensusSexFilter();
+			filter = new CensusParishFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class CensusSexFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private CensusSexFilter() {
+	private CensusParishFilter() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class CensusSexFilter extends ViewerFilter {
 
 		final CensusRecord cr = (CensusRecord) element;
 
-		if (cr.getKoen().toLowerCase().matches(searchString)) {
+		if (cr.getSogn().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.BurregRecord;
 
 /**
- * Filter for parish column in census table (Singleton)
+ * Filter for birth date column in burreg table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class CensusParishFilter extends ViewerFilter {
-	private static CensusParishFilter filter = null;
+public class BurregBirthDateFilter extends ViewerFilter {
+	private static BurregBirthDateFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static CensusParishFilter getInstance() {
+	public static BurregBirthDateFilter getInstance() {
 		if (filter == null) {
-			filter = new CensusParishFilter();
+			filter = new BurregBirthDateFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class CensusParishFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private CensusParishFilter() {
+	private BurregBirthDateFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class CensusParishFilter extends ViewerFilter {
 			return true;
 		}
 
-		final CensusRecord cr = (CensusRecord) element;
+		final BurregRecord cr = (BurregRecord) element;
 
-		if (cr.getSogn().toLowerCase().matches(searchString)) {
+		if (cr.getYearOfBirth().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

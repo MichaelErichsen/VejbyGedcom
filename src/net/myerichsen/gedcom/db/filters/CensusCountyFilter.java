@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -6,21 +6,21 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import net.myerichsen.gedcom.db.models.CensusRecord;
 
 /**
- * Filter for year column in census table (Singleton)
+ * Filter for county column in census table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class CensusYearFilter extends ViewerFilter {
-	private static CensusYearFilter filter = null;
+public class CensusCountyFilter extends ViewerFilter {
+	private static CensusCountyFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static CensusYearFilter getInstance() {
+	public static CensusCountyFilter getInstance() {
 		if (filter == null) {
-			filter = new CensusYearFilter();
+			filter = new CensusCountyFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class CensusYearFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private CensusYearFilter() {
+	private CensusCountyFilter() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class CensusYearFilter extends ViewerFilter {
 
 		final CensusRecord cr = (CensusRecord) element;
 
-		if (Integer.toString(cr.getFTaar()).matches(searchString)) {
+		if (cr.getAmt().toLowerCase().matches(searchString)) {
 			return true;
 		}
 
@@ -53,7 +53,7 @@ public class CensusYearFilter extends ViewerFilter {
 	}
 
 	public void setSearchText(String s) {
-		this.searchString = ".*" + s + ".*";
+		this.searchString = ".*" + s.toLowerCase() + ".*";
 	}
 
 }

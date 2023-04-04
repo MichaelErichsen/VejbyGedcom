@@ -412,7 +412,6 @@ public class IndividualRecord extends ASModel {
 
 	@Override
 	public String[] toStringArray() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

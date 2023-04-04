@@ -1,24 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
+import net.myerichsen.gedcom.db.models.CensusRecord;
+
 /**
- * Filter for birth date column in polreg table (Singleton)
+ * Filter for birth place column in census table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class PolregBirthdateFilter extends ViewerFilter {
-	private static PolregBirthdateFilter filter = null;
+public class CensusBirthPlaceFilter extends ViewerFilter {
+	private static CensusBirthPlaceFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static PolregBirthdateFilter getInstance() {
+	public static CensusBirthPlaceFilter getInstance() {
 		if (filter == null) {
-			filter = new PolregBirthdateFilter();
+			filter = new CensusBirthPlaceFilter();
 		}
 
 		return filter;
@@ -31,7 +33,7 @@ public class PolregBirthdateFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private PolregBirthdateFilter() {
+	private CensusBirthPlaceFilter() {
 		super();
 	}
 
@@ -41,12 +43,11 @@ public class PolregBirthdateFilter extends ViewerFilter {
 			return true;
 		}
 
-//		final PolregRecord cr = (PolregRecord) element;
+		final CensusRecord cr = (CensusRecord) element;
 
-		// FIXME
-//		if (cr.getBirthDate().toString.matches(searchString)) {
-//			return true;
-//		}
+		if (cr.getKildefoedested().toLowerCase().matches(searchString)) {
+			return true;
+		}
 
 		return false;
 	}

@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.PolregRecord;
+import net.myerichsen.gedcom.db.models.SiblingRecord;
 
 /**
- * Filter for address column in polreg table (Singleton)
+ * Filter for place column in siblings table (Singleton)
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 4. apr. 2023
  *
  */
-public class PolregAddressFilter extends ViewerFilter {
-	private static PolregAddressFilter filter = null;
+public class SiblingsPlaceFilter extends ViewerFilter {
+	private static SiblingsPlaceFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static PolregAddressFilter getInstance() {
+	public static SiblingsPlaceFilter getInstance() {
 		if (filter == null) {
-			filter = new PolregAddressFilter();
+			filter = new SiblingsPlaceFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class PolregAddressFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private PolregAddressFilter() {
+	private SiblingsPlaceFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class PolregAddressFilter extends ViewerFilter {
 			return true;
 		}
 
-		final PolregRecord cr = (PolregRecord) element;
+		final SiblingRecord cr = (SiblingRecord) element;
 
-		if (cr.getFullAddress().toLowerCase().matches(searchString)) {
+		if (cr.getPlace().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

@@ -382,7 +382,7 @@ public class PolregRecord extends ASModel {
 	 */
 	@Override
 	public String[] toStringArray() {
-		final String[] sa = new String[15];
+		final String[] sa = new String[13];
 
 		sa[0] = name;
 		sa[1] = birthDate.toString();

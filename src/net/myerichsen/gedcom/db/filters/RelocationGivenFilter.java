@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -6,21 +6,21 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import net.myerichsen.gedcom.db.models.RelocationRecord;
 
 /**
- * Filter for surname column in relocation table (Singleton)
+ * Filter for given name column in relocation table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class RelocationSurnameFilter extends ViewerFilter {
-	private static RelocationSurnameFilter filter = null;
+public class RelocationGivenFilter extends ViewerFilter {
+	private static RelocationGivenFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static RelocationSurnameFilter getInstance() {
+	public static RelocationGivenFilter getInstance() {
 		if (filter == null) {
-			filter = new RelocationSurnameFilter();
+			filter = new RelocationGivenFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class RelocationSurnameFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private RelocationSurnameFilter() {
+	private RelocationGivenFilter() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class RelocationSurnameFilter extends ViewerFilter {
 
 		final RelocationRecord cr = (RelocationRecord) element;
 
-		if (cr.getSurName().toLowerCase().matches(searchString)) {
+		if (cr.getGivenName().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

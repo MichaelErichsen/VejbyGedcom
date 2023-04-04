@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.BurregRecord;
+import net.myerichsen.gedcom.db.models.PolregRecord;
 
 /**
- * Filter for given name column in burreg table (Singleton)
+ * Filter for address column in polreg table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class BurregGivenFilter extends ViewerFilter {
-	private static BurregGivenFilter filter = null;
+public class PolregAddressFilter extends ViewerFilter {
+	private static PolregAddressFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static BurregGivenFilter getInstance() {
+	public static PolregAddressFilter getInstance() {
 		if (filter == null) {
-			filter = new BurregGivenFilter();
+			filter = new PolregAddressFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class BurregGivenFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private BurregGivenFilter() {
+	private PolregAddressFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class BurregGivenFilter extends ViewerFilter {
 			return true;
 		}
 
-		final BurregRecord cr = (BurregRecord) element;
+		final PolregRecord cr = (PolregRecord) element;
 
-		if (cr.getFirstNames().toLowerCase().matches(searchString)) {
+		if (cr.getFullAddress().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

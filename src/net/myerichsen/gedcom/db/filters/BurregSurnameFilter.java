@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.BurregRecord;
 
 /**
- * Filter for birth place column in census table (Singleton)
+ * Filter for surname column in burreg table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class CensusBirthPlaceFilter extends ViewerFilter {
-	private static CensusBirthPlaceFilter filter = null;
+public class BurregSurnameFilter extends ViewerFilter {
+	private static BurregSurnameFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static CensusBirthPlaceFilter getInstance() {
+	public static BurregSurnameFilter getInstance() {
 		if (filter == null) {
-			filter = new CensusBirthPlaceFilter();
+			filter = new BurregSurnameFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class CensusBirthPlaceFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private CensusBirthPlaceFilter() {
+	private BurregSurnameFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class CensusBirthPlaceFilter extends ViewerFilter {
 			return true;
 		}
 
-		final CensusRecord cr = (CensusRecord) element;
+		final BurregRecord cr = (BurregRecord) element;
 
-		if (cr.getKildefoedested().toLowerCase().matches(searchString)) {
+		if (cr.getLastName().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

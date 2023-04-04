@@ -1,26 +1,26 @@
-package net.myerichsen.gedcom.db.util;
+package net.myerichsen.gedcom.db.filters;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.ProbateRecord;
+import net.myerichsen.gedcom.db.models.CensusRecord;
 
 /**
- * Filter for place column in prov´bate table (Singleton)
+ * Filter for sex column in census table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class ProbatePlaceFilter extends ViewerFilter {
-	private static ProbatePlaceFilter filter = null;
+public class CensusSexFilter extends ViewerFilter {
+	private static CensusSexFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static ProbatePlaceFilter getInstance() {
+	public static CensusSexFilter getInstance() {
 		if (filter == null) {
-			filter = new ProbatePlaceFilter();
+			filter = new CensusSexFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class ProbatePlaceFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private ProbatePlaceFilter() {
+	private CensusSexFilter() {
 		super();
 	}
 
@@ -43,9 +43,9 @@ public class ProbatePlaceFilter extends ViewerFilter {
 			return true;
 		}
 
-		final ProbateRecord cr = (ProbateRecord) element;
+		final CensusRecord cr = (CensusRecord) element;
 
-		if (cr.getPlace().toLowerCase().matches(searchString)) {
+		if (cr.getKoen().toLowerCase().matches(searchString)) {
 			return true;
 		}
 
