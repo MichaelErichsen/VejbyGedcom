@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 30. mar. 2023
+ * @version 3. apr. 2023
  *
  */
 public class RelocationRecord extends ASModel {
@@ -33,8 +33,8 @@ public class RelocationRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<RelocationRecord> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
-			throws SQLException {
+	public static RelocationRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate,
+			String deathDate) throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		RelocationRecord relocationRecord;
 		final List<RelocationRecord> lr = new ArrayList<>();
@@ -97,7 +97,13 @@ public class RelocationRecord extends ASModel {
 
 		statement.close();
 
-		return lr;
+		RelocationRecord[] rra = new RelocationRecord[lr.size()];
+
+		for (int i = 0; i < lr.size(); i++) {
+			rra[i] = lr.get(i);
+		}
+
+		return rra;
 	}
 
 	private String id = "";
@@ -305,6 +311,7 @@ public class RelocationRecord extends ASModel {
 	 *
 	 * @return
 	 */
+	@Override
 	public String[] toStringArray() {
 		final String[] sa = new String[9];
 		sa[0] = id;

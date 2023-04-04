@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 31. mar. 2023
+ * @version 3. apr. 2023
  *
  */
 public class ProbateRecord extends ASModel {
@@ -18,7 +18,7 @@ public class ProbateRecord extends ASModel {
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
 
-	public static List<ProbateRecord> loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
+	public static ProbateRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
 			String probateSource) throws SQLException {
 		ProbateRecord probateRecord;
 		final List<ProbateRecord> lp = new ArrayList<>();
@@ -52,7 +52,13 @@ public class ProbateRecord extends ASModel {
 
 		statement.close();
 
-		return lp;
+		ProbateRecord[] pra = new ProbateRecord[lp.size()];
+
+		for (int i = 0; i < lp.size(); i++) {
+			pra[i] = lp.get(i);
+		}
+
+		return pra;
 	}
 
 	private String name = "";

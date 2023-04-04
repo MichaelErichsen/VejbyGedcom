@@ -13,7 +13,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings
  *
  * @author Michael Erichsen
- * @version 2. apr. 2023
+ * @version 3. apr. 2023
  *
  */
 public class SiblingRecord extends ASModel {
@@ -49,9 +49,9 @@ public class SiblingRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<SiblingRecord> loadFromDatabase(String dbPath, String parents) throws SQLException {
+	public static SiblingRecord[] loadFromDatabase(String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
-			return new ArrayList<>();
+			return new SiblingRecord[0];
 		}
 
 		final String[] p = splitParents(parents);
@@ -68,7 +68,7 @@ public class SiblingRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<SiblingRecord> loadFromDatabase(String dbPath, String fathersName, String mothersName)
+	public static SiblingRecord[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
 			throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
@@ -85,7 +85,7 @@ public class SiblingRecord extends ASModel {
 			motherPhonetic = fk.generateKey(mothersName);
 		} catch (final Exception e) {
 			System.out.println("Invalid parents: " + fathersName + "," + mothersName);
-			return lpr;
+			return new SiblingRecord[0];
 		}
 
 		final List<IndividualRecord> ldbi = IndividualRecord.loadFromDB(conn);
@@ -113,10 +113,18 @@ public class SiblingRecord extends ASModel {
 			pr.setParents(dbi.getParents());
 			pr.setBirthDate(dbi.getBirthDate());
 
-			lpr.add(pr);
+			if (dbi.getParents().length() > 0) {
+				lpr.add(pr);
+			}
 		}
 
-		return lpr;
+		SiblingRecord[] sra = new SiblingRecord[lpr.size()];
+
+		for (int i = 0; i < lpr.size(); i++) {
+			sra[i] = lpr.get(i);
+		}
+
+		return sra;
 	}
 
 	/**

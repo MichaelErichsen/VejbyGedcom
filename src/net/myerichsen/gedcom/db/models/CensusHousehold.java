@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 1. apr. 2023
+ * @version 3. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
@@ -60,7 +60,6 @@ public class CensusHousehold extends ASModel {
 			ci.setFTaar(rs.getInt("FTaar"));
 			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
-			ci.setCompString(ci.getFTaar() + ci.getAmt() + ci.getHerred() + ci.getSogn());
 			cil.add(ci);
 		}
 

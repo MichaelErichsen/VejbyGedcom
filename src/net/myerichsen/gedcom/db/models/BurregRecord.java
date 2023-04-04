@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 31. mar. 2023
+ * @version 4. apr. 2023
  *
  */
 public class BurregRecord extends ASModel {
@@ -31,8 +31,8 @@ public class BurregRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<BurregRecord> loadFromDatabase(String dbPath, String phonName, String birthDate,
-			String deathDate) throws SQLException {
+	public static BurregRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+			throws SQLException {
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement = conn.prepareStatement(SELECT_BURIAL_PERSON);
@@ -89,7 +89,14 @@ public class BurregRecord extends ASModel {
 		}
 
 		statement.close();
-		return lbr;
+
+		BurregRecord[] bra = new BurregRecord[lbr.size()];
+
+		for (int i = 0; i < lbr.size(); i++) {
+			bra[i] = lbr.get(i);
+		}
+
+		return bra;
 	}
 
 	private String firstNames = "";

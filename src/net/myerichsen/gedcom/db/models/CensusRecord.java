@@ -80,7 +80,6 @@ public class CensusRecord extends ASModel {
 			ci.setFTaar(rs.getInt("FTaar"));
 			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
-			ci.setCompString(ci.getFTaar() + ci.getAmt() + ci.getHerred() + ci.getSogn());
 			logger.fine(ci.toString());
 			cil.add(ci);
 		}
@@ -119,7 +118,6 @@ public class CensusRecord extends ASModel {
 	private String Kildehenvisning = "";
 	private String Kildekommentar = "";
 	private String Kildedetaljer = "";
-	private String compString = "";
 
 	/**
 	 * @return the adresse
@@ -147,13 +145,6 @@ public class CensusRecord extends ASModel {
 	 */
 	public String getCivilstand() {
 		return Civilstand;
-	}
-
-	/**
-	 * @return the compString
-	 */
-	public String getCompString() {
-		return compString;
 	}
 
 	/**
@@ -356,13 +347,6 @@ public class CensusRecord extends ASModel {
 	 */
 	public void setCivilstand(String civilstand) {
 		Civilstand = civilstand.replace("'", "").trim();
-	}
-
-	/**
-	 * @param compString the compString to set
-	 */
-	public void setCompString(String compString) {
-		this.compString = compString;
 	}
 
 	/**

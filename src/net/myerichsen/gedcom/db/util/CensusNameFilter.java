@@ -6,21 +6,21 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import net.myerichsen.gedcom.db.models.CensusRecord;
 
 /**
- * Filter for year column in census table (Singleton)
+ * Filter for name column in census table (Singleton)
  *
  * @author Michael Erichsen
  * @version 3. apr. 2023
  *
  */
-public class CensusTableViewerFilter extends ViewerFilter {
-	private static CensusTableViewerFilter filter = null;
+public class CensusNameFilter extends ViewerFilter {
+	private static CensusNameFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static CensusTableViewerFilter getInstance() {
+	public static CensusNameFilter getInstance() {
 		if (filter == null) {
-			filter = new CensusTableViewerFilter();
+			filter = new CensusNameFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class CensusTableViewerFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private CensusTableViewerFilter() {
+	private CensusNameFilter() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class CensusTableViewerFilter extends ViewerFilter {
 
 		final CensusRecord cr = (CensusRecord) element;
 
-		if (Integer.toString(cr.getFTaar()).matches(searchString)) {
+		if (cr.getKildenavn().toLowerCase().matches(searchString)) {
 			return true;
 		}
 
@@ -53,7 +53,7 @@ public class CensusTableViewerFilter extends ViewerFilter {
 	}
 
 	public void setSearchText(String s) {
-		this.searchString = ".*" + s + ".*";
+		this.searchString = ".*" + s.toLowerCase() + ".*";
 	}
 
 }

@@ -31,8 +31,8 @@ public class PolregRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<PolregRecord> loadFromDatabase(String dbPath, String phonName, String birthDate,
-			String deathDate) throws SQLException {
+	public static PolregRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+			throws SQLException {
 		final Date bd = (birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate));
 		int calcYear = 0;
 
@@ -135,7 +135,14 @@ public class PolregRecord extends ASModel {
 		}
 
 		statement.close();
-		return lpr;
+
+		PolregRecord[] pra = new PolregRecord[lpr.size()];
+
+		for (int i = 0; i < lpr.size(); i++) {
+			pra[i] = lpr.get(i);
+		}
+
+		return pra;
 	}
 
 	private int id;

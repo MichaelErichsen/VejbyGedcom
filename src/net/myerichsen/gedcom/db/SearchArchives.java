@@ -16,13 +16,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
 import net.myerichsen.gedcom.db.models.IndividualRecord;
 import net.myerichsen.gedcom.db.models.RelocationRecord;
-import net.myerichsen.gedcom.db.util.CensusIndividualComparator;
 import net.myerichsen.gedcom.db.util.RelocationComparator;
 import net.myerichsen.gedcom.util.Fonkod;
 
@@ -31,7 +27,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * given individual in the derby database
  *
  * @author Michael Erichsen
- * @version 29. mar. 2023
+ * @version 3. apr. 2023
  *
  */
 
@@ -42,16 +38,11 @@ public class SearchArchives {
 	 */
 	private static final String PROBATE_SOURCE = "Kronborg";
 	private static final String DIGITS_ONLY = "\\d+";
-	private static final String FOUR_DIGITS = "\\d{4}";
 
 	private static final String BURIAL_HEADER = "FIRSTNAMES;LASTNAME;DATEOFDEATH;YEAROFBIRTH;DEATHPLACE;CIVILSTATUS;"
 			+ "ADRESSOUTSIDECPH;SEX;COMMENT;CEMETARY;CHAPEL;PARISH;STREET;HOOD;STREET_NUMBER;LETTER;"
 			+ "FLOOR;INSTITUTION;INSTITUTION_STREET;INSTITUTION_HOOD;INSTITUTION_STREET_NUMBER;"
 			+ "OCCUPTATIONS;OCCUPATION_RELATION_TYPES;DEATHCAUSES;DEATHCAUSES_DANISH\n";
-	private static final String CENSUS_HEADER = "FTaar;Amt;Herred;Sogn;Kildestednavn;"
-			+ "Husstands_familienr;Matr_nr_Adresse;Kildenavn;Koen;Alder;Civilstand;"
-			+ "Kildeerhverv;Stilling_i_husstanden;Kildefoedested;Foedt_kildedato;Foedeaar;"
-			+ "Adresse;Matrikel;Gade_nr;Kildehenvisning;Kildekommentar;KIPnr;Loebenr;Fonnavn;Kildedetaljer\n";
 	private static final String POLREG_HEADER = "NAME;BirthDate;OCCUPATION;STREET;NUMBER;LETTER;"
 			+ "FLOOR;PLACE;HOST;DAY;MONTH;XYEAR;FULL_DATE;FULL_ADDRESS\n";
 	private static final String PROBATE_HEADER = "GEDCOM NAME;ID;FROMDATE;TODATE;PLACE;EVENTTYPE;"
@@ -61,10 +52,6 @@ public class SearchArchives {
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = ? AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = ?";
-	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = ? "
-			+ "AND FTAAR >= ? AND FTAAR <= ?";
-	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = ? "
-			+ "AND HUSSTANDS_FAMILIENR = ? ORDER BY LOEBENR";
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = ?";
 	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = ?";
 	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = ?";
@@ -106,32 +93,6 @@ public class SearchArchives {
 	}
 
 	/**
-	 * Compare all component parts of the two locations with each other
-	 *
-	 * @param ci
-	 * @param location
-	 * @return
-	 */
-	private boolean compareLocation(CensusRecord ci, String location) {
-		if (ci.getKildefoedested().length() == 0) {
-			return true;
-		}
-
-		final String[] locationParts = location.split(",");
-
-		for (String part : locationParts) {
-			part = part.trim();
-
-			if (ci.getAmt().contains(part) || ci.getHerred().contains(part) || ci.getSogn().contains(part)
-					|| ci.getKildestednavn().contains(part)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Worker method
 	 *
 	 * @param args
@@ -146,10 +107,6 @@ public class SearchArchives {
 		logger.info("Search for similar relocations for " + individual.getName());
 		final Connection conn1 = DriverManager.getConnection("jdbc:derby:" + args[0]);
 		searchRelocations(args, conn1, individual);
-
-		// Search Census Derby table
-		logger.info("Search for censuses for " + individual.getName());
-		searchCensusTable(args, conn1, individual);
 
 		// Search Probates Derby table
 		logger.info("Search for probates for " + individual.getName() + " in " + PROBATE_SOURCE);
@@ -278,60 +235,6 @@ public class SearchArchives {
 			Desktop.getDesktop().open(new File(outName));
 		}
 
-	}
-
-	/**
-	 * Search the census table for the individual
-	 *
-	 * @param args
-	 * @param conn
-	 * @param individual
-	 * @throws Exception
-	 */
-
-	private void searchCensusTable(String[] args, Connection conn, IndividualRecord individual) throws Exception {
-		PreparedStatement statement1 = conn.prepareStatement(SELECT_CENSUS);
-		statement1.setString(1, individual.getPhonName().trim());
-		statement1.setLong(2, individual.getBirthDate().toLocalDate().getYear());
-		final int dd = (individual.getDeathDate() == null ? 9999 : individual.getDeathDate().toLocalDate().getYear());
-		statement1.setLong(3, dd);
-//		ResultSet rs1 = statement1.executeQuery();
-		ResultSet rs2;
-		String string = "";
-
-		List<CensusRecord> cil = null;
-		cil = CensusRecord.loadFromDatabase(string, string, string, string);
-
-		// Add all household members as source details
-		PreparedStatement statement2 = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
-
-		for (final CensusRecord ci : cil) {
-			statement2.setString(1, ci.getKIPnr());
-			statement2.setString(2, ci.getHusstands_familienr());
-			rs2 = statement2.executeQuery();
-
-			final StringBuffer sb = new StringBuffer();
-
-			while (rs2.next()) {
-				sb.append(rs2.getString("KILDENAVN") + ", " + rs2.getString("ALDER") + ", "
-						+ rs2.getString("CIVILSTAND") + ", " + rs2.getString("KILDEERHVERV") + ", "
-						+ rs2.getString("STILLING_I_HUSSTANDEN") + " - ");
-			}
-
-			string = sb.toString();
-
-			if (string.length() > 4096) {
-				string = string.substring(0, 4095);
-			}
-
-			ci.setKildedetaljer(string);
-		}
-
-		statement2.close();
-
-		if ((cil != null) && (cil.size() > 0)) {
-			writeCensusOutput(cil, args, individual);
-		}
 	}
 
 	/**
@@ -585,67 +488,6 @@ public class SearchArchives {
 
 		statement.close();
 
-	}
-
-	/**
-	 * Write output for the census search
-	 *
-	 * @param cil
-	 * @param args
-	 * @param individual
-	 * @throws IOException
-	 */
-	private void writeCensusOutput(List<CensusRecord> cil, String[] args, IndividualRecord individual)
-			throws IOException {
-		final String outName = args[3] + "/" + individual.getName() + "_census.csv";
-		int diff = 0;
-		final Pattern pattern = Pattern.compile(FOUR_DIGITS);
-		Matcher matcher;
-		counter = 0;
-
-		Collections.sort(cil, new CensusIndividualComparator());
-
-		for (final CensusRecord ci : cil) {
-			diff = 0;
-
-			if (ci.getFoedeaar() > 0) {
-				diff = individual.getBirthDate().toLocalDate().getYear() - ci.getFoedeaar();
-			} else {
-				if (ci.getFoedt_kildedato().length() > 0) {
-					matcher = pattern.matcher(ci.getFoedt_kildedato());
-
-					if (matcher.find()) {
-						diff = individual.getBirthDate().toLocalDate().getYear() - Integer.parseInt(matcher.group(0));
-					}
-				} else {
-					if (ci.getAlder() > 0) {
-						diff = ci.getFTaar() - individual.getBirthDate().toLocalDate().getYear() - ci.getAlder();
-					}
-				}
-			}
-
-			if ((diff >= -2) && (diff <= 2)) {
-				if ((individual.getBirthPlace() == null) || (individual.getBirthPlace().length() == 0)
-						|| (ci.getKildefoedested().length() == 0)
-						|| (compareLocation(ci, individual.getBirthPlace()))) {
-					if (counter == 0) {
-						bw = new BufferedWriter(new FileWriter(new File(outName)));
-						bw.write(CENSUS_HEADER);
-					}
-
-					bw.write(ci.toString());
-					counter++;
-				}
-			}
-		}
-
-		if (counter > 0) {
-			bw.flush();
-			bw.close();
-			logger.info(counter + " lines of census data written to " + outName);
-
-			Desktop.getDesktop().open(new File(outName));
-		}
 	}
 
 	/**
