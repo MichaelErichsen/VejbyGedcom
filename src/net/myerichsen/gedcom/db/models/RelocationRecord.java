@@ -41,9 +41,6 @@ public class RelocationRecord extends ASModel {
 		RelocationRecord relocationRecord;
 		final List<RelocationRecord> lr = new ArrayList<>();
 
-		// FIXME VEJBY.EVENT.NOTE is null - should be note
-
-		// FIXME java.sql.SQLSyntaxErrorException: Schema 'VEJBY' does not exist
 		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
 		ResultSet rs = statement.executeQuery();

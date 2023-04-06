@@ -11,6 +11,7 @@ public interface ASPopulator {
 	/**
 	 * @param args
 	 * @return
+	 * @throws Exception
 	 */
-	ASModel[] loadFromDatabase(String[] args);
+	ASModel[] loadFromDatabase(String[] args) throws Exception;
 }
