@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.comparators;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
-import net.myerichsen.gedcom.db.models.SiblingRecord;
+import net.myerichsen.gedcom.db.models.SiblingsRecord;
 
 /**
  * @author Michael Erichsen
@@ -17,8 +17,8 @@ public class SiblingComparator extends ViewerComparator {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		SiblingRecord o1 = (SiblingRecord) e1;
-		SiblingRecord o2 = (SiblingRecord) e2;
+		SiblingsRecord o1 = (SiblingsRecord) e1;
+		SiblingsRecord o2 = (SiblingsRecord) e2;
 		final String key1 = o1.getBirthDate().toString() + o1.getName();
 		final String key2 = o2.getBirthDate().toString() + o2.getName();
 		return key1.compareToIgnoreCase(key2);

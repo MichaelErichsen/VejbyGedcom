@@ -13,10 +13,10 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings
  *
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 5. apr. 2023
  *
  */
-public class SiblingRecord extends ASModel {
+public class SiblingsRecord extends ASModel {
 
 	/**
 	 * @param dpp
@@ -49,9 +49,9 @@ public class SiblingRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SiblingRecord[] loadFromDatabase(String dbPath, String parents) throws SQLException {
+	public static SiblingsRecord[] loadFromDatabase(String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
-			return new SiblingRecord[0];
+			return new SiblingsRecord[0];
 		}
 
 		final String[] p = splitParents(parents);
@@ -68,13 +68,13 @@ public class SiblingRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SiblingRecord[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
+	public static SiblingsRecord[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
 			throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
 		String[] dpp;
-		SiblingRecord pr;
-		final List<SiblingRecord> lpr = new ArrayList<>();
+		SiblingsRecord pr;
+		final List<SiblingsRecord> lpr = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 
@@ -85,7 +85,7 @@ public class SiblingRecord extends ASModel {
 			motherPhonetic = fk.generateKey(mothersName);
 		} catch (final Exception e) {
 			System.out.println("Invalid parents: " + fathersName + "," + mothersName);
-			return new SiblingRecord[0];
+			return new SiblingsRecord[0];
 		}
 
 		final List<IndividualRecord> ldbi = IndividualRecord.loadFromDB(conn);
@@ -105,7 +105,7 @@ public class SiblingRecord extends ASModel {
 				continue;
 			}
 
-			pr = new SiblingRecord();
+			pr = new SiblingsRecord();
 
 			pr.setIndividualKey(dbi.getId());
 			pr.setName(dbi.getName());
@@ -118,13 +118,26 @@ public class SiblingRecord extends ASModel {
 			}
 		}
 
-		SiblingRecord[] sra = new SiblingRecord[lpr.size()];
+		final SiblingsRecord[] sra = new SiblingsRecord[lpr.size()];
 
 		for (int i = 0; i < lpr.size(); i++) {
 			sra[i] = lpr.get(i);
 		}
 
 		return sra;
+	}
+
+	/**
+	 * @param dbPath
+	 * @param phonName
+	 * @param birthDate2
+	 * @param deathDate
+	 * @return
+	 */
+	public static SiblingsRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate2,
+			String deathDate) {
+		System.out.println("Not yet implemented");
+		return null;
 	}
 
 	/**
@@ -162,6 +175,7 @@ public class SiblingRecord extends ASModel {
 	private String parents = "";
 	private String fatherPhonetic = "";
 	private String motherPhonetic = "";
+
 	private String place = "";
 
 	/**
@@ -278,7 +292,7 @@ public class SiblingRecord extends ASModel {
 
 	@Override
 	public String toString() {
-		return "SiblingRecord [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "")
+		return "SiblingsRecord [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "")
 				+ (birthDate != null ? "birthDate=" + birthDate + ", " : "")
 				+ (name != null ? "name=" + name + ", " : "") + (parents != null ? "parents=" + parents + ", " : "")
 				+ (fatherPhonetic != null ? "fatherPhonetic=" + fatherPhonetic + ", " : "")

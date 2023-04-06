@@ -31,51 +31,59 @@ import org.gedcom4j.model.IndividualReference;
 import org.gedcom4j.model.NoteStructure;
 import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
+import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 import net.myerichsen.gedcom.db.models.IndividualRecord;
-import net.myerichsen.gedcom.db.models.SiblingRecord;
+import net.myerichsen.gedcom.db.models.SiblingsRecord;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 5. apr. 2023
  */
 public class DBLoader {
 	/**
 	 * Static constants and variables
 	 */
-	private static final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHDATE = ?, "
-			+ "BIRTHPLACE = ?, DEATHDATE = ?, DEATHPLACE = ?, PARENTS = ? WHERE ID = ?";
-	private static final String INSERT_INDIVIDUAL_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
-			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = ?, PARENTS = ? WHERE ID = ?";
+	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
+
 	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM VEJBY.INDIVIDUAL";
 	private static final String DELETE_FAMILY = "DELETE FROM VEJBY.FAMILY";
 	private static final String DELETE_PARENTS = "DELETE FROM VEJBY.PARENTS";
-	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE=? WHERE ID = ?";
-	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = ? WHERE ID = ?";
+
+	private static final String INSERT_INDIVIDUAL_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, INDIVIDUAL, "
+			+ "FAMILY, PLACE, NOTE, SOURCEDETAIL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT_INDIVIDUAL = "INSERT INTO VEJBY.INDIVIDUAL (ID, GIVENNAME, SURNAME, SEX, PHONNAME) VALUES (?, ?, ?, ?, ?)";
 	private static final String INSERT_FAMILY_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
 			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES (?, NULL, NULL)";
 	private static final String INSERT_PARENTS = "INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, "
 			+ "PARENTS, FATHERPHONETIC, MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)";
-	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
 
-	private static PreparedStatement psUPDATE_INDIVIDUAL_BDP;
+	private static final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHDATE = ?, "
+			+ "BIRTHPLACE = ?, DEATHDATE = ?, DEATHPLACE = ? WHERE ID = ?";
+	private static final String UPDATE_INDIVIDUAL_FAMC = "UPDATE VEJBY.INDIVIDUAL SET FAMC = ?, PARENTS = ? WHERE ID = ?";
+	private static final String UPDATE_INDIVIDUAL_PARENTS = "UPDATE VEJBY.INDIVIDUAL SET PARENTS = ? WHERE ID = ?";
+	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE=? WHERE ID = ?";
+	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = ? WHERE ID = ?";
+
+	private static PreparedStatement psSELECT_INDIVIDUAL;
+
 	private static PreparedStatement psINSERT_INDIVIDUAL_EVENT;
-	private static PreparedStatement psUPDATE_INDIVIDUAL_FAMC;
-	private static PreparedStatement psUPDATE_FAMILY_WIFE;
-	private static PreparedStatement psUPDATE_FAMILY_HUSBAND;
 	private static PreparedStatement psINSERT_INDIVIDUAL;
 	private static PreparedStatement psINSERT_FAMILY_EVENT;
 	private static PreparedStatement psINSERT_FAMILY;
 	private static PreparedStatement psINSERT_PARENTS;
-	private static PreparedStatement psSELECT_INDIVIDUAL;
+
+	private static PreparedStatement psUPDATE_INDIVIDUAL_BDP;
+	private static PreparedStatement psUPDATE_INDIVIDUAL_FAMC;
+	private static PreparedStatement psUPDATE_INDIVIDUAL_PARENTS;
+	private static PreparedStatement psUPDATE_FAMILY_WIFE;
+	private static PreparedStatement psUPDATE_FAMILY_HUSBAND;
 
 	private static Logger logger;
 	private static Fonkod fonkod = new Fonkod();
@@ -169,7 +177,7 @@ public class DBLoader {
 		parseAllIndividuals();
 
 		logger.info("Add birth and death data and parents");
-		updateBirthDeathParentsData(conn);
+		updateBirthDeathData(conn);
 
 		logger.info("Parsing parents");
 		parseParents();
@@ -256,12 +264,14 @@ public class DBLoader {
 	}
 
 	/**
-	 * Insert a family into Derby
+	 * Insert an empty family into Derby
+	 * <p>
+	 * INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES (?, NULL, NULL)
 	 *
 	 * @param key
 	 * @throws SQLException
 	 */
-	private void insertFamily(String key) throws SQLException {
+	private void insertEmptyFamily(String key) throws SQLException {
 		psINSERT_FAMILY.setString(1, key);
 		psINSERT_FAMILY.execute();
 		familyCounter++;
@@ -384,7 +394,9 @@ public class DBLoader {
 				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 			}
 			logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
-			updateIndividual(individual);
+
+			updateIndividualFamc(individual);
+			updateIndividualParents(individual);
 		}
 	}
 
@@ -491,11 +503,6 @@ public class DBLoader {
 			psINSERT_INDIVIDUAL.setString(3, surname);
 			psINSERT_INDIVIDUAL.setString(4, individual.getSex().getValue());
 			psINSERT_INDIVIDUAL.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
-
-			if (individual.getFamiliesWhereChild() == null) {
-				updateIndividual(individual);
-			}
-
 			psINSERT_INDIVIDUAL.execute();
 			individualCounter++;
 		} catch (final SQLException e) {
@@ -504,7 +511,8 @@ public class DBLoader {
 				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 			}
 
-			updateIndividual(individual);
+			updateIndividualFamc(individual);
+			updateIndividualParents(individual);
 		}
 	}
 
@@ -530,24 +538,20 @@ public class DBLoader {
 
 		for (final Entry<String, Family> familyNode : families.entrySet()) {
 			key = familyNode.getKey();
-			insertFamily(key);
+			insertEmptyFamily(key);
 
 			family = familyNode.getValue();
 
-			try {
+			if (family.getHusband() != null) {
 				husband = family.getHusband().getIndividual();
 				insertIndividual(husband);
 				updateFamilyHusband(key, husband);
-			} catch (final NullPointerException e) {
-				logger.fine(e.getMessage());
 			}
 
-			try {
+			if (family.getWife() != null) {
 				wife = family.getWife().getIndividual();
 				insertIndividual(wife);
 				updateFamilyWife(key, wife);
-			} catch (final NullPointerException e) {
-				logger.fine(e.getMessage());
 			}
 
 			final List<IndividualReference> children = family.getChildren();
@@ -586,19 +590,24 @@ public class DBLoader {
 	}
 
 	/**
+	 * SELECT * FROM VEJBY.INDIVIDUAL
+	 * <p>
+	 * INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, PARENTS,
+	 * FATHERPHONETIC, MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)
+	 * 
 	 * @throws SQLException
 	 *
 	 */
 	private void parseParents() throws SQLException {
-		final List<SiblingRecord> lpr = new ArrayList<>();
-		SiblingRecord pr;
+		final List<SiblingsRecord> lpr = new ArrayList<>();
+		SiblingsRecord pr;
 		String parents;
 		final Fonkod fk = new Fonkod();
 
 		final ResultSet rs = psSELECT_INDIVIDUAL.executeQuery();
 
 		while (rs.next()) {
-			pr = new SiblingRecord();
+			pr = new SiblingsRecord();
 			pr.setIndividualKey(rs.getString("ID"));
 			pr.setBirthDate(rs.getDate("BIRTHDATE"));
 			pr.setName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
@@ -606,9 +615,9 @@ public class DBLoader {
 			parents = rs.getString("PARENTS");
 			pr.setParents(parents);
 
-			if (parents.length() == 0) {
-
-			}
+//			if (parents.length() == 0) {
+//
+//			}
 
 			final String[] sa = splitParents(parents);
 
@@ -633,7 +642,7 @@ public class DBLoader {
 		String fatherPhonetic;
 		String motherPhonetic;
 
-		for (final SiblingRecord pr2 : lpr) {
+		for (final SiblingsRecord pr2 : lpr) {
 			psINSERT_PARENTS.setString(1, pr2.getIndividualKey());
 			psINSERT_PARENTS.setDate(2, pr2.getBirthDate());
 			psINSERT_PARENTS.setString(3, pr2.getName());
@@ -671,6 +680,7 @@ public class DBLoader {
 		psUPDATE_INDIVIDUAL_BDP = conn.prepareStatement(UPDATE_INDIVIDUAL_BDP);
 		psINSERT_INDIVIDUAL_EVENT = conn.prepareStatement(INSERT_INDIVIDUAL_EVENT);
 		psUPDATE_INDIVIDUAL_FAMC = conn.prepareStatement(UPDATE_INDIVIDUAL_FAMC);
+		psUPDATE_INDIVIDUAL_PARENTS = conn.prepareStatement(UPDATE_INDIVIDUAL_PARENTS);
 		psUPDATE_FAMILY_WIFE = conn.prepareStatement(UPDATE_FAMILY_WIFE);
 		psUPDATE_FAMILY_HUSBAND = conn.prepareStatement(UPDATE_FAMILY_HUSBAND);
 		psINSERT_INDIVIDUAL = conn.prepareStatement(INSERT_INDIVIDUAL);
@@ -693,7 +703,15 @@ public class DBLoader {
 		gedcom = gp.getGedcom();
 	}
 
+	/**
+	 * @param parents2
+	 * @return
+	 */
 	private String[] splitParents(String parents2) {
+		if ((parents2 == null) || (parents2.length() == 0)) {
+			return new String[] { "", "" };
+		}
+
 		String s = parents2.replaceAll("\\d", "").replaceAll("\\.", "").toLowerCase();
 		s = s.replace(", f.", "");
 		String[] sa = s.split(",");
@@ -728,16 +746,16 @@ public class DBLoader {
 	 *
 	 * @throws SQLException
 	 */
-	private void updateBirthDeathParentsData(Connection conn) throws SQLException {
+	private void updateBirthDeathData(Connection conn) throws SQLException {
 		// Read all individuals into a list
 		final List<IndividualRecord> ldbi = IndividualRecord.loadFromDB(conn);
 
 		// Update all individual records in Derby
-		updateIndividualsBDP(ldbi);
+		updateIndividualsBirthDeath(ldbi);
 	}
 
 	/**
-	 * UPDATE VEJBY.FAMILY SET HUSBAND = '' WHERE ID = ''
+	 * UPDATE VEJBY.FAMILY SET HUSBAND = ? WHERE ID = ?
 	 *
 	 * @param husband
 	 * @throws Exception
@@ -765,19 +783,20 @@ public class DBLoader {
 
 	/**
 	 * Update an individual by adding FAMC
+	 * <p>
+	 * UPDATE VEJBY.INDIVIDUAL SET FAMC = ? WHERE ID = ?
 	 *
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void updateIndividual(Individual individual) throws Exception {
+	private void updateIndividualFamc(Individual individual) throws Exception {
 		final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
 
 		String father;
 		String mother;
-		String parents;
+		String parents = "";
 
 		if (familiesWhereChild != null) {
-
 			try {
 				father = familiesWhereChild.get(0).getFamily().getHusband().getIndividual().getFormattedName()
 						.replace("/", "");
@@ -798,6 +817,7 @@ public class DBLoader {
 				parents = (father + mother).trim();
 			}
 
+			logger.info("Parents: " + parents);
 			psUPDATE_INDIVIDUAL_FAMC.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
 			psUPDATE_INDIVIDUAL_FAMC.setString(2, parents);
 			psUPDATE_INDIVIDUAL_FAMC.setString(3, individual.getXref());
@@ -805,37 +825,61 @@ public class DBLoader {
 			try {
 				psUPDATE_INDIVIDUAL_FAMC.execute();
 			} catch (final SQLException e) {
+				logger.info("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+
 				// Handle family not yet inserted
 				if (!e.getSQLState().equals("23503")) {
 					throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 				}
-				logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
-
 			}
 		}
-
 	}
 
 	/**
-	 * Update birth and death data and parents for all individuals
+	 * Update an individual by adding parents
+	 * <p>
+	 * UPDATE VEJBY.INDIVIDUAL SET PARENTS = ? WHERE ID = ?
+	 *
+	 * @param individual
+	 * @throws Exception
+	 */
+	private void updateIndividualParents(Individual individual) throws Exception {
+		final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild();
+
+		if (familiesWhereChild == null) {
+			try {
+				List<IndividualEvent> eventsOfType = individual.getEventsOfType(IndividualEventType.CHRISTENING);
+				IndividualEvent event = eventsOfType.get(0);
+				List<AbstractCitation> citations = event.getCitations();
+				CitationWithSource citation = (CitationWithSource) citations.get(0);
+				StringWithCustomFacts whereInSource = citation.getWhereInSource();
+				String parents = whereInSource.toString();
+				parents = (parents.length() > 256 ? parents.substring(0, 255) : parents);
+				logger.info("Parents: " + parents);
+
+				psUPDATE_INDIVIDUAL_PARENTS.setString(1, parents);
+				psUPDATE_INDIVIDUAL_PARENTS.setString(2, individual.getXref());
+				psUPDATE_INDIVIDUAL_PARENTS.execute();
+			} catch (final Exception e) {
+				logger.info(e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Update birth and death data for all individuals
+	 * <p>
+	 * UPDATE VEJBY.INDIVIDUAL SET BIRTHDATE = ?, BIRTHPLACE = ?, DEATHDATE = ?,
+	 * DEATHPLACE = ? WHERE ID = ?
 	 *
 	 * @param ldbi
 	 * @throws SQLException
 	 */
-	private void updateIndividualsBDP(List<IndividualRecord> ldbi) throws SQLException {
+	private void updateIndividualsBirthDeath(List<IndividualRecord> ldbi) throws SQLException {
 		Date bd;
 		Date dd;
-		String parents;
 
 		for (final IndividualRecord dbi : ldbi) {
-			parents = dbi.getParents();
-
-			if (parents == null) {
-				parents = "";
-			} else {
-				parents = (parents.length() > 256 ? parents.substring(0, 255) : parents);
-			}
-
 			bd = dbi.getBirthDate();
 			dd = dbi.getDeathDate();
 
@@ -854,8 +898,7 @@ public class DBLoader {
 			}
 
 			psUPDATE_INDIVIDUAL_BDP.setString(4, dbi.getDeathPlace());
-			psUPDATE_INDIVIDUAL_BDP.setString(5, parents);
-			psUPDATE_INDIVIDUAL_BDP.setString(6, dbi.getId());
+			psUPDATE_INDIVIDUAL_BDP.setString(5, dbi.getId());
 			psUPDATE_INDIVIDUAL_BDP.executeUpdate();
 		}
 	}

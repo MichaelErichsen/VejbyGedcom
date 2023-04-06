@@ -25,6 +25,8 @@ public class RelocationRecord extends ASModel {
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = ? "
 			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 
+	// TODO Not restricted by birth and death dates
+
 	/**
 	 * @param dbPath
 	 * @param phonName
@@ -39,8 +41,9 @@ public class RelocationRecord extends ASModel {
 		RelocationRecord relocationRecord;
 		final List<RelocationRecord> lr = new ArrayList<>();
 
-		// FIUXME VEJBY.EVENT.NOTE is null - should be note
+		// FIXME VEJBY.EVENT.NOTE is null - should be note
 
+		// FIXME java.sql.SQLSyntaxErrorException: Schema 'VEJBY' does not exist
 		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
 		ResultSet rs = statement.executeQuery();

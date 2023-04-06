@@ -48,9 +48,13 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.BurregComparator;
 import net.myerichsen.gedcom.db.comparators.CensusComparator;
+import net.myerichsen.gedcom.db.comparators.PolregComparator;
+import net.myerichsen.gedcom.db.comparators.RelocationComparator;
+import net.myerichsen.gedcom.db.comparators.SiblingComparator;
 import net.myerichsen.gedcom.db.filters.BurregBirthDateFilter;
 import net.myerichsen.gedcom.db.filters.BurregGivenFilter;
 import net.myerichsen.gedcom.db.filters.BurregSurnameFilter;
+import net.myerichsen.gedcom.db.filters.CensusAgeFilter;
 import net.myerichsen.gedcom.db.filters.CensusBirthPlaceFilter;
 import net.myerichsen.gedcom.db.filters.CensusCountyFilter;
 import net.myerichsen.gedcom.db.filters.CensusNameFilter;
@@ -77,12 +81,19 @@ import net.myerichsen.gedcom.db.models.IndividualRecord;
 import net.myerichsen.gedcom.db.models.PolregRecord;
 import net.myerichsen.gedcom.db.models.ProbateRecord;
 import net.myerichsen.gedcom.db.models.RelocationRecord;
-import net.myerichsen.gedcom.db.models.SiblingRecord;
+import net.myerichsen.gedcom.db.models.SiblingsRecord;
+import net.myerichsen.gedcom.db.populators.ASPopulator;
+import net.myerichsen.gedcom.db.populators.BurregPopulator;
+import net.myerichsen.gedcom.db.populators.CensusPopulator;
+import net.myerichsen.gedcom.db.populators.PolregPopulator;
+import net.myerichsen.gedcom.db.populators.ProbatePopulator;
+import net.myerichsen.gedcom.db.populators.RelocationPopulator;
+import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 6. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -91,15 +102,8 @@ public class ArchiveSearcher extends Shell {
 	// TODO Run Derby multithreaded
 	// FIXME Find why FLOOR column missing in Polreg
 	// FIXME Census table missing scrollbar
-	// TODO Add shortcuts for "Copy" on popups
 	// FIXME Parents ID search not using parents names
-	// FIXME Setting tab label wrong
-	// TODO Test probate for individual life span
-	// TODO Siblings should also find individuals with only one parent
 	// TODO Find all relocations to and from an individual
-	// FIXME Relocation parents "NULL", but existed in Christening event
-	// TODO Rightclick to remove items from table
-	// TODO Census age filter
 
 	/**
 	 * Static constants used to initalize properties file
@@ -180,7 +184,7 @@ public class ArchiveSearcher extends Shell {
 	private Text txtCensusParish;
 	private Text txtCensusName;
 	private Text txtCensusSex;
-	private Text txtBirthPlace;
+	private Text txtCensusBirthPlace;
 	private Text txtRelocationGiven;
 	private TableViewer relocationTableViewer;
 	private Text txtRelocationSurname;
@@ -196,6 +200,13 @@ public class ArchiveSearcher extends Shell {
 	private Text txtBurregSurname;
 	private Text txtBurregBirthYear;
 	private Text txtSiblingsParents;
+	private Text txtCensusAge;
+	private ASPopulator burregListener;
+	private ASPopulator censusListener;
+	private ASPopulator polregListener;
+	private ASPopulator relocationListener;
+	private ASPopulator siblingListener;
+	private ASPopulator probateListener;
 
 	/**
 	 * Create the shell.
@@ -232,6 +243,7 @@ public class ArchiveSearcher extends Shell {
 	 * @param e
 	 */
 	protected void burregLoader(SelectionEvent e) {
+		// TODO LoadBurialPersonComplete derbydatabasepath csvfile
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -287,7 +299,7 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 *
+	 * Create the census popup
 	 */
 	private void censusPopup() {
 		final TableItem[] tia = censusTable.getSelection();
@@ -803,11 +815,29 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 
+		final Label lblAlder = new Label(censusFilterComposite, SWT.NONE);
+		lblAlder.setText("Alder +/- 2 \u00E5r");
+
+		txtCensusAge = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusAge.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				CensusAgeFilter.getInstance().setSearchText(txtCensusAge.getText());
+				censusTableViewer.refresh();
+			}
+		});
+
 		final Label lblFdested = new Label(censusFilterComposite, SWT.NONE);
 		lblFdested.setText("F\u00F8dested");
 
-		txtBirthPlace = new Text(censusFilterComposite, SWT.BORDER);
-
+		txtCensusBirthPlace = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusBirthPlace.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				CensusBirthPlaceFilter.getInstance().setSearchText(txtCensusBirthPlace.getText());
+				censusTableViewer.refresh();
+			}
+		});
 		final Button btnRydFelterneCensus = new Button(censusFilterComposite, SWT.NONE);
 		btnRydFelterneCensus.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -818,7 +848,7 @@ public class ArchiveSearcher extends Shell {
 				CensusParishFilter.getInstance().setSearchText("");
 				CensusSexFilter.getInstance().setSearchText("");
 				CensusYearFilter.getInstance().setSearchText("");
-				txtBirthPlace.setText("");
+				txtCensusBirthPlace.setText("");
 				txtCensusCounty.setText("");
 				txtCensusName.setText("");
 				txtCensusParish.setText("");
@@ -828,13 +858,6 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		btnRydFelterneCensus.setText("Ryd felterne");
-		txtBirthPlace.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				CensusBirthPlaceFilter.getInstance().setSearchText(txtBirthPlace.getText());
-				censusTableViewer.refresh();
-			}
-		});
 
 		final ScrolledComposite censusScroller = new ScrolledComposite(censusComposite,
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -850,14 +873,16 @@ public class ArchiveSearcher extends Shell {
 			censusPopup();
 		});
 
-		final ViewerFilter[] filters = new ViewerFilter[6];
+		final ViewerFilter[] filters = new ViewerFilter[7];
 		filters[0] = CensusBirthPlaceFilter.getInstance();
 		filters[1] = CensusCountyFilter.getInstance();
 		filters[2] = CensusNameFilter.getInstance();
 		filters[3] = CensusParishFilter.getInstance();
 		filters[4] = CensusSexFilter.getInstance();
 		filters[5] = CensusYearFilter.getInstance();
+		filters[6] = CensusAgeFilter.getInstance();
 		censusTableViewer.setFilters(filters);
+		censusTableViewer.setComparator(new CensusComparator());
 
 		censusTable = censusTableViewer.getTable();
 		censusTable.setLinesVisible(true);
@@ -1162,8 +1187,6 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 
-		censusTableViewer.setComparator(new CensusComparator());
-
 		censusScroller.setContent(censusTable);
 		censusScroller.setMinSize(censusTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
@@ -1305,6 +1328,7 @@ public class ArchiveSearcher extends Shell {
 		filters[0] = PolregAddressFilter.getInstance();
 		filters[1] = PolregBirthdateFilter.getInstance();
 		polregTableViewer.setFilters(filters);
+		polregTableViewer.setComparator(new PolregComparator());
 		polregTableViewer.addDoubleClickListener(event -> {
 			polregPopup();
 		});
@@ -1688,20 +1712,25 @@ public class ArchiveSearcher extends Shell {
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		relocationScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		relocationScroller.setSize(0, 0);
+
+		tbtmRelocations.setControl(relocationComposite);
 		relocationScroller.setExpandHorizontal(true);
 		relocationScroller.setExpandVertical(true);
 
 		relocationTableViewer = new TableViewer(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION);
 		relocationTableViewer.addDoubleClickListener(event -> relocationPopup());
+
+		final ViewerFilter[] filters = new ViewerFilter[2];
+		filters[0] = RelocationGivenFilter.getInstance();
+		filters[1] = RelocationSurnameFilter.getInstance();
+		relocationTableViewer.setFilters(filters);
+		relocationTableViewer.setComparator(new RelocationComparator());
+
 		relocationTable = relocationTableViewer.getTable();
 		relocationTable.setLinesVisible(true);
 		relocationTable.setHeaderVisible(true);
 
 		relocationTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		final ViewerFilter[] filters = new ViewerFilter[2];
-		filters[0] = RelocationGivenFilter.getInstance();
-		filters[1] = RelocationSurnameFilter.getInstance();
-		relocationTableViewer.setFilters(filters);
 
 		final TableViewerColumn relocationTableViewerColumn = new TableViewerColumn(relocationTableViewer, SWT.NONE);
 		relocationTableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
@@ -1826,7 +1855,7 @@ public class ArchiveSearcher extends Shell {
 		final Label lblVlgEntenId = new Label(searchComposite, SWT.NONE);
 		lblVlgEntenId.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
 		lblVlgEntenId.setText(
-				"V\u00E6lg enten ID fra stamtr\u00E6et eller et navn, evt. med f\u00F8de\u00E5r, d\u00F8ds\u00E5r, fader og moder");
+				"V\u00E6lg enten ID fra stamtr\u00E6et, et navn (evt. med f\u00F8de\u00E5r og d\u00F8ds\u00E5r) eller fader og moder");
 		lblVlgEntenId.setLayoutData(new GridData(SWT.FILL, SWT.LEFT, true, false, 7, 1));
 
 		final Label lblId = new Label(searchComposite, SWT.NONE);
@@ -1845,11 +1874,25 @@ public class ArchiveSearcher extends Shell {
 
 			}
 		});
-		btnSearchId.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		btnSearchId.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
 		btnSearchId.setText("S\u00F8g p\u00E5 ID");
 		new Label(searchComposite, SWT.NONE);
 		new Label(searchComposite, SWT.NONE);
-		new Label(searchComposite, SWT.NONE);
+
+		final Button btnRydFelterne = new Button(searchComposite, SWT.NONE);
+		btnRydFelterne.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				searchBirth.setText("");
+				searchDeath.setText("");
+				searchFather.setText("");
+				searchId.setText("");
+				searchMother.setText("");
+				searchName.setText("");
+			}
+		});
+		btnRydFelterne.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
+		btnRydFelterne.setText("Ryd felterne");
 
 		final Label lblNewLabel_1 = new Label(searchComposite, SWT.NONE);
 		lblNewLabel_1.setText("Navn");
@@ -1871,13 +1914,13 @@ public class ArchiveSearcher extends Shell {
 		searchDeath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblFader = new Label(searchComposite, SWT.NONE);
-		lblFader.setText("Fader (Valgfri)");
+		lblFader.setText("Fader");
 
 		searchFather = new Text(searchComposite, SWT.BORDER);
 		searchFather.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
 
 		final Label lblModer = new Label(searchComposite, SWT.NONE);
-		lblModer.setText("Moder (Valgfri)");
+		lblModer.setText("Moder");
 
 		searchMother = new Text(searchComposite, SWT.BORDER);
 		searchMother.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -1890,23 +1933,18 @@ public class ArchiveSearcher extends Shell {
 			}
 
 		});
-		btnSearchName.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
+		btnSearchName.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
 		btnSearchName.setText("S\u00F8g p\u00E5 navn");
 
-		final Button btnRydFelterne = new Button(searchComposite, SWT.NONE);
-		btnRydFelterne.addSelectionListener(new SelectionAdapter() {
+		final Button btnSgPForldre = new Button(searchComposite, SWT.NONE);
+		btnSgPForldre.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				searchBirth.setText("");
-				searchDeath.setText("");
-				searchFather.setText("");
-				searchId.setText("");
-				searchMother.setText("");
-				searchName.setText("");
+				searchByParents(e);
 			}
 		});
-		btnRydFelterne.setFont(SWTResourceManager.getFont("Segoe UI", 16, SWT.BOLD));
-		btnRydFelterne.setText("Ryd felterne");
+		btnSgPForldre.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
+		btnSgPForldre.setText("S\u00F8g p\u00E5 for\u00E6ldre");
 
 		final Composite composite = new Composite(searchComposite, SWT.NONE);
 		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -2075,7 +2113,7 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		final Label lblKipTextFilnavn = new Label(compositeOpstning, SWT.NONE);
-		lblKipTextFilnavn.setText("KIP cphDbPath filnavn uden sti");
+		lblKipTextFilnavn.setText("KIP tekst filnavn uden sti");
 
 		kipTextFilename = new Text(compositeOpstning, SWT.BORDER);
 		kipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -2307,6 +2345,7 @@ public class ArchiveSearcher extends Shell {
 		filters[0] = SiblingsParentsFilter.getInstance();
 		filters[1] = SiblingsPlaceFilter.getInstance();
 		siblingsTableViewer.setFilters(filters);
+		siblingsTableViewer.setComparator(new SiblingComparator());
 
 		siblingsTable.setHeaderVisible(true);
 		siblingsTable.setLinesVisible(true);
@@ -2319,7 +2358,7 @@ public class ArchiveSearcher extends Shell {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingRecord pr = (SiblingRecord) element;
+				final SiblingsRecord pr = (SiblingsRecord) element;
 				return pr.getIndividualKey();
 			}
 		});
@@ -2332,7 +2371,7 @@ public class ArchiveSearcher extends Shell {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingRecord pr = (SiblingRecord) element;
+				final SiblingsRecord pr = (SiblingsRecord) element;
 				return pr.getBirthDate().toString();
 			}
 		});
@@ -2345,7 +2384,7 @@ public class ArchiveSearcher extends Shell {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingRecord pr = (SiblingRecord) element;
+				final SiblingsRecord pr = (SiblingsRecord) element;
 				return pr.getName();
 			}
 		});
@@ -2358,7 +2397,7 @@ public class ArchiveSearcher extends Shell {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingRecord pr = (SiblingRecord) element;
+				final SiblingsRecord pr = (SiblingsRecord) element;
 				return pr.getParents();
 			}
 		});
@@ -2371,7 +2410,7 @@ public class ArchiveSearcher extends Shell {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingRecord pr = (SiblingRecord) element;
+				final SiblingsRecord pr = (SiblingsRecord) element;
 				return pr.getPlace();
 			}
 		});
@@ -2498,6 +2537,12 @@ public class ArchiveSearcher extends Shell {
 	 * @param e
 	 */
 	protected void polregLoader(SelectionEvent e) {
+		// TODO LoadPolicePosition derbydatabasepath csvfile
+
+		// TODO LoadPolicePerson derbydatabasepath csvfile
+
+		// TODO LoadPoliceAddress derbydatabasepath csvfile
+
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -2561,11 +2606,17 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Begravelsesregister hentes");
+		burregListener = new BurregPopulator();
+		registerBurregPopulatorListener(burregListener);
 
-		final BurregRecord[] lbr = BurregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName, birthDate,
-				deathDate);
-		burregTableViewer.setInput(lbr);
+		new Thread(() -> {
+			if (burregListener != null) {
+				String[] loadArgs = new String[] { props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
+				final BurregRecord[] burregRecords = (BurregRecord[]) burregListener.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> burregTableViewer.setInput(burregRecords));
+			}
+		}).start();
 	}
 
 	/**
@@ -2581,11 +2632,18 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Folketællinger hentes");
+		censusListener = new CensusPopulator();
+		registerCensusPopulatorListener(censusListener);
 
-		final CensusRecord[] censuses = CensusRecord.loadFromDatabase(props.getProperty("vejbyPath"), phonName,
-				birthDate.substring(0, 4), deathDate.substring(0, 4));
-		censusTableViewer.setInput(censuses);
+		new Thread(() -> {
+			if (censusListener != null) {
+				String[] loadArgs = new String[] { props.getProperty("vejbyPath"), phonName, birthDate.substring(0, 4),
+						deathDate.substring(0, 4) };
+				final CensusRecord[] CensusRecords = (CensusRecord[]) censusListener.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> censusTableViewer.setInput(CensusRecords));
+			}
+		}).start();
 	}
 
 	/**
@@ -2603,11 +2661,17 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Politiregister hentes");
+		polregListener = new PolregPopulator();
+		registerPolregPopulatorListener(polregListener);
 
-		final PolregRecord[] lpr = PolregRecord.loadFromDatabase(props.getProperty("cphDbPath"), phonName, birthDate,
-				deathDate);
-		polregTableViewer.setInput(lpr);
+		new Thread(() -> {
+			if (polregListener != null) {
+				String[] loadArgs = new String[] { props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
+				final PolregRecord[] PolregRecords = (PolregRecord[]) polregListener.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> polregTableViewer.setInput(PolregRecords));
+			}
+		}).start();
 	}
 
 	/**
@@ -2623,11 +2687,25 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Skifter hentes");
+		probateListener = new ProbatePopulator();
+		registerProbatePopulatorListener(relocationListener);
 
-		final ProbateRecord[] lp = ProbateRecord.loadFromDatabase(props.getProperty("probatePath"), phonName, birthDate,
-				deathDate, props.getProperty("probateSource"));
-		probateTableViewer.setInput(lp);
+		new Thread(() -> {
+			if (probateListener != null) {
+				String[] loadArgs = new String[] { props.getProperty("probatePath"), phonName, birthDate, deathDate,
+						props.getProperty("probateSource") };
+				final ProbateRecord[] probateRecords = (ProbateRecord[]) probateListener.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
+			}
+		}).start();
+	}
+
+	/**
+	 * @param probateListener
+	 */
+	private void registerProbatePopulatorListener(ASPopulator probateListener) {
+		this.probateListener = probateListener;
 	}
 
 	/**
@@ -2643,11 +2721,18 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Flytninger hentes");
+		relocationListener = new RelocationPopulator();
+		registerPopulatorListener(relocationListener);
 
-		final RelocationRecord[] relocationRecords = RelocationRecord.loadFromDatabase(props.getProperty("vejbyPath"),
-				phonName, birthDate, deathDate);
-		relocationTableViewer.setInput(relocationRecords);
+		new Thread(() -> {
+			if (relocationListener != null) {
+				String[] loadArgs = new String[] { props.getProperty("vejbyPath"), phonName, birthDate, deathDate };
+				final RelocationRecord[] relocationRecords = (RelocationRecord[]) relocationListener
+						.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> relocationTableViewer.setInput(relocationRecords));
+			}
+		}).start();
 	}
 
 	/**
@@ -2661,10 +2746,20 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Søskende hentes");
-
-		final SiblingRecord[] lpr = SiblingRecord.loadFromDatabase(props.getProperty("vejbyPath"), parents);
+		final SiblingsRecord[] lpr = SiblingsRecord.loadFromDatabase(props.getProperty("vejbyPath"), parents);
 		siblingsTableViewer.setInput(lpr);
+
+		siblingListener = new SiblingsPopulator();
+		registerSiblingsPopulatorListener(siblingListener);
+
+		new Thread(() -> {
+			if (siblingListener != null) {
+				String[] loadArgs = new String[] { parents };
+				final SiblingsRecord[] SiblingRecords = (SiblingsRecord[]) siblingListener.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
+			}
+		}).start();
 	}
 
 	/**
@@ -2682,11 +2777,17 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setMessage("Søskende hentes");
+		siblingListener = new SiblingsPopulator();
+		registerSiblingsPopulatorListener(siblingListener);
 
-		final SiblingRecord[] lpr = SiblingRecord.loadFromDatabase(props.getProperty("vejbyPath"), fathersName,
-				mothersName);
-		siblingsTableViewer.setInput(lpr);
+		new Thread(() -> {
+			if (siblingListener != null) {
+				String[] loadArgs = new String[] { props.getProperty("vejbyPath"), fathersName, mothersName };
+				final SiblingsRecord[] SiblingRecords = (SiblingsRecord[]) siblingListener.loadFromDatabase(loadArgs);
+
+				Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
+			}
+		}).start();
 	}
 
 	/**
@@ -2721,9 +2822,58 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Register burreg populator listener
+	 *
+	 * @param rListener
+	 */
+	private void registerBurregPopulatorListener(ASPopulator rListener) {
+		this.burregListener = rListener;
+
+	}
+
+	/**
+	 * Register census populator listener
+	 *
+	 * @param rListener
+	 */
+	private void registerCensusPopulatorListener(ASPopulator rListener) {
+		this.censusListener = rListener;
+
+	}
+
+	/**
+	 * Register polreg populator listener
+	 *
+	 * @param rListener
+	 */
+	private void registerPolregPopulatorListener(ASPopulator rListener) {
+		this.polregListener = rListener;
+
+	}
+
+	/**
+	 * Register relocation populator listener
+	 *
+	 * @param rListener
+	 */
+	private void registerPopulatorListener(ASPopulator rListener) {
+		this.relocationListener = rListener;
+
+	}
+
+	/**
+	 * Register siblings populator listener
+	 *
+	 * @param rListener
+	 */
+	private void registerSiblingsPopulatorListener(ASPopulator rListener) {
+		this.siblingListener = rListener;
+
+	}
+
+	/**
 	 *
 	 */
-	// FIXME Parents can be "NULL"
 	private void relocationPopup() {
 		final TableItem[] tia = relocationTable.getSelection();
 		final TableItem ti = tia[0];
@@ -2744,6 +2894,7 @@ public class ArchiveSearcher extends Shell {
 			final Clipboard clipboard = new Clipboard(display);
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { tia[0].getText(6) }, new Transfer[] { textTransfer });
+			// FIXME java.lang.IllegalArgumentException: Argument not valid
 			clipboard.dispose();
 		}
 	}
@@ -2759,6 +2910,16 @@ public class ArchiveSearcher extends Shell {
 		searchFather.setText("");
 		searchMother.setText("");
 		searchName.setText("");
+
+		if (searchId.getText().equals("")) {
+			final Shell[] shells = e.widget.getDisplay().getShells();
+			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
+			messageBox.setText("Advarsel");
+			messageBox.setMessage("Indtast venligst et tal");
+			messageBox.open();
+			searchId.setFocus();
+			return;
+		}
 
 		final String Id = "@I" + searchId.getText() + "@";
 		try {
@@ -2803,13 +2964,14 @@ public class ArchiveSearcher extends Shell {
 	 */
 	private void searchByName(SelectionEvent e) {
 		searchId.setText("");
+
 		if (searchName.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
 			messageBox.setText("Advarsel");
 			messageBox.setMessage("Indtast venligst et navn");
 			messageBox.open();
-			searchId.setFocus();
+			searchName.setFocus();
 			return;
 		}
 
@@ -2849,6 +3011,37 @@ public class ArchiveSearcher extends Shell {
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Search by parents
+	 */
+	protected void searchByParents(SelectionEvent e) {
+		// TODO Search by parent logic not developed yet
+		searchBirth.setText("");
+		searchDeath.setText("");
+		searchName.setText("");
+		searchId.setText("");
+
+		if ((searchFather.getText().equals("")) && (searchMother.getText().equals(""))) {
+			final Shell[] shells = e.widget.getDisplay().getShells();
+			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
+			messageBox.setText("Advarsel");
+			messageBox.setMessage("Indtast venligst fader og/eller moder");
+			messageBox.open();
+			searchFather.setFocus();
+			return;
+		}
+
+		try {
+			populateSiblingsTable(searchFather.getText(), searchMother.getText());
+			siblingsTable.forceFocus();
+			setMessage("Klar");
+		} catch (final Exception e2) {
+			setMessage(e2.getMessage());
+			e2.printStackTrace();
 		}
 
 	}

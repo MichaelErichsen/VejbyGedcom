@@ -18,6 +18,18 @@ public class ProbateRecord extends ASModel {
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
 
+	/**
+	 * @param dbPath
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @return
+	 */
+	public static ProbateRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate) {
+		System.out.println("Not yet implemented");
+		return null;
+	}
+
 	public static ProbateRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
 			String probateSource) throws SQLException {
 		ProbateRecord probateRecord;
@@ -52,7 +64,7 @@ public class ProbateRecord extends ASModel {
 
 		statement.close();
 
-		ProbateRecord[] pra = new ProbateRecord[lp.size()];
+		final ProbateRecord[] pra = new ProbateRecord[lp.size()];
 
 		for (int i = 0; i < lp.size(); i++) {
 			pra[i] = lp.get(i);
@@ -159,7 +171,7 @@ public class ProbateRecord extends ASModel {
 
 	/**
 	 * return the object as a String Array
-	 * 
+	 *
 	 * @return
 	 */
 	@Override

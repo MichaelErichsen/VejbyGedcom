@@ -3,24 +3,24 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.SiblingsRecord;
+import net.myerichsen.gedcom.db.models.CensusRecord;
 
 /**
- * Filter for place column in siblings table (Singleton)
+ * Filter for age column in census table (Singleton)
  *
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 5. apr. 2023
  *
  */
-public class SiblingsParentsFilter extends ViewerFilter {
-	private static SiblingsParentsFilter filter = null;
+public class CensusAgeFilter extends ViewerFilter {
+	private static CensusAgeFilter filter = null;
 
 	/**
 	 * @return
 	 */
-	public static SiblingsParentsFilter getInstance() {
+	public static CensusAgeFilter getInstance() {
 		if (filter == null) {
-			filter = new SiblingsParentsFilter();
+			filter = new CensusAgeFilter();
 		}
 
 		return filter;
@@ -33,7 +33,7 @@ public class SiblingsParentsFilter extends ViewerFilter {
 	 * Constructor
 	 *
 	 */
-	private SiblingsParentsFilter() {
+	private CensusAgeFilter() {
 		super();
 	}
 
@@ -43,9 +43,10 @@ public class SiblingsParentsFilter extends ViewerFilter {
 			return true;
 		}
 
-		final SiblingsRecord cr = (SiblingsRecord) element;
+		final CensusRecord cr = (CensusRecord) element;
 
-		if (cr.getParents().toLowerCase().matches(searchString)) {
+		int diff = cr.getAlder() - Integer.parseInt(searchString);
+		if (Math.abs(diff) < 2) {
 			return true;
 		}
 
@@ -53,8 +54,7 @@ public class SiblingsParentsFilter extends ViewerFilter {
 	}
 
 	public void setSearchText(String s) {
-		this.searchString = ".*" + s.toLowerCase() + ".*";
-
+		this.searchString = s;
 	}
 
 }
