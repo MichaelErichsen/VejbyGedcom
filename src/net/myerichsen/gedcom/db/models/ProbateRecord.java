@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 7. apr. 2023
  *
  */
 public class ProbateRecord extends ASModel {
@@ -26,6 +26,7 @@ public class ProbateRecord extends ASModel {
 	 * @return
 	 */
 	public static ProbateRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate) {
+		// TODO Implement load probate from DB
 		System.out.println("Not yet implemented");
 		return null;
 	}
