@@ -5,17 +5,17 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.AbstractCitation;
@@ -29,27 +29,25 @@ import org.gedcom4j.model.Individual;
 import org.gedcom4j.model.IndividualEvent;
 import org.gedcom4j.model.IndividualReference;
 import org.gedcom4j.model.NoteStructure;
+import org.gedcom4j.model.PersonalName;
 import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 import net.myerichsen.gedcom.db.models.IndividualRecord;
-import net.myerichsen.gedcom.db.models.SiblingsRecord;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 5. apr. 2023
+ * @version 7. apr. 2023
  */
 public class DBLoader {
 	/**
 	 * Static constants and variables
 	 */
-	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
-
 	private static final String DELETE_EVENT = "DELETE FROM VEJBY.EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM VEJBY.INDIVIDUAL";
 	private static final String DELETE_FAMILY = "DELETE FROM VEJBY.FAMILY";
@@ -61,7 +59,7 @@ public class DBLoader {
 	private static final String INSERT_FAMILY_EVENT = "INSERT INTO VEJBY.EVENT (TYPE, SUBTYPE, DATE, FAMILY, PLACE, "
 			+ "NOTE, SOURCEDETAIL, INDIVIDUAL) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String INSERT_FAMILY = "INSERT INTO VEJBY.FAMILY (ID, HUSBAND, WIFE) VALUES (?, NULL, NULL)";
-	private static final String INSERT_PARENTS = "INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, "
+	private static final String INSERT_PARENTS = "INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHYEAR, NAME, "
 			+ "PARENTS, FATHERPHONETIC, MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_INDIVIDUAL_BDP = "UPDATE VEJBY.INDIVIDUAL SET BIRTHDATE = ?, "
@@ -70,8 +68,6 @@ public class DBLoader {
 	private static final String UPDATE_INDIVIDUAL_PARENTS = "UPDATE VEJBY.INDIVIDUAL SET PARENTS = ? WHERE ID = ?";
 	private static final String UPDATE_FAMILY_WIFE = "UPDATE VEJBY.FAMILY SET WIFE=? WHERE ID = ?";
 	private static final String UPDATE_FAMILY_HUSBAND = "UPDATE VEJBY.FAMILY SET HUSBAND = ? WHERE ID = ?";
-
-	private static PreparedStatement psSELECT_INDIVIDUAL;
 
 	private static PreparedStatement psINSERT_INDIVIDUAL_EVENT;
 	private static PreparedStatement psINSERT_INDIVIDUAL;
@@ -116,6 +112,10 @@ public class DBLoader {
 		}
 
 	}
+
+	private int birthYear;
+
+	private String sted;
 
 	/**
 	 * Delete all rows from all tables
@@ -590,85 +590,138 @@ public class DBLoader {
 	}
 
 	/**
-	 * SELECT * FROM VEJBY.INDIVIDUAL
-	 * <p>
+	 * Get parents from christening source citation
+	 *
+	 * @param value
+	 * @return
+	 */
+	private String getParentsFromSource(Individual value) {
+		try {
+			final IndividualEvent christening = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
+			birthYear = extractBirthYear(christening.getDate().getValue());
+			sted = christening.getPlace().getPlaceName().toString();
+			final CitationWithSource citation = (CitationWithSource) christening.getCitations().get(0);
+			return citation.getWhereInSource().toString();
+		} catch (final Exception e) {
+		}
+
+		return "";
+	}
+
+	/**
 	 * INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, PARENTS,
 	 * FATHERPHONETIC, MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)
-	 * 
+	 *
 	 * @throws SQLException
 	 *
 	 */
 	private void parseParents() throws SQLException {
-		final List<SiblingsRecord> lpr = new ArrayList<>();
-		SiblingsRecord pr;
-		String parents;
-		final Fonkod fk = new Fonkod();
+		StringBuilder sb;
+		String parents = "";
+		IndividualEvent christening;
 
-		final ResultSet rs = psSELECT_INDIVIDUAL.executeQuery();
+		// For each individual
+		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
-		while (rs.next()) {
-			pr = new SiblingsRecord();
-			pr.setIndividualKey(rs.getString("ID"));
-			pr.setBirthDate(rs.getDate("BIRTHDATE"));
-			pr.setName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
+		for (final Entry<String, Individual> individualMapEntry : individuals.entrySet()) {
+			birthYear = 0;
+			sted = "";
+			parents = "";
 
-			parents = rs.getString("PARENTS");
-			pr.setParents(parents);
+			final Individual individual = individualMapEntry.getValue();
 
-//			if (parents.length() == 0) {
-//
-//			}
+			sb = new StringBuilder();
 
-			final String[] sa = splitParents(parents);
+			// Get all families where the individual is a child
+			try {
+				final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild(false);
+
+				for (final FamilyChild familyWhereChild : familiesWhereChild) {
+					final Family family = familyWhereChild.getFamily();
+
+					// Get the father
+					boolean husb = false;
+
+					try {
+						sb.append(family.getHusband().getIndividual().getNames().get(0));
+						husb = true;
+					} catch (final Exception e) {
+					}
+
+					// Get the mother
+					try {
+						final PersonalName w = family.getWife().getIndividual().getNames().get(0);
+
+						if (husb) {
+							sb.append(" og ");
+						}
+
+						sb.append(w);
+					} catch (final Exception e) {
+					}
+				}
+			} catch (final Exception e) {
+			}
+
+			if (sb.length() > 0) {
+				parents = sb.toString().replace("/", "");
+
+				try {
+					christening = individual.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
+					birthYear = extractBirthYear(christening.getDate().getValue());
+					sted = christening.getPlace().getPlaceName().toString();
+				} catch (final Exception e) {
+				}
+			} else {
+				parents = getParentsFromSource(individual);
+			}
+
+			final String[] splitParents = splitParents(parents);
+			String a = "";
+			String b = "";
+
+			psINSERT_PARENTS.setString(1, individualMapEntry.getKey().replace("@I", "").replace("@", ""));
+			psINSERT_PARENTS.setInt(2, birthYear);
+			psINSERT_PARENTS.setString(3, individual.getFormattedName().replace("/", ""));
+			psINSERT_PARENTS.setString(4, parents.replace("  ", " "));
 
 			try {
-				pr.setFatherPhonetic(fk.generateKey(sa[0]));
+				a = fonkod.generateKey(splitParents[0]);
+				a = (a.length() > 64 ? a.substring(0, 63) : a);
 			} catch (final Exception e) {
-				continue;
 			}
+
+			psINSERT_PARENTS.setString(5, a);
+
 			try {
-				pr.setMotherPhonetic(fk.generateKey(sa[1]));
+				b = fonkod.generateKey(splitParents[1]);
+				b = (b.length() > 64 ? b.substring(0, 63) : b);
 			} catch (final Exception e) {
-				continue;
-			}
-			pr.setPlace(rs.getString("BIRTHPLACE"));
-
-			lpr.add(pr);
-		}
-
-		logger.info("Parent records: " + lpr.size());
-
-		parentsCounter = 0;
-		String fatherPhonetic;
-		String motherPhonetic;
-
-		for (final SiblingsRecord pr2 : lpr) {
-			psINSERT_PARENTS.setString(1, pr2.getIndividualKey());
-			psINSERT_PARENTS.setDate(2, pr2.getBirthDate());
-			psINSERT_PARENTS.setString(3, pr2.getName());
-			psINSERT_PARENTS.setString(4, pr2.getParents());
-			fatherPhonetic = pr2.getFatherPhonetic();
-
-			if (fatherPhonetic.length() > 64) {
-				fatherPhonetic = fatherPhonetic.substring(0, 63);
 			}
 
-			psINSERT_PARENTS.setString(5, fatherPhonetic);
-			motherPhonetic = pr2.getMotherPhonetic();
-
-			if (motherPhonetic.length() > 64) {
-				motherPhonetic = motherPhonetic.substring(0, 63);
-			}
-
-			psINSERT_PARENTS.setString(6, motherPhonetic);
-			psINSERT_PARENTS.setString(7, pr2.getPlace());
+			psINSERT_PARENTS.setString(6, b);
+			psINSERT_PARENTS.setString(7, sted);
 			psINSERT_PARENTS.executeUpdate();
 			parentsCounter++;
-
-			if ((parentsCounter % 100) == 0) {
-				logger.info("Parent records inserted: " + parentsCounter);
-			}
 		}
+	}
+
+	/**
+	 * Extract birthYear from date string
+	 *
+	 * @param dateString
+	 * @return
+	 */
+	private int extractBirthYear(String dateString) {
+		String year = dateString;
+		Pattern pattern = Pattern.compile("\\d{4}");
+		Matcher m = pattern.matcher(dateString);
+
+		if (m.find()) {
+			year = m.group(0);
+		}
+
+		return Integer.parseInt(year);
 
 	}
 
@@ -687,7 +740,6 @@ public class DBLoader {
 		psINSERT_FAMILY_EVENT = conn.prepareStatement(INSERT_FAMILY_EVENT);
 		psINSERT_FAMILY = conn.prepareStatement(INSERT_FAMILY);
 		psINSERT_PARENTS = conn.prepareStatement(INSERT_PARENTS);
-		psSELECT_INDIVIDUAL = conn.prepareStatement(SELECT_INDIVIDUAL);
 	}
 
 	/**
@@ -817,7 +869,7 @@ public class DBLoader {
 				parents = (father + mother).trim();
 			}
 
-			logger.info("Parents: " + parents);
+			logger.fine("Parents: " + parents);
 			psUPDATE_INDIVIDUAL_FAMC.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
 			psUPDATE_INDIVIDUAL_FAMC.setString(2, parents);
 			psUPDATE_INDIVIDUAL_FAMC.setString(3, individual.getXref());
@@ -855,13 +907,13 @@ public class DBLoader {
 				StringWithCustomFacts whereInSource = citation.getWhereInSource();
 				String parents = whereInSource.toString();
 				parents = (parents.length() > 256 ? parents.substring(0, 255) : parents);
-				logger.info("Parents: " + parents);
+				logger.fine("Parents: " + parents);
 
 				psUPDATE_INDIVIDUAL_PARENTS.setString(1, parents);
 				psUPDATE_INDIVIDUAL_PARENTS.setString(2, individual.getXref());
 				psUPDATE_INDIVIDUAL_PARENTS.execute();
 			} catch (final Exception e) {
-				logger.info(e.getMessage());
+				logger.fine(e.getMessage());
 			}
 		}
 	}

@@ -90,25 +90,30 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 6. apr. 2023
+ * @version 7. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
 	// TODO Make database schemas configurable
 	// FIXME Find why FLOOR column missing in Polreg
-	// FIXME Parents ID search not using parents names
+	// FIXME Parents search not finished
 	// TODO Find all relocations to and from an individual
-	// FIXME Census table double H SCROLL
-
-	/**
-	 * Static constants used to initalize properties file
-	 */
-
-	// TODO C:\Users\michael\Downloads\data-20230129T125804Z-001\data
+	// FIXME Census table has double Horizonal SCROLLbar
+	// TODO Doubleclick om sibling row inserts id and name in search bar
+	// TODO Move settings to wizard
+	// TODO properties for C:\Users\michael\Downloads\data-20230129T125804Z-001\data
 	// hack4dk_burial_person_complete.csv
 	// hack4dk_police_address.csv
 	// hack4dk_police_person.csv
 	// hack4dk_police_position.csv
+	// TODO Move tab components to separate classes
+	// TODO Add individual tab
+	// TODO Add ancestors tree tab
+	// TODO Add descendants tree tab
+
+	/**
+	 * Static constants used to initalize properties file
+	 */
 
 	private static final String CPHDB_SCHEMA = "CPH";
 	private static final String CPHDB_PATH = "c:/Users/michael/CPHDB";
@@ -1218,7 +1223,22 @@ public class ArchiveSearcher extends Shell {
 		final Menu menu_1 = new Menu(mntmFiler);
 		mntmFiler.setMenu(menu_1);
 
-		final MenuItem mntmL = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmAfslut = new MenuItem(menu_1, SWT.NONE);
+		mntmAfslut.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				e.display.dispose();
+			}
+		});
+		mntmAfslut.setText("Afslut");
+
+		MenuItem mntmIndlsning = new MenuItem(menu, SWT.CASCADE);
+		mntmIndlsning.setText("Indl\u00E6sning");
+
+		Menu menu_2 = new Menu(mntmIndlsning);
+		mntmIndlsning.setMenu(menu_2);
+
+		final MenuItem mntmL = new MenuItem(menu_2, SWT.NONE);
 		mntmL.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -1228,7 +1248,7 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmL.setText("Indl\u00E6s GEDCOM i databasen");
 
-		final MenuItem mntmIndlsKipFiler = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmIndlsKipFiler = new MenuItem(menu_2, SWT.NONE);
 		mntmIndlsKipFiler.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -1237,7 +1257,7 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmIndlsKipFiler.setText("Indl\u00E6s KIP filer i databasen");
 
-		final MenuItem mntmIndlsPolitietsRegisterblade = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmIndlsPolitietsRegisterblade = new MenuItem(menu_2, SWT.NONE);
 		mntmIndlsPolitietsRegisterblade.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -1246,7 +1266,7 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmIndlsPolitietsRegisterblade.setText("Indl\u00E6s Politiets Registerblade");
 
-		final MenuItem mntmIndlsBegravelsregisteret = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmIndlsBegravelsregisteret = new MenuItem(menu_2, SWT.NONE);
 		mntmIndlsBegravelsregisteret.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -1255,14 +1275,23 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s begravelsesregisteret");
 
-		final MenuItem mntmAfslut = new MenuItem(menu_1, SWT.NONE);
-		mntmAfslut.addSelectionListener(new SelectionAdapter() {
+		new MenuItem(menu, SWT.SEPARATOR);
+
+		MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
+		mntmNewSubmenu.setText("Hj\u00E6lp");
+
+		Menu menu_3 = new Menu(mntmNewSubmenu);
+		mntmNewSubmenu.setMenu(menu_3);
+
+		MenuItem mntmOm = new MenuItem(menu_3, SWT.NONE);
+		mntmOm.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				e.display.dispose();
+				HelpDialog helpDialog = new HelpDialog(shell);
+				helpDialog.open();
 			}
 		});
-		mntmAfslut.setText("Afslut");
+		mntmOm.setText("Om...");
 	}
 
 	/**
@@ -1913,12 +1942,6 @@ public class ArchiveSearcher extends Shell {
 		lblNewLabel_1.setText("Navn");
 
 		searchName = new Text(searchComposite, SWT.BORDER);
-		searchName.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				searchByName(e);
-			}
-		});
 		searchName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblAltFdt = new Label(searchComposite, SWT.NONE);
@@ -1944,12 +1967,6 @@ public class ArchiveSearcher extends Shell {
 		lblModer.setText("Moder");
 
 		searchMother = new Text(searchComposite, SWT.BORDER);
-		searchMother.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				searchByParents(e);
-			}
-		});
 		searchMother.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Button btnSearchName = new Button(searchComposite, SWT.NONE);
@@ -2399,7 +2416,7 @@ public class ArchiveSearcher extends Shell {
 			@Override
 			public String getText(Object element) {
 				final SiblingsRecord pr = (SiblingsRecord) element;
-				return pr.getBirthDate().toString();
+				return pr.getBirthYear() + "";
 			}
 		});
 
@@ -2769,8 +2786,8 @@ public class ArchiveSearcher extends Shell {
 		if (!btnSiblings.getSelection()) {
 			return;
 		}
-
-		final SiblingsRecord[] lpr = SiblingsRecord.loadFromDatabase(props.getProperty("vejbyPath"), parents);
+		String[] sa = new String[] { props.getProperty("vejbyPath"), parents };
+		final SiblingsRecord[] lpr = SiblingsRecord.loadFromDatabase(sa);
 		siblingsTableViewer.setInput(lpr);
 
 		new Thread(() -> {
@@ -2806,14 +2823,12 @@ public class ArchiveSearcher extends Shell {
 
 		new Thread(() -> {
 			if (siblingListener != null) {
-				final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), fathersName, mothersName };
-				SiblingsRecord[] SiblingRecords;
 				try {
-					SiblingRecords = (SiblingsRecord[]) siblingListener.loadFromDatabase(loadArgs);
+					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), fathersName, mothersName };
+					SiblingsRecord[] SiblingRecords = (SiblingsRecord[]) siblingListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
 				} catch (final Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -2942,7 +2957,10 @@ public class ArchiveSearcher extends Shell {
 			populateProbateTable(phonName, birthDate, deathDate);
 			populatePolregTable(phonName, birthDate, deathDate);
 			populateBurregTable(phonName, birthDate, deathDate);
-			populateSiblingsTable(individual.getParents());
+			if ((individual.getParents() != null) && (individual.getParents().length() > 0)) {
+				populateSiblingsTable(individual.getParents());
+			}
+
 		} catch (final SQLException e1) {
 			messageField.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -2998,7 +3016,9 @@ public class ArchiveSearcher extends Shell {
 			populateProbateTable(phonName, birthDate, deathDate);
 			populatePolregTable(phonName, birthDate, deathDate);
 			populateBurregTable(phonName, birthDate, deathDate);
-			populateSiblingsTable(searchFather.getText(), searchMother.getText());
+			if ((searchFather.getText().length() > 0) || (searchMother.getText().length() > 0)) {
+				populateSiblingsTable(searchFather.getText(), searchMother.getText());
+			}
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
@@ -3010,7 +3030,6 @@ public class ArchiveSearcher extends Shell {
 	 * Search by parents
 	 */
 	protected void searchByParents(TypedEvent e) {
-		// TODO Search by parent logic not developed yet
 		searchBirth.setText("");
 		searchDeath.setText("");
 		searchName.setText("");
@@ -3093,5 +3112,4 @@ public class ArchiveSearcher extends Shell {
 			e2.printStackTrace();
 		}
 	}
-
 }

@@ -1,8 +1,9 @@
 package net.myerichsen.gedcom.db.models;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,35 +11,36 @@ import java.util.List;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
- * Class representing siblings
+ * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 5. apr. 2023
+ * @version 7. apr. 2023
  *
  */
 public class SiblingsRecord extends ASModel {
+	private static String SELECT = "SELECT * FROM VEJBY.PARENTS WHERE FATHERPHONETIC = ? " + "AND MOTHERPHONETIC = ?";
 
 	/**
-	 * @param dpp
-	 * @param fatherPhonetic
-	 * @param motherPhonetic
+	 * Get a list of objects from the database
+	 * 
+	 * @param sa
 	 * @return
+	 * @throws SQLException
 	 */
-	private static boolean comparePhoneticParentPairs(String[] dpp, String fatherPhonetic, String motherPhonetic) {
-		if (dpp.length > 1) {
-			if ((dpp[0].equals(fatherPhonetic)) && (dpp[1].equals(motherPhonetic))) {
-				return true;
-			}
-			return false;
+	public static SiblingsRecord[] loadFromDatabase(String[] args) throws SQLException {
+		switch (args.length) {
+		case 2: {
+			return loadFromDatabase(args[0], args[1]);
 		}
-
-		if (dpp.length == 1) {
-			if ((dpp[0].equals(fatherPhonetic)) || (dpp[0].equals(motherPhonetic))) {
-				return true;
-			}
+		case 3: {
+			return loadFromDatabase(args[0], args[1], args[2]);
 		}
-
-		return false;
+		case 4: {
+			return loadFromDatabase(args[0], args[1], args[2], args[3]);
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");
+		}
 	}
 
 	/**
@@ -49,7 +51,7 @@ public class SiblingsRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SiblingsRecord[] loadFromDatabase(String dbPath, String parents) throws SQLException {
+	private static SiblingsRecord[] loadFromDatabase(String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
 			return new SiblingsRecord[0];
 		}
@@ -68,11 +70,10 @@ public class SiblingsRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SiblingsRecord[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
+	private static SiblingsRecord[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
 			throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
-		String[] dpp;
 		SiblingsRecord pr;
 		final List<SiblingsRecord> lpr = new ArrayList<>();
 
@@ -88,34 +89,19 @@ public class SiblingsRecord extends ASModel {
 			return new SiblingsRecord[0];
 		}
 
-		final List<IndividualRecord> ldbi = IndividualRecord.loadFromDB(conn);
+		PreparedStatement statement = conn.prepareStatement(SELECT);
+		statement.setString(1, fatherPhonetic);
+		statement.setString(2, motherPhonetic);
+		ResultSet rs = statement.executeQuery();
 
-		for (final IndividualRecord dbi : ldbi) {
-			dpp = splitParents(dbi.getParents());
-
-			for (int i = 0; i < dpp.length; i++) {
-				try {
-					dpp[i] = fk.generateKey(dpp[i]);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (!comparePhoneticParentPairs(dpp, fatherPhonetic, motherPhonetic)) {
-				continue;
-			}
-
+		while (rs.next()) {
 			pr = new SiblingsRecord();
-
-			pr.setIndividualKey(dbi.getId());
-			pr.setName(dbi.getName());
-			pr.setLocation((dbi.getBirthPlace().equals("NULL") ? "" : dbi.getBirthPlace()));
-			pr.setParents(dbi.getParents());
-			pr.setBirthDate(dbi.getBirthDate());
-
-			if (dbi.getParents().length() > 0) {
-				lpr.add(pr);
-			}
+			pr.setIndividualKey(rs.getString("INDIVIDUALKEY"));
+			pr.setName(rs.getString("NAME"));
+			pr.setLocation(rs.getString("PLACE"));
+			pr.setParents(rs.getString("PARENTS"));
+			pr.setBirthDate(rs.getInt("BIRTHYEAR"));
+			lpr.add(pr);
 		}
 
 		final SiblingsRecord[] sra = new SiblingsRecord[lpr.size()];
@@ -134,7 +120,7 @@ public class SiblingsRecord extends ASModel {
 	 * @param deathDate
 	 * @return
 	 */
-	public static SiblingsRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate2,
+	private static SiblingsRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate2,
 			String deathDate) {
 		System.out.println("Not yet implemented");
 		return null;
@@ -170,7 +156,7 @@ public class SiblingsRecord extends ASModel {
 	}
 
 	private String individualKey = "";
-	private Date birthDate;
+	private int birthYear;
 	private String name = "";
 	private String parents = "";
 	private String fatherPhonetic = "";
@@ -181,8 +167,8 @@ public class SiblingsRecord extends ASModel {
 	/**
 	 * @return the birthDate
 	 */
-	public Date getBirthDate() {
-		return birthDate;
+	public int getBirthYear() {
+		return birthYear;
 	}
 
 	/**
@@ -237,8 +223,8 @@ public class SiblingsRecord extends ASModel {
 	/**
 	 * @param year the birth date to set
 	 */
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
+	public void setBirthDate(int j) {
+		this.birthYear = j;
 	}
 
 	/**
@@ -292,8 +278,7 @@ public class SiblingsRecord extends ASModel {
 
 	@Override
 	public String toString() {
-		return "SiblingsRecord [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "")
-				+ (birthDate != null ? "birthDate=" + birthDate + ", " : "")
+		return "SiblingsRecord [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "") + birthYear
 				+ (name != null ? "name=" + name + ", " : "") + (parents != null ? "parents=" + parents + ", " : "")
 				+ (fatherPhonetic != null ? "fatherPhonetic=" + fatherPhonetic + ", " : "")
 				+ (motherPhonetic != null ? "motherPhonetic=" + motherPhonetic + ", " : "")
@@ -305,7 +290,7 @@ public class SiblingsRecord extends ASModel {
 		final String[] sa = new String[5];
 
 		sa[0] = individualKey;
-		sa[1] = (birthDate != null ? birthDate.toString() : "");
+		sa[1] = birthYear + "";
 		sa[2] = name;
 		sa[3] = parents;
 		sa[4] = place;
