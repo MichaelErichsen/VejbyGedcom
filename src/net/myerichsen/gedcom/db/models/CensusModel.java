@@ -21,7 +21,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 3. apr. 2023
  *
  */
-public class CensusRecord extends ASModel {
+public class CensusModel extends ASModel {
 	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
@@ -43,10 +43,10 @@ public class CensusRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CensusRecord[] loadFromDatabase(String dbPath, String phonName, String birthYear, String deathYear)
+	public static CensusModel[] loadFromDatabase(String dbPath, String phonName, String birthYear, String deathYear)
 			throws SQLException {
-		CensusRecord ci;
-		final List<CensusRecord> cil = new ArrayList<>();
+		CensusModel ci;
+		final List<CensusModel> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS);
@@ -56,7 +56,7 @@ public class CensusRecord extends ASModel {
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			ci = new CensusRecord();
+			ci = new CensusModel();
 			ci.setKIPnr(rs.getString("kipNr"));
 			ci.setLoebenr(rs.getInt("Loebenr"));
 			ci.setKildestednavn(rs.getString("Kildestednavn"));
@@ -84,7 +84,7 @@ public class CensusRecord extends ASModel {
 			cil.add(ci);
 		}
 
-		CensusRecord[] cra = new CensusRecord[cil.size()];
+		CensusModel[] cra = new CensusModel[cil.size()];
 
 		for (int i = 0; i < cra.length; i++) {
 			cra[i] = cil.get(i);

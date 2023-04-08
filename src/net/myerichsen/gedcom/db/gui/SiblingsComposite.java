@@ -33,13 +33,13 @@ import org.eclipse.swt.widgets.Text;
 import net.myerichsen.gedcom.db.comparators.SiblingComparator;
 import net.myerichsen.gedcom.db.filters.SiblingsParentsFilter;
 import net.myerichsen.gedcom.db.filters.SiblingsPlaceFilter;
-import net.myerichsen.gedcom.db.models.SiblingsRecord;
+import net.myerichsen.gedcom.db.models.SiblingsModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class SiblingsComposite extends Composite {
@@ -132,7 +132,7 @@ public class SiblingsComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsRecord pr = (SiblingsRecord) element;
+				final SiblingsModel pr = (SiblingsModel) element;
 				return pr.getIndividualKey();
 			}
 		});
@@ -145,7 +145,7 @@ public class SiblingsComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsRecord pr = (SiblingsRecord) element;
+				final SiblingsModel pr = (SiblingsModel) element;
 				return pr.getBirthYear() + "";
 			}
 		});
@@ -158,7 +158,7 @@ public class SiblingsComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsRecord pr = (SiblingsRecord) element;
+				final SiblingsModel pr = (SiblingsModel) element;
 				return pr.getName();
 			}
 		});
@@ -171,7 +171,7 @@ public class SiblingsComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsRecord pr = (SiblingsRecord) element;
+				final SiblingsModel pr = (SiblingsModel) element;
 				return pr.getParents();
 			}
 		});
@@ -184,7 +184,7 @@ public class SiblingsComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsRecord pr = (SiblingsRecord) element;
+				final SiblingsModel pr = (SiblingsModel) element;
 				return pr.getPlace();
 			}
 		});
@@ -214,18 +214,13 @@ public class SiblingsComposite extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String parents) throws SQLException {
-		String[] sa = new String[] { props.getProperty("vejbyPath"), parents };
-		final SiblingsRecord[] lpr = SiblingsRecord.loadFromDatabase(sa);
-		siblingsTableViewer.setInput(lpr);
-
 		new Thread(() -> {
 			if (siblingsListener != null) {
-				final String[] loadArgs = new String[] { parents };
-				SiblingsRecord[] SiblingRecords;
 				try {
-					SiblingRecords = (SiblingsRecord[]) siblingsListener.loadFromDatabase(loadArgs);
+					String[] loadArgs = new String[] { props.getProperty("vejbyPath"), parents };
+					SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener.loadFromDatabase(loadArgs);
 
-					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
+					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(siblingRecords));
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -249,7 +244,7 @@ public class SiblingsComposite extends Composite {
 			if (siblingsListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), fathersName, mothersName };
-					SiblingsRecord[] SiblingRecords = (SiblingsRecord[]) siblingsListener.loadFromDatabase(loadArgs);
+					SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
 				} catch (final Exception e) {

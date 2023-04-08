@@ -7,7 +7,6 @@ import java.util.Properties;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -41,13 +40,13 @@ import net.myerichsen.gedcom.db.filters.CensusParishFilter;
 import net.myerichsen.gedcom.db.filters.CensusSexFilter;
 import net.myerichsen.gedcom.db.filters.CensusYearFilter;
 import net.myerichsen.gedcom.db.models.CensusHousehold;
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.CensusModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.CensusPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class CensusComposite extends Composite {
@@ -62,7 +61,7 @@ public class CensusComposite extends Composite {
 	private Text txtCensusBirthPlace;
 	private Table censusTable;
 	private ASPopulator censusListener;
-	private List<CensusRecord> household;
+	private List<CensusModel> household;
 	private Properties props;
 
 	/**
@@ -91,7 +90,6 @@ public class CensusComposite extends Composite {
 
 		txtCensusCounty = new Text(censusFilterComposite, SWT.BORDER);
 		txtCensusCounty.addKeyListener(new KeyAdapter() {
-			private StructuredViewer censusTableViewer;
 
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -217,7 +215,7 @@ public class CensusComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return Integer.toString(cr.getFTaar());
 			}
 		});
@@ -229,7 +227,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getAmt();
 			}
 		});
@@ -241,7 +239,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getHerred();
 			}
 		});
@@ -253,7 +251,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_3.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getSogn();
 			}
 		});
@@ -265,7 +263,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_4.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildestednavn();
 			}
 		});
@@ -277,7 +275,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_5.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getHusstands_familienr();
 			}
 		});
@@ -289,7 +287,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getMatr_nr_Adresse();
 			}
 		});
@@ -301,7 +299,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_7.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildenavn();
 			}
 		});
@@ -313,7 +311,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_8.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKoen();
 			}
 		});
@@ -325,7 +323,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_9.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return Integer.toString(cr.getAlder());
 			}
 		});
@@ -337,7 +335,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_10.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getCivilstand();
 			}
 		});
@@ -349,7 +347,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_11.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildeerhverv();
 			}
 		});
@@ -361,7 +359,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_12.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getStilling_i_husstanden();
 			}
 		});
@@ -373,7 +371,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_13.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildefoedested();
 			}
 		});
@@ -385,7 +383,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_14.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getFoedt_kildedato();
 			}
 		});
@@ -397,7 +395,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_15.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return Integer.toString(cr.getFoedeaar());
 			}
 		});
@@ -409,7 +407,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_16.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getAdresse();
 			}
 		});
@@ -421,7 +419,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_17.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getMatrikel();
 			}
 		});
@@ -433,7 +431,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_18.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getGade_nr();
 			}
 		});
@@ -445,7 +443,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_19.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildehenvisning();
 			}
 		});
@@ -457,7 +455,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_20.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildekommentar();
 			}
 		});
@@ -469,7 +467,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_21.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKIPnr();
 			}
 		});
@@ -481,7 +479,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_22.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return Integer.toString(cr.getLoebenr());
 			}
 		});
@@ -493,7 +491,7 @@ public class CensusComposite extends Composite {
 		censusTableVieverColumn_23.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusRecord cr = (CensusRecord) element;
+				final CensusModel cr = (CensusModel) element;
 				return cr.getKildedetaljer();
 			}
 		});
@@ -545,11 +543,11 @@ public class CensusComposite extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusRecord> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
+				final List<CensusModel> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
 						ti.getText(21), ti.getText(5));
 				final StringBuffer sb2 = new StringBuffer();
 
-				for (final CensusRecord element : lcr) {
+				for (final CensusModel element : lcr) {
 					sb2.append(element.toString() + "\n");
 				}
 
@@ -577,7 +575,7 @@ public class CensusComposite extends Composite {
 
 		household = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"), kipNr, nr);
 
-		for (final CensusRecord hhr : household) {
+		for (final CensusModel hhr : household) {
 			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
 					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + "\n");
 		}
@@ -604,7 +602,7 @@ public class CensusComposite extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), phonName,
 							birthDate.substring(0, 4), deathDate.substring(0, 4) };
-					final CensusRecord[] CensusRecords = (CensusRecord[]) censusListener.loadFromDatabase(loadArgs);
+					final CensusModel[] CensusRecords = (CensusModel[]) censusListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> censusTableViewer.setInput(CensusRecords));
 				} catch (final Exception e) {

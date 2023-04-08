@@ -11,12 +11,12 @@ import java.util.List;
 
 /**
  * Class representing a police registry event
- * 
+ *
  * @author Michael Erichsen
  * @version 31. mar. 2023
  *
  */
-public class PolregRecord extends ASModel {
+public class PolregModel extends ASModel {
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = ?";
 	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = ?";
 	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = ?";
@@ -31,7 +31,7 @@ public class PolregRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static PolregRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+	public static PolregModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
 		final Date bd = (birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate));
 		int calcYear = 0;
@@ -47,11 +47,11 @@ public class PolregRecord extends ASModel {
 		int year = 0;
 		String rsbd;
 
-		PolregRecord pr;
-		final List<PolregRecord> lpr = new ArrayList<>();
+		PolregModel pr;
+		final List<PolregModel> lpr = new ArrayList<>();
 
 		while (rs.next()) {
-			pr = new PolregRecord();
+			pr = new PolregModel();
 			pr.setId(rs.getInt("ID"));
 			pr.setName(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
 
@@ -89,7 +89,7 @@ public class PolregRecord extends ASModel {
 
 		statement = conn.prepareStatement(SELECT_POLICE_POSITION);
 
-		for (final PolregRecord pr2 : lpr) {
+		for (final PolregModel pr2 : lpr) {
 			statement.setInt(1, pr2.getId());
 			rs2 = statement.executeQuery();
 
@@ -100,7 +100,7 @@ public class PolregRecord extends ASModel {
 
 		statement = conn.prepareStatement(SELECT_POLICE_ADDRESS);
 
-		for (final PolregRecord pr3 : lpr) {
+		for (final PolregModel pr3 : lpr) {
 			statement.setInt(1, pr3.getId());
 			rs3 = statement.executeQuery();
 
@@ -136,7 +136,7 @@ public class PolregRecord extends ASModel {
 
 		statement.close();
 
-		PolregRecord[] pra = new PolregRecord[lpr.size()];
+		PolregModel[] pra = new PolregModel[lpr.size()];
 
 		for (int i = 0; i < lpr.size(); i++) {
 			pra[i] = lpr.get(i);
@@ -164,7 +164,7 @@ public class PolregRecord extends ASModel {
 	 * Constructor
 	 *
 	 */
-	public PolregRecord() {
+	public PolregModel() {
 	}
 
 	/**

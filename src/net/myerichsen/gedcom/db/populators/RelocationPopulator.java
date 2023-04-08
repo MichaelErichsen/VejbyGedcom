@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db.populators;
 
 import java.sql.SQLException;
 
-import net.myerichsen.gedcom.db.models.RelocationRecord;
+import net.myerichsen.gedcom.db.models.RelocationModel;
 
 /**
  * @author Michael Erichsen
@@ -12,9 +12,9 @@ import net.myerichsen.gedcom.db.models.RelocationRecord;
 public class RelocationPopulator implements ASPopulator {
 
 	@Override
-	public RelocationRecord[] loadFromDatabase(String[] args) {
+	public RelocationModel[] loadFromDatabase(String[] args) {
 		try {
-			final RelocationRecord[] relocationRecords = RelocationRecord.loadFromDatabase(args[0], args[1], args[2],
+			final RelocationModel[] relocationRecords = RelocationModel.loadFromDatabase(args[0], args[1], args[2],
 					args[3]);
 			return relocationRecords;
 		} catch (SQLException e) {

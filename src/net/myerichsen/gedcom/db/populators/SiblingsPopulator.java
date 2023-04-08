@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db.populators;
 
 import java.sql.SQLException;
 
-import net.myerichsen.gedcom.db.models.SiblingsRecord;
+import net.myerichsen.gedcom.db.models.SiblingsModel;
 
 /**
  * @author Michael Erichsen
@@ -12,7 +12,7 @@ import net.myerichsen.gedcom.db.models.SiblingsRecord;
 public class SiblingsPopulator implements ASPopulator {
 
 	@Override
-	public SiblingsRecord[] loadFromDatabase(String[] args) throws SQLException {
-		return SiblingsRecord.loadFromDatabase(args);
+	public SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
+		return SiblingsModel.loadFromDatabase(args);
 	}
 }

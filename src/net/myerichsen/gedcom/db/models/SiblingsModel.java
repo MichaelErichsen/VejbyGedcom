@@ -17,17 +17,17 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 7. apr. 2023
  *
  */
-public class SiblingsRecord extends ASModel {
+public class SiblingsModel extends ASModel {
 	private static String SELECT = "SELECT * FROM VEJBY.PARENTS WHERE FATHERPHONETIC = ? " + "AND MOTHERPHONETIC = ?";
 
 	/**
 	 * Get a list of objects from the database
-	 * 
+	 *
 	 * @param sa
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SiblingsRecord[] loadFromDatabase(String[] args) throws SQLException {
+	public static SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
 		switch (args.length) {
 		case 2: {
 			return loadFromDatabase(args[0], args[1]);
@@ -51,14 +51,20 @@ public class SiblingsRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsRecord[] loadFromDatabase(String dbPath, String parents) throws SQLException {
+	private static SiblingsModel[] loadFromDatabase(String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
-			return new SiblingsRecord[0];
+			return new SiblingsModel[0];
 		}
 
 		final String[] p = splitParents(parents);
 
-		return loadFromDatabase(dbPath, p[0], p[1]);
+		if (p.length > 1) {
+
+			return loadFromDatabase(dbPath, p[0], p[1]);
+		} else {
+			return loadFromDatabase(dbPath, p[0], "");
+		}
+
 	}
 
 	/**
@@ -70,12 +76,12 @@ public class SiblingsRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsRecord[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
+	private static SiblingsModel[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
 			throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
-		SiblingsRecord pr;
-		final List<SiblingsRecord> lpr = new ArrayList<>();
+		SiblingsModel pr;
+		final List<SiblingsModel> lpr = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 
@@ -86,7 +92,7 @@ public class SiblingsRecord extends ASModel {
 			motherPhonetic = fk.generateKey(mothersName);
 		} catch (final Exception e) {
 			System.out.println("Invalid parents: " + fathersName + "," + mothersName);
-			return new SiblingsRecord[0];
+			return new SiblingsModel[0];
 		}
 
 		PreparedStatement statement = conn.prepareStatement(SELECT);
@@ -95,7 +101,7 @@ public class SiblingsRecord extends ASModel {
 		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			pr = new SiblingsRecord();
+			pr = new SiblingsModel();
 			pr.setIndividualKey(rs.getString("INDIVIDUALKEY"));
 			pr.setName(rs.getString("NAME"));
 			pr.setLocation(rs.getString("PLACE"));
@@ -104,7 +110,7 @@ public class SiblingsRecord extends ASModel {
 			lpr.add(pr);
 		}
 
-		final SiblingsRecord[] sra = new SiblingsRecord[lpr.size()];
+		final SiblingsModel[] sra = new SiblingsModel[lpr.size()];
 
 		for (int i = 0; i < lpr.size(); i++) {
 			sra[i] = lpr.get(i);
@@ -120,7 +126,7 @@ public class SiblingsRecord extends ASModel {
 	 * @param deathDate
 	 * @return
 	 */
-	private static SiblingsRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate2,
+	private static SiblingsModel[] loadFromDatabase(String dbPath, String phonName, String birthDate2,
 			String deathDate) {
 		// TODO Load siblings from database
 		System.out.println("Not yet implemented");

@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.BurregRecord;
+import net.myerichsen.gedcom.db.models.BurregModel;
 
 /**
  * Filter for given name column in burreg table (Singleton)
@@ -43,7 +43,7 @@ public class BurregGivenFilter extends ViewerFilter {
 			return true;
 		}
 
-		final BurregRecord cr = (BurregRecord) element;
+		final BurregModel cr = (BurregModel) element;
 
 		if (cr.getFirstNames().toLowerCase().matches(searchString)) {
 			return true;

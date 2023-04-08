@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.CensusModel;
 import net.myerichsen.gedcom.db.models.KipTextEntry;
 
 /**
@@ -29,7 +29,7 @@ public class CensusDbLoader {
 	private static Logger logger;
 	private static Statement statement;
 	private static int counter = 0;
-	private static CensusRecord lastCi = null;
+	private static CensusModel lastCi = null;
 
 	/**
 	 * Constructor
@@ -170,7 +170,7 @@ public class CensusDbLoader {
 		statement.getConnection().commit();
 
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
-		CensusRecord ci;
+		CensusModel ci;
 		String[] fields;
 
 //		if (censusFileLines.size() > count) {
@@ -207,7 +207,7 @@ public class CensusDbLoader {
 		for (final String line : censusFileLines) {
 			fields = line.split(";");
 
-			ci = new CensusRecord();
+			ci = new CensusModel();
 
 			ci.setKIPnr(fields[kipNr]);
 			try {

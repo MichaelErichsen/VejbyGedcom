@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import net.myerichsen.gedcom.db.filters.ProbatePlaceFilter;
-import net.myerichsen.gedcom.db.models.ProbateRecord;
+import net.myerichsen.gedcom.db.models.ProbateModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.ProbatePopulator;
 
@@ -112,7 +112,7 @@ public class ProbateComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final ProbateRecord pr = (ProbateRecord) element;
+				final ProbateModel pr = (ProbateModel) element;
 				return pr.getName();
 			}
 		});
@@ -125,7 +125,7 @@ public class ProbateComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final ProbateRecord pr = (ProbateRecord) element;
+				final ProbateModel pr = (ProbateModel) element;
 				return pr.getFromDate();
 			}
 		});
@@ -138,7 +138,7 @@ public class ProbateComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final ProbateRecord pr = (ProbateRecord) element;
+				final ProbateModel pr = (ProbateModel) element;
 				return pr.getToDate();
 			}
 		});
@@ -151,7 +151,7 @@ public class ProbateComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final ProbateRecord pr = (ProbateRecord) element;
+				final ProbateModel pr = (ProbateModel) element;
 				return pr.getPlace();
 			}
 		});
@@ -164,7 +164,7 @@ public class ProbateComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final ProbateRecord pr = (ProbateRecord) element;
+				final ProbateModel pr = (ProbateModel) element;
 				return pr.getData();
 			}
 		});
@@ -177,7 +177,7 @@ public class ProbateComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final ProbateRecord pr = (ProbateRecord) element;
+				final ProbateModel pr = (ProbateModel) element;
 				return pr.getSource();
 			}
 		});
@@ -245,7 +245,7 @@ public class ProbateComposite extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("probatePath"), phonName, birthDate,
 							deathDate, props.getProperty("probateSource") };
-					final ProbateRecord[] probateRecords = (ProbateRecord[]) probateListener.loadFromDatabase(loadArgs);
+					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
 				} catch (final Exception e) {

@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db.populators;
 
 import java.sql.SQLException;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.CensusModel;
 
 /**
  * @author Michael Erichsen
@@ -12,9 +12,9 @@ import net.myerichsen.gedcom.db.models.CensusRecord;
 public class CensusPopulator implements ASPopulator {
 
 	@Override
-	public CensusRecord[] loadFromDatabase(String[] args) {
+	public CensusModel[] loadFromDatabase(String[] args) {
 		try {
-			final CensusRecord[] CensusRecords = CensusRecord.loadFromDatabase(args[0], args[1], args[2], args[3]);
+			final CensusModel[] CensusRecords = CensusModel.loadFromDatabase(args[0], args[1], args[2], args[3]);
 			return CensusRecords;
 		} catch (SQLException e) {
 			e.printStackTrace();

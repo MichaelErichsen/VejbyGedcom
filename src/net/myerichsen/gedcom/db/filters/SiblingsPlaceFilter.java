@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.SiblingsRecord;
+import net.myerichsen.gedcom.db.models.SiblingsModel;
 
 /**
  * Filter for place column in siblings table (Singleton)
@@ -43,7 +43,7 @@ public class SiblingsPlaceFilter extends ViewerFilter {
 			return true;
 		}
 
-		final SiblingsRecord cr = (SiblingsRecord) element;
+		final SiblingsModel cr = (SiblingsModel) element;
 
 		if (cr.getPlace().toLowerCase().matches(searchString)) {
 			return true;

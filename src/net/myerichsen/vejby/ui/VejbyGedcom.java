@@ -10,6 +10,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 /**
  * Main user interface for the Vejby Gedcom application. Implements tabbed
@@ -90,7 +91,7 @@ public class VejbyGedcom {
 		frmVejbyGedcomIndtastning = new JFrame();
 		frmVejbyGedcomIndtastning.setTitle("Vejby GEDCOM indtastning");
 		frmVejbyGedcomIndtastning.setBounds(100, 100, 1080, 624);
-		frmVejbyGedcomIndtastning.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmVejbyGedcomIndtastning.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		final JMenuBar menuBar = new JMenuBar();
 		frmVejbyGedcomIndtastning.setJMenuBar(menuBar);

@@ -1,17 +1,20 @@
 package net.myerichsen.gedcom.db.populators;
 
-import net.myerichsen.gedcom.db.models.ProbateRecord;
+import java.sql.SQLException;
+
+import net.myerichsen.gedcom.db.models.ProbateModel;
 
 /**
  * @author Michael Erichsen
- * @version 6. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class ProbatePopulator implements ASPopulator {
 
 	@Override
-	public ProbateRecord[] loadFromDatabase(String[] args) {
-		final ProbateRecord[] probateRecords = ProbateRecord.loadFromDatabase(args[0], args[1], args[2], args[3]);
+	public ProbateModel[] loadFromDatabase(String[] args) throws SQLException {
+		final ProbateModel[] probateRecords = ProbateModel.loadFromDatabase(args[0], args[1], args[2], args[3],
+				args[4]);
 		return probateRecords;
 	}
 

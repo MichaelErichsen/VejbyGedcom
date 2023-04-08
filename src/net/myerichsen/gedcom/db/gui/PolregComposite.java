@@ -33,13 +33,13 @@ import org.eclipse.swt.widgets.Text;
 import net.myerichsen.gedcom.db.comparators.PolregComparator;
 import net.myerichsen.gedcom.db.filters.PolregAddressFilter;
 import net.myerichsen.gedcom.db.filters.PolregBirthdateFilter;
-import net.myerichsen.gedcom.db.models.PolregRecord;
+import net.myerichsen.gedcom.db.models.PolregModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.PolregPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class PolregComposite extends Composite {
@@ -52,7 +52,7 @@ public class PolregComposite extends Composite {
 
 	/**
 	 * Create the composite.
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 */
@@ -132,7 +132,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getName();
 			}
 		});
@@ -145,7 +145,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getBirthDate().toString();
 			}
 		});
@@ -158,7 +158,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getOccupation();
 			}
 		});
@@ -171,7 +171,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getStreet();
 			}
 		});
@@ -184,7 +184,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return Integer.toString(pr.getNumber());
 			}
 		});
@@ -197,7 +197,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getLetter();
 			}
 		});
@@ -210,7 +210,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getFloor();
 			}
 		});
@@ -223,7 +223,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getPlace();
 			}
 		});
@@ -236,7 +236,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getHost();
 			}
 		});
@@ -249,7 +249,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return Integer.toString(pr.getDay());
 			}
 		});
@@ -262,7 +262,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return Integer.toString(pr.getMonth());
 			}
 		});
@@ -275,7 +275,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return Integer.toString(pr.getYear());
 			}
 		});
@@ -288,7 +288,7 @@ public class PolregComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregRecord pr = (PolregRecord) element;
+				final PolregModel pr = (PolregModel) element;
 				return pr.getFullAddress();
 			}
 		});
@@ -312,18 +312,12 @@ public class PolregComposite extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		polregTable.removeAll();
-
-		if (props.getProperty("polregSearch").equals("true")) {
-			return;
-		}
-
 		new Thread(() -> {
 			if (polregListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("cphDbPath"), phonName, birthDate,
 							deathDate };
-					final PolregRecord[] PolregRecords = (PolregRecord[]) polregListener.loadFromDatabase(loadArgs);
+					final PolregModel[] PolregRecords = (PolregModel[]) polregListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> polregTableViewer.setInput(PolregRecords));
 				} catch (final Exception e) {

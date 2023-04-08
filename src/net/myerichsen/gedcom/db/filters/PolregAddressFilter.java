@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.PolregRecord;
+import net.myerichsen.gedcom.db.models.PolregModel;
 
 /**
  * Filter for address column in polreg table (Singleton)
@@ -43,7 +43,7 @@ public class PolregAddressFilter extends ViewerFilter {
 			return true;
 		}
 
-		final PolregRecord cr = (PolregRecord) element;
+		final PolregModel cr = (PolregModel) element;
 
 		if (cr.getFullAddress().toLowerCase().matches(searchString)) {
 			return true;

@@ -17,7 +17,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 4. apr. 2023
  *
  */
-public class BurregRecord extends ASModel {
+public class BurregModel extends ASModel {
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = ?";
 
@@ -31,7 +31,7 @@ public class BurregRecord extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static BurregRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+	public static BurregModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
@@ -39,8 +39,8 @@ public class BurregRecord extends ASModel {
 		statement.setString(1, phonName);
 		final ResultSet rs = statement.executeQuery();
 
-		BurregRecord br;
-		final List<BurregRecord> lbr = new ArrayList<>();
+		BurregModel br;
+		final List<BurregModel> lbr = new ArrayList<>();
 
 		String name;
 		final Fonkod fk = new Fonkod();
@@ -57,7 +57,7 @@ public class BurregRecord extends ASModel {
 				System.out.println(e.getMessage() + ": " + name + ", " + phonName);
 			}
 
-			br = new BurregRecord();
+			br = new BurregModel();
 
 			br.setFirstNames(rs.getString("FIRSTNAMES"));
 			br.setLastName(rs.getString("LASTNAME"));
@@ -90,7 +90,7 @@ public class BurregRecord extends ASModel {
 
 		statement.close();
 
-		BurregRecord[] bra = new BurregRecord[lbr.size()];
+		BurregModel[] bra = new BurregModel[lbr.size()];
 
 		for (int i = 0; i < lbr.size(); i++) {
 			bra[i] = lbr.get(i);

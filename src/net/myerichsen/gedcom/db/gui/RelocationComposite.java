@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import net.myerichsen.gedcom.db.comparators.RelocationComparator;
 import net.myerichsen.gedcom.db.filters.RelocationGivenFilter;
 import net.myerichsen.gedcom.db.filters.RelocationSurnameFilter;
-import net.myerichsen.gedcom.db.models.RelocationRecord;
+import net.myerichsen.gedcom.db.models.RelocationModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.RelocationPopulator;
 
@@ -51,7 +51,7 @@ public class RelocationComposite extends Composite {
 
 	/**
 	 * Create the composite.
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 */
@@ -131,7 +131,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getId();
 			}
 		});
@@ -147,7 +147,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getGivenName();
 			}
 		});
@@ -159,7 +159,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getSurName();
 			}
 		});
@@ -171,7 +171,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getDate().toString();
 			}
 		});
@@ -183,7 +183,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getPlace();
 			}
 		});
@@ -195,7 +195,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getNote();
 			}
 		});
@@ -206,7 +206,7 @@ public class RelocationComposite extends Composite {
 		relocationTableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getSourceDetail();
 			}
 		});
@@ -218,7 +218,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getBirthDate().toString();
 			}
 		});
@@ -230,7 +230,7 @@ public class RelocationComposite extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationRecord rr = (RelocationRecord) element;
+				final RelocationModel rr = (RelocationModel) element;
 				return rr.getParents();
 			}
 		});
@@ -278,13 +278,12 @@ public class RelocationComposite extends Composite {
 	 * @param deathDate
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) {
-
 		new Thread(() -> {
 			if (relocationListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), phonName, birthDate,
 							deathDate };
-					final RelocationRecord[] relocationRecords = (RelocationRecord[]) relocationListener
+					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener
 							.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> relocationTableViewer.setInput(relocationRecords));

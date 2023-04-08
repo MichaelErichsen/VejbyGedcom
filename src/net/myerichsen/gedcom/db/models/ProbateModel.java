@@ -10,31 +10,18 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 8. apr. 2023
  *
  */
-public class ProbateRecord extends ASModel {
+public class ProbateModel extends ASModel {
 	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
 			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
 			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
 
-	/**
-	 * @param dbPath
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @return
-	 */
-	public static ProbateRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate) {
-		// TODO Implement load probate from DB
-		System.out.println("Not yet implemented");
-		return null;
-	}
-
-	public static ProbateRecord[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
+	public static ProbateModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
 			String probateSource) throws SQLException {
-		ProbateRecord probateRecord;
-		final List<ProbateRecord> lp = new ArrayList<>();
+		ProbateModel probateRecord;
+		final List<ProbateModel> lp = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement = conn.prepareStatement(SELECT_PROBATE);
@@ -47,7 +34,7 @@ public class ProbateRecord extends ASModel {
 		String data;
 
 		while (rs.next()) {
-			probateRecord = new ProbateRecord();
+			probateRecord = new ProbateModel();
 			name = rs.getString("NAME").trim();
 			probateRecord.setName(name);
 			data = rs.getString("COVERED_DATA").replaceAll("\\r\\n", " ¤ ");
@@ -65,7 +52,7 @@ public class ProbateRecord extends ASModel {
 
 		statement.close();
 
-		final ProbateRecord[] pra = new ProbateRecord[lp.size()];
+		final ProbateModel[] pra = new ProbateModel[lp.size()];
 
 		for (int i = 0; i < lp.size(); i++) {
 			pra[i] = lp.get(i);
@@ -75,15 +62,10 @@ public class ProbateRecord extends ASModel {
 	}
 
 	private String name = "";
-
 	private String fromDate = "";
-
 	private String toDate = "";
-
 	private String place = "";
-
 	private String data = "";
-
 	private String source = "";
 
 	/**

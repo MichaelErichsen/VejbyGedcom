@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.comparators;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
-import net.myerichsen.gedcom.db.models.PolregRecord;
+import net.myerichsen.gedcom.db.models.PolregModel;
 
 /**
  * @author Michael Erichsen
@@ -17,8 +17,8 @@ public class PolregComparator extends ViewerComparator {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		PolregRecord o1 = (PolregRecord) e1;
-		PolregRecord o2 = (PolregRecord) e2;
+		PolregModel o1 = (PolregModel) e1;
+		PolregModel o2 = (PolregModel) e2;
 		final String key1 = o1.getBirthDate().toString() + o1.getName();
 		final String key2 = o2.getBirthDate().toString() + o2.getName();
 		return key1.compareToIgnoreCase(key2);

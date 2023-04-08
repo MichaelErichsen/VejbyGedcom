@@ -7,13 +7,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import net.myerichsen.gedcom.db.models.IndividualRecord;
+import net.myerichsen.gedcom.db.models.IndividualModel;
 
 /**
  * Individual tab composite
  *
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class IndividualComposite extends Composite {
@@ -34,6 +34,8 @@ public class IndividualComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
+
+	// TODO Clear all fields function for serach by name and family
 	public IndividualComposite(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
@@ -127,11 +129,15 @@ public class IndividualComposite extends Composite {
 	/**
 	 * @param individual
 	 */
-	public void populate(IndividualRecord individual) {
+	public void populate(IndividualModel individual) {
 		txtindividualid.setText(individual.getId());
 		txtindividualname.setText(individual.getName());
 		txtindividualsex.setText(individual.getSex());
-		txtindividualfamc.setText(individual.getFamc());
+
+		if (individual.getFamc() != null) {
+			txtindividualfamc.setText(individual.getFamc());
+		}
+
 		txtindividualphonname.setText(individual.getPhonName());
 
 		if (individual.getBirthDate() != null) {
@@ -145,7 +151,10 @@ public class IndividualComposite extends Composite {
 		}
 
 		txtindividualdeathplace.setText(individual.getDeathPlace());
-		txtindividualparents.setText(individual.getParents());
+
+		if (individual.getParents() != null) {
+			txtindividualparents.setText(individual.getParents());
+		}
 	}
 
 }

@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.ProbateRecord;
+import net.myerichsen.gedcom.db.models.ProbateModel;
 
 /**
  * Filter for place column in probate table (Singleton)
@@ -43,7 +43,7 @@ public class ProbatePlaceFilter extends ViewerFilter {
 			return true;
 		}
 
-		final ProbateRecord cr = (ProbateRecord) element;
+		final ProbateModel cr = (ProbateModel) element;
 
 		if (cr.getPlace().toLowerCase().matches(searchString)) {
 			return true;

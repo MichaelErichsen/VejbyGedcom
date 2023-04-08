@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.RelocationRecord;
+import net.myerichsen.gedcom.db.models.RelocationModel;
 
 /**
  * Filter for surname column in relocation table (Singleton)
@@ -43,7 +43,7 @@ public class RelocationSurnameFilter extends ViewerFilter {
 			return true;
 		}
 
-		final RelocationRecord cr = (RelocationRecord) element;
+		final RelocationModel cr = (RelocationModel) element;
 
 		if (cr.getSurName().toLowerCase().matches(searchString)) {
 			return true;

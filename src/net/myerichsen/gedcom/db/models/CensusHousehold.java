@@ -16,7 +16,7 @@ import java.util.List;
 public class CensusHousehold extends ASModel {
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS "
 			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
-	private List<CensusRecord> household;
+	private List<CensusModel> household;
 
 	/**
 	 * Get a list of household census records from the Derby table
@@ -25,9 +25,9 @@ public class CensusHousehold extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusRecord> loadFromDatabase(String dbPath, String kipNr, String nr) throws SQLException {
-		CensusRecord ci;
-		final List<CensusRecord> cil = new ArrayList<>();
+	public static List<CensusModel> loadFromDatabase(String dbPath, String kipNr, String nr) throws SQLException {
+		CensusModel ci;
+		final List<CensusModel> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		final PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
@@ -36,7 +36,7 @@ public class CensusHousehold extends ASModel {
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			ci = new CensusRecord();
+			ci = new CensusModel();
 			ci.setKIPnr(rs.getString("kipNr"));
 			ci.setLoebenr(rs.getInt("Loebenr"));
 			ci.setKildestednavn(rs.getString("Kildestednavn"));
@@ -70,22 +70,22 @@ public class CensusHousehold extends ASModel {
 	/**
 	 * @param household the household to set
 	 */
-	public void setHousehold(List<CensusRecord> household) {
+	public void setHousehold(List<CensusModel> household) {
 		this.household = household;
 	}
 
 	/**
 	 * @return the household
 	 */
-	public List<CensusRecord> getHousehold() {
+	public List<CensusModel> getHousehold() {
 		return household;
 	}
 
 	@Override
 	public String[] toStringArray() {
-		List<String> ls = new ArrayList<String>();
+		List<String> ls = new ArrayList<>();
 
-		for (CensusRecord censusRecord : household) {
+		for (CensusModel censusRecord : household) {
 			ls.add(censusRecord.toString());
 		}
 

@@ -35,7 +35,7 @@ import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
-import net.myerichsen.gedcom.db.models.IndividualRecord;
+import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
@@ -800,7 +800,7 @@ public class DBLoader {
 	 */
 	private void updateBirthDeathData(Connection conn) throws SQLException {
 		// Read all individuals into a list
-		final List<IndividualRecord> ldbi = IndividualRecord.loadFromDB(conn);
+		final List<IndividualModel> ldbi = IndividualModel.loadFromDB(conn);
 
 		// Update all individual records in Derby
 		updateIndividualsBirthDeath(ldbi);
@@ -927,11 +927,11 @@ public class DBLoader {
 	 * @param ldbi
 	 * @throws SQLException
 	 */
-	private void updateIndividualsBirthDeath(List<IndividualRecord> ldbi) throws SQLException {
+	private void updateIndividualsBirthDeath(List<IndividualModel> ldbi) throws SQLException {
 		Date bd;
 		Date dd;
 
-		for (final IndividualRecord dbi : ldbi) {
+		for (final IndividualModel dbi : ldbi) {
 			bd = dbi.getBirthDate();
 			dd = dbi.getDeathDate();
 

@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Table;
  * Helper for sorting {@link TableViewer} by one of its {@link TableViewerColumn}s.
  * <p>
  * Originally from http://wiki.eclipse.org/index.php/JFaceSnippets, Snippet040TableViewerSorting.
- * 
+ *
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  * @author Konstantin Scheglov <Konstantin.Scheglov@gmail.com>
  */
@@ -54,6 +54,7 @@ public class TableViewerColumnSorter extends ViewerComparator {
 		m_viewer = (TableViewer) column.getViewer();
 		m_table = m_viewer.getTable();
 		m_column.getColumn().addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (m_viewer.getComparator() != null) {
 					if (m_viewer.getComparator() == TableViewerColumnSorter.this) {
@@ -101,6 +102,7 @@ public class TableViewerColumnSorter extends ViewerComparator {
 	// ViewerComparator
 	//
 	////////////////////////////////////////////////////////////////////////////
+	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		return m_direction * doCompare(viewer, e1, e2);
 	}
@@ -118,7 +120,7 @@ public class TableViewerColumnSorter extends ViewerComparator {
 		return 0;
 	}
 	/**
-	 * 
+	 *
 	 * @return the value to compare in {@link #doCompare(Viewer, Object, Object)}. Be default tries to get it
 	 *         from {@link EditingSupport}. May return <code>null</code>.
 	 */

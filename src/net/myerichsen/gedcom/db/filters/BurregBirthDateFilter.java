@@ -3,13 +3,13 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.BurregRecord;
+import net.myerichsen.gedcom.db.models.BurregModel;
 
 /**
  * Filter for birth date column in burreg table (Singleton)
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class BurregBirthDateFilter extends ViewerFilter {
@@ -43,9 +43,9 @@ public class BurregBirthDateFilter extends ViewerFilter {
 			return true;
 		}
 
-		final BurregRecord cr = (BurregRecord) element;
+		final BurregModel cr = (BurregModel) element;
 
-		if (cr.getYearOfBirth().toLowerCase().matches(searchString)) {
+		if ((cr.getYearOfBirth() == null) || cr.getYearOfBirth().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

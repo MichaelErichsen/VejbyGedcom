@@ -3,7 +3,7 @@ package net.myerichsen.gedcom.db.filters;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import net.myerichsen.gedcom.db.models.CensusRecord;
+import net.myerichsen.gedcom.db.models.CensusModel;
 
 /**
  * Filter for age column in census table (Singleton)
@@ -43,7 +43,7 @@ public class CensusAgeFilter extends ViewerFilter {
 			return true;
 		}
 
-		final CensusRecord cr = (CensusRecord) element;
+		final CensusModel cr = (CensusModel) element;
 
 		int diff = cr.getAlder() - Integer.parseInt(searchString);
 		if (Math.abs(diff) < 2) {

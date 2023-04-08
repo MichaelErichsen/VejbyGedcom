@@ -36,12 +36,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
 import net.myerichsen.gedcom.db.loaders.DBLoader;
-import net.myerichsen.gedcom.db.models.IndividualRecord;
+import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 8. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -56,9 +56,13 @@ public class ArchiveSearcher extends Shell {
 	// hack4dk_police_address.csv
 	// hack4dk_police_person.csv
 	// hack4dk_police_position.csv
-	// TODO Add ancestors tree tab
+	// TODO Populate ancestors tree tab
 	// TODO Add descendants tree tab
-	// TODO Debug settings wizard
+	// FIXME Siblings: Cannot invoke "org.eclipse.swt.widgets.Table.forceFocus()"
+	// because "this.siblingsTable" is null
+	// FIXME ID search does not clear siblings table
+	// TODO Change from Shell to ApplicationWindow @see
+	// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/DemonstratesTreeViewer.htm
 
 	/**
 	 * Static constants used to initalize properties file
@@ -107,7 +111,6 @@ public class ArchiveSearcher extends Shell {
 	private Text searchName;
 	private Text searchBirth;
 	private Text searchDeath;
-	private Button btnRelocationTab;
 	private final Shell shell;
 	private Table siblingsTable;
 	private Text searchFather;
@@ -142,6 +145,12 @@ public class ArchiveSearcher extends Shell {
 		tbtmPerson.setText("Person");
 		individualComposite = new IndividualComposite(tabFolder, SWT.NONE);
 		tbtmPerson.setControl(individualComposite);
+
+		TabItem tbtmAncestors = new TabItem(tabFolder, SWT.NONE);
+		tbtmAncestors.setText("Aner");
+
+		AncestorComposite ancestorComposite = new AncestorComposite(tabFolder, SWT.NONE);
+		tbtmAncestors.setControl(ancestorComposite);
 
 		final TabItem tbtmRelocations = new TabItem(tabFolder, SWT.NONE);
 		tbtmRelocations.setText("Flytninger");
@@ -215,402 +224,6 @@ public class ArchiveSearcher extends Shell {
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
 	}
-
-	/**
-	 * Create burial registry tab
-	 *
-	 * @param display
-	 * @param tabFolder
-	 */
-
-//	private void createBurregTab(Display display, final TabFolder tabFolder) {
-//		final TabItem tbtmBurreg = new TabItem(tabFolder, SWT.NONE);
-//		tbtmBurreg.setText("Kbhvn. begravelsesregister");
-//
-//		final Composite burregComposite = new Composite(tabFolder, SWT.NONE);
-//		tbtmBurreg.setControl(burregComposite);
-//		burregComposite.setLayout(new GridLayout(1, false));
-//
-//		final Composite burregFilterComposite = new Composite(burregComposite, SWT.BORDER);
-//		burregFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-//		burregFilterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
-//
-//		final Label bLabel = new Label(burregFilterComposite, SWT.NONE);
-//		bLabel.setText("Filtre: Fornavn");
-//
-//		txtBurregGiven = new Text(burregFilterComposite, SWT.BORDER);
-//		txtBurregGiven.addKeyListener(new KeyAdapter() {
-//			@Override
-//			public void keyReleased(KeyEvent e) {
-//				BurregGivenFilter.getInstance().setSearchText(txtBurregGiven.getText());
-//				burregTableViewer.refresh();
-//			}
-//		});
-//
-//		final Label lblEfternavn = new Label(burregFilterComposite, SWT.NONE);
-//		lblEfternavn.setText("Efternavn");
-//
-//		txtBurregSurname = new Text(burregFilterComposite, SWT.BORDER);
-//		txtBurregSurname.addKeyListener(new KeyAdapter() {
-//			@Override
-//			public void keyReleased(KeyEvent e) {
-//				BurregSurnameFilter.getInstance().setSearchText(txtBurregSurname.getText());
-//				burregTableViewer.refresh();
-//			}
-//		});
-//
-//		final Label lblFder = new Label(burregFilterComposite, SWT.NONE);
-//		lblFder.setText("F\u00F8de\u00E5r");
-//
-//		txtBurregBirthYear = new Text(burregFilterComposite, SWT.BORDER);
-//		txtBurregBirthYear.addKeyListener(new KeyAdapter() {
-//			@Override
-//			public void keyReleased(KeyEvent e) {
-//				BurregBirthDateFilter.getInstance().setSearchText(txtBurregBirthYear.getText());
-//				burregTableViewer.refresh();
-//			}
-//		});
-//
-//		final Button btnRydFelterne_2 = new Button(burregFilterComposite, SWT.NONE);
-//		btnRydFelterne_2.setText("Ryd felterne");
-//
-//		final ScrolledComposite burregScroller = new ScrolledComposite(burregComposite,
-//				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-//		burregScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-//		burregScroller.setSize(0, 0);
-//		tbtmBurreg.setControl(burregComposite);
-//		burregScroller.setExpandHorizontal(true);
-//		burregScroller.setExpandVertical(true);
-//
-//		burregTableViewer = new TableViewer(burregScroller, SWT.BORDER | SWT.FULL_SELECTION);
-//		burregTableViewer.addDoubleClickListener(event -> burregPopup(display));
-//		burregTable = burregTableViewer.getTable();
-//		burregTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-//		final ViewerFilter[] filters = new ViewerFilter[3];
-//		filters[0] = BurregBirthDateFilter.getInstance();
-//		filters[1] = BurregGivenFilter.getInstance();
-//		filters[2] = BurregSurnameFilter.getInstance();
-//		burregTableViewer.setFilters(filters);
-//		burregTableViewer.setComparator(new BurregComparator());
-//
-//		burregTable.setHeaderVisible(true);
-//		burregTable.setLinesVisible(true);
-//
-//		final TableViewerColumn tableViewerColumn = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnFornavne = tableViewerColumn.getColumn();
-//		tblclmnFornavne.setWidth(100);
-//		tblclmnFornavne.setText("Fornavne");
-//		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getFirstNames();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnEfternavn_1 = tableViewerColumn_1.getColumn();
-//		tblclmnEfternavn_1.setWidth(100);
-//		tblclmnEfternavn_1.setText("Efternavn");
-//		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getLastName();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnDdsdato = tableViewerColumn_2.getColumn();
-//		tblclmnDdsdato.setWidth(100);
-//		tblclmnDdsdato.setText("D\u00F8dsdato");
-//		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getDateOfDeath();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnFder_1 = tableViewerColumn_3.getColumn();
-//		tblclmnFder_1.setWidth(100);
-//		tblclmnFder_1.setText("F\u00F8de\u00E5r");
-//		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getYearOfBirth();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnDdssted = tableViewerColumn_4.getColumn();
-//		tblclmnDdssted.setWidth(100);
-//		tblclmnDdssted.setText("D\u00F8dssted");
-//		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getDeathPlace();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnCivilstand_1 = tableViewerColumn_5.getColumn();
-//		tblclmnCivilstand_1.setWidth(100);
-//		tblclmnCivilstand_1.setText("Civilstand");
-//		tableViewerColumn_5.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getCivilStatus();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnAdrUdfKbhvn = tableViewerColumn_6.getColumn();
-//		tblclmnAdrUdfKbhvn.setWidth(100);
-//		tblclmnAdrUdfKbhvn.setText("Adr. udf. Kbhvn.");
-//		tableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getAdressOutsideCph();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnKn_1 = tableViewerColumn_7.getColumn();
-//		tblclmnKn_1.setWidth(100);
-//		tblclmnKn_1.setText("K\u00F8n");
-//		tableViewerColumn_7.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getSex();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnKommentar_1 = tableViewerColumn_8.getColumn();
-//		tblclmnKommentar_1.setWidth(100);
-//		tblclmnKommentar_1.setText("Kommentar");
-//		tableViewerColumn_8.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getComment();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_9 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnKirkegrd = tableViewerColumn_9.getColumn();
-//		tblclmnKirkegrd.setWidth(100);
-//		tblclmnKirkegrd.setText("Kirkeg\u00E5rd");
-//		tableViewerColumn_9.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getCemetary();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_10 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnKapel = tableViewerColumn_10.getColumn();
-//		tblclmnKapel.setWidth(100);
-//		tblclmnKapel.setText("Kapel");
-//		tableViewerColumn_10.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getChapel();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_11 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnGade_1 = tableViewerColumn_11.getColumn();
-//		tblclmnGade_1.setWidth(100);
-//		tblclmnGade_1.setText("Gade");
-//		tableViewerColumn_11.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getStreet();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_12 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnKvarter = tableViewerColumn_12.getColumn();
-//		tblclmnKvarter.setWidth(100);
-//		tblclmnKvarter.setText("Kvarter");
-//		tableViewerColumn_12.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getHood();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_13 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnGadenr_1 = tableViewerColumn_13.getColumn();
-//		tblclmnGadenr_1.setWidth(40);
-//		tblclmnGadenr_1.setText("Gadenr.");
-//		tableViewerColumn_13.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getStreetNumber();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_14 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnBogstav_1 = tableViewerColumn_14.getColumn();
-//		tblclmnBogstav_1.setWidth(40);
-//		tblclmnBogstav_1.setText("Bogstav");
-//		tableViewerColumn_14.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getLetter();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_15 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnEtage_1 = tableViewerColumn_15.getColumn();
-//		tblclmnEtage_1.setWidth(40);
-//		tblclmnEtage_1.setText("Etage");
-//		tableViewerColumn_15.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getFloor();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_16 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnInstitution = tableViewerColumn_16.getColumn();
-//		tblclmnInstitution.setWidth(100);
-//		tblclmnInstitution.setText("Institution");
-//		tableViewerColumn_16.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getInstitution();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_17 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnInstGade = tableViewerColumn_17.getColumn();
-//		tblclmnInstGade.setWidth(100);
-//		tblclmnInstGade.setText("Inst. gade");
-//		tableViewerColumn_17.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getInstitutionStreet();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_19 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnInstGadenr = tableViewerColumn_19.getColumn();
-//		tblclmnInstGadenr.setWidth(40);
-//		tblclmnInstGadenr.setText("Inst. gadenr.");
-//		tableViewerColumn_19.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getInstitutionStreet();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_18 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnInstKvarter = tableViewerColumn_18.getColumn();
-//		tblclmnInstKvarter.setWidth(100);
-//		tblclmnInstKvarter.setText("Inst. kvarter");
-//		tableViewerColumn_18.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getInstitutionHood();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_20 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnErhverv_2 = tableViewerColumn_20.getColumn();
-//		tblclmnErhverv_2.setWidth(40);
-//		tblclmnErhverv_2.setText("Erhverv");
-//		tableViewerColumn_20.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getOccuptations();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_21 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnErhvforhtyper = tableViewerColumn_21.getColumn();
-//		tblclmnErhvforhtyper.setWidth(100);
-//		tblclmnErhvforhtyper.setText("Erhv.forh.typer");
-//		tableViewerColumn_21.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getOccupationRelationTypes();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_22 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnDdsrsager = tableViewerColumn_22.getColumn();
-//		tblclmnDdsrsager.setWidth(100);
-//		tblclmnDdsrsager.setText("D\u00F8ds\u00E5rsager");
-//		tableViewerColumn_22.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getDeathCauses();
-//			}
-//		});
-//
-//		final TableViewerColumn tableViewerColumn_23 = new TableViewerColumn(burregTableViewer, SWT.NONE);
-//		final TableColumn tblclmnDdsrsDansk = tableViewerColumn_23.getColumn();
-//		tblclmnDdsrsDansk.setWidth(100);
-//		tblclmnDdsrsDansk.setText("D\u00F8ds\u00E5rs. dansk");
-//		tableViewerColumn_23.setLabelProvider(new ColumnLabelProvider() {
-//
-//			@Override
-//			public String getText(Object element) {
-//				final BurregRecord pr = (BurregRecord) element;
-//				return pr.getDeathCausesDanish();
-//			}
-//		});
-//
-//		burregScroller.setContent(burregTable);
-//		burregScroller.setMinSize(burregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-//	}
 
 	/**
 	 * Create contents of the shell.
@@ -973,7 +586,7 @@ public class ArchiveSearcher extends Shell {
 		final String Id = "@I" + searchId.getText() + "@";
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-			final IndividualRecord individual = new IndividualRecord(conn, Id);
+			final IndividualModel individual = new IndividualModel(conn, Id);
 
 			if (individual.getName().equals("")) {
 				setMessage("ID " + Id + " findes ikke i databasen");
@@ -995,6 +608,7 @@ public class ArchiveSearcher extends Shell {
 			searchDeath.setText(deathDate);
 
 			individualComposite.populate(individual);
+
 			if (props.getProperty("relocationSearch").equals("true")) {
 				relocationComposite.populate(phonName, birthDate, deathDate);
 			}
@@ -1069,7 +683,7 @@ public class ArchiveSearcher extends Shell {
 				}
 			}
 
-			if (btnRelocationTab.getSelection()) {
+			if (props.getProperty("relocationSearch").equals("true")) {
 				relocationComposite.populate(phonName, birthDate, deathDate);
 			}
 

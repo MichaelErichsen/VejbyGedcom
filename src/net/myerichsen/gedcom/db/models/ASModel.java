@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 /**
  * Abstract superclass for ArchiveSearcherX model classes
- * 
+ *
  * @author Michael Erichsen
  * @version 7. apr. 2023
  *
