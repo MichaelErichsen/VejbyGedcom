@@ -4,48 +4,51 @@ import java.util.Properties;
 
 import org.eclipse.jface.wizard.Wizard;
 
-import net.myerichsen.gedcom.db.models.ASSettings;
+import net.myerichsen.gedcom.db.models.SettingsModel;
 
 /**
  * Settings wizard
  *
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 10. apr. 2023
  *
  */
 public class SettingsWizard extends Wizard {
-	private Properties props;
-	private ASSettings asSettings;
+	private final Properties props;
+	private SettingsModel settings;
 
 	public SettingsWizard(Properties props) {
 		setWindowTitle("Indstillinger");
 		this.props = props;
-		asSettings = new ASSettings(props);
+		settings = new SettingsModel(props);
 	}
 
 	@Override
 	public void addPages() {
-		addPage(new SettingsWizardPage1(asSettings));
-		addPage(new SettingsWizardPage2(asSettings));
+		addPage(new SettingsWizardPage1());
+		addPage(new SettingsWizardPage2());
+		addPage(new SettingsWizardPage3());
+		addPage(new SettingsWizardPage4());
+	}
+
+	/**
+	 * @return the settings
+	 */
+	public SettingsModel getSettings() {
+		return settings;
 	}
 
 	@Override
 	public boolean performFinish() {
-		asSettings.storeProperties(props);
+		settings.storeProperties(props);
 		return true;
 	}
 
 	/**
-	 * @return the props
+	 * @param settings the settings to set
 	 */
-	public Properties getProps() {
-		return props;
+	public void setSettings(SettingsModel settings) {
+		this.settings = settings;
 	}
 
-	/**
-	 * @param props the props to set
-	 */
-	public void setProps(Properties props) {
-		this.props = props;
-	}
 }

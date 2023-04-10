@@ -13,7 +13,7 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
  * Individual tab composite
  *
  * @author Michael Erichsen
- * @version 8. apr. 2023
+ * @version 9. apr. 2023
  *
  */
 public class IndividualComposite extends Composite {
@@ -29,13 +29,28 @@ public class IndividualComposite extends Composite {
 	private Text txtindividualdeathplace;
 
 	/**
+	 * Clear all fields
+	 */
+	public void clear() {
+		txtindividualid.setText("");
+		txtindividualname.setText("");
+		txtindividualsex.setText("");
+		txtindividualfamc.setText("");
+		txtindividualphonname.setText("");
+		txtindividualbirthdate.setText("");
+		txtindividualbirthplace.setText("");
+		txtindividualdeathdate.setText("");
+		txtindividualdeathplace.setText("");
+		txtindividualparents.setText("");
+	}
+
+	/**
 	 * Create the composite.
 	 *
 	 * @param parent
 	 * @param style
 	 */
 
-	// TODO Clear all fields function for serach by name and family
 	public IndividualComposite(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));

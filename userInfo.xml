@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="userInfo">
+	<item key="customer-name" value="a"/>
+	<item key="customer-phone" value="x"/>
+	<item key="customer-email" value="x@c.d"/>
+	<item key="customer-address" value="aaaa&#x0D;&#x0A;&#x0D;&#x0A;&#x0D;&#x0A;"/>
+</section>

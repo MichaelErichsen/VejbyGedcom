@@ -14,7 +14,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 10. apr. 2023
  *
  */
 public class HelpDialog extends Dialog {
@@ -59,20 +59,27 @@ public class HelpDialog extends Dialog {
 
 		Label lblFolketllingerneKanHentes = new Label(container, SWT.NONE);
 		lblFolketllingerneKanHentes.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		lblFolketllingerneKanHentes.setText("Folket\u00E6llingerne kan hentes fra " + "http://www.salldata.dk/zip/");
+		lblFolketllingerneKanHentes.setText("Folket\u00E6llingerne kan hentes fra " + "http://www.salldata.dk/zip/.");
 
 		Label lblDeKbenhavnskeDatabaser = new Label(container, SWT.NONE);
 		lblDeKbenhavnskeDatabaser.setText("De k\u00F8benhavnske databaser kan hentes fra "
-				+ "https://docs.google.com/spreadsheets/d/1hDJItyQqaeRTbo30C1y4fHPzp4Q4tlQHoCCKSJwv2iQ/edit#gid=1318577");
+				+ "https://docs.google.com/spreadsheets/d/1hDJItyQqaeRTbo30C1y4fHPzp4Q4tlQHoCCKSJwv2iQ/edit#gid=1318577.");
 
-		Label lblSkifterneErHentet = new Label(container, SWT.NONE);
-		lblSkifterneErHentet.setText("Skifterne er hentet fra mange forskellige kilder og indl\u00E6st med et "
-				+ "specialprogram, baseret p\u00E5 Apache UIMA-arkitekturen (https://uima.apache.org/).");
+		Label lblSkifterneErHentet = new Label(container, SWT.WRAP);
+		GridData gd_lblSkifterneErHentet = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_lblSkifterneErHentet.widthHint = 782;
+		gd_lblSkifterneErHentet.heightHint = 54;
+		lblSkifterneErHentet.setLayoutData(gd_lblSkifterneErHentet);
+		lblSkifterneErHentet.setText(
+				"Skifterne er indl\u00E6st med et specialprogram, baseret p\u00E5 Apache UIMA-arkitekturen (https://uima.apache.org/). "
+						+ "Data kan for eksempel hentes fra Asger Bruuns skifteuddrag, Aurelia Clemons probate extract, Bornholm Sl\u00E6gtss\u00F8gning, "
+						+ "Erik Brejl skifteuddrag Erik Reinert Nielsen skifteuddrag, Godsskifter Vendsyssel, Kurt Kermit skifteuddrag, "
+						+ "Sydfynske godsskifter og S\u00F8rensen & Helseby skifteuddrag.");
 
 		Label lblIndldningprogrammerneAnvenderGedcomjbiblioteket = new Label(container, SWT.NONE);
 		lblIndldningprogrammerneAnvenderGedcomjbiblioteket
 				.setText("Indl\u00E6sningprogrammerne anvender Gedcom4J-biblioteket fra "
-						+ "https://github.com/frizbog/gedcom4j");
+						+ "https://github.com/frizbog/gedcom4j.");
 
 		Label lblProgrammetKanIndlse = new Label(container, SWT.NONE);
 		lblProgrammetKanIndlse
@@ -107,7 +114,7 @@ public class HelpDialog extends Dialog {
 		Label lblKildetekstenTilProgrammet = new Label(container, SWT.NONE);
 		lblKildetekstenTilProgrammet.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		lblKildetekstenTilProgrammet.setText(
-				"Kildeteksten til programmet kan hentes fra " + "https://github.com/MichaelErichsen/VejbyGedcom");
+				"Kildeteksten til programmet kan hentes fra " + "https://github.com/MichaelErichsen/VejbyGedcom.");
 
 		Label lblProgrammetErSkrevet_1 = new Label(container, SWT.NONE);
 		lblProgrammetErSkrevet_1.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
@@ -132,7 +139,7 @@ public class HelpDialog extends Dialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(869, 493);
+		return new Point(869, 555);
 	}
 
 }
