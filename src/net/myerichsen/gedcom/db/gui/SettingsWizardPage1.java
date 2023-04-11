@@ -20,7 +20,7 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
  * Wizard page to handle GEDCOM imports
  *
  * @author Michael Erichsen
- * @version 10. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 

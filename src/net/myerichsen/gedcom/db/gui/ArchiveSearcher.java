@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -98,7 +97,6 @@ public class ArchiveSearcher extends Shell {
 	private static final String VEJBYDB_SCHEMA = "VEJBY";
 
 	private static Display display;
-	private static Logger logger;
 
 	/**
 	 * Launch the application.
@@ -107,7 +105,6 @@ public class ArchiveSearcher extends Shell {
 	 */
 	public static void main(String args[]) {
 		try {
-			logger = Logger.getLogger("ArchiveSearcher");
 			display = Display.getDefault();
 			final ArchiveSearcher shell = new ArchiveSearcher(display);
 			shell.open();
@@ -517,9 +514,17 @@ public class ArchiveSearcher extends Shell {
 					+ props.getProperty("vejbyPath"));
 
 			new Thread(() -> {
-				final String[] sa = new String[] { props.getProperty("gedcomFilePath"),
-						props.getProperty("vejbyPath") };
-				DBLoader.main(sa);
+				final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
+						props.getProperty("vejbySchema") };
+				String message = DBLoader.loadGedcomFiles(sa);
+
+				messageField.getDisplay().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						setMessage(message);
+					}
+				});
 
 			}).start();
 			break;
