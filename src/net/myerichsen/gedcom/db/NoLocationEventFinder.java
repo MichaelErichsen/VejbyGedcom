@@ -33,7 +33,7 @@ public class NoLocationEventFinder {
 	 * @version 10. mar. 2023
 	 *
 	 */
-	private class NvecIndividual {
+	private static class NvecIndividual {
 		private String id = "";
 		private String givenName = "";
 		private String surName = "";
@@ -131,11 +131,11 @@ public class NoLocationEventFinder {
 			rs2 = ps.executeQuery();
 
 			while (rs2.next()) {
-				if ((rs2.getString("TYPE").trim().equals("Birth"))
-						|| (rs2.getString("TYPE").trim().equals("Christening"))) {
+				if (rs2.getString("TYPE").trim().equals("Birth")
+						|| rs2.getString("TYPE").trim().equals("Christening")) {
 					place = rs2.getString("PLACE");
 
-					if ((place != null) && (place.toLowerCase().contains(location))) {
+					if (place != null && place.toLowerCase().contains(location)) {
 						return true;
 					}
 				}
@@ -192,7 +192,7 @@ public class NoLocationEventFinder {
 				if (rs2.getString("TYPE").trim().equals("Birth")) {
 					year = rs2.getDate("DATE").toLocalDate().getYear();
 
-					if ((year < 1789) || checkChildrenLocation(conn1, individual, location)) {
+					if (year < 1789 || checkChildrenLocation(conn1, individual, location)) {
 						hsni.remove(individual);
 						break;
 					}
@@ -202,20 +202,20 @@ public class NoLocationEventFinder {
 
 				place = rs2.getString("PLACE");
 
-				if ((place != null) && (place.toLowerCase().contains(location))) {
+				if (place != null && place.toLowerCase().contains(location)) {
 					hsni.remove(individual);
 					break;
 				}
 
 				note = rs2.getString("NOTE");
 
-				if ((note != null) && (note.toLowerCase().contains(location))) {
+				if (note != null && note.toLowerCase().contains(location)) {
 					hsni.remove(individual);
 					break;
 				}
 			}
 
-			if ((counter % 1000) == 0) {
+			if (counter % 1000 == 0) {
 				logger.info("Analysed individuals: " + counter);
 			}
 		}

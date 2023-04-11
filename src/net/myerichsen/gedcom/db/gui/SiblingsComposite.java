@@ -200,14 +200,6 @@ public class SiblingsComposite extends Composite {
 	}
 
 	/**
-	 * @param props
-	 */
-	public void setProperties(Properties props) {
-		this.props = props;
-
-	}
-
-	/**
 	 * Populate siblings table by individual parent field
 	 *
 	 * @param parents
@@ -217,8 +209,9 @@ public class SiblingsComposite extends Composite {
 		new Thread(() -> {
 			if (siblingsListener != null) {
 				try {
-					String[] loadArgs = new String[] { props.getProperty("vejbyPath"), parents };
-					SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener.loadFromDatabase(loadArgs);
+					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), parents };
+					final SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener
+							.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(siblingRecords));
 				} catch (final Exception e) {
@@ -244,7 +237,8 @@ public class SiblingsComposite extends Composite {
 			if (siblingsListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), fathersName, mothersName };
-					SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener.loadFromDatabase(loadArgs);
+					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener
+							.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
 				} catch (final Exception e) {
@@ -256,13 +250,21 @@ public class SiblingsComposite extends Composite {
 	}
 
 	/**
+	 * @param props
+	 */
+	public void setProperties(Properties props) {
+		this.props = props;
+
+	}
+
+	/**
 	 * @param display
 	 */
 	private void siblingsPopup(Display display) {
 		final TableItem[] tia = siblingsTable.getSelection();
 		final TableItem ti = tia[0];
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < 25; i++) {
 			if (ti.getText(i).length() > 0) {

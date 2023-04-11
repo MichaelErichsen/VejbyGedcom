@@ -33,7 +33,7 @@ public class FindLocationIndividuals {
 	 * @version 12. mar. 2023
 	 *
 	 */
-	private class NvecIndividual {
+	private static class NvecIndividual {
 		private String id = "";
 		private String givenName = "";
 		private String surName = "";
@@ -147,11 +147,11 @@ public class FindLocationIndividuals {
 			rs2 = ps.executeQuery();
 
 			while (rs2.next()) {
-				if ((rs2.getString("TYPE").trim().equals("Birth"))
-						|| (rs2.getString("TYPE").trim().equals("Christening"))) {
+				if (rs2.getString("TYPE").trim().equals("Birth")
+						|| rs2.getString("TYPE").trim().equals("Christening")) {
 					place = rs2.getString("PLACE");
 
-					if ((place != null) && (place.toLowerCase().contains(location))) {
+					if (place != null && place.toLowerCase().contains(location)) {
 						return true;
 					}
 				}
@@ -201,8 +201,8 @@ public class FindLocationIndividuals {
 
 			while (rs2.next()) {
 				// Add birth year and place to individual
-				if ((rs2.getString("TYPE").trim().equals("Birth"))
-						|| (rs2.getString("TYPE").trim().equals("Christening"))) {
+				if (rs2.getString("TYPE").trim().equals("Birth")
+						|| rs2.getString("TYPE").trim().equals("Christening")) {
 					individual.setBirthYear(rs2.getDate("DATE").toLocalDate().getYear());
 					place = rs2.getString("PLACE");
 
@@ -212,7 +212,7 @@ public class FindLocationIndividuals {
 				}
 
 				// Add death year to individual
-				if ((rs2.getString("TYPE").trim().equals("Death")) || (rs2.getString("TYPE").trim().equals("Burial"))) {
+				if (rs2.getString("TYPE").trim().equals("Death") || rs2.getString("TYPE").trim().equals("Burial")) {
 					year = rs2.getDate("DATE");
 
 					if (year != null) {
@@ -223,7 +223,7 @@ public class FindLocationIndividuals {
 				// Add if any location matches
 				place = rs2.getString("PLACE");
 
-				if ((place != null) && (place.toLowerCase().contains(location))) {
+				if (place != null && place.toLowerCase().contains(location)) {
 					hsni.add(individual);
 					break;
 				}
@@ -231,13 +231,14 @@ public class FindLocationIndividuals {
 				note = rs2.getString("NOTE");
 
 				// Add if birth of any children matches
-				if (((note != null) && (note.toLowerCase().contains(location))) || checkChildrenLocation(conn1, individual, location)) {
+				if (note != null && note.toLowerCase().contains(location)
+						|| checkChildrenLocation(conn1, individual, location)) {
 					hsni.add(individual);
 					break;
 				}
 			}
 
-			if ((counter % 1000) == 0) {
+			if (counter % 1000 == 0) {
 				logger.info("Analysed individuals: " + counter);
 			}
 		}

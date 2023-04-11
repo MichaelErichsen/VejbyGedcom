@@ -35,8 +35,8 @@ public class RelocationModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static RelocationModel[] loadFromDatabase(String dbPath, String phonName, String birthDate,
-			String deathDate) throws SQLException {
+	public static RelocationModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
+			throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		RelocationModel relocationRecord;
 		final List<RelocationModel> lr = new ArrayList<>();
@@ -47,13 +47,13 @@ public class RelocationModel extends ASModel {
 
 		while (rs.next()) {
 			relocationRecord = new RelocationModel(
-					(rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim()),
-					(rs.getString(2) == null ? "" : rs.getString(2).trim()),
-					(rs.getString(3) == null ? "" : rs.getString(3).trim()), rs.getDate(4),
-					(rs.getString(5) == null ? "" : rs.getString(5).trim()),
-					(rs.getString(6) == null ? "" : rs.getString(6).trim()),
-					(rs.getString(7) == null ? "" : rs.getString(7).trim()),
-					(rs.getString(8) == null ? "" : rs.getString(8).trim()));
+					rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim(),
+					rs.getString(2) == null ? "" : rs.getString(2).trim(),
+					rs.getString(3) == null ? "" : rs.getString(3).trim(), rs.getDate(4),
+					rs.getString(5) == null ? "" : rs.getString(5).trim(),
+					rs.getString(6) == null ? "" : rs.getString(6).trim(),
+					rs.getString(7) == null ? "" : rs.getString(7).trim(),
+					rs.getString(8) == null ? "" : rs.getString(8).trim());
 			lr.add(relocationRecord);
 		}
 
@@ -62,13 +62,13 @@ public class RelocationModel extends ASModel {
 		// Find relocation dates outside the life span of the individual to
 		// eliminate
 
-		final Date bd = (birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate));
-		final Date dd = (deathDate.equals("") ? Date.valueOf("9999-12-31") : Date.valueOf(deathDate));
+		final Date bd = birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate);
+		final Date dd = deathDate.equals("") ? Date.valueOf("9999-12-31") : Date.valueOf(deathDate);
 
 		final List<String> ls = new ArrayList<>();
 
 		for (final RelocationModel relocation2 : lr) {
-			if ((relocation2.getRelocationDate().before(bd)) || (relocation2.getRelocationDate().after(dd))) {
+			if (relocation2.getRelocationDate().before(bd) || relocation2.getRelocationDate().after(dd)) {
 				ls.add(relocation2.getId());
 			}
 		}
@@ -99,7 +99,7 @@ public class RelocationModel extends ASModel {
 
 		statement.close();
 
-		RelocationModel[] rra = new RelocationModel[lr.size()];
+		final RelocationModel[] rra = new RelocationModel[lr.size()];
 
 		for (int i = 0; i < lr.size(); i++) {
 			rra[i] = lr.get(i);
@@ -214,7 +214,7 @@ public class RelocationModel extends ASModel {
 	 * @return the sourceDetail
 	 */
 	public String getSourceDetail() {
-		return (sourceDetail.equals("NULL") ? "" : sourceDetail);
+		return sourceDetail.equals("NULL") ? "" : sourceDetail;
 	}
 
 	/**
@@ -322,9 +322,9 @@ public class RelocationModel extends ASModel {
 		sa[3] = relocationDate.toString();
 		sa[4] = place;
 		sa[5] = note;
-		sa[6] = (sourceDetail.equals("NULL") ? "" : sourceDetail);
+		sa[6] = sourceDetail.equals("NULL") ? "" : sourceDetail;
 		sa[7] = birthDate.toString();
-		sa[8] = (parents.equals("NULL") ? "" : parents);
+		sa[8] = parents.equals("NULL") ? "" : parents;
 		return sa;
 	}
 }

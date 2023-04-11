@@ -209,14 +209,16 @@ public class BirthPanel extends FsPanel {
 			family.getChildren().add(child);
 
 			if (!line[6].equals("")) {
-				father = new Individual(individualId++);
+				father = new Individual(individualId);
+				individualId++;
 				father.setName(line[6]);
 				father.setSex("M");
 				family.setFather(father);
 			}
 
 			if (!line[7].equals("")) {
-				mother = new Individual(individualId++);
+				mother = new Individual(individualId);
+				individualId++;
 				mother.setName(line[7]);
 				mother.setSex("F");
 				family.setMother(mother);

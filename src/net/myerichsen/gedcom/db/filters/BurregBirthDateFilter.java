@@ -39,13 +39,13 @@ public class BurregBirthDateFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if ((searchString == null) || (searchString.length() == 0)) {
+		if (searchString == null || searchString.length() == 0) {
 			return true;
 		}
 
 		final BurregModel cr = (BurregModel) element;
 
-		if ((cr.getYearOfBirth() == null) || cr.getYearOfBirth().toLowerCase().matches(searchString)) {
+		if (cr.getYearOfBirth() == null || cr.getYearOfBirth().toLowerCase().matches(searchString)) {
 			return true;
 		}
 

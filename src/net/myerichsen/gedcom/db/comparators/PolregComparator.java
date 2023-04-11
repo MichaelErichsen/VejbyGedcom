@@ -17,8 +17,8 @@ public class PolregComparator extends ViewerComparator {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		PolregModel o1 = (PolregModel) e1;
-		PolregModel o2 = (PolregModel) e2;
+		final PolregModel o1 = (PolregModel) e1;
+		final PolregModel o2 = (PolregModel) e2;
 		final String key1 = o1.getBirthDate().toString() + o1.getName();
 		final String key2 = o2.getBirthDate().toString() + o2.getName();
 		return key1.compareToIgnoreCase(key2);

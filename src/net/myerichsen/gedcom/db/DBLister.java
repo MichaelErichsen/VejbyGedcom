@@ -105,19 +105,19 @@ public class DBLister {
 		final String query = String.format(SELECT_METADATA, tableName);
 		final ResultSet rs = statement.executeQuery(query);
 		final ResultSetMetaData rsmd = rs.getMetaData();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		final int columnCount = rsmd.getColumnCount();
 
-		for (int i = 1; i < (columnCount + 1); i++) {
+		for (int i = 1; i < columnCount + 1; i++) {
 			sb.append(rsmd.getColumnName(i).trim() + ";");
 		}
 
 		System.out.println(sb.toString());
 
 		while (rs.next()) {
-			sb = new StringBuffer();
+			sb = new StringBuilder();
 
-			for (int i = 1; i < (columnCount + 1); i++) {
+			for (int i = 1; i < columnCount + 1; i++) {
 				if (rs.getString(i) == null) {
 					sb.append(";");
 				} else {

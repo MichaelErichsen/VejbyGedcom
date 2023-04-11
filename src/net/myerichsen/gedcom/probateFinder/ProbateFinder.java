@@ -102,11 +102,11 @@ public class ProbateFinder {
 			individual = entry.getValue();
 			births = individual.getEventsOfType(IndividualEventType.BIRTH);
 
-			if (births.isEmpty() || (births.size() == 0)) {
+			if (births.isEmpty() || births.size() == 0) {
 				births = individual.getEventsOfType(IndividualEventType.CHRISTENING);
 			}
 
-			if (births.isEmpty() || (births.size() == 0)) {
+			if (births.isEmpty() || births.size() == 0) {
 				System.err.println("No Birth: " + entry.getKey() + ";" + individual);
 				continue;
 			}

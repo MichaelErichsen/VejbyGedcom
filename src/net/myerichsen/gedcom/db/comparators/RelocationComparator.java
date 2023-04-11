@@ -20,8 +20,8 @@ public class RelocationComparator extends ViewerComparator {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		RelocationModel o1 = (RelocationModel) e1;
-		RelocationModel o2 = (RelocationModel) e2;
+		final RelocationModel o1 = (RelocationModel) e1;
+		final RelocationModel o2 = (RelocationModel) e2;
 
 		final String key1 = o1.getGivenName() + o1.getSurName() + o1.getBirthDate().toString() + o1.getDate();
 		final String key2 = o2.getGivenName() + o1.getSurName() + o2.getBirthDate().toString() + o2.getDate();

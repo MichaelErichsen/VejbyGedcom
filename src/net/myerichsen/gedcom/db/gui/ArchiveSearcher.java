@@ -8,8 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 10. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -68,30 +68,35 @@ public class ArchiveSearcher extends Shell {
 	// FIXME ID search does not clear siblings table
 	// TODO Doubleclick om sibling row inserts id and name in search bar
 
+	// TODO Create tables function
+
 	/**
 	 * Static constants used to initalize properties file
 	 */
 
-	private static final String CPHDB_SCHEMA = "CPH";
-	private static final String CPHDB_PATH = System.getProperty("user.home") + "/CPHDB";
+	private static final String CENSUSDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
+	private static final String CENSUSDB_SCHEMA = "VEJBY";
 	private static final String CENSUS_CSV_FILE_DIRECTORY = System.getProperty("user.home")
-			+ "/Documents/The Master Genealogist v9/Kilder/DDD";
+			+ "Documents/The Master Genealogist v9/Kilder/DDD";
+	private static final String CPHDB_PATH = System.getProperty("user.home") + "/CPHDB";
+	private static final String CPHDB_SCHEMA = "CPH";
+	private static final String CPH_CSV_FILE_DIRECTORY = "C:/Users/michael/Downloads/data-20230129T125804Z-001/data";
 	private static final String GEDCOM_FILE_PATH = System.getProperty("user.home")
 			+ "/Documents/The Master Genealogist v9/Export/Vejby.ged";
-	private static final String KIP_TEXT_FILENAME = "kipdata.txt";
-	private static final String PROBATE_SOURCE = "Kronborg";
-	private static final String PROBATEDB_PATH = "c:/DerbyDB/gedcom";
-	private static final String PROBATEDB_SCHEMA = "GEDCOM";
-	private static final String PROPERTIES_PATH = System.getProperty("user.home") + "/ArchiveSearcher.properties";
-	private static final String VEJBYDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
-	private static final String VEJBYDB_SCHEMA = "VEJBY";
-	private static final String CPH_CSV_FILE_DIRECTORY = "C:/Users/michael/Downloads/data-20230129T125804Z-001/data";
 	private static final String HACK4DK_BURIAL_PERSON_COMPLETE = "hack4dk_burial_person_complete.csv";
 	private static final String HACK4DK_POLICE_ADDRESS = "hack4dk_police_address.csv";
 	private static final String HACK4DK_POLICE_PERSON = "hack4dk_police_person.csv";
 	private static final String HACK4DK_POLICE_POSITION = "hack4dk_police_position.csv";
+	private static final String KIP_TEXT_FILENAME = "kipdata.txt";
+	private static final String PROBATEDB_PATH = "c:/DerbyDB/gedcom";
+	private static final String PROBATEDB_SCHEMA = "GEDCOM";
+	private static final String PROBATE_SOURCE = "Kronborg";
+	private static final String PROPERTIES_PATH = System.getProperty("user.home") + "/ArchiveSearcher.properties";
+	private static final String VEJBYDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
+	private static final String VEJBYDB_SCHEMA = "VEJBY";
 
 	private static Display display;
+	private static Logger logger;
 
 	/**
 	 * Launch the application.
@@ -100,6 +105,7 @@ public class ArchiveSearcher extends Shell {
 	 */
 	public static void main(String args[]) {
 		try {
+			logger = Logger.getLogger("ArchiveSearcher");
 			display = Display.getDefault();
 			final ArchiveSearcher shell = new ArchiveSearcher(display);
 			shell.open();
@@ -125,13 +131,13 @@ public class ArchiveSearcher extends Shell {
 	private Text searchFather;
 	private Text searchMother;
 	private final TabFolder tabFolder;
-	private IndividualComposite individualComposite;
-	private RelocationComposite relocationComposite;
-	private CensusComposite censusComposite;
-	private BurregComposite burregComposite;
-	private PolregComposite polregComposite;
-	private ProbateComposite probateComposite;
-	private SiblingsComposite siblingsComposite;
+	private final IndividualComposite individualComposite;
+	private final RelocationComposite relocationComposite;
+	private final CensusComposite censusComposite;
+	private final BurregComposite burregComposite;
+	private final PolregComposite polregComposite;
+	private final ProbateComposite probateComposite;
+	private final SiblingsComposite siblingsComposite;
 
 	/**
 	 * Create the shell.
@@ -150,7 +156,7 @@ public class ArchiveSearcher extends Shell {
 		tabFolder = new TabFolder(this, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		TabItem tbtmPerson = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmPerson = new TabItem(tabFolder, SWT.NONE);
 		tbtmPerson.setText("Person");
 		individualComposite = new IndividualComposite(tabFolder, SWT.NONE);
 		tbtmPerson.setControl(individualComposite);
@@ -249,22 +255,23 @@ public class ArchiveSearcher extends Shell {
 		final Menu menu_1 = new Menu(mntmFiler);
 		mntmFiler.setMenu(menu_1);
 
-		MenuItem mntmIndstillinger = new MenuItem(menu_1, SWT.NONE);
+		final MenuItem mntmIndstillinger = new MenuItem(menu_1, SWT.NONE);
 		mntmIndstillinger.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				SettingsWizard settingsWizard = new SettingsWizard(props);
-				WizardDialog wizardDialog = new WizardDialog(shell, settingsWizard);
+				final SettingsWizard settingsWizard = new SettingsWizard(props);
+				final WizardDialog wizardDialog = new WizardDialog(shell, settingsWizard);
 
 				wizardDialog.setBlockOnOpen(true);
 
-				int returnCode = wizardDialog.open();
+//				final int returnCode =
+				wizardDialog.open();
 
-				if (returnCode == Dialog.OK) {
-					// TODO Store in properties
-					System.out.println("Ok pressed");
-				} else
-					System.out.println("Cancel pressed");
+//				if (returnCode == Window.OK) {
+//					System.out.println("Ok pressed");
+//				} else {
+//					System.out.println("Cancel pressed");
+//				}
 			}
 		});
 		mntmIndstillinger.setText("Indstillinger");
@@ -278,10 +285,10 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmAfslut.setText("Afslut");
 
-		MenuItem mntmIndlsning = new MenuItem(menu, SWT.CASCADE);
+		final MenuItem mntmIndlsning = new MenuItem(menu, SWT.CASCADE);
 		mntmIndlsning.setText("Indl\u00E6sning");
 
-		Menu menu_2 = new Menu(mntmIndlsning);
+		final Menu menu_2 = new Menu(mntmIndlsning);
 		mntmIndlsning.setMenu(menu_2);
 
 		final MenuItem mntmL = new MenuItem(menu_2, SWT.NONE);
@@ -321,17 +328,17 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s begravelsesregisteret");
 
-		MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
+		final MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
 		mntmNewSubmenu.setText("Hj\u00E6lp");
 
-		Menu menu_3 = new Menu(mntmNewSubmenu);
+		final Menu menu_3 = new Menu(mntmNewSubmenu);
 		mntmNewSubmenu.setMenu(menu_3);
 
-		MenuItem mntmOm = new MenuItem(menu_3, SWT.NONE);
+		final MenuItem mntmOm = new MenuItem(menu_3, SWT.NONE);
 		mntmOm.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				HelpDialog helpDialog = new HelpDialog(shell);
+				final HelpDialog helpDialog = new HelpDialog(shell);
 				helpDialog.open();
 			}
 		});
@@ -472,6 +479,7 @@ public class ArchiveSearcher extends Shell {
 				final String[] sa = new String[] { props.getProperty("gedcomFilePath"),
 						props.getProperty("vejbyPath") };
 				DBLoader.main(sa);
+
 			}).start();
 			break;
 		case SWT.CANCEL:
@@ -489,27 +497,29 @@ public class ArchiveSearcher extends Shell {
 			final InputStream input = new FileInputStream(PROPERTIES_PATH);
 			props.load(input);
 		} catch (final Exception e) {
-			props.setProperty("vejbyPath", VEJBYDB_PATH);
-			props.setProperty("probatePath", PROBATEDB_PATH);
-			props.setProperty("probateSource", PROBATE_SOURCE);
+			props.setProperty("burialPersonComplete", HACK4DK_BURIAL_PERSON_COMPLETE);
+			props.setProperty("burregSearch", "true");
+			props.setProperty("censusCsvFileDirectory", CENSUS_CSV_FILE_DIRECTORY);
+			props.setProperty("censusPath", CENSUSDB_PATH);
+			props.setProperty("censusSchema", CENSUSDB_SCHEMA);
+			props.setProperty("censusSearch", "true");
+			props.setProperty("cphCsvFileDirectory", CPH_CSV_FILE_DIRECTORY);
 			props.setProperty("cphDbPath", CPHDB_PATH);
+			props.setProperty("cphSchema", CPHDB_SCHEMA);
 			props.setProperty("gedcomFilePath", GEDCOM_FILE_PATH);
 			props.setProperty("kipTextFilename", KIP_TEXT_FILENAME);
-			props.setProperty("censusCsvFileDirectory", CENSUS_CSV_FILE_DIRECTORY);
-			props.setProperty("vejbySchema", VEJBYDB_SCHEMA);
-			props.setProperty("probateSchema", PROBATEDB_SCHEMA);
-			props.setProperty("cphSchema", CPHDB_SCHEMA);
-			props.setProperty("cphCsvFilePath", CPH_CSV_FILE_DIRECTORY);
-			props.setProperty("burialPersonComplete", HACK4DK_BURIAL_PERSON_COMPLETE);
-			props.setProperty("policePerson", HACK4DK_POLICE_PERSON);
 			props.setProperty("policeAddress", HACK4DK_POLICE_ADDRESS);
+			props.setProperty("policePerson", HACK4DK_POLICE_PERSON);
 			props.setProperty("policePosition", HACK4DK_POLICE_POSITION);
-			props.setProperty("relocationSearch", "true");
-			props.setProperty("censusSearch", "true");
-			props.setProperty("probateSearch", "true");
 			props.setProperty("polregSearch", "true");
-			props.setProperty("burregSearch", "true");
+			props.setProperty("probatePath", PROBATEDB_PATH);
+			props.setProperty("probateSchema", PROBATEDB_SCHEMA);
+			props.setProperty("probateSearch", "true");
+			props.setProperty("probateSource", PROBATE_SOURCE);
+			props.setProperty("relocationSearch", "true");
 			props.setProperty("siblingSearch", "true");
+			props.setProperty("vejbyPath", VEJBYDB_PATH);
+			props.setProperty("vejbySchema", VEJBYDB_SCHEMA);
 
 			storeProperties();
 			System.out.println("Egenskaber gemt i " + PROPERTIES_PATH);
@@ -617,8 +627,8 @@ public class ArchiveSearcher extends Shell {
 			final String phonName = individual.getPhonName();
 			final String birthDate = individual.getBirthDate().toString();
 			searchBirth.setText(birthDate);
-			final String deathDate = (individual.getDeathDate() == null ? "9999-12-31"
-					: individual.getDeathDate().toString());
+			final String deathDate = individual.getDeathDate() == null ? "9999-12-31"
+					: individual.getDeathDate().toString();
 			searchDeath.setText(deathDate);
 
 			individualComposite.populate(individual);
@@ -643,7 +653,7 @@ public class ArchiveSearcher extends Shell {
 				burregComposite.populate(phonName, birthDate, deathDate);
 			}
 
-			if ((individual.getParents() != null) && (individual.getParents().length() > 0)) {
+			if (individual.getParents() != null && individual.getParents().length() > 0) {
 				siblingsComposite.populate(individual.getParents());
 			}
 
@@ -679,23 +689,19 @@ public class ArchiveSearcher extends Shell {
 			String birthDate;
 			if (searchBirth.getText().equals("")) {
 				birthDate = "0001-01-01";
+			} else if (searchBirth.getText().length() == 4) {
+				birthDate = searchBirth.getText() + "-01-01";
 			} else {
-				if (searchBirth.getText().length() == 4) {
-					birthDate = searchBirth.getText() + "-01-01";
-				} else {
-					birthDate = searchBirth.getText();
-				}
+				birthDate = searchBirth.getText();
 			}
 
 			String deathDate;
 			if (searchDeath.getText().equals("")) {
 				deathDate = "9999-12-31";
+			} else if (searchDeath.getText().length() == 4) {
+				deathDate = searchDeath.getText() + "-12-31";
 			} else {
-				if (searchDeath.getText().length() == 4) {
-					deathDate = searchDeath.getText() + "-12-31";
-				} else {
-					deathDate = searchDeath.getText();
-				}
+				deathDate = searchDeath.getText();
 			}
 
 			if (props.getProperty("relocationSearch").equals("true")) {
@@ -718,7 +724,7 @@ public class ArchiveSearcher extends Shell {
 				burregComposite.populate(phonName, birthDate, deathDate);
 			}
 
-			if ((searchFather.getText().length() > 0) || (searchMother.getText().length() > 0)) {
+			if (searchFather.getText().length() > 0 || searchMother.getText().length() > 0) {
 				siblingsComposite.populate(searchFather.getText(), searchMother.getText());
 			}
 		} catch (final Exception e1) {
@@ -738,7 +744,7 @@ public class ArchiveSearcher extends Shell {
 		searchId.setText("");
 		individualComposite.clear();
 
-		if ((searchFather.getText().equals("")) && (searchMother.getText().equals(""))) {
+		if (searchFather.getText().equals("") && searchMother.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
 			messageBox.setText("Advarsel");

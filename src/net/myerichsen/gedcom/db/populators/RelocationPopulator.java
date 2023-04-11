@@ -17,7 +17,7 @@ public class RelocationPopulator implements ASPopulator {
 			final RelocationModel[] relocationRecords = RelocationModel.loadFromDatabase(args[0], args[1], args[2],
 					args[3]);
 			return relocationRecords;
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 		return null;

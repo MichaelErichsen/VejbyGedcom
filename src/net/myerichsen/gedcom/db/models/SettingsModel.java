@@ -8,31 +8,33 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 10. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class SettingsModel {
-	private String vejbyPath;
-	private String probatePath;
-	private String probateSource;
+	private String burialPersonComplete;
+	private String burregSearch;
+	private String censusCsvFileDirectory;
+	private String censusPath;
+	private String censusSchema;
+	private String censusSearch;
+	private String cphCsvFileDirectory;
 	private String cphDbPath;
+	private String cphSchema;
 	private String gedcomFilePath;
 	private String kipTextFilename;
-	private String censusCsvFileDirectory;
-	private String vejbySchema;
-	private String probateSchema;
-	private String cphSchema;
-	private String relocationSearch;
-	private String censusSearch;
-	private String probateSearch;
-	private String polregSearch;
-	private String burregSearch;
-	private String siblingSearch;
-	private String cphCsvFileDirectory;
-	private String burialPersonComplete;
 	private String policeAddress;
 	private String policePerson;
 	private String policePosition;
+	private String polregSearch;
+	private String probatePath;
+	private String probateSchema;
+	private String probateSearch;
+	private String probateSource;
+	private String relocationSearch;
+	private String siblingSearch;
+	private String vejbyPath;
+	private String vejbySchema;
 
 	/**
 	 * Constructor
@@ -41,27 +43,29 @@ public class SettingsModel {
 	 */
 	public SettingsModel(Properties props) {
 		super();
-		vejbyPath = props.getProperty("vejbyPath");
-		probatePath = props.getProperty("probatePath");
-		probateSource = props.getProperty("probateSource");
+		burialPersonComplete = props.getProperty("burialPersonComplete");
+		burregSearch = props.getProperty("burregSearch");
+		censusCsvFileDirectory = props.getProperty("censusCsvFileDirectory");
+		censusPath = props.getProperty("censusPath");
+		censusSchema = props.getProperty("censusSchema");
+		censusSearch = props.getProperty("censusSearch");
+		cphCsvFileDirectory = props.getProperty("cphCsvFileDirectory");
 		cphDbPath = props.getProperty("cphDbPath");
+		cphSchema = props.getProperty("cphSchema");
 		gedcomFilePath = props.getProperty("gedcomFilePath");
 		kipTextFilename = props.getProperty("kipTextFilename");
-		censusCsvFileDirectory = props.getProperty("censusCsvFileDirectory");
-		vejbySchema = props.getProperty("vejbySchema");
-		probateSchema = props.getProperty("probateSchema");
-		cphSchema = props.getProperty("cphSchema");
-		relocationSearch = props.getProperty("relocationSearch");
-		censusSearch = props.getProperty("censusSearch");
-		probateSearch = props.getProperty("probateSearch");
-		polregSearch = props.getProperty("polregSearch");
-		burregSearch = props.getProperty("burregSearch");
-		siblingSearch = props.getProperty("siblingSearch");
-		cphCsvFileDirectory = props.getProperty("cphCsvFileDirectory");
-		burialPersonComplete = props.getProperty("burialPersonComplete");
 		policeAddress = props.getProperty("policeAddress");
 		policePerson = props.getProperty("policePerson");
 		policePosition = props.getProperty("policePosition");
+		polregSearch = props.getProperty("polregSearch");
+		probatePath = props.getProperty("probatePath");
+		probateSchema = props.getProperty("probateSchema");
+		probateSearch = props.getProperty("probateSearch");
+		probateSource = props.getProperty("probateSource");
+		relocationSearch = props.getProperty("relocationSearch");
+		siblingSearch = props.getProperty("siblingSearch");
+		vejbyPath = props.getProperty("vejbyPath");
+		vejbySchema = props.getProperty("vejbySchema");
 	}
 
 	/**
@@ -83,6 +87,20 @@ public class SettingsModel {
 	 */
 	public String getCensusCsvFileDirectory() {
 		return censusCsvFileDirectory;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getCensusPath() {
+		return censusPath;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getCensusSchema() {
+		return censusSchema;
 	}
 
 	/**
@@ -240,6 +258,21 @@ public class SettingsModel {
 	}
 
 	/**
+	 * @param text
+	 */
+	public void setCensusPath(String text) {
+		censusPath = text;
+
+	}
+
+	/**
+	 * @param text
+	 */
+	public void setCensusSchema(String text) {
+		censusSchema = text;
+	}
+
+	/**
 	 * @param censusSearch the censusSearch to set
 	 */
 	public void setCensusSearch(String censusSearch) {
@@ -376,27 +409,29 @@ public class SettingsModel {
 	 * @param props
 	 */
 	public void storeProperties(Properties props) {
-		props.setProperty("vejbyPath", vejbyPath);
-		props.setProperty("probatePath", probatePath);
-		props.setProperty("probateSource", probateSource);
+		props.setProperty("burialPersonComplete", burialPersonComplete);
+		props.setProperty("burregSearch", burregSearch);
+		props.setProperty("censusCsvFileDirectory", censusCsvFileDirectory);
+		props.setProperty("censusPath", censusPath);
+		props.setProperty("censusSchema", censusSchema);
+		props.setProperty("censusSearch", censusSearch);
+		props.setProperty("cphCsvFileDirectory", cphCsvFileDirectory);
 		props.setProperty("cphDbPath", cphDbPath);
+		props.setProperty("cphSchema", cphSchema);
 		props.setProperty("gedcomFilePath", gedcomFilePath);
 		props.setProperty("kipTextFilename", kipTextFilename);
-		props.setProperty("censusCsvFileDirectory", censusCsvFileDirectory);
-		props.setProperty("vejbySchema", vejbySchema);
-		props.setProperty("probateSchema", probateSchema);
-		props.setProperty("cphSchema", cphSchema);
-		props.setProperty("relocationSearch", relocationSearch);
-		props.setProperty("censusSearch", censusSearch);
-		props.setProperty("probateSearch", probateSearch);
-		props.setProperty("polregSearch", polregSearch);
-		props.setProperty("burregSearch", burregSearch);
-		props.setProperty("siblingSearch", siblingSearch);
-		props.setProperty("cphCsvFileDirectory", cphCsvFileDirectory);
-		props.setProperty("burialPersonComplete", burialPersonComplete);
 		props.setProperty("policeAddress", policeAddress);
 		props.setProperty("policePerson", policePerson);
 		props.setProperty("policePosition", policePosition);
+		props.setProperty("polregSearch", polregSearch);
+		props.setProperty("probatePath", probatePath);
+		props.setProperty("probateSchema", probateSchema);
+		props.setProperty("probateSearch", probateSearch);
+		props.setProperty("probateSource", probateSource);
+		props.setProperty("relocationSearch", relocationSearch);
+		props.setProperty("siblingSearch", siblingSearch);
+		props.setProperty("vejbyPath", vejbyPath);
+		props.setProperty("vejbySchema", vejbySchema);
 
 		final String path = System.getProperty("user.home") + "/ArchiveSearcher.properties";
 

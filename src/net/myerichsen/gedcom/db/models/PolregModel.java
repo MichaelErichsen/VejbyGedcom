@@ -33,7 +33,7 @@ public class PolregModel extends ASModel {
 	 */
 	public static PolregModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
-		final Date bd = (birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate));
+		final Date bd = birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate);
 		int calcYear = 0;
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
@@ -63,8 +63,8 @@ public class PolregModel extends ASModel {
 				continue;
 			}
 
-			day = (day == 0 ? 1 : day);
-			month = (month == 0 ? 1 : month);
+			day = day == 0 ? 1 : day;
+			month = month == 0 ? 1 : month;
 			rsbd = String.format("%04d", year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
 
 			prBirthDate = Date.valueOf(rsbd);
@@ -79,7 +79,7 @@ public class PolregModel extends ASModel {
 				}
 			}
 
-			if ((calcYear > 2) || (calcYear < -2)) {
+			if (calcYear > 2 || calcYear < -2) {
 				continue;
 			}
 
@@ -110,24 +110,24 @@ public class PolregModel extends ASModel {
 				pr3.setLetter(rs3.getString("LETTER"));
 				try {
 					pr3.setFloor(rs.getString("FLOOR"));
-				} catch (SQLException e) {
+				} catch (final SQLException e) {
 					pr3.setFloor("");
 				}
 				try {
 					pr3.setPlace(rs.getString("PLACE"));
-				} catch (SQLException e) {
+				} catch (final SQLException e) {
 					pr3.setPlace("");
 				}
 				pr3.setHost(rs3.getString("HOST"));
 				pr3.setDay(rs3.getInt("DAY"));
 				try {
 					pr3.setMonth(rs.getInt("MONTH"));
-				} catch (SQLException e) {
+				} catch (final SQLException e) {
 					pr3.setMonth(1);
 				}
 				try {
 					pr3.setYear(rs3.getInt("YEAR"));
-				} catch (SQLException e) {
+				} catch (final SQLException e) {
 					pr3.setYear(1);
 				}
 				pr3.setFullAddress(rs3.getString("FULL_ADDRESS"));
@@ -136,7 +136,7 @@ public class PolregModel extends ASModel {
 
 		statement.close();
 
-		PolregModel[] pra = new PolregModel[lpr.size()];
+		final PolregModel[] pra = new PolregModel[lpr.size()];
 
 		for (int i = 0; i < lpr.size(); i++) {
 			pra[i] = lpr.get(i);

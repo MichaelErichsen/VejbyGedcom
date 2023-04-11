@@ -84,7 +84,7 @@ public class CensusModel extends ASModel {
 			cil.add(ci);
 		}
 
-		CensusModel[] cra = new CensusModel[cil.size()];
+		final CensusModel[] cra = new CensusModel[cil.size()];
 
 		for (int i = 0; i < cra.length; i++) {
 			cra[i] = cil.get(i);

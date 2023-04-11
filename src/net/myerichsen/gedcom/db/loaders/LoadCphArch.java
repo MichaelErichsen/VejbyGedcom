@@ -66,7 +66,8 @@ public abstract class LoadCphArch {
 		}
 		if (columnType.startsWith("CHAR") || columnType.startsWith("VARCHAR") || columnType.startsWith("DATE")) {
 			return "'" + string + "'";
-		} else if (columnType.startsWith("BOOLEAN")) {
+		}
+		if (columnType.startsWith("BOOLEAN")) {
 			if (string.equals("b'\\x00'")) {
 				return "TRUE";
 			} else {
@@ -185,7 +186,7 @@ public abstract class LoadCphArch {
 			for (int i = 0; i < columnTypes.size(); i++) {
 				sb.append(convertString(columnTypes.get(i), columns[i]));
 
-				if (i < (columnTypes.size() - 1)) {
+				if (i < columnTypes.size() - 1) {
 					sb.append(", ");
 				}
 			}
@@ -196,7 +197,7 @@ public abstract class LoadCphArch {
 				logger.fine(query);
 				statement.execute(query);
 				counter++;
-				if ((counter % 100000) == 0) {
+				if (counter % 100000 == 0) {
 					logger.info("Counter: " + counter);
 				}
 				previousLine = line;

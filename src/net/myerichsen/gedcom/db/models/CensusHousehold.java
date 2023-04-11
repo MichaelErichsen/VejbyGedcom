@@ -16,7 +16,6 @@ import java.util.List;
 public class CensusHousehold extends ASModel {
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS "
 			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
-	private List<CensusModel> household;
 
 	/**
 	 * Get a list of household census records from the Derby table
@@ -67,12 +66,7 @@ public class CensusHousehold extends ASModel {
 		return cil;
 	}
 
-	/**
-	 * @param household the household to set
-	 */
-	public void setHousehold(List<CensusModel> household) {
-		this.household = household;
-	}
+	private List<CensusModel> household;
 
 	/**
 	 * @return the household
@@ -81,11 +75,18 @@ public class CensusHousehold extends ASModel {
 		return household;
 	}
 
+	/**
+	 * @param household the household to set
+	 */
+	public void setHousehold(List<CensusModel> household) {
+		this.household = household;
+	}
+
 	@Override
 	public String[] toStringArray() {
-		List<String> ls = new ArrayList<>();
+		final List<String> ls = new ArrayList<>();
 
-		for (CensusModel censusRecord : household) {
+		for (final CensusModel censusRecord : household) {
 			ls.add(censusRecord.toString());
 		}
 

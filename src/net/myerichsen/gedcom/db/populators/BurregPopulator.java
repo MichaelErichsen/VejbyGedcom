@@ -16,7 +16,7 @@ public class BurregPopulator implements ASPopulator {
 		try {
 			final BurregModel[] BurregRecords = BurregModel.loadFromDatabase(args[0], args[1], args[2], args[3]);
 			return BurregRecords;
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 		return null;

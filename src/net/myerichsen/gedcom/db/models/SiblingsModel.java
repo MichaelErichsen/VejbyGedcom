@@ -23,29 +23,6 @@ public class SiblingsModel extends ASModel {
 	/**
 	 * Get a list of objects from the database
 	 *
-	 * @param sa
-	 * @return
-	 * @throws SQLException
-	 */
-	public static SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
-		switch (args.length) {
-		case 2: {
-			return loadFromDatabase(args[0], args[1]);
-		}
-		case 3: {
-			return loadFromDatabase(args[0], args[1], args[2]);
-		}
-		case 4: {
-			return loadFromDatabase(args[0], args[1], args[2], args[3]);
-		}
-		default:
-			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");
-		}
-	}
-
-	/**
-	 * Get a list of objects from the database
-	 *
 	 * @param dbPath
 	 * @param parents
 	 * @return
@@ -61,9 +38,8 @@ public class SiblingsModel extends ASModel {
 		if (p.length > 1) {
 
 			return loadFromDatabase(dbPath, p[0], p[1]);
-		} else {
-			return loadFromDatabase(dbPath, p[0], "");
 		}
+		return loadFromDatabase(dbPath, p[0], "");
 
 	}
 
@@ -95,10 +71,10 @@ public class SiblingsModel extends ASModel {
 			return new SiblingsModel[0];
 		}
 
-		PreparedStatement statement = conn.prepareStatement(SELECT);
+		final PreparedStatement statement = conn.prepareStatement(SELECT);
 		statement.setString(1, fatherPhonetic);
 		statement.setString(2, motherPhonetic);
-		ResultSet rs = statement.executeQuery();
+		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			pr = new SiblingsModel();
@@ -134,20 +110,43 @@ public class SiblingsModel extends ASModel {
 	}
 
 	/**
+	 * Get a list of objects from the database
+	 *
+	 * @param sa
+	 * @return
+	 * @throws SQLException
+	 */
+	public static SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
+		switch (args.length) {
+		case 2: {
+			return loadFromDatabase(args[0], args[1]);
+		}
+		case 3: {
+			return loadFromDatabase(args[0], args[1], args[2]);
+		}
+		case 4: {
+			return loadFromDatabase(args[0], args[1], args[2], args[3]);
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");
+		}
+	}
+
+	/**
 	 * Split into two names and phonetisize
 	 *
 	 * @param parents2
 	 * @return
 	 */
 	private static String[] splitParents(String parents2) {
-		String s = parents2.replaceAll("\\d", "").replaceAll("\\.", "").toLowerCase();
+		String s = parents2.replaceAll("\\d", "").replace(".", "").toLowerCase();
 		s = s.replace(", f.", "");
 		String[] sa = s.split(",");
 		final String[] words = sa[0].split(" ");
 
 		final String filter = "af bager gamle gmd i inds junior kirkesanger pige pigen portner proprietær sadelmager "
 				+ "skolelærer skovfoged slagter smed smedesvend snedker søn ugift ugifte unge ungkarl " + "uægte år";
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (final String word : words) {
 			if (!filter.contains(word)) {

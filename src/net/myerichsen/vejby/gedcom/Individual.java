@@ -426,13 +426,13 @@ public class Individual {
 
 		if (mapping.getDaughterNameStubs().contains(familyName.toLowerCase())) {
 			LOGGER.log(Level.INFO, "Invalid family name: " + familyName);
-			familyName = (nameParts[nameParts.length - 2] + "datter");
+			familyName = nameParts[nameParts.length - 2] + "datter";
 
-			for (int i = 0; i < (nameParts.length - 2); i++) {
+			for (int i = 0; i < nameParts.length - 2; i++) {
 				sb.append(nameParts[i] + " ");
 			}
 		} else {
-			for (int i = 0; i < (nameParts.length - 1); i++) {
+			for (int i = 0; i < nameParts.length - 1; i++) {
 				sb.append(nameParts[i] + " ");
 			}
 		}
@@ -440,7 +440,7 @@ public class Individual {
 		// Surround with slashes to mark as family name
 		sb.append("/" + familyName + "/\n");
 
-		if ((getSource() != null) && !getSource().equals("")) {
+		if (getSource() != null && !getSource().equals("")) {
 			sb.append("2 SOUR @S1@\n");
 			sb.append("3 PAGE " + getSource() + "\n");
 		}
@@ -452,43 +452,43 @@ public class Individual {
 			sb.append("1 SEX M\n");
 		}
 
-		if ((getBirthDate() != null) && !getBirthDate().equals("")) {
+		if (getBirthDate() != null && !getBirthDate().equals("")) {
 			sb.append("1 BIRT\n");
 			sb.append("2 DATE " + getBirthDate() + "\n");
-			if ((getBirthPlace() != null) && !getBirthPlace().equals("")) {
+			if (getBirthPlace() != null && !getBirthPlace().equals("")) {
 				sb.append("2 PLAC " + getBirthPlace() + ",\n");
 			}
 		}
 
-		if ((getChristeningDate() != null) && !getChristeningDate().equals("")) {
+		if (getChristeningDate() != null && !getChristeningDate().equals("")) {
 			sb.append("1 CHR\n");
 			sb.append("2 DATE " + getChristeningDate() + "\n");
-			if ((getChristeningPlace() != null) && !getChristeningPlace().equals("")) {
+			if (getChristeningPlace() != null && !getChristeningPlace().equals("")) {
 				sb.append("2 PLAC " + getChristeningPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if ((getConfirmationDate() != null) && !getConfirmationDate().equals("")) {
+		if (getConfirmationDate() != null && !getConfirmationDate().equals("")) {
 			sb.append("1 CONF\n");
 			sb.append("2 DATE " + getConfirmationDate() + "\n");
-			if ((getConfirmationPlace() != null) && !getConfirmationPlace().equals("")) {
+			if (getConfirmationPlace() != null && !getConfirmationPlace().equals("")) {
 				sb.append("2 PLAC " + getConfirmationPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if ((getDeathDate() != null) && !getDeathDate().equals("")) {
+		if (getDeathDate() != null && !getDeathDate().equals("")) {
 			sb.append("1 DEAT\n");
 			sb.append("2 DATE " + getDeathDate() + "\n");
 
-			if ((getDeathPlace() != null) && !getDeathPlace().equals("")) {
+			if (getDeathPlace() != null && !getDeathPlace().equals("")) {
 				sb.append("2 PLAC " + getDeathPlace() + "\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if ((getTrade() != null) && !getTrade().equals("")) {
+		if (getTrade() != null && !getTrade().equals("")) {
 			sb.append("1 OCCU " + getTrade() + "\n");
 		}
 

@@ -193,13 +193,37 @@ public class ProbateComposite extends Composite {
 	}
 
 	/**
+	 * Populate probate table
+	 *
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
+		new Thread(() -> {
+			if (probateListener != null) {
+				try {
+					final String[] loadArgs = new String[] { props.getProperty("probatePath"), phonName, birthDate,
+							deathDate, props.getProperty("probateSource") };
+					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.loadFromDatabase(loadArgs);
+
+					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+
+	/**
 	 * @param display
 	 */
 	private void probatePopup(Display display) {
 		final TableItem[] tia = probateTable.getSelection();
 		final TableItem ti = tia[0];
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < 5; i++) {
 			if (ti.getText(i).length() > 0) {
@@ -229,29 +253,5 @@ public class ProbateComposite extends Composite {
 	public void setProperties(Properties props) {
 		this.props = props;
 
-	}
-
-	/**
-	 * Populate probate table
-	 *
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @throws SQLException
-	 */
-	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		new Thread(() -> {
-			if (probateListener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("probatePath"), phonName, birthDate,
-							deathDate, props.getProperty("probateSource") };
-					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.loadFromDatabase(loadArgs);
-
-					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
 	}
 }

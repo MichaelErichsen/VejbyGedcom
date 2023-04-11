@@ -17,16 +17,113 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
  *
  */
 public class IndividualComposite extends Composite {
-	private Text txtindividualid;
-	private Text txtindividualname;
-	private Text txtindividualsex;
-	private Text txtindividualfamc;
-	private Text txtindividualphonname;
-	private Text txtindividualbirthdate;
-	private Text txtindividualbirthplace;
-	private Text txtindividualparents;
-	private Text txtindividualdeathdate;
-	private Text txtindividualdeathplace;
+	private final Text txtindividualid;
+	private final Text txtindividualname;
+	private final Text txtindividualsex;
+	private final Text txtindividualfamc;
+	private final Text txtindividualphonname;
+	private final Text txtindividualbirthdate;
+	private final Text txtindividualbirthplace;
+	private final Text txtindividualparents;
+	private final Text txtindividualdeathdate;
+	private final Text txtindividualdeathplace;
+
+	/**
+	 * Create the composite.
+	 *
+	 * @param parent
+	 * @param style
+	 */
+
+	public IndividualComposite(Composite parent, int style) {
+		super(parent, style);
+		setLayout(new GridLayout(2, false));
+
+		final Label lblId = new Label(this, SWT.NONE);
+		lblId.setText("ID");
+
+		txtindividualid = new Text(this, SWT.BORDER);
+		txtindividualid.setEditable(false);
+		txtindividualid.setText("");
+		txtindividualid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFornavn = new Label(this, SWT.NONE);
+		lblFornavn.setText("Navn");
+
+		txtindividualname = new Text(this, SWT.BORDER);
+		txtindividualname.setEditable(false);
+		txtindividualname.setText("");
+		txtindividualname.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblKn = new Label(this, SWT.NONE);
+		lblKn.setText("K\u00F8n");
+
+		txtindividualsex = new Text(this, SWT.BORDER);
+		txtindividualsex.setEditable(false);
+		txtindividualsex.setText("");
+		txtindividualsex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFamilieId = new Label(this, SWT.NONE);
+		lblFamilieId.setText("Familie ID");
+
+		txtindividualfamc = new Text(this, SWT.BORDER);
+		txtindividualfamc.setEditable(false);
+		txtindividualfamc.setText("");
+		txtindividualfamc.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFonetiskNavn = new Label(this, SWT.NONE);
+		lblFonetiskNavn.setText("Fonetisk navn");
+
+		txtindividualphonname = new Text(this, SWT.BORDER);
+		txtindividualphonname.setEditable(false);
+		txtindividualphonname.setText("");
+		txtindividualphonname.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFdselsdato = new Label(this, SWT.NONE);
+		lblFdselsdato.setText("F\u00F8dselsdato");
+
+		txtindividualbirthdate = new Text(this, SWT.BORDER);
+		txtindividualbirthdate.setEditable(false);
+		txtindividualbirthdate.setText("");
+		txtindividualbirthdate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFdested = new Label(this, SWT.NONE);
+		lblFdested.setText("F\u00F8dested");
+
+		txtindividualbirthplace = new Text(this, SWT.BORDER);
+		txtindividualbirthplace.setEditable(false);
+		txtindividualbirthplace.setText("");
+		txtindividualbirthplace.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblDddato = new Label(this, SWT.NONE);
+		lblDddato.setText("Dødsdato");
+
+		txtindividualdeathdate = new Text(this, SWT.BORDER);
+		txtindividualdeathdate.setEditable(false);
+		txtindividualdeathdate.setText("");
+		txtindividualdeathdate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblddsted = new Label(this, SWT.NONE);
+		lblddsted.setText("D\u00F8dssted");
+
+		txtindividualdeathplace = new Text(this, SWT.BORDER);
+		txtindividualdeathplace.setEditable(false);
+		txtindividualdeathplace.setText("");
+		txtindividualdeathplace.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblForldre = new Label(this, SWT.NONE);
+		lblForldre.setText("For\u00E6ldre");
+
+		txtindividualparents = new Text(this, SWT.BORDER);
+		txtindividualparents.setEditable(false);
+		txtindividualparents.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+	}
+
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
+	}
 
 	/**
 	 * Clear all fields
@@ -42,103 +139,6 @@ public class IndividualComposite extends Composite {
 		txtindividualdeathdate.setText("");
 		txtindividualdeathplace.setText("");
 		txtindividualparents.setText("");
-	}
-
-	/**
-	 * Create the composite.
-	 *
-	 * @param parent
-	 * @param style
-	 */
-
-	public IndividualComposite(Composite parent, int style) {
-		super(parent, style);
-		setLayout(new GridLayout(2, false));
-
-		Label lblId = new Label(this, SWT.NONE);
-		lblId.setText("ID");
-
-		txtindividualid = new Text(this, SWT.BORDER);
-		txtindividualid.setEditable(false);
-		txtindividualid.setText("");
-		txtindividualid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblFornavn = new Label(this, SWT.NONE);
-		lblFornavn.setText("Navn");
-
-		txtindividualname = new Text(this, SWT.BORDER);
-		txtindividualname.setEditable(false);
-		txtindividualname.setText("");
-		txtindividualname.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblKn = new Label(this, SWT.NONE);
-		lblKn.setText("K\u00F8n");
-
-		txtindividualsex = new Text(this, SWT.BORDER);
-		txtindividualsex.setEditable(false);
-		txtindividualsex.setText("");
-		txtindividualsex.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblFamilieId = new Label(this, SWT.NONE);
-		lblFamilieId.setText("Familie ID");
-
-		txtindividualfamc = new Text(this, SWT.BORDER);
-		txtindividualfamc.setEditable(false);
-		txtindividualfamc.setText("");
-		txtindividualfamc.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblFonetiskNavn = new Label(this, SWT.NONE);
-		lblFonetiskNavn.setText("Fonetisk navn");
-
-		txtindividualphonname = new Text(this, SWT.BORDER);
-		txtindividualphonname.setEditable(false);
-		txtindividualphonname.setText("");
-		txtindividualphonname.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblFdselsdato = new Label(this, SWT.NONE);
-		lblFdselsdato.setText("F\u00F8dselsdato");
-
-		txtindividualbirthdate = new Text(this, SWT.BORDER);
-		txtindividualbirthdate.setEditable(false);
-		txtindividualbirthdate.setText("");
-		txtindividualbirthdate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblFdested = new Label(this, SWT.NONE);
-		lblFdested.setText("F\u00F8dested");
-
-		txtindividualbirthplace = new Text(this, SWT.BORDER);
-		txtindividualbirthplace.setEditable(false);
-		txtindividualbirthplace.setText("");
-		txtindividualbirthplace.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblDddato = new Label(this, SWT.NONE);
-		lblDddato.setText("Dødsdato");
-
-		txtindividualdeathdate = new Text(this, SWT.BORDER);
-		txtindividualdeathdate.setEditable(false);
-		txtindividualdeathdate.setText("");
-		txtindividualdeathdate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblddsted = new Label(this, SWT.NONE);
-		lblddsted.setText("D\u00F8dssted");
-
-		txtindividualdeathplace = new Text(this, SWT.BORDER);
-		txtindividualdeathplace.setEditable(false);
-		txtindividualdeathplace.setText("");
-		txtindividualdeathplace.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Label lblForldre = new Label(this, SWT.NONE);
-		lblForldre.setText("For\u00E6ldre");
-
-		txtindividualparents = new Text(this, SWT.BORDER);
-		txtindividualparents.setEditable(false);
-		txtindividualparents.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-	}
-
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
 	}
 
 	/**

@@ -39,7 +39,7 @@ public class CensusBirthPlaceFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if ((searchString == null) || (searchString.length() == 0)) {
+		if (searchString == null || searchString.length() == 0) {
 			return true;
 		}
 

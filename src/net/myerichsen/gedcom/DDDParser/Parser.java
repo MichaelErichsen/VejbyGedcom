@@ -191,7 +191,8 @@ public class Parser {
 
 		while (fields[householdColumn].equals(household)) {
 			printHouseholdMember(thisLine);
-			thisLine = csvLines.get(firstInHousehold++);
+			thisLine = csvLines.get(firstInHousehold);
+			firstInHousehold++;
 			fields = thisLine.split(";");
 		}
 

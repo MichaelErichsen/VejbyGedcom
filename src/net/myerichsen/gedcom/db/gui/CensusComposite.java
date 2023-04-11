@@ -511,11 +511,6 @@ public class CensusComposite extends Composite {
 
 	}
 
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
-
 	/**
 	 * Create the census popup
 	 */
@@ -523,7 +518,7 @@ public class CensusComposite extends Composite {
 		final TableItem[] tia = censusTable.getSelection();
 		final TableItem ti = tia[0];
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 24; i++) {
 			if (ti.getText(i).length() > 0) {
 				sb.append(ti.getText(i) + ", ");
@@ -545,7 +540,7 @@ public class CensusComposite extends Composite {
 			try {
 				final List<CensusModel> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
 						ti.getText(21), ti.getText(5));
-				final StringBuffer sb2 = new StringBuffer();
+				final StringBuilder sb2 = new StringBuilder();
 
 				for (final CensusModel element : lcr) {
 					sb2.append(element.toString() + "\n");
@@ -562,6 +557,11 @@ public class CensusComposite extends Composite {
 		}
 	}
 
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
+	}
+
 	/**
 	 * @param property
 	 * @param text
@@ -570,7 +570,7 @@ public class CensusComposite extends Composite {
 	 * @throws SQLException
 	 */
 	protected String getCensusHousehold(String kipNr, String nr) throws SQLException {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		String string;
 
 		household = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"), kipNr, nr);

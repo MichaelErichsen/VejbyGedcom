@@ -92,7 +92,7 @@ public class BirthdateMatcher {
 			value1 = individual1.getValue();
 			event1 = value1.getEventsOfType(IndividualEventType.BIRTH);
 
-			if ((event1 != null) && (event1.size() > 0)) {
+			if (event1 != null && event1.size() > 0) {
 				birthDate1 = event1.get(0).getDate().getValue();
 
 				if (!pattern.matcher(birthDate1).matches()) {
@@ -104,7 +104,7 @@ public class BirthdateMatcher {
 					value2 = individual2.getValue();
 					event2 = value2.getEventsOfType(IndividualEventType.BIRTH);
 
-					if ((event2 != null) && (event2.size() > 0)) {
+					if (event2 != null && event2.size() > 0) {
 						birthDate2 = event2.get(0).getDate().getValue();
 
 						if (!pattern.matcher(birthDate2).matches()) {

@@ -27,7 +27,7 @@ public class Fonkod {
 	 */
 	private String eliminateImpossibleConsonantCombinations(String input) {
 		String out = input;
-		if ((out.length() < 2) || isVowel(out.charAt(0), out.charAt(1))) {
+		if (out.length() < 2 || isVowel(out.charAt(0), out.charAt(1))) {
 			return out;
 		}
 
@@ -345,7 +345,7 @@ public class Fonkod {
 			p = Pattern.compile(pattern);
 			m = p.matcher(out);
 
-			if (m.lookingAt() && (m.start() == 0)) {
+			if (m.lookingAt() && m.start() == 0) {
 				sb.append("v" + out.substring(1) + " f" + out.substring(1));
 				out = sb.toString();
 				break;
@@ -730,7 +730,7 @@ public class Fonkod {
 		final int vgSlut = m.end();
 
 		// Kun én vokal i gruppen?
-		if (vgStart == (vgSlut - 1)) {
+		if (vgStart == vgSlut - 1) {
 
 			// y fordobles til y og ø
 			if (input.charAt(vgStart) == 'y') {

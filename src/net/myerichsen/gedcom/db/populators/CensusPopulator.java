@@ -16,7 +16,7 @@ public class CensusPopulator implements ASPopulator {
 		try {
 			final CensusModel[] CensusRecords = CensusModel.loadFromDatabase(args[0], args[1], args[2], args[3]);
 			return CensusRecords;
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 		return null;

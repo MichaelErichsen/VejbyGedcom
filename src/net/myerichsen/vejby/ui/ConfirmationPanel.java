@@ -225,14 +225,16 @@ public class ConfirmationPanel extends FsPanel {
 			family.getChildren().add(child);
 
 			if (!line[4].equals("")) {
-				father = new Individual(individualId++);
+				father = new Individual(individualId);
+				individualId++;
 				father.setName(line[4]);
 				father.setSex("M");
 				family.setFather(father);
 			}
 
 			if (!line[5].equals("")) {
-				mother = new Individual(individualId++);
+				mother = new Individual(individualId);
+				individualId++;
 				mother.setName(line[5]);
 				mother.setSex("F");
 				family.setMother(mother);

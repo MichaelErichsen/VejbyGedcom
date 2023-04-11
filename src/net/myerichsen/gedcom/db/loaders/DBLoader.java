@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 10. apr. 2023
  */
 public class DBLoader {
 	/**
@@ -100,7 +100,7 @@ public class DBLoader {
 			System.exit(4);
 		}
 
-		logger = Logger.getLogger("DBLoader");
+		logger = Logger.getLogger("ArchiveSearcher");
 
 		final DBLoader ir = new DBLoader();
 
@@ -190,6 +190,25 @@ public class DBLoader {
 	}
 
 	/**
+	 * Extract birthYear from date string
+	 *
+	 * @param dateString
+	 * @return
+	 */
+	private int extractBirthYear(String dateString) {
+		String year = dateString;
+		final Pattern pattern = Pattern.compile("\\d{4}");
+		final Matcher m = pattern.matcher(dateString);
+
+		if (m.find()) {
+			year = m.group(0);
+		}
+
+		return Integer.parseInt(year);
+
+	}
+
+	/**
 	 * Insert a family event into Derby for husband and wife
 	 *
 	 * @param family
@@ -261,6 +280,25 @@ public class DBLoader {
 			outDate = date + "-01-01";
 		}
 		return Date.valueOf(outDate);
+	}
+
+	/**
+	 * Get parents from christening source citation
+	 *
+	 * @param value
+	 * @return
+	 */
+	private String getParentsFromSource(Individual value) {
+		try {
+			final IndividualEvent christening = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
+			birthYear = extractBirthYear(christening.getDate().getValue());
+			sted = christening.getPlace().getPlaceName().toString();
+			final CitationWithSource citation = (CitationWithSource) christening.getCitations().get(0);
+			return citation.getWhereInSource().toString();
+		} catch (final Exception e) {
+		}
+
+		return "";
 	}
 
 	/**
@@ -343,7 +381,7 @@ public class DBLoader {
 						psINSERT_FAMILY_EVENT.setString(7, "NULL");
 					}
 				} else {
-					final StringBuffer sb2 = new StringBuffer();
+					final StringBuilder sb2 = new StringBuilder();
 
 					for (final CustomFact customFact : customFacts) {
 						sb2.append(customFact.getDescription().getValue());
@@ -470,7 +508,7 @@ public class DBLoader {
 						psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
 					}
 				} else {
-					final StringBuffer sb2 = new StringBuffer();
+					final StringBuilder sb2 = new StringBuilder();
 
 					for (final CustomFact customFact : customFacts) {
 						sb2.append(customFact.getDescription().getValue());
@@ -590,25 +628,6 @@ public class DBLoader {
 	}
 
 	/**
-	 * Get parents from christening source citation
-	 *
-	 * @param value
-	 * @return
-	 */
-	private String getParentsFromSource(Individual value) {
-		try {
-			final IndividualEvent christening = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
-			birthYear = extractBirthYear(christening.getDate().getValue());
-			sted = christening.getPlace().getPlaceName().toString();
-			final CitationWithSource citation = (CitationWithSource) christening.getCitations().get(0);
-			return citation.getWhereInSource().toString();
-		} catch (final Exception e) {
-		}
-
-		return "";
-	}
-
-	/**
 	 * INSERT INTO VEJBY.PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, PARENTS,
 	 * FATHERPHONETIC, MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)
 	 *
@@ -687,7 +706,7 @@ public class DBLoader {
 
 			try {
 				a = fonkod.generateKey(splitParents[0]);
-				a = (a.length() > 64 ? a.substring(0, 63) : a);
+				a = a.length() > 64 ? a.substring(0, 63) : a;
 			} catch (final Exception e) {
 			}
 
@@ -695,7 +714,7 @@ public class DBLoader {
 
 			try {
 				b = fonkod.generateKey(splitParents[1]);
-				b = (b.length() > 64 ? b.substring(0, 63) : b);
+				b = b.length() > 64 ? b.substring(0, 63) : b;
 			} catch (final Exception e) {
 			}
 
@@ -704,25 +723,6 @@ public class DBLoader {
 			psINSERT_PARENTS.executeUpdate();
 			parentsCounter++;
 		}
-	}
-
-	/**
-	 * Extract birthYear from date string
-	 *
-	 * @param dateString
-	 * @return
-	 */
-	private int extractBirthYear(String dateString) {
-		String year = dateString;
-		Pattern pattern = Pattern.compile("\\d{4}");
-		Matcher m = pattern.matcher(dateString);
-
-		if (m.find()) {
-			year = m.group(0);
-		}
-
-		return Integer.parseInt(year);
-
 	}
 
 	/**
@@ -760,11 +760,11 @@ public class DBLoader {
 	 * @return
 	 */
 	private String[] splitParents(String parents2) {
-		if ((parents2 == null) || (parents2.length() == 0)) {
+		if (parents2 == null || parents2.length() == 0) {
 			return new String[] { "", "" };
 		}
 
-		String s = parents2.replaceAll("\\d", "").replaceAll("\\.", "").toLowerCase();
+		String s = parents2.replaceAll("\\d", "").replace(".", "").toLowerCase();
 		s = s.replace(", f.", "");
 		String[] sa = s.split(",");
 		final String[] words = sa[0].split(" ");
@@ -773,7 +773,7 @@ public class DBLoader {
 				"pige", "pigen", "portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed",
 				"smedesvend", "snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (final String word : words) {
 			for (final String element : filter) {
@@ -862,7 +862,7 @@ public class DBLoader {
 				mother = "";
 			}
 
-			if ((father.length() > 0) && (mother.length() > 0)) {
+			if (father.length() > 0 && mother.length() > 0) {
 				parents = father + " og " + mother;
 				parentsCounter++;
 			} else {
@@ -877,7 +877,7 @@ public class DBLoader {
 			try {
 				psUPDATE_INDIVIDUAL_FAMC.execute();
 			} catch (final SQLException e) {
-				logger.info("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+				logger.fine("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 
 				// Handle family not yet inserted
 				if (!e.getSQLState().equals("23503")) {
@@ -900,13 +900,13 @@ public class DBLoader {
 
 		if (familiesWhereChild == null) {
 			try {
-				List<IndividualEvent> eventsOfType = individual.getEventsOfType(IndividualEventType.CHRISTENING);
-				IndividualEvent event = eventsOfType.get(0);
-				List<AbstractCitation> citations = event.getCitations();
-				CitationWithSource citation = (CitationWithSource) citations.get(0);
-				StringWithCustomFacts whereInSource = citation.getWhereInSource();
+				final List<IndividualEvent> eventsOfType = individual.getEventsOfType(IndividualEventType.CHRISTENING);
+				final IndividualEvent event = eventsOfType.get(0);
+				final List<AbstractCitation> citations = event.getCitations();
+				final CitationWithSource citation = (CitationWithSource) citations.get(0);
+				final StringWithCustomFacts whereInSource = citation.getWhereInSource();
 				String parents = whereInSource.toString();
-				parents = (parents.length() > 256 ? parents.substring(0, 255) : parents);
+				parents = parents.length() > 256 ? parents.substring(0, 255) : parents;
 				logger.fine("Parents: " + parents);
 
 				psUPDATE_INDIVIDUAL_PARENTS.setString(1, parents);

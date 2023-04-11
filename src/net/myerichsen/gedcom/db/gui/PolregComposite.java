@@ -304,6 +304,33 @@ public class PolregComposite extends Composite {
 	}
 
 	/**
+	 *
+	 */
+	private void polregPopup() {
+		final TableItem[] tia = polregTable.getSelection();
+		final TableItem ti = tia[0];
+
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 13; i++) {
+			if (ti.getText(i).length() > 0) {
+				sb.append(ti.getText(i) + ", ");
+			}
+		}
+		sb.append("\n");
+
+		final MessageDialog dialog = new MessageDialog(getShell(), "Politiets Registerblade", null, sb.toString(),
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+		final int open = dialog.open();
+
+		if (open == 1) {
+			final Clipboard clipboard = new Clipboard(getDisplay());
+			final TextTransfer textTransfer = TextTransfer.getInstance();
+			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
+			clipboard.dispose();
+		}
+	}
+
+	/**
 	 * Populate police registry table
 	 *
 	 * @param phonName
@@ -325,33 +352,6 @@ public class PolregComposite extends Composite {
 				}
 			}
 		}).start();
-	}
-
-	/**
-	 *
-	 */
-	private void polregPopup() {
-		final TableItem[] tia = polregTable.getSelection();
-		final TableItem ti = tia[0];
-
-		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < 13; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-		sb.append("\n");
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Politiets Registerblade", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
-		final int open = dialog.open();
-
-		if (open == 1) {
-			final Clipboard clipboard = new Clipboard(getDisplay());
-			final TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
-			clipboard.dispose();
-		}
 	}
 
 	/**

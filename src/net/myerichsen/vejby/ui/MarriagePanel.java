@@ -193,7 +193,8 @@ public class MarriagePanel extends FsPanel {
 					groom.setBirthDate(line[2]);
 				}
 
-				bride = new Individual(individualId++);
+				bride = new Individual(individualId);
+				individualId++;
 				bride.setName(line[5]);
 			} else {
 				bride = new Individual(individualId);
@@ -204,7 +205,8 @@ public class MarriagePanel extends FsPanel {
 					bride.setBirthDate(line[2]);
 				}
 
-				groom = new Individual(individualId++);
+				groom = new Individual(individualId);
+				individualId++;
 				groom.setName(line[5]);
 			}
 

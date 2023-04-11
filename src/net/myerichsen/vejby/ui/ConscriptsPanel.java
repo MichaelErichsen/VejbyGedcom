@@ -203,7 +203,8 @@ public class ConscriptsPanel extends FsPanel {
 			family.getChildren().add(child);
 
 			if (!line[4].equals("")) {
-				father = new Individual(individualId++);
+				father = new Individual(individualId);
+				individualId++;
 				father.setName(line[4]);
 				father.setSex("M");
 				family.setFather(father);

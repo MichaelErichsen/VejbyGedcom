@@ -2,8 +2,6 @@ package net.myerichsen.gedcom.db.gui;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -20,7 +18,7 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
 
 /**
  * Wizard page to handle GEDCOM imports
- * 
+ *
  * @author Michael Erichsen
  * @version 10. apr. 2023
  *
@@ -42,7 +40,7 @@ public class SettingsWizardPage1 extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		setControl(container);
 		container.setLayout(new GridLayout(3, false));
 
@@ -52,17 +50,14 @@ public class SettingsWizardPage1 extends WizardPage {
 		lblGedcomFilSti.setText("GEDCOM fil sti");
 
 		txtGedcomFilePath = new Text(container, SWT.BORDER);
-		txtGedcomFilePath.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				settings.setGedcomFilePath(txtGedcomFilePath.getText());
+		txtGedcomFilePath.addModifyListener(e -> {
+			settings.setGedcomFilePath(txtGedcomFilePath.getText());
 
-				if ((settings.getGedcomFilePath().equals("")) || (settings.getVejbyPath().equals(""))
-						|| (settings.getVejbySchema().equals(""))) {
-					setPageComplete(false);
-				} else {
-					setPageComplete(true);
-				}
+			if (settings.getGedcomFilePath().equals("") || settings.getVejbyPath().equals("")
+					|| settings.getVejbySchema().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
 			}
 		});
 		txtGedcomFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -93,17 +88,14 @@ public class SettingsWizardPage1 extends WizardPage {
 		lblVejbyDatabaseSti.setText("Vejby database sti");
 
 		txtVejbyPath = new Text(container, SWT.BORDER);
-		txtVejbyPath.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				settings.setVejbyPath(txtVejbyPath.getText());
+		txtVejbyPath.addModifyListener(e -> {
+			settings.setVejbyPath(txtVejbyPath.getText());
 
-				if ((settings.getGedcomFilePath().equals("")) || (settings.getVejbyPath().equals(""))
-						|| (settings.getVejbySchema().equals(""))) {
-					setPageComplete(false);
-				} else {
-					setPageComplete(true);
-				}
+			if (settings.getGedcomFilePath().equals("") || settings.getVejbyPath().equals("")
+					|| settings.getVejbySchema().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
 			}
 		});
 		txtVejbyPath.setText(settings.getVejbyPath());
@@ -132,17 +124,14 @@ public class SettingsWizardPage1 extends WizardPage {
 		lblVejbySchema.setText("Vejby database schema");
 
 		txtVejbySchema = new Text(container, SWT.BORDER);
-		txtVejbySchema.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				settings.setVejbySchema(txtVejbySchema.getText());
+		txtVejbySchema.addModifyListener(e -> {
+			settings.setVejbySchema(txtVejbySchema.getText());
 
-				if ((settings.getGedcomFilePath().equals("")) || (settings.getVejbyPath().equals(""))
-						|| (settings.getVejbySchema().equals(""))) {
-					setPageComplete(false);
-				} else {
-					setPageComplete(true);
-				}
+			if (settings.getGedcomFilePath().equals("") || settings.getVejbyPath().equals("")
+					|| settings.getVejbySchema().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
 			}
 		});
 		txtVejbySchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

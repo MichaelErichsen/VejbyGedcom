@@ -199,14 +199,14 @@ public class MatchPerson {
 		sex = value.getSex().getValue();
 		List<IndividualEvent> event = value.getEventsOfType(IndividualEventType.BIRTH);
 
-		if ((event != null) && (event.size() > 0)) {
+		if (event != null && event.size() > 0) {
 			birthDate = event.get(0).getDate().getValue();
 			birthYear = getYear(birthDate);
 			birtChrFlag = "B";
 		} else {
 			event = value.getEventsOfType(IndividualEventType.CHRISTENING);
 
-			if ((event != null) && (event.size() > 0)) {
+			if (event != null && event.size() > 0) {
 				birthDate = event.get(0).getDate().getValue();
 				birthYear = getYear(birthDate);
 				birtChrFlag = "C";

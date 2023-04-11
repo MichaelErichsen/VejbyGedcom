@@ -113,7 +113,7 @@ public class PhonCoder {
 			ps.execute();
 			counter++;
 
-			if ((counter % 10000) == 0) {
+			if (counter % 10000 == 0) {
 				logger.info("Opdateret " + counter);
 			}
 		}

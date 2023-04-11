@@ -212,7 +212,7 @@ public class BurialPanel extends FsPanel {
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
 		if (!path.equals("")) {
-			JOptionPane.showMessageDialog(new JFrame(), (individualId - 1) + " dødsfald er gemt som GEDCOM fil " + path,
+			JOptionPane.showMessageDialog(new JFrame(), individualId - 1 + " dødsfald er gemt som GEDCOM fil " + path,
 					"Vejby Gedcom", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

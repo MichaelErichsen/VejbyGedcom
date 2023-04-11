@@ -90,7 +90,7 @@ public class BurregModel extends ASModel {
 
 		statement.close();
 
-		BurregModel[] bra = new BurregModel[lbr.size()];
+		final BurregModel[] bra = new BurregModel[lbr.size()];
 
 		for (int i = 0; i < lbr.size(); i++) {
 			bra[i] = lbr.get(i);

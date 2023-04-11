@@ -246,33 +246,6 @@ public class RelocationComposite extends Composite {
 	}
 
 	/**
-	 *
-	 */
-	private void relocationPopup() {
-		final TableItem[] tia = relocationTable.getSelection();
-		final TableItem ti = tia[0];
-
-		final StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < 9; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-		sb.append("\n");
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Flytning", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
-		final int open = dialog.open();
-
-		if (open == 1) {
-			final Clipboard clipboard = new Clipboard(getDisplay());
-			final TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[] { tia[0].getText(6) }, new Transfer[] { textTransfer });
-			clipboard.dispose();
-		}
-	}
-
-	/**
 	 * @param phonName
 	 * @param birthDate
 	 * @param deathDate
@@ -292,6 +265,33 @@ public class RelocationComposite extends Composite {
 				}
 			}
 		}).start();
+	}
+
+	/**
+	 *
+	 */
+	private void relocationPopup() {
+		final TableItem[] tia = relocationTable.getSelection();
+		final TableItem ti = tia[0];
+
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 9; i++) {
+			if (ti.getText(i).length() > 0) {
+				sb.append(ti.getText(i) + ", ");
+			}
+		}
+		sb.append("\n");
+
+		final MessageDialog dialog = new MessageDialog(getShell(), "Flytning", null, sb.toString(),
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+		final int open = dialog.open();
+
+		if (open == 1) {
+			final Clipboard clipboard = new Clipboard(getDisplay());
+			final TextTransfer textTransfer = TextTransfer.getInstance();
+			clipboard.setContents(new String[] { tia[0].getText(6) }, new Transfer[] { textTransfer });
+			clipboard.dispose();
+		}
 	}
 
 	/**

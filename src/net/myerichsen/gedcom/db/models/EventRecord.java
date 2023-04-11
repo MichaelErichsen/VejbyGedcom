@@ -72,8 +72,8 @@ public class EventRecord extends ASModel {
 	public boolean isInLocation(String location) {
 		final String l = location.toLowerCase().trim();
 
-		if (((place != null) && (place.toLowerCase().contains(l))) || ((subType != null) && (subType.equals("Flytning"))
-				&& (note != null) && (note.toLowerCase().contains(l)))) {
+		if (place != null && place.toLowerCase().contains(l)
+				|| subType != null && subType.equals("Flytning") && note != null && note.toLowerCase().contains(l)) {
 			return true;
 		}
 

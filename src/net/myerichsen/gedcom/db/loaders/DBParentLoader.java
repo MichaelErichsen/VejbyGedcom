@@ -206,7 +206,7 @@ public class DBParentLoader {
 
 			try {
 				a = fonkod.generateKey(splitParents[0]);
-				a = (a.length() > 64 ? a.substring(0, 63) : a);
+				a = a.length() > 64 ? a.substring(0, 63) : a;
 			} catch (final Exception e) {
 			}
 
@@ -214,7 +214,7 @@ public class DBParentLoader {
 
 			try {
 				b = fonkod.generateKey(splitParents[1]);
-				b = (b.length() > 64 ? b.substring(0, 63) : b);
+				b = b.length() > 64 ? b.substring(0, 63) : b;
 			} catch (final Exception e) {
 			}
 
@@ -230,11 +230,11 @@ public class DBParentLoader {
 	 * @return
 	 */
 	private String[] splitParents(String parents2) {
-		if ((parents2 == null) || (parents2.length() == 0)) {
+		if (parents2 == null || parents2.length() == 0) {
 			return new String[] { "", "" };
 		}
 
-		String s = parents2.replaceAll("\\d", "").replaceAll("\\.", "").toLowerCase();
+		String s = parents2.replaceAll("\\d", "").replace(".", "").toLowerCase();
 		s = s.replace(", f.", "");
 		String[] sa = s.split(",");
 		final String[] words = sa[0].split(" ");
@@ -243,7 +243,7 @@ public class DBParentLoader {
 				"pige", "pigen", "portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed",
 				"smedesvend", "snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (final String word : words) {
 			for (final String element : filter) {

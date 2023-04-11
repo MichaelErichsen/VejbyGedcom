@@ -19,14 +19,16 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
 
 /**
  * Wizard page to handle census imports
- * 
+ *
  * @author Michael Erichsen
- * @version 10. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class SettingsWizardPage2 extends WizardPage {
 	private Text txtCensusCsvFileDirectory;
 	private Text txtKipTextFilename;
+	private Text txtCensusPath;
+	private Text txtCensusSchema;
 
 	private SettingsModel settings;
 
@@ -40,7 +42,7 @@ public class SettingsWizardPage2 extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		setControl(container);
 		container.setLayout(new GridLayout(3, false));
 
@@ -50,17 +52,22 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblKipCsvFil.setText("KIP csv fil sti");
 
 		txtCensusCsvFileDirectory = new Text(container, SWT.BORDER);
-		txtCensusCsvFileDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtCensusCsvFileDirectory.addModifyListener(new ModifyListener() {
+
 			@Override
 			public void modifyText(ModifyEvent e) {
-				settings.setCensusCsvFileDirectory(txtCensusCsvFileDirectory.getText());
+				// TODO Auto-generated method stub
 
-				if ((settings.getCensusCsvFileDirectory().equals("")) || (settings.getKipTextFilename().equals(""))) {
-					setPageComplete(false);
-				} else {
-					setPageComplete(true);
-				}
+			}
+		});
+		txtCensusCsvFileDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtCensusCsvFileDirectory.addModifyListener(e -> {
+			settings.setCensusCsvFileDirectory(txtCensusCsvFileDirectory.getText());
+
+			if (settings.getCensusCsvFileDirectory().equals("") || settings.getKipTextFilename().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
 			}
 		});
 		txtCensusCsvFileDirectory.setText(settings.getCsvFileDirectory());
@@ -88,22 +95,108 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblKipTextFilnavn.setText("KIP tekst filnavn uden sti");
 
 		txtKipTextFilename = new Text(container, SWT.BORDER);
-		txtKipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtKipTextFilename.addModifyListener(new ModifyListener() {
+
 			@Override
 			public void modifyText(ModifyEvent e) {
-				settings.setKipTextFilename(txtKipTextFilename.getText());
+				// TODO Auto-generated method stub
 
-				if ((settings.getCensusCsvFileDirectory().equals("")) || (settings.getKipTextFilename().equals(""))) {
-					setPageComplete(false);
-				} else {
-					setPageComplete(true);
-				}
+			}
+		});
+		txtKipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtKipTextFilename.addModifyListener(e -> {
+			settings.setKipTextFilename(txtKipTextFilename.getText());
+
+			if (settings.getCensusCsvFileDirectory().equals("") || settings.getKipTextFilename().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
 			}
 		});
 		txtKipTextFilename.setText(settings.getKipTextFilename());
 		new Label(container, SWT.NONE);
 
+		final Label lblCensusDatabaseSti = new Label(container, SWT.NONE);
+		lblCensusDatabaseSti.setText("Census database sti");
+
+		txtCensusPath = new Text(container, SWT.BORDER);
+		txtCensusPath.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		txtCensusPath.addModifyListener(e -> {
+			settings.setCensusPath(txtCensusPath.getText());
+
+			if (settings.getGedcomFilePath().equals("") || settings.getCensusPath().equals("")
+					|| settings.getCensusSchema().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
+			}
+		});
+		txtCensusPath.setText(settings.getCensusPath());
+		txtCensusPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Button btnFindCensusPath = new Button(container, SWT.NONE);
+		btnFindCensusPath.setText("Find");
+		btnFindCensusPath.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Shell[] shells = e.widget.getDisplay().getShells();
+				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
+
+				directoryDialog.setFilterPath(txtCensusPath.getText());
+				directoryDialog.setText("Vælg venligst en folder og klik OK");
+
+				final String dir = directoryDialog.open();
+				if (dir.equals("")) {
+					txtCensusPath.setText(dir);
+					settings.setCensusPath(dir);
+				}
+			}
+		});
+
+		final Label lblCensusSchema = new Label(container, SWT.NONE);
+		lblCensusSchema.setText("Census database schema");
+
+		txtCensusSchema = new Text(container, SWT.BORDER);
+		txtCensusSchema.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		txtCensusSchema.addModifyListener(e -> {
+			settings.setCensusSchema(txtCensusSchema.getText());
+
+			if (settings.getGedcomFilePath().equals("") || settings.getCensusPath().equals("")
+					|| settings.getCensusSchema().equals("")) {
+				setPageComplete(false);
+			} else {
+				setPageComplete(true);
+			}
+		});
+		txtCensusSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtCensusSchema.setText(settings.getCensusSchema());
+		new Label(container, SWT.NONE);
+
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+
+		Label lblDatabaseOgSchema = new Label(container, SWT.NONE);
+		lblDatabaseOgSchema.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+		lblDatabaseOgSchema.setText("Database og schema beh\u00F8ver ikke at v\u00E6re forskellige");
+		new Label(container, SWT.NONE);
+		new Label(container, SWT.NONE);
+
 		setControl(container);
+		new Label(container, SWT.NONE);
 	}
 }

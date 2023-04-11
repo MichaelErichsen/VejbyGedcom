@@ -42,7 +42,7 @@ public class ProbateModel extends ASModel {
 			source = rs.getString("SOURCE");
 			probateRecord.setSource(source);
 
-			if ((source.contains(probateSource) && (data.contains(name)))) {
+			if (source.contains(probateSource) && data.contains(name)) {
 				probateRecord.setFromDate(rs.getString("FROMDATE").trim());
 				probateRecord.setToDate(rs.getString("TODATE").trim());
 				probateRecord.setPlace(rs.getString("PLACE").trim());

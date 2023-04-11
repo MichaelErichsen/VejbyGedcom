@@ -45,9 +45,8 @@ public class IndividualModel extends ASModel {
 
 			if (string == null) {
 				return "";
-			} else {
-				return string;
 			}
+			return string;
 		}
 
 		return "";
@@ -173,7 +172,7 @@ public class IndividualModel extends ASModel {
 					wifeName = getNameFromId(conn, wifeId);
 				}
 
-				dbi.setParents((husbandName + " og " + wifeName));
+				dbi.setParents(husbandName + " og " + wifeName);
 			} else {
 				// Find names from christening event source detail
 				dbi.setParents(findParentsFromChristeningEvent(conn, dbi.getId()));
@@ -409,7 +408,7 @@ public class IndividualModel extends ASModel {
 
 	@Override
 	public String toString() {
-		final String dy = (deathDate.before(Date.valueOf("9999-12-31")) ? deathDate.toString() : "");
+		final String dy = deathDate.before(Date.valueOf("9999-12-31")) ? deathDate.toString() : "";
 
 		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthDate + ";" + dy + ";" + birthPlace + ";"
 				+ parents + ";" + phonName;

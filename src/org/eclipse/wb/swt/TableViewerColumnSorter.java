@@ -24,9 +24,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Table;
 
 /**
- * Helper for sorting {@link TableViewer} by one of its {@link TableViewerColumn}s.
+ * Helper for sorting {@link TableViewer} by one of its
+ * {@link TableViewerColumn}s.
  * <p>
- * Originally from http://wiki.eclipse.org/index.php/JFaceSnippets, Snippet040TableViewerSorting.
+ * Originally from http://wiki.eclipse.org/index.php/JFaceSnippets,
+ * Snippet040TableViewerSorting.
  *
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  * @author Konstantin Scheglov <Konstantin.Scheglov@gmail.com>
@@ -44,6 +46,7 @@ public class TableViewerColumnSorter extends ViewerComparator {
 	private final TableViewer m_viewer;
 	private final Table m_table;
 	private int m_direction = NONE;
+
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// Constructor
@@ -56,15 +59,11 @@ public class TableViewerColumnSorter extends ViewerComparator {
 		m_column.getColumn().addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (m_viewer.getComparator() != null) {
-					if (m_viewer.getComparator() == TableViewerColumnSorter.this) {
-						if (m_direction == ASC) {
-							setSorter(DESC);
-						} else if (m_direction == DESC) {
-							setSorter(NONE);
-						}
-					} else {
-						setSorter(ASC);
+				if ((m_viewer.getComparator() != null) && (m_viewer.getComparator() == TableViewerColumnSorter.this)) {
+					if (m_direction == ASC) {
+						setSorter(DESC);
+					} else if (m_direction == DESC) {
+						setSorter(NONE);
 					}
 				} else {
 					setSorter(ASC);
@@ -72,6 +71,58 @@ public class TableViewerColumnSorter extends ViewerComparator {
 			}
 		});
 	}
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// ViewerComparator
+	//
+	////////////////////////////////////////////////////////////////////////////
+	@Override
+	public int compare(Viewer viewer, Object e1, Object e2) {
+		return m_direction * doCompare(viewer, e1, e2);
+	}
+
+	/**
+	 * Compares to elements of viewer. By default tries to compare values extracted
+	 * from these elements using {@link #getValue(Object)}, because usually you want
+	 * to compare value of some attribute.
+	 */
+	@SuppressWarnings("unchecked")
+	protected int doCompare(Viewer viewer, Object e1, Object e2) {
+		final Object o1 = getValue(e1);
+		final Object o2 = getValue(e2);
+		if (o1 instanceof Comparable && o2 instanceof Comparable) {
+			return ((Comparable<Object>) o1).compareTo(o2);
+		}
+		return 0;
+	}
+
+	/**
+	 *
+	 * @return the value to compare in {@link #doCompare(Viewer, Object, Object)}.
+	 *         Be default tries to get it from {@link EditingSupport}. May return
+	 *         <code>null</code>.
+	 */
+	protected Object getValue(Object o) {
+		try {
+			EditingSupport editingSupport;
+			{
+				final Method getEditingMethod = ViewerColumn.class.getDeclaredMethod("getEditingSupport",
+						new Class[] {});
+				getEditingMethod.setAccessible(true);
+				editingSupport = (EditingSupport) getEditingMethod.invoke(m_column, new Object[] {});
+			}
+			if (editingSupport != null) {
+				final Method getValueMethod = EditingSupport.class.getDeclaredMethod("getValue",
+						new Class[] { Object.class });
+				getValueMethod.setAccessible(true);
+				return getValueMethod.invoke(editingSupport, new Object[] { o });
+			}
+		} catch (final Throwable e) {
+		}
+		return null;
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// Utils
@@ -96,51 +147,5 @@ public class TableViewerColumnSorter extends ViewerComparator {
 				m_viewer.setComparator(this);
 			}
 		}
-	}
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// ViewerComparator
-	//
-	////////////////////////////////////////////////////////////////////////////
-	@Override
-	public int compare(Viewer viewer, Object e1, Object e2) {
-		return m_direction * doCompare(viewer, e1, e2);
-	}
-	/**
-	 * Compares to elements of viewer. By default tries to compare values extracted from these elements using
-	 * {@link #getValue(Object)}, because usually you want to compare value of some attribute.
-	 */
-	@SuppressWarnings("unchecked")
-	protected int doCompare(Viewer viewer, Object e1, Object e2) {
-		Object o1 = getValue(e1);
-		Object o2 = getValue(e2);
-		if (o1 instanceof Comparable && o2 instanceof Comparable) {
-			return ((Comparable<Object>) o1).compareTo(o2);
-		}
-		return 0;
-	}
-	/**
-	 *
-	 * @return the value to compare in {@link #doCompare(Viewer, Object, Object)}. Be default tries to get it
-	 *         from {@link EditingSupport}. May return <code>null</code>.
-	 */
-	protected Object getValue(Object o) {
-		try {
-			EditingSupport editingSupport;
-			{
-				Method getEditingMethod = ViewerColumn.class.getDeclaredMethod("getEditingSupport",
-					new Class[]{});
-				getEditingMethod.setAccessible(true);
-				editingSupport = (EditingSupport) getEditingMethod.invoke(m_column, new Object[]{});
-			}
-			if (editingSupport != null) {
-				Method getValueMethod = EditingSupport.class.getDeclaredMethod("getValue",
-					new Class[]{Object.class});
-				getValueMethod.setAccessible(true);
-				return getValueMethod.invoke(editingSupport, new Object[]{o});
-			}
-		} catch (Throwable e) {
-		}
-		return null;
 	}
 }

@@ -39,13 +39,13 @@ public class CensusAgeFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if ((searchString == null) || (searchString.length() == 0)) {
+		if (searchString == null || searchString.length() == 0) {
 			return true;
 		}
 
 		final CensusModel cr = (CensusModel) element;
 
-		int diff = cr.getAlder() - Integer.parseInt(searchString);
+		final int diff = cr.getAlder() - Integer.parseInt(searchString);
 		if (Math.abs(diff) < 2) {
 			return true;
 		}

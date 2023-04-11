@@ -449,7 +449,7 @@ public class BurregComposite extends Composite {
 		final TableItem[] tia = burregTable.getSelection();
 		final TableItem ti = tia[0];
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < 25; i++) {
 			if (ti.getText(i).length() > 0) {
