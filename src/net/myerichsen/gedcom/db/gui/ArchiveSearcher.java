@@ -66,13 +66,8 @@ public class ArchiveSearcher extends Shell {
 	// TODO Populate ancestors tree tab
 	// TODO Add descendants tree tab
 
-	// TODO Id search should populate father and mother search fields
-	// FIXME Parents search not finished
-	// TODO Siblings: Sort by birthdate
-	// TODO Siblings Search by ID giving parents should do a parents search for
-	// siblings
-	// FIXME ID search does not clear siblings table
-	// TODO Doubleclick om sibling row inserts id and name in search bar
+	// FIXME ID search and name search does not clear siblings table
+	// TODO Doubleclick om sibling row should insert id and name in search bar
 
 	private static Display display;
 

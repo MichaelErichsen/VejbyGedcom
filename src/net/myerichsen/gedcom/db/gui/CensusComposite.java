@@ -1,5 +1,9 @@
 package net.myerichsen.gedcom.db.gui;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -26,6 +30,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -188,7 +194,11 @@ public class CensusComposite extends Composite {
 
 		censusTableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION);
 		censusTableViewer.addDoubleClickListener(event -> {
-			censusPopup();
+			try {
+				censusPopup();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 		});
 
 		final ViewerFilter[] filters = new ViewerFilter[7];
@@ -512,8 +522,10 @@ public class CensusComposite extends Composite {
 
 	/**
 	 * Create the census popup
+	 * 
+	 * @throws SQLException
 	 */
-	private void censusPopup() {
+	private void censusPopup() throws SQLException {
 		final TableItem[] tia = censusTable.getSelection();
 		final TableItem ti = tia[0];
 
@@ -532,7 +544,7 @@ public class CensusComposite extends Composite {
 		}
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketælling", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Overhovede" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -553,7 +565,93 @@ public class CensusComposite extends Composite {
 			} catch (final SQLException e) {
 				e.printStackTrace();
 			}
+		} else if (open == 2) {
+			final List<CensusModel> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
+					ti.getText(21), ti.getText(5), props.getProperty("censusSchema"));
+			CensusModel censusModel = lcr.get(0);
+			final Shell[] shells = getDisplay().getShells();
+			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+			messageBox.setText("Info");
+			messageBox.setMessage("Husstandens overhovede var " + getHeadOfHousehold(censusModel));
+			@SuppressWarnings("unused")
+			final int buttonID = messageBox.open();
 		}
+	}
+
+	/**
+	 * @param censusModel
+	 * @return
+	 * @throws SQLException
+	 */
+	private String getHeadOfHousehold(CensusModel censusModel) throws SQLException {
+		String SELECT_SCHEMA = "SET SCHEMA = ?";
+		String SELECT_HOUSEHOLD_HEAD_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
+		String SELECT_HOUSEHOLD_HEAD_2 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
+				+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
+
+		Connection conn1 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("censusPath"));
+		Connection conn2 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
+		PreparedStatement statement1 = conn1.prepareStatement(SELECT_SCHEMA);
+		statement1.setString(1, props.getProperty("censusSchema"));
+		statement1.execute();
+
+		statement1 = conn1.prepareStatement(SELECT_HOUSEHOLD_HEAD_1);
+		statement1.setString(1, censusModel.getKIPnr());
+		statement1.setInt(2, censusModel.getLoebenr());
+		ResultSet rs = statement1.executeQuery();
+
+		PreparedStatement statement2;
+		int year;
+		String kipNr;
+		int loebeNr;
+		String ftDate;
+		String result = "ikke fundet";
+
+		if (rs.next()) {
+			year = rs.getInt("FTAAR");
+			kipNr = rs.getString("KIPNR");
+			loebeNr = rs.getInt("LOEBENR");
+
+			switch (year) {
+			case 1787:
+				ftDate = "1787-07-01";
+				break;
+			case 1834:
+				ftDate = "1834-02-18";
+				break;
+			case 1925:
+			case 1930:
+			case 1940:
+				ftDate = year + "-11-05";
+				break;
+			default:
+				ftDate = year + "-02-01";
+			}
+
+			statement2 = conn2.prepareStatement(SELECT_SCHEMA);
+			statement2.setString(1, props.getProperty("vejbySchema"));
+			statement2.execute();
+			statement2 = conn2.prepareStatement(SELECT_HOUSEHOLD_HEAD_2);
+			statement2.setString(1, ftDate);
+			statement2.setString(2, "%" + kipNr.trim() + ", " + loebeNr + "%");
+			ResultSet rs2 = statement2.executeQuery();
+
+			if (rs2.next()) {
+				result = rs2.getString("INDIVIDUAL");
+				conn2.close();
+			} else {
+				statement2.setString(2, "%" + loebeNr + ", " + kipNr.trim() + "%");
+				rs2 = statement2.executeQuery();
+
+				if (rs2.next()) {
+					result = rs2.getString("INDIVIDUAL");
+					conn2.close();
+				}
+			}
+		}
+
+		conn1.close();
+		return result;
 	}
 
 	@Override
@@ -572,7 +670,7 @@ public class CensusComposite extends Composite {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"), kipNr, nr,
+		household = CensusHousehold.loadFromDatabase(props.getProperty("censusPath"), kipNr, nr,
 				props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {

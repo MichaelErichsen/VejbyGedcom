@@ -140,7 +140,6 @@ public class CensusDbLoader {
 	 * @throws Exception
 	 */
 	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
-		// FIXME java.lang.Exception: sql Error Code: 20000, sql State: XJ016
 		statement = conn.prepareStatement(SELECT_COUNT);
 		statement.setString(1, kipTextEntry.getKipNr());
 		final ResultSet rs = statement.executeQuery();
