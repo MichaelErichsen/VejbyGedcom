@@ -37,7 +37,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class ProbateComposite extends Composite {
@@ -204,8 +204,9 @@ public class ProbateComposite extends Composite {
 		new Thread(() -> {
 			if (probateListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("probatePath"), phonName, birthDate,
-							deathDate, props.getProperty("probateSource") };
+					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
+							props.getProperty("probatePath"), phonName, birthDate, deathDate,
+							props.getProperty("probateSource") };
 					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));

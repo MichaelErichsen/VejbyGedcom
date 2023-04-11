@@ -25,6 +25,8 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * @version 17. mar. 2023
  */
 public class CensusDbLoader {
+	// TODO " + props.getProperty("vejbySchema") + "
+	// TODO Return message string
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.CENSUS WHERE KIPNR = '%s'";
 	private static Logger logger;
 	private static Statement statement;

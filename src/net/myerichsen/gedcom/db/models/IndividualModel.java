@@ -18,6 +18,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 public class IndividualModel extends ASModel {
+	// TODO Configurable schema
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
 	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";

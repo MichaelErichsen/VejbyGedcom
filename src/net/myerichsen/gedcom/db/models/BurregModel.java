@@ -18,7 +18,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 public class BurregModel extends ASModel {
-	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM CPH.BURIAL_PERSON_COMPLETE "
+	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = ?";
 
 	/**
@@ -31,11 +31,13 @@ public class BurregModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static BurregModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
-			throws SQLException {
+	public static BurregModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate,
+			String deathDate) throws SQLException {
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		final PreparedStatement statement = conn.prepareStatement(SELECT_BURIAL_PERSON);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_BURIAL_PERSON);
 		statement.setString(1, phonName);
 		final ResultSet rs = statement.executeQuery();
 

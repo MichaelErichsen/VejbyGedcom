@@ -46,11 +46,10 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 8. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class CensusComposite extends Composite {
-
 	private Text txtCensusYear;
 	private Text txtCensusCounty;
 	private Text txtCensusParish;
@@ -600,8 +599,9 @@ public class CensusComposite extends Composite {
 		new Thread(() -> {
 			if (censusListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), phonName,
-							birthDate.substring(0, 4), deathDate.substring(0, 4) };
+					final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
+							props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
+							deathDate.substring(0, 4) };
 					final CensusModel[] CensusRecords = (CensusModel[]) censusListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> censusTableViewer.setInput(CensusRecords));

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
  *
  */
 public class LoadBurialPersonComplete extends LoadCphArch {
+	// TODO Return message string
 	/**
 	 *
 	 */

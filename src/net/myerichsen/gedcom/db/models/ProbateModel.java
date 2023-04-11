@@ -10,21 +10,23 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 8. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class ProbateModel extends ASModel {
-	private static final String SELECT_PROBATE = "SELECT * FROM GEDCOM.EVENT "
-			+ "JOIN GEDCOM.INDIVIDUAL ON GEDCOM.EVENT.ID = GEDCOM.INDIVIDUAL.EVENT_ID "
-			+ "WHERE GEDCOM.INDIVIDUAL.FONKOD = ? AND GEDCOM.EVENT.FROMDATE >= ? AND TODATE <= ?";
+	private static final String SELECT_PROBATE = "SELECT * FROM EVENT "
+			+ "JOIN INDIVIDUAL ON EVENT.ID = INDIVIDUAL.EVENT_ID "
+			+ "WHERE INDIVIDUAL.FONKOD = ? AND EVENT.FROMDATE >= ? AND TODATE <= ?";
 
-	public static ProbateModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate,
-			String probateSource) throws SQLException {
+	public static ProbateModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate,
+			String deathDate, String probateSource) throws SQLException {
 		ProbateModel probateRecord;
 		final List<ProbateModel> lp = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		final PreparedStatement statement = conn.prepareStatement(SELECT_PROBATE);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_PROBATE);
 		statement.setString(1, phonName);
 		statement.setString(2, birthDate);
 		statement.setString(3, deathDate);

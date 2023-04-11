@@ -38,7 +38,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class RelocationComposite extends Composite {
@@ -254,8 +254,8 @@ public class RelocationComposite extends Composite {
 		new Thread(() -> {
 			if (relocationListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), phonName, birthDate,
-							deathDate };
+					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+							props.getProperty("vejbyPath"), phonName, birthDate, deathDate };
 					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener
 							.loadFromDatabase(loadArgs);
 

@@ -14,11 +14,11 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class SiblingsModel extends ASModel {
-	private static String SELECT = "SELECT * FROM VEJBY.PARENTS WHERE FATHERPHONETIC = ? " + "AND MOTHERPHONETIC = ?";
+	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? " + "AND MOTHERPHONETIC = ?";
 
 	/**
 	 * Get a list of objects from the database
@@ -28,7 +28,7 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] loadFromDatabase(String dbPath, String parents) throws SQLException {
+	private static SiblingsModel[] loadFromDatabase(String schema, String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
 			return new SiblingsModel[0];
 		}
@@ -39,7 +39,7 @@ public class SiblingsModel extends ASModel {
 
 			return loadFromDatabase(dbPath, p[0], p[1]);
 		}
-		return loadFromDatabase(dbPath, p[0], "");
+		return loadFromDatabase(schema, dbPath, p[0], "");
 
 	}
 
@@ -52,8 +52,8 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] loadFromDatabase(String dbPath, String fathersName, String mothersName)
-			throws SQLException {
+	private static SiblingsModel[] loadFromDatabase(String schema, String dbPath, String fathersName,
+			String mothersName) throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
 		SiblingsModel pr;
@@ -71,7 +71,9 @@ public class SiblingsModel extends ASModel {
 			return new SiblingsModel[0];
 		}
 
-		final PreparedStatement statement = conn.prepareStatement(SELECT);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT);
 		statement.setString(1, fatherPhonetic);
 		statement.setString(2, motherPhonetic);
 		final ResultSet rs = statement.executeQuery();
@@ -102,7 +104,7 @@ public class SiblingsModel extends ASModel {
 	 * @param deathDate
 	 * @return
 	 */
-	private static SiblingsModel[] loadFromDatabase(String dbPath, String phonName, String birthDate2,
+	private static SiblingsModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate2,
 			String deathDate) {
 		// TODO Load siblings from database
 		System.out.println("Not yet implemented");
@@ -118,14 +120,14 @@ public class SiblingsModel extends ASModel {
 	 */
 	public static SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
 		switch (args.length) {
-		case 2: {
-			return loadFromDatabase(args[0], args[1]);
-		}
 		case 3: {
 			return loadFromDatabase(args[0], args[1], args[2]);
 		}
 		case 4: {
 			return loadFromDatabase(args[0], args[1], args[2], args[3]);
+		}
+		case 5: {
+			return loadFromDatabase(args[0], args[1], args[2], args[3], args[4]);
 		}
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");

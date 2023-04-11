@@ -38,7 +38,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class BurregComposite extends Composite {
@@ -492,8 +492,8 @@ public class BurregComposite extends Composite {
 		new Thread(() -> {
 			if (burregListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("cphDbPath"), phonName, birthDate,
-							deathDate };
+					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
+							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
 					final BurregModel[] burregRecords = (BurregModel[]) burregListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> burregTableViewer.setInput(burregRecords));

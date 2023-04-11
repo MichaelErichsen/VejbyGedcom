@@ -18,7 +18,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class CensusModel extends ASModel {
@@ -26,13 +26,13 @@ public class CensusModel extends ASModel {
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
 	private static final String DIGITS_ONLY = "\\d+";
-	private static final String INSERT = "INSERT INTO VEJBY.CENSUS (KIPNR, LOEBENR, AMT, HERRED, SOGN, "
+	private static final String INSERT = "INSERT INTO CENSUS (KIPNR, LOEBENR, AMT, HERRED, SOGN, "
 			+ "KILDESTEDNAVN, HUSSTANDS_FAMILIENR, MATR_NR_ADRESSE, KILDENAVN, FONNAVN, "
 			+ "KOEN, ALDER, CIVILSTAND, KILDEERHVERV, STILLING_I_HUSSTANDEN, "
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "
 			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES ('%s',%d,'%s','%s', '%s', '%s', '%s', '%s', "
 			+ "'%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
-	private static final String SELECT_CENSUS = "SELECT * FROM VEJBY.CENSUS WHERE FONNAVN = ? "
+	private static final String SELECT_CENSUS = "SELECT * FROM CENSUS WHERE FONNAVN = ? "
 			+ "AND FTAAR >= ? AND FTAAR <= ?";
 	private static Logger logger = Logger.getLogger("CensusRecord");
 
@@ -43,13 +43,15 @@ public class CensusModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CensusModel[] loadFromDatabase(String dbPath, String phonName, String birthYear, String deathYear)
-			throws SQLException {
+	public static CensusModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthYear,
+			String deathYear) throws SQLException {
 		CensusModel ci;
 		final List<CensusModel> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		final PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_CENSUS);
 		statement.setString(1, phonName);
 		statement.setString(2, birthYear);
 		statement.setString(3, deathYear);

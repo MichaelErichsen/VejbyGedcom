@@ -39,7 +39,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 8. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class PolregComposite extends Composite {
@@ -342,8 +342,8 @@ public class PolregComposite extends Composite {
 		new Thread(() -> {
 			if (polregListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("cphDbPath"), phonName, birthDate,
-							deathDate };
+					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
+							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
 					final PolregModel[] PolregRecords = (PolregModel[]) polregListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> polregTableViewer.setInput(PolregRecords));

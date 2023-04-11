@@ -37,6 +37,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
 import net.myerichsen.gedcom.db.loaders.DBLoader;
 import net.myerichsen.gedcom.db.models.IndividualModel;
+import net.myerichsen.gedcom.db.tablecreators.CensusTableCreator;
+import net.myerichsen.gedcom.db.tablecreators.CphTableCreator;
+import net.myerichsen.gedcom.db.tablecreators.GedcomTableCreator;
+import net.myerichsen.gedcom.db.tablecreators.ProbateTableCreator;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
@@ -67,8 +71,6 @@ public class ArchiveSearcher extends Shell {
 	// siblings
 	// FIXME ID search does not clear siblings table
 	// TODO Doubleclick om sibling row inserts id and name in search bar
-
-	// TODO Create tables function
 
 	/**
 	 * Static constants used to initalize properties file
@@ -291,6 +293,45 @@ public class ArchiveSearcher extends Shell {
 		final Menu menu_2 = new Menu(mntmIndlsning);
 		mntmIndlsning.setMenu(menu_2);
 
+		final MenuItem mntmDanGedcomTabeller = new MenuItem(menu_2, SWT.NONE);
+		mntmDanGedcomTabeller.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setMessage(GedcomTableCreator.createTables(props));
+			}
+		});
+		mntmDanGedcomTabeller.setText("Dan GEDCOM tabeller");
+
+		final MenuItem mntmDanFolketllingstabeller = new MenuItem(menu_2, SWT.NONE);
+		mntmDanFolketllingstabeller.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setMessage(CensusTableCreator.createTables(props));
+
+			}
+		});
+		mntmDanFolketllingstabeller.setText("Dan folket\u00E6llingstabeller");
+
+		final MenuItem mntmDanSkifteprotokoltabeller = new MenuItem(menu_2, SWT.NONE);
+		mntmDanSkifteprotokoltabeller.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setMessage(ProbateTableCreator.createTables(props));
+			}
+		});
+		mntmDanSkifteprotokoltabeller.setText("Dan skifteprotokoltabeller");
+
+		final MenuItem mntmDanTabbellerTil = new MenuItem(menu_2, SWT.NONE);
+		mntmDanTabbellerTil.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setMessage(CphTableCreator.createTables(props));
+			}
+		});
+		mntmDanTabbellerTil.setText("Dan tabeller til K\u00F8benhavnske registre");
+
+		new MenuItem(menu_2, SWT.SEPARATOR);
+
 		final MenuItem mntmL = new MenuItem(menu_2, SWT.NONE);
 		mntmL.addSelectionListener(new SelectionAdapter() {
 
@@ -308,7 +349,7 @@ public class ArchiveSearcher extends Shell {
 				kipFileLoader(e);
 			}
 		});
-		mntmIndlsKipFiler.setText("Indl\u00E6s KIP filer i databasen");
+		mntmIndlsKipFiler.setText("Indl\u00E6s folket\u00E6llinger i databasen");
 
 		final MenuItem mntmIndlsPolitietsRegisterblade = new MenuItem(menu_2, SWT.NONE);
 		mntmIndlsPolitietsRegisterblade.addSelectionListener(new SelectionAdapter() {
@@ -326,7 +367,7 @@ public class ArchiveSearcher extends Shell {
 				burregLoader(e);
 			}
 		});
-		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s begravelsesregisteret");
+		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s Begravelsesregisteret");
 
 		final MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
 		mntmNewSubmenu.setText("Hj\u00E6lp");

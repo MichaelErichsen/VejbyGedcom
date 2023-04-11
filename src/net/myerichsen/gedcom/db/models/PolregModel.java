@@ -13,13 +13,13 @@ import java.util.List;
  * Class representing a police registry event
  *
  * @author Michael Erichsen
- * @version 31. mar. 2023
+ * @version 11. apr. 2023
  *
  */
 public class PolregModel extends ASModel {
-	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM CPH.POLICE_ADDRESS WHERE CPH.POLICE_ADDRESS.PERSON_ID = ?";
-	private static final String SELECT_POLICE_PERSON = "SELECT * FROM CPH.POLICE_PERSON WHERE CPH.POLICE_PERSON.PHONNAME = ?";
-	private static final String SELECT_POLICE_POSITION = "SELECT * FROM CPH.POLICE_POSITION WHERE CPH.POLICE_POSITION.PERSON_ID = ?";
+	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM POLICE_ADDRESS WHERE POLICE_ADDRESS.PERSON_ID = ?";
+	private static final String SELECT_POLICE_PERSON = "SELECT * FROM POLICE_PERSON WHERE POLICE_PERSON.PHONNAME = ?";
+	private static final String SELECT_POLICE_POSITION = "SELECT * FROM POLICE_POSITION WHERE POLICE_POSITION.PERSON_ID = ?";
 
 	/**
 	 * Get a list of objects from the database
@@ -31,13 +31,15 @@ public class PolregModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static PolregModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
-			throws SQLException {
+	public static PolregModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate,
+			String deathDate) throws SQLException {
 		final Date bd = birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate);
 		int calcYear = 0;
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		PreparedStatement statement = conn.prepareStatement(SELECT_POLICE_PERSON);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_POLICE_PERSON);
 		statement.setString(1, phonName);
 		final ResultSet rs = statement.executeQuery();
 		ResultSet rs2, rs3;

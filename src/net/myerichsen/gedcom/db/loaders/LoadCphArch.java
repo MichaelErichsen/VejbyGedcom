@@ -19,6 +19,7 @@ import java.util.logging.Logger;
  * @version 3. feb. 2023
  */
 public abstract class LoadCphArch {
+	// TODO Return message string
 	protected static Logger logger;
 	protected static int counter;
 

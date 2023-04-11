@@ -13,6 +13,7 @@ public class LoadPolicePerson extends LoadCphArch {
 	/**
 	 *
 	 */
+	// TODO Return message string
 	static final String TABLENAME = "POLICE_PERSON";
 	static final String DELETE = "DELETE FROM CPH.POLICE_PERSON";
 	static final String INSERT = "INSERT INTO CPH.POLICE_PERSON (ID, FIRSTNAMES, LASTNAME, "

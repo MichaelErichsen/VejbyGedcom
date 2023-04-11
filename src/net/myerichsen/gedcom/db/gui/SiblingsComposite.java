@@ -39,7 +39,7 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 8. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class SiblingsComposite extends Composite {
@@ -209,7 +209,8 @@ public class SiblingsComposite extends Composite {
 		new Thread(() -> {
 			if (siblingsListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), parents };
+					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+							props.getProperty("vejbyPath"), parents };
 					final SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener
 							.loadFromDatabase(loadArgs);
 
@@ -236,7 +237,8 @@ public class SiblingsComposite extends Composite {
 		new Thread(() -> {
 			if (siblingsListener != null) {
 				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"), fathersName, mothersName };
+					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+							props.getProperty("vejbyPath"), fathersName, mothersName };
 					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener
 							.loadFromDatabase(loadArgs);
 

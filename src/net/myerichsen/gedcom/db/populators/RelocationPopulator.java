@@ -6,7 +6,7 @@ import net.myerichsen.gedcom.db.models.RelocationModel;
 
 /**
  * @author Michael Erichsen
- * @version 6. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class RelocationPopulator implements ASPopulator {
@@ -15,7 +15,7 @@ public class RelocationPopulator implements ASPopulator {
 	public RelocationModel[] loadFromDatabase(String[] args) {
 		try {
 			final RelocationModel[] relocationRecords = RelocationModel.loadFromDatabase(args[0], args[1], args[2],
-					args[3]);
+					args[3], args[4]);
 			return relocationRecords;
 		} catch (final SQLException e) {
 			e.printStackTrace();

@@ -13,16 +13,15 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class RelocationModel extends ASModel {
-	private static final String SELECT_RELOCATION = "SELECT VEJBY.INDIVIDUAL.ID, VEJBY.INDIVIDUAL.GIVENNAME, "
-			+ "VEJBY.INDIVIDUAL.SURNAME, VEJBY.EVENT.DATE, "
-			+ "VEJBY.EVENT.PLACE, VEJBY.EVENT.NOTE, VEJBY.EVENT.SOURCEDETAIL, VEJBY.INDIVIDUAL.PARENTS "
-			+ "FROM VEJBY.INDIVIDUAL, VEJBY.EVENT WHERE VEJBY.EVENT.SUBTYPE = 'Flytning' "
-			+ "AND VEJBY.INDIVIDUAL.ID = VEJBY.EVENT.INDIVIDUAL AND VEJBY.INDIVIDUAL.PHONNAME = ?";
-	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM VEJBY.EVENT WHERE INDIVIDUAL = ? "
+	private static final String SELECT_RELOCATION = "SELECT INDIVIDUAL.ID, INDIVIDUAL.GIVENNAME, "
+			+ "INDIVIDUAL.SURNAME, EVENT.DATE, EVENT.PLACE, EVENT.NOTE, EVENT.SOURCEDETAIL, "
+			+ "INDIVIDUAL.PARENTS FROM INDIVIDUAL, EVENT WHERE EVENT.SUBTYPE = 'Flytning' "
+			+ "AND INDIVIDUAL.ID = EVENT.INDIVIDUAL AND INDIVIDUAL.PHONNAME = ?";
+	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM EVENT WHERE INDIVIDUAL = ? "
 			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 
 	// TODO Not restricted by birth and death dates
@@ -35,13 +34,15 @@ public class RelocationModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static RelocationModel[] loadFromDatabase(String dbPath, String phonName, String birthDate, String deathDate)
-			throws SQLException {
+	public static RelocationModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate,
+			String deathDate) throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		RelocationModel relocationRecord;
 		final List<RelocationModel> lr = new ArrayList<>();
 
-		PreparedStatement statement = conn.prepareStatement(SELECT_RELOCATION);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
 		ResultSet rs = statement.executeQuery();
 

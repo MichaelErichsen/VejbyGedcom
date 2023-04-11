@@ -45,6 +45,8 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @version 10. apr. 2023
  */
 public class DBLoader {
+	// TODO " + props.getProperty("vejbySchema") + "
+	// TODO Return message string
 	/**
 	 * Static constants and variables
 	 */
