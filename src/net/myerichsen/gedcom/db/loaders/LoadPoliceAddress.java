@@ -1,12 +1,10 @@
 package net.myerichsen.gedcom.db.loaders;
 
-import java.util.logging.Logger;
-
 /**
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 30. jan. 2023
+ * @version 11. apr. 2023
  *
  */
 public class LoadPoliceAddress extends LoadCphArch {
@@ -15,8 +13,8 @@ public class LoadPoliceAddress extends LoadCphArch {
 	 */
 	// TODO Return message string
 	static final String TABLENAME = "POLICE_ADDRESS";
-	static final String DELETE = "DELETE FROM CPH.POLICE_ADDRESS";
-	static final String INSERT = "INSERT INTO CPH.POLICE_ADDRESS (ID, PERSON_ID, STREET, NUMBER, LETTER, FLOOR, "
+	static final String DELETE = "DELETE FROM POLICE_ADDRESS";
+	static final String INSERT = "INSERT INTO POLICE_ADDRESS (ID, PERSON_ID, STREET, NUMBER, LETTER, FLOOR, "
 			+ "SIDE, PLACE, HOST, LATITUDE, LONGITUDE, DAY, MONTH, XYEAR, FULL_ADDRESS) VALUES (";
 	static int counter = 0;
 
@@ -25,22 +23,16 @@ public class LoadPoliceAddress extends LoadCphArch {
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		if (args.length < 2) {
-			System.out.println("Usage: LoadPoliceAddress derbydatabasepath csvfile");
-			System.exit(4);
-		}
-
-		logger = Logger.getLogger("LoadPoliceAddress");
-
+	public static String loadCsvFiles(String[] args) {
 		final LoadPoliceAddress lba = new LoadPoliceAddress();
 
 		try {
 			lba.execute(args);
 		} catch (final Exception e) {
-			logger.severe(e.getMessage());
 			e.printStackTrace();
+			return e.getMessage();
 		}
+		return "Police Address er indlæst";
 	}
 
 	/*

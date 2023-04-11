@@ -5,42 +5,27 @@ import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 3. feb. 2023
+ * @version 11. apr. 2023
  */
 public abstract class LoadCphArch {
-	// TODO Return message string
-	protected static Logger logger;
 	protected static int counter;
+	private Connection conn;
 
 	/**
 	 * No arg c:tor
 	 */
 	public LoadCphArch() {
-	}
-
-	/**
-	 * Connect to the Derby database
-	 *
-	 * @param url
-	 * @return
-	 * @throws SQLException
-	 */
-	protected Statement connectToDB(String url) throws SQLException {
-		final String dbURL1 = "jdbc:derby:" + url;
-		final Connection conn1 = DriverManager.getConnection(dbURL1);
-		logger.info("Connected to database " + dbURL1);
-		return conn1.createStatement();
 	}
 
 	/**
@@ -68,14 +53,13 @@ public abstract class LoadCphArch {
 		if (columnType.startsWith("CHAR") || columnType.startsWith("VARCHAR") || columnType.startsWith("DATE")) {
 			return "'" + string + "'";
 		}
-		if (columnType.startsWith("BOOLEAN")) {
-			if (string.equals("b'\\x00'")) {
-				return "TRUE";
-			} else {
-				return "FALSE";
-			}
-		} else {
+		if (!columnType.startsWith("BOOLEAN")) {
 			throw new Exception("Unknown column type: " + columnType);
+		}
+		if (string.equals("b'\\x00'")) {
+			return "TRUE";
+		} else {
+			return "FALSE";
 		}
 	}
 
@@ -86,10 +70,11 @@ public abstract class LoadCphArch {
 	 * @throws Exception
 	 */
 	protected void execute(String[] args) throws Exception {
-		final Statement statement = connectToDB(args[1]);
+		final String dbURL1 = "jdbc:derby:" + args[1];
+		conn = DriverManager.getConnection(dbURL1);
+		final PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + args[2]);
+		statement.execute();
 		loadTable(statement, args);
-
-		logger.info(counter + " rows added to " + getTablename() + " in " + args[0]);
 		statement.close();
 
 	}
@@ -142,19 +127,18 @@ public abstract class LoadCphArch {
 	 *
 	 * @param statement
 	 * @param args
+	 * @return
 	 * @throws Exception
 	 */
-	protected void loadTable(Statement statement, String[] args) throws Exception {
+	protected void loadTable(PreparedStatement statement, String[] args) throws Exception {
 		String[] columns;
 		StringBuilder sb = new StringBuilder();
 		String query = "";
-		String previousLine = "";
-		String thisLine = "";
 
 		final List<String> columnTypes = getColumnTypes(statement, getTablename());
-		logger.fine("Count: " + columnTypes.size());
 
-		statement.execute(getDelete());
+		statement = conn.prepareStatement(getDelete());
+		statement.execute();
 
 		final BufferedReader br = new BufferedReader(new FileReader(new File(args[1])));
 		String line;
@@ -167,11 +151,8 @@ public abstract class LoadCphArch {
 				line = line + br.readLine();
 			}
 
-			thisLine = line;
-
 			if (line.endsWith("\";\"")) {
 				line = line.substring(0, line.length() - 2);
-				logger.info("Shortened line: " + line);
 			}
 
 			sb = new StringBuilder(getInsert());
@@ -195,22 +176,14 @@ public abstract class LoadCphArch {
 			try {
 				sb.append(")");
 				query = sb.toString();
-				logger.fine(query);
-				statement.execute(query);
+				statement = conn.prepareStatement(query);
+				statement.execute();
 				counter++;
-				if (counter % 100000 == 0) {
-					logger.info("Counter: " + counter);
-				}
-				previousLine = line;
 			} catch (final SQLException e) {
 				if (!e.getSQLState().equals("42821")) {
-					logger.info("Previous: " + previousLine);
-					logger.info("This : " + thisLine);
-					logger.severe(e.getSQLState() + ", " + e.getMessage() + ", " + query);
 					br.close();
 					throw new SQLException(e);
 				}
-				logger.warning(e.getSQLState() + ", " + e.getMessage() + ", " + query);
 			}
 
 		}

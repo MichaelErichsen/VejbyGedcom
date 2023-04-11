@@ -34,7 +34,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
-import net.myerichsen.gedcom.db.loaders.DBLoader;
+import net.myerichsen.gedcom.db.loaders.GedcomLoader;
+import net.myerichsen.gedcom.db.loaders.LoadBurialPersonComplete;
+import net.myerichsen.gedcom.db.loaders.LoadPoliceAddress;
+import net.myerichsen.gedcom.db.loaders.LoadPolicePerson;
+import net.myerichsen.gedcom.db.loaders.LoadPolicePosition;
 import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.tablecreators.CensusTableCreator;
 import net.myerichsen.gedcom.db.tablecreators.CphTableCreator;
@@ -48,7 +52,6 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 public class ArchiveSearcher extends Shell {
-	// TODO Make database schemas configurable
 	// FIXME Find why FLOOR column missing in Polreg
 
 	// TODO Find all relocations to and from an individual
@@ -70,31 +73,6 @@ public class ArchiveSearcher extends Shell {
 	// siblings
 	// FIXME ID search does not clear siblings table
 	// TODO Doubleclick om sibling row inserts id and name in search bar
-
-	/**
-	 * Static constants used to initalize properties file
-	 */
-
-	private static final String CENSUSDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
-	private static final String CENSUSDB_SCHEMA = "VEJBY";
-	private static final String CENSUS_CSV_FILE_DIRECTORY = System.getProperty("user.home")
-			+ "Documents/The Master Genealogist v9/Kilder/DDD";
-	private static final String CPHDB_PATH = System.getProperty("user.home") + "/CPHDB";
-	private static final String CPHDB_SCHEMA = "CPH";
-	private static final String CPH_CSV_FILE_DIRECTORY = "C:/Users/michael/Downloads/data-20230129T125804Z-001/data";
-	private static final String GEDCOM_FILE_PATH = System.getProperty("user.home")
-			+ "/Documents/The Master Genealogist v9/Export/Vejby.ged";
-	private static final String HACK4DK_BURIAL_PERSON_COMPLETE = "hack4dk_burial_person_complete.csv";
-	private static final String HACK4DK_POLICE_ADDRESS = "hack4dk_police_address.csv";
-	private static final String HACK4DK_POLICE_PERSON = "hack4dk_police_person.csv";
-	private static final String HACK4DK_POLICE_POSITION = "hack4dk_police_position.csv";
-	private static final String KIP_TEXT_FILENAME = "kipdata.txt";
-	private static final String PROBATEDB_PATH = "c:/DerbyDB/gedcom";
-	private static final String PROBATEDB_SCHEMA = "GEDCOM";
-	private static final String PROBATE_SOURCE = "Kronborg";
-	private static final String PROPERTIES_PATH = System.getProperty("user.home") + "/ArchiveSearcher.properties";
-	private static final String VEJBYDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
-	private static final String VEJBYDB_SCHEMA = "VEJBY";
 
 	private static Display display;
 
@@ -125,10 +103,10 @@ public class ArchiveSearcher extends Shell {
 	private Text searchName;
 	private Text searchBirth;
 	private Text searchDeath;
-	private final Shell shell;
-	private Table siblingsTable;
 	private Text searchFather;
 	private Text searchMother;
+	private final Shell shell;
+	private Table siblingsTable;
 	private final TabFolder tabFolder;
 	private final IndividualComposite individualComposite;
 	private final RelocationComposite relocationComposite;
@@ -203,10 +181,11 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Load burial registry
+	 *
 	 * @param e
 	 */
 	protected void burregLoader(SelectionEvent e) {
-		// TODO LoadBurialPersonComplete derbydatabasepath csvfile
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -218,10 +197,13 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra " + props.getProperty("cphDbPath") + " ind i tabellerne i "
 					+ props.getProperty("cphPath"));
 
-//			new Thread(() -> {
-//				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath") };
-//				LoadBurialPersonComplete.main(sa);
-//			}).start();
+			new Thread(() -> {
+				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath"),
+						props.getProperty("cphSchema") };
+				final String message = LoadBurialPersonComplete.loadCsvFiles(sa);
+
+				messageField.getDisplay().asyncExec(() -> setMessage(message));
+			}).start();
 			break;
 		case SWT.CANCEL:
 			break;
@@ -516,15 +498,9 @@ public class ArchiveSearcher extends Shell {
 			new Thread(() -> {
 				final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
 						props.getProperty("vejbySchema") };
-				String message = DBLoader.loadGedcomFiles(sa);
+				final String message = GedcomLoader.loadCsvFiles(sa);
 
-				messageField.getDisplay().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						setMessage(message);
-					}
-				});
+				messageField.getDisplay().asyncExec(() -> setMessage(message));
 
 			}).start();
 			break;
@@ -540,35 +516,35 @@ public class ArchiveSearcher extends Shell {
 		props = new Properties();
 
 		try {
-			final InputStream input = new FileInputStream(PROPERTIES_PATH);
+			final InputStream input = new FileInputStream(Constants.PROPERTIES_PATH);
 			props.load(input);
 		} catch (final Exception e) {
-			props.setProperty("burialPersonComplete", HACK4DK_BURIAL_PERSON_COMPLETE);
+			props.setProperty("burialPersonComplete", Constants.HACK4DK_BURIAL_PERSON_COMPLETE);
 			props.setProperty("burregSearch", "true");
-			props.setProperty("censusCsvFileDirectory", CENSUS_CSV_FILE_DIRECTORY);
-			props.setProperty("censusPath", CENSUSDB_PATH);
-			props.setProperty("censusSchema", CENSUSDB_SCHEMA);
+			props.setProperty("censusCsvFileDirectory", Constants.CENSUS_CSV_FILE_DIRECTORY);
+			props.setProperty("censusPath", Constants.CENSUSDB_PATH);
+			props.setProperty("censusSchema", Constants.CENSUSDB_SCHEMA);
 			props.setProperty("censusSearch", "true");
-			props.setProperty("cphCsvFileDirectory", CPH_CSV_FILE_DIRECTORY);
-			props.setProperty("cphDbPath", CPHDB_PATH);
-			props.setProperty("cphSchema", CPHDB_SCHEMA);
-			props.setProperty("gedcomFilePath", GEDCOM_FILE_PATH);
-			props.setProperty("kipTextFilename", KIP_TEXT_FILENAME);
-			props.setProperty("policeAddress", HACK4DK_POLICE_ADDRESS);
-			props.setProperty("policePerson", HACK4DK_POLICE_PERSON);
-			props.setProperty("policePosition", HACK4DK_POLICE_POSITION);
+			props.setProperty("cphCsvFileDirectory", Constants.CPH_CSV_FILE_DIRECTORY);
+			props.setProperty("cphDbPath", Constants.CPHDB_PATH);
+			props.setProperty("cphSchema", Constants.CPHDB_SCHEMA);
+			props.setProperty("gedcomFilePath", Constants.GEDCOM_FILE_PATH);
+			props.setProperty("kipTextFilename", Constants.KIP_TEXT_FILENAME);
+			props.setProperty("policeAddress", Constants.HACK4DK_POLICE_ADDRESS);
+			props.setProperty("policePerson", Constants.HACK4DK_POLICE_PERSON);
+			props.setProperty("policePosition", Constants.HACK4DK_POLICE_POSITION);
 			props.setProperty("polregSearch", "true");
-			props.setProperty("probatePath", PROBATEDB_PATH);
-			props.setProperty("probateSchema", PROBATEDB_SCHEMA);
+			props.setProperty("probatePath", Constants.PROBATEDB_PATH);
+			props.setProperty("probateSchema", Constants.PROBATEDB_SCHEMA);
 			props.setProperty("probateSearch", "true");
-			props.setProperty("probateSource", PROBATE_SOURCE);
+			props.setProperty("probateSource", Constants.PROBATE_SOURCE);
 			props.setProperty("relocationSearch", "true");
 			props.setProperty("siblingSearch", "true");
-			props.setProperty("vejbyPath", VEJBYDB_PATH);
-			props.setProperty("vejbySchema", VEJBYDB_SCHEMA);
+			props.setProperty("vejbyPath", Constants.VEJBYDB_PATH);
+			props.setProperty("vejbySchema", Constants.VEJBYDB_SCHEMA);
 
 			storeProperties();
-			System.out.println("Egenskaber gemt i " + PROPERTIES_PATH);
+			System.out.println("Egenskaber gemt i " + Constants.PROPERTIES_PATH);
 		}
 	}
 
@@ -585,14 +561,15 @@ public class ArchiveSearcher extends Shell {
 		switch (buttonID) {
 		case SWT.OK:
 			setMessage("Data hentes fra KIP-filerne " + props.getProperty("censusCsvFileDirectory")
-					+ " ind i tabellen i " + props.getProperty("vejbyPath"));
+					+ " ind i tabellen i " + props.getProperty("censusPath"));
 
 			new Thread(() -> {
 				final String[] sa = new String[] { props.getProperty("kipTextFilename"),
-						props.getProperty("censusCsvFileDirectory"), props.getProperty("vejbyPath") };
-				System.out.println(props.getProperty("kipTextFilename") + ", "
-						+ props.getProperty("censusCsvFileDirectory") + ", " + props.getProperty("vejbyPath"));
-				CensusDbLoader.main(sa);
+						props.getProperty("censusCsvFileDirectory"), props.getProperty("censusPath"),
+						props.getProperty("censusSchema") };
+				final String message = CensusDbLoader.loadCsvFiles(sa);
+
+				messageField.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();
 
 			break;
@@ -605,8 +582,6 @@ public class ArchiveSearcher extends Shell {
 	 * @param e
 	 */
 	protected void polregLoader(SelectionEvent e) {
-		// TODO LoadPolicePosition derbydatabasepath csvfile
-
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -618,12 +593,18 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra " + props.getProperty("cphDbPath") + " ind i tabellerne i "
 					+ props.getProperty("cphPath"));
 
-//			new Thread(() -> {
-//				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath") };
-//				LoadPoliceAddress.main(sa);
-//				LoadPolicePosition.main(sa);
-//				LoadPolicePerson.main(sa);
-//			}).start();
+			new Thread(() -> {
+				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath"),
+						props.getProperty("cphSchema") };
+				final String message1 = LoadPoliceAddress.loadCsvFiles(sa);
+				messageField.getDisplay().asyncExec(() -> setMessage(message1));
+
+				final String message2 = LoadPolicePosition.loadCsvFiles(sa);
+				messageField.getDisplay().asyncExec(() -> setMessage(message2));
+				final String message3 = LoadPolicePerson.loadCsvFiles(sa);
+				messageField.getDisplay().asyncExec(() -> setMessage(message3));
+
+			}).start();
 			break;
 		case SWT.CANCEL:
 			break;
@@ -656,7 +637,7 @@ public class ArchiveSearcher extends Shell {
 		final String Id = "@I" + searchId.getText() + "@";
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-			final IndividualModel individual = new IndividualModel(conn, Id);
+			final IndividualModel individual = new IndividualModel(conn, Id, props.getProperty("vejbySchema"));
 
 			if (individual.getName().equals("")) {
 				setMessage("ID " + Id + " findes ikke i databasen");
@@ -676,6 +657,19 @@ public class ArchiveSearcher extends Shell {
 			final String deathDate = individual.getDeathDate() == null ? "9999-12-31"
 					: individual.getDeathDate().toString();
 			searchDeath.setText(deathDate);
+
+			try {
+				String[] parentPair = IndividualModel.splitParents(individual.getParents());
+				if (parentPair.length > 0) {
+					searchFather.setText(parentPair[0]);
+
+				}
+
+				if (parentPair.length > 1) {
+					searchMother.setText(parentPair[1]);
+				}
+			} catch (Exception e1) {
+			}
 
 			individualComposite.populate(individual);
 
@@ -829,10 +823,10 @@ public class ArchiveSearcher extends Shell {
 	 */
 	private void storeProperties() {
 		try {
-			final OutputStream output = new FileOutputStream(PROPERTIES_PATH);
+			final OutputStream output = new FileOutputStream(Constants.PROPERTIES_PATH);
 			props.store(output, "Archive searcher properties");
 		} catch (final Exception e2) {
-			setMessage("Kan ikke gemme egenskaber i " + PROPERTIES_PATH);
+			setMessage("Kan ikke gemme egenskaber i " + Constants.PROPERTIES_PATH);
 			e2.printStackTrace();
 		}
 	}

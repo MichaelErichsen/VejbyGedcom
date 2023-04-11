@@ -14,7 +14,7 @@ import java.util.List;
  *
  */
 public class CensusHousehold extends ASModel {
-	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM VEJBY.CENSUS "
+	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "
 			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
 
 	/**
@@ -24,12 +24,15 @@ public class CensusHousehold extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusModel> loadFromDatabase(String dbPath, String kipNr, String nr) throws SQLException {
+	public static List<CensusModel> loadFromDatabase(String dbPath, String kipNr, String nr, String schema)
+			throws SQLException {
 		CensusModel ci;
 		final List<CensusModel> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		final PreparedStatement statement = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
 		statement.setString(1, kipNr);
 		statement.setString(2, nr);
 		final ResultSet rs = statement.executeQuery();

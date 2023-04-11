@@ -59,7 +59,7 @@ public class TableViewerColumnSorter extends ViewerComparator {
 		m_column.getColumn().addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if ((m_viewer.getComparator() != null) && (m_viewer.getComparator() == TableViewerColumnSorter.this)) {
+				if (m_viewer.getComparator() != null && m_viewer.getComparator() == TableViewerColumnSorter.this) {
 					if (m_direction == ASC) {
 						setSorter(DESC);
 					} else if (m_direction == DESC) {

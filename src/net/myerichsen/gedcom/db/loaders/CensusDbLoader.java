@@ -6,12 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.myerichsen.gedcom.db.models.CensusModel;
 import net.myerichsen.gedcom.db.models.KipTextEntry;
@@ -22,46 +21,34 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 17. mar. 2023
+ * @version 11. apr. 2023
  */
 public class CensusDbLoader {
-	// TODO " + props.getProperty("vejbySchema") + "
-	// TODO Return message string
-	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM VEJBY.CENSUS WHERE KIPNR = '%s'";
-	private static Logger logger;
-	private static Statement statement;
+	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM CENSUS WHERE KIPNR = ?";
+	private static PreparedStatement statement;
 	private static int counter = 0;
-	private static CensusModel lastCi = null;
 
 	/**
 	 * Constructor
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		if (args.length < 3) {
-			System.out.println("Usage: CensusDbLoader kiptextfilename csvfiledirectory derbydatabasepath");
-			System.exit(4);
-		}
-
-		logger = Logger.getLogger("CensusDbLoader");
-
+	public static String loadCsvFiles(String[] args) {
 		final CensusDbLoader censusDbLoader = new CensusDbLoader();
 
 		try {
 			censusDbLoader.execute(args);
 
-			logger.info(counter + " rækker indsat i VEJBY.CENSUS");
 		} catch (final Exception e) {
-			logger.severe(e.getMessage());
-
-			if (lastCi != null) {
-				logger.info(lastCi.toString());
-			}
 
 			e.printStackTrace();
+			return e.getMessage();
 		}
+
+		return "Folketællinger er indlæst. " + counter + " rækker indsat i " + args[3] + ".CENSUS";
 	}
+
+	private Connection conn;
 
 	/**
 	 * Connect to the Derby database
@@ -73,10 +60,10 @@ public class CensusDbLoader {
 	 */
 	private void connectToDB(String[] args) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[2];
-		final Connection conn = DriverManager.getConnection(dbURL);
+		conn = DriverManager.getConnection(dbURL);
 		conn.setAutoCommit(false);
-		logger.info("Connected to database " + dbURL);
-		statement = conn.createStatement();
+		statement = conn.prepareStatement("SET SCHEMA = " + args[3]);
+		statement.execute();
 	}
 
 	/**
@@ -153,8 +140,10 @@ public class CensusDbLoader {
 	 * @throws Exception
 	 */
 	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
-		final String query = String.format(SELECT_COUNT, kipTextEntry.getKipNr());
-		final ResultSet rs = statement.executeQuery(query);
+		// FIXME java.lang.Exception: sql Error Code: 20000, sql State: XJ016
+		statement = conn.prepareStatement(SELECT_COUNT);
+		statement.setString(1, kipTextEntry.getKipNr());
+		final ResultSet rs = statement.executeQuery();
 
 		int count = 0;
 
@@ -162,23 +151,15 @@ public class CensusDbLoader {
 		if (rs.next()) {
 			count = rs.getInt("COUNT");
 			if (count > 0) {
-				logger.info("Skipping " + kipTextEntry.getKipNr());
 				return;
 			}
 		}
 
-		logger.info("Parsing " + kipTextEntry.getAmt() + ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn()
-				+ ", " + kipTextEntry.getAar() + ", " + kipTextEntry.getKipNr());
 		statement.getConnection().commit();
 
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
 		CensusModel ci;
 		String[] fields;
-
-//		if (censusFileLines.size() > count) {
-//			logger.info("Skipping " + kipTextEntry.getKipNr());
-//			return;
-//		}
 
 		final String[] columnNames = censusFileLines.get(0).split(";");
 
@@ -307,8 +288,6 @@ public class CensusDbLoader {
 			} catch (final Exception e21) {
 
 			}
-
-			lastCi = ci;
 
 			try {
 				ci.insertIntoDb(statement);

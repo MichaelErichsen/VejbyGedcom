@@ -18,7 +18,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 public class SiblingsModel extends ASModel {
-	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? " + "AND MOTHERPHONETIC = ?";
+	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? AND MOTHERPHONETIC = ?";
 
 	/**
 	 * Get a list of objects from the database
@@ -33,14 +33,13 @@ public class SiblingsModel extends ASModel {
 			return new SiblingsModel[0];
 		}
 
-		final String[] p = splitParents(parents);
+		final String[] p = IndividualModel.splitParents(parents);
 
 		if (p.length > 1) {
-
-			return loadFromDatabase(dbPath, p[0], p[1]);
+			return loadFromDatabase(schema, dbPath, p[0], p[1]);
 		}
-		return loadFromDatabase(schema, dbPath, p[0], "");
 
+		return loadFromDatabase(schema, dbPath, p[0], "");
 	}
 
 	/**
@@ -140,28 +139,6 @@ public class SiblingsModel extends ASModel {
 	 * @param parents2
 	 * @return
 	 */
-	private static String[] splitParents(String parents2) {
-		String s = parents2.replaceAll("\\d", "").replace(".", "").toLowerCase();
-		s = s.replace(", f.", "");
-		String[] sa = s.split(",");
-		final String[] words = sa[0].split(" ");
-
-		final String filter = "af bager gamle gmd i inds junior kirkesanger pige pigen portner proprietær sadelmager "
-				+ "skolelærer skovfoged slagter smed smedesvend snedker søn ugift ugifte unge ungkarl " + "uægte år";
-		final StringBuilder sb = new StringBuilder();
-
-		for (final String word : words) {
-			if (!filter.contains(word)) {
-				sb.append(word + " ");
-			}
-		}
-
-		s = sb.toString();
-
-		sa = s.split(" og ");
-
-		return sa;
-	}
 
 	private String individualKey = "";
 	private int birthYear;
@@ -169,7 +146,6 @@ public class SiblingsModel extends ASModel {
 	private String parents = "";
 	private String fatherPhonetic = "";
 	private String motherPhonetic = "";
-
 	private String place = "";
 
 	/**

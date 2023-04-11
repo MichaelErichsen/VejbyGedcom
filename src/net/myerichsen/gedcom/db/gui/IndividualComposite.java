@@ -13,7 +13,7 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
  * Individual tab composite
  *
  * @author Michael Erichsen
- * @version 9. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class IndividualComposite extends Composite {
@@ -171,5 +171,4 @@ public class IndividualComposite extends Composite {
 			txtindividualparents.setText(individual.getParents());
 		}
 	}
-
 }

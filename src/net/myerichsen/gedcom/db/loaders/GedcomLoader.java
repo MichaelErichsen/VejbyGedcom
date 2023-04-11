@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * @author Michael Erichsen
  * @version 11. apr. 2023
  */
-public class DBLoader {
+public class GedcomLoader {
 	/**
 	 * Static constants and variables
 	 */
@@ -85,12 +85,12 @@ public class DBLoader {
 
 	/**
 	 * Main called method
-	 * 
+	 *
 	 * @param args
 	 * @return
 	 */
-	public static String loadGedcomFiles(String[] args) {
-		final DBLoader ir = new DBLoader();
+	public static String loadCsvFiles(String[] args) {
+		final GedcomLoader ir = new GedcomLoader();
 
 		try {
 			ir.execute(args);
@@ -136,7 +136,7 @@ public class DBLoader {
 	private void execute(String[] args) throws Exception {
 		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn = DriverManager.getConnection(dbURL);
-		PreparedStatement ps = conn.prepareStatement("SET SCHEMA = " + args[2]);
+		final PreparedStatement ps = conn.prepareStatement("SET SCHEMA = " + args[2]);
 		ps.execute();
 
 		prepareStatements(conn);
@@ -149,7 +149,7 @@ public class DBLoader {
 
 		parseAllIndividuals();
 
-		updateBirthDeathData(conn);
+		updateBirthDeathData(conn, args[2]);
 
 		parseParents();
 
@@ -758,9 +758,9 @@ public class DBLoader {
 	 *
 	 * @throws SQLException
 	 */
-	private void updateBirthDeathData(Connection conn) throws SQLException {
+	private void updateBirthDeathData(Connection conn, String schema) throws SQLException {
 		// Read all individuals into a list
-		final List<IndividualModel> ldbi = IndividualModel.loadFromDB(conn);
+		final List<IndividualModel> ldbi = IndividualModel.loadFromDB(conn, schema);
 
 		// Update all individual records in Derby
 		updateIndividualsBirthDeath(ldbi);

@@ -2,8 +2,6 @@ package net.myerichsen.gedcom.db.gui;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -52,13 +50,9 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblKipCsvFil.setText("KIP csv fil sti");
 
 		txtCensusCsvFileDirectory = new Text(container, SWT.BORDER);
-		txtCensusCsvFileDirectory.addModifyListener(new ModifyListener() {
+		txtCensusCsvFileDirectory.addModifyListener(e -> {
+			// TODO Auto-generated method stub
 
-			@Override
-			public void modifyText(ModifyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
 		});
 		txtCensusCsvFileDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtCensusCsvFileDirectory.addModifyListener(e -> {
@@ -96,13 +90,9 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblKipTextFilnavn.setText("KIP tekst filnavn uden sti");
 
 		txtKipTextFilename = new Text(container, SWT.BORDER);
-		txtKipTextFilename.addModifyListener(new ModifyListener() {
+		txtKipTextFilename.addModifyListener(e -> {
+			// TODO Auto-generated method stub
 
-			@Override
-			public void modifyText(ModifyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
 		});
 		txtKipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtKipTextFilename.addModifyListener(e -> {
@@ -122,13 +112,9 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblCensusDatabaseSti.setText("Census database sti");
 
 		txtCensusPath = new Text(container, SWT.BORDER);
-		txtCensusPath.addModifyListener(new ModifyListener() {
+		txtCensusPath.addModifyListener(e -> {
+			// TODO Auto-generated method stub
 
-			@Override
-			public void modifyText(ModifyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
 		});
 		txtCensusPath.addModifyListener(e -> {
 			settings.setCensusPath(txtCensusPath.getText());
@@ -166,13 +152,9 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblCensusSchema.setText("Census database schema");
 
 		txtCensusSchema = new Text(container, SWT.BORDER);
-		txtCensusSchema.addModifyListener(new ModifyListener() {
+		txtCensusSchema.addModifyListener(e -> {
+			// TODO Auto-generated method stub
 
-			@Override
-			public void modifyText(ModifyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
 		});
 		txtCensusSchema.addModifyListener(e -> {
 			settings.setCensusSchema(txtCensusSchema.getText());
@@ -192,7 +174,7 @@ public class SettingsWizardPage2 extends WizardPage {
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 
-		Label lblDatabaseOgSchema = new Label(container, SWT.NONE);
+		final Label lblDatabaseOgSchema = new Label(container, SWT.NONE);
 		lblDatabaseOgSchema.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 		lblDatabaseOgSchema.setText("Database og schema beh\u00F8ver ikke at v\u00E6re forskellige");
 		new Label(container, SWT.NONE);

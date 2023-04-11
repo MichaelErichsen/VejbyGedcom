@@ -1,22 +1,19 @@
 package net.myerichsen.gedcom.db.loaders;
 
-import java.util.logging.Logger;
-
 /**
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 12. feb. 2023
+ * @version 11. apr. 2023
  *
  */
 public class LoadBurialPersonComplete extends LoadCphArch {
-	// TODO Return message string
 	/**
 	 *
 	 */
 	static final String TABLENAME = "BURIAL_PERSON_COMPLETE";
-	static final String DELETE = "DELETE FROM CPH.BURIAL_PERSON_COMPLETE";
-	static final String INSERT = "INSERT INTO CPH.BURIAL_PERSON_COMPLETE (ID, NUMBER, FIRSTNAMES, LASTNAME, "
+	static final String DELETE = "DELETE FROM BURIAL_PERSON_COMPLETE";
+	static final String INSERT = "INSERT INTO BURIAL_PERSON_COMPLETE (ID, NUMBER, FIRSTNAMES, LASTNAME, "
 			+ "BIRTHNAME, AGEYEARS, AGEMONTH, AGEWEEKS, AGEDAYS, AGEHOURS, DATEOFBIRTH, DATEOFDEATH, YEAROFBIRTH, "
 			+ "DEATHPLACE, CIVILSTATUS, ADRESSOUTSIDECPH, SEX, COMMENT, CEMETARY, CHAPEL, PARISH, STREET, HOOD, "
 			+ "STREET_NUMBER, LETTER, FLOOR, INSTITUTION, INSTITUTION_STREET, INSTITUTION_HOOD, "
@@ -29,22 +26,16 @@ public class LoadBurialPersonComplete extends LoadCphArch {
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		if (args.length < 2) {
-			System.out.println("Usage: LoadBurialPersonComplete derbydatabasepath csvfile");
-			System.exit(4);
-		}
-
-		logger = Logger.getLogger("LoadBurialPersonComplete");
-
+	public static String loadCsvFiles(String[] args) {
 		final LoadBurialPersonComplete lba = new LoadBurialPersonComplete();
 
 		try {
 			lba.execute(args);
 		} catch (final Exception e) {
-			logger.severe(e.getMessage());
 			e.printStackTrace();
+			return e.getMessage();
 		}
+		return "Begravelsesregister er indlæst";
 	}
 
 	/*

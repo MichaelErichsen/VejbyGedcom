@@ -14,19 +14,18 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 8. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class IndividualModel extends ASModel {
-	// TODO Configurable schema
-	private static final String SELECT_INDIVIDUAL = "SELECT * FROM VEJBY.INDIVIDUAL";
-	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = "
+	private static final String SELECT_INDIVIDUAL = "SELECT * FROM INDIVIDUAL";
+	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
-	private static final String SELECT_DEATH_EVENT = "SELECT * FROM VEJBY.EVENT WHERE INDIVIDUAL = "
+	private static final String SELECT_DEATH_EVENT = "SELECT * FROM EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Death' OR TYPE = 'Burial') ORDER BY DATE";
-	private static final String SELECT_PARENTS = "SELECT * FROM VEJBY.FAMILY WHERE ID = ?";
-	private static final String SELECT_INDIVIDUAL_FROM_ID = "SELECT * FROM VEJBY.INDIVIDUAL WHERE ID = ?";
-	private static final String SELECT_PARENTS_FROM_CHRISTENING = "SELECT * FROM VEJBY.EVENT WHERE TYPE = 'Christening' AND INDIVIDUAL = ?";
+	private static final String SELECT_PARENTS = "SELECT * FROM FAMILY WHERE ID = ?";
+	private static final String SELECT_INDIVIDUAL_FROM_ID = "SELECT * FROM INDIVIDUAL WHERE ID = ?";
+	private static final String SELECT_PARENTS_FROM_CHRISTENING = "SELECT * FROM EVENT WHERE TYPE = 'Christening' AND INDIVIDUAL = ?";
 
 	/**
 	 * Find parent names from christening event
@@ -36,8 +35,11 @@ public class IndividualModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static String findParentsFromChristeningEvent(Connection conn, String id) throws SQLException {
-		final PreparedStatement statement = conn.prepareStatement(SELECT_PARENTS_FROM_CHRISTENING);
+	private static String findParentsFromChristeningEvent(Connection conn, String id, String schema)
+			throws SQLException {
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_PARENTS_FROM_CHRISTENING);
 		statement.setString(1, id);
 		final ResultSet rs = statement.executeQuery();
 
@@ -61,8 +63,10 @@ public class IndividualModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static String getNameFromId(Connection conn, String id) throws SQLException {
-		final PreparedStatement statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
+	private static String getNameFromId(Connection conn, String id, String schema) throws SQLException {
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
 		statement.setString(1, id);
 		final ResultSet rs = statement.executeQuery();
 
@@ -80,7 +84,7 @@ public class IndividualModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IndividualModel> loadFromDB(Connection conn) throws SQLException {
+	public static List<IndividualModel> loadFromDB(Connection conn, String schema) throws SQLException {
 		IndividualModel individual;
 		final List<IndividualModel> ldbi = new ArrayList<>();
 		String givenName = "";
@@ -91,8 +95,10 @@ public class IndividualModel extends ASModel {
 		String wifeName = "";
 
 		// Read all individuals into a list
-		final PreparedStatement statement1 = conn.prepareStatement(SELECT_INDIVIDUAL);
-		ResultSet rs = statement1.executeQuery();
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_INDIVIDUAL);
+		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			individual = new IndividualModel();
@@ -166,17 +172,17 @@ public class IndividualModel extends ASModel {
 				wifeId = rs.getString("WIFE");
 
 				if (husbandId != null) {
-					husbandName = getNameFromId(conn, husbandId);
+					husbandName = getNameFromId(conn, husbandId, schema);
 				}
 
 				if (wifeId != null) {
-					wifeName = getNameFromId(conn, wifeId);
+					wifeName = getNameFromId(conn, wifeId, schema);
 				}
 
 				dbi.setParents(husbandName + " og " + wifeName);
 			} else {
 				// Find names from christening event source detail
-				dbi.setParents(findParentsFromChristeningEvent(conn, dbi.getId()));
+				dbi.setParents(findParentsFromChristeningEvent(conn, dbi.getId(), schema));
 			}
 		}
 		return ldbi;
@@ -207,14 +213,16 @@ public class IndividualModel extends ASModel {
 	 * @param id
 	 * @throws SQLException
 	 */
-	public IndividualModel(Connection conn, String id) throws SQLException {
+	public IndividualModel(Connection conn, String id, String schema) throws SQLException {
 		if (id.contains("@")) {
 			this.setId(id);
 		} else {
 			this.setId("@I" + id + "@");
 		}
 
-		PreparedStatement statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
+		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
 		statement.setString(1, this.id);
 		ResultSet rs = statement.executeQuery();
 
@@ -418,5 +426,35 @@ public class IndividualModel extends ASModel {
 	@Override
 	public String[] toStringArray() {
 		return null;
+	}
+
+	/**
+	 * @param parents2
+	 * @return
+	 */
+	public static String[] splitParents(String parents2) {
+		String s = parents2.replaceAll("\\d", "").replace(".", "");
+		s = s.replace(", f.", "");
+		String[] sa = s.split(",");
+		final String[] words = sa[0].split(" ");
+
+		final String[] filter = { "af", "bager", "gamle", "gmd", "i", "inds", "junior", "kirkesanger", "pige", "pigen",
+				"portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed", "smedesvend",
+				"snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
+		final StringBuilder sb = new StringBuilder();
+
+		for (final String word : words) {
+			for (String filterword : filter) {
+				if (word.equalsIgnoreCase(filterword)) {
+					continue;
+				}
+			}
+			sb.append(word + " ");
+		}
+
+		s = sb.toString();
+		sa = s.split(" og ");
+
+		return sa;
 	}
 }

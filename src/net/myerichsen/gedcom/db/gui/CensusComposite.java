@@ -538,7 +538,7 @@ public class CensusComposite extends Composite {
 		if (open == 1) {
 			try {
 				final List<CensusModel> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
-						ti.getText(21), ti.getText(5));
+						ti.getText(21), ti.getText(5), props.getProperty("censusSchema"));
 				final StringBuilder sb2 = new StringBuilder();
 
 				for (final CensusModel element : lcr) {
@@ -572,7 +572,8 @@ public class CensusComposite extends Composite {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"), kipNr, nr);
+		household = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"), kipNr, nr,
+				props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {
 			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
