@@ -7,15 +7,94 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Michael Erichsen
- * @version 3. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "
 			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
+	private final static String SELECT_SCHEMA = "SET SCHEMA = ?";
+	private final static String SELECT_HOUSEHOLD_HEAD_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
+	private final static String SELECT_HOUSEHOLD_HEAD_2 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
+			+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
+
+	/**
+	 * Get the id for the head of the household
+	 *
+	 * @param censusModel
+	 * @return
+	 * @throws SQLException
+	 */
+	public static String getHeadOfHousehold(Properties props, CensusModel censusModel) throws SQLException {
+
+		final Connection conn1 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("censusPath"));
+		final Connection conn2 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
+		PreparedStatement statement1 = conn1.prepareStatement(SELECT_SCHEMA);
+		statement1.setString(1, props.getProperty("censusSchema"));
+		statement1.execute();
+
+		statement1 = conn1.prepareStatement(SELECT_HOUSEHOLD_HEAD_1);
+		statement1.setString(1, censusModel.getKIPnr());
+		statement1.setInt(2, censusModel.getLoebenr());
+		final ResultSet rs = statement1.executeQuery();
+
+		PreparedStatement statement2;
+		int year;
+		String kipNr;
+		int loebeNr;
+		String ftDate;
+		String result = "ikke fundet";
+
+		if (rs.next()) {
+			year = rs.getInt("FTAAR");
+			kipNr = rs.getString("KIPNR");
+			loebeNr = rs.getInt("LOEBENR");
+
+			switch (year) {
+			case 1787:
+				ftDate = "1787-07-01";
+				break;
+			case 1834:
+				ftDate = "1834-02-18";
+				break;
+			case 1925:
+			case 1930:
+			case 1940:
+				ftDate = year + "-11-05";
+				break;
+			default:
+				ftDate = year + "-02-01";
+			}
+
+			statement2 = conn2.prepareStatement(SELECT_SCHEMA);
+			statement2.setString(1, props.getProperty("vejbySchema"));
+			statement2.execute();
+			statement2 = conn2.prepareStatement(SELECT_HOUSEHOLD_HEAD_2);
+			statement2.setString(1, ftDate);
+			statement2.setString(2, "%" + kipNr.trim() + ", " + loebeNr + "%");
+			ResultSet rs2 = statement2.executeQuery();
+
+			if (rs2.next()) {
+				result = rs2.getString("INDIVIDUAL");
+				conn2.close();
+			} else {
+				statement2.setString(2, "%" + loebeNr + ", " + kipNr.trim() + "%");
+				rs2 = statement2.executeQuery();
+
+				if (rs2.next()) {
+					result = rs2.getString("INDIVIDUAL").replace("@", "").replace("I", "");
+					conn2.close();
+				}
+			}
+		}
+
+		conn1.close();
+		return result;
+	}
 
 	/**
 	 * Get a list of household census records from the Derby table

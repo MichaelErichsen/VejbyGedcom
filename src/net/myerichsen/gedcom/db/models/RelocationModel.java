@@ -24,7 +24,7 @@ public class RelocationModel extends ASModel {
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM EVENT WHERE INDIVIDUAL = ? "
 			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 
-	// TODO Not restricted by birth and death dates
+	// TODO Not restricted by birth and death dates?
 
 	/**
 	 * @param dbPath

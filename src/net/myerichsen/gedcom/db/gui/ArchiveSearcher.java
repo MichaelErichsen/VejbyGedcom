@@ -48,26 +48,16 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
-	// FIXME Find why FLOOR column missing in Polreg
-
 	// TODO Find all relocations to and from an individual
 
 	// FIXME Census table has double Horizonal SCROLLbar
 
 	// TODO Change from Shell to ApplicationWindow @see
 	// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/DemonstratesTreeViewer.htm
-
-	// TODO Individual: Add fatherId, motherId and a String[] of children Id's for
-	// tree population
-	// TODO Populate ancestors tree tab
-	// TODO Add descendants tree tab
-
-	// FIXME ID search and name search does not clear siblings table
-	// TODO Doubleclick om sibling row should insert id and name in search bar
 
 	private static Display display;
 
@@ -95,6 +85,14 @@ public class ArchiveSearcher extends Shell {
 	private Properties props;
 	private final Text messageField;
 	private Text searchId;
+
+	/**
+	 * @return the searchId
+	 */
+	public Text getSearchId() {
+		return searchId;
+	}
+
 	private Text searchName;
 	private Text searchBirth;
 	private Text searchDeath;
@@ -103,13 +101,14 @@ public class ArchiveSearcher extends Shell {
 	private final Shell shell;
 	private Table siblingsTable;
 	private final TabFolder tabFolder;
-	private final IndividualComposite individualComposite;
-	private final RelocationComposite relocationComposite;
-	private final CensusComposite censusComposite;
-	private final BurregComposite burregComposite;
-	private final PolregComposite polregComposite;
-	private final ProbateComposite probateComposite;
-	private final SiblingsComposite siblingsComposite;
+	private final IndividualView individualView;
+	private final RelocationView relocationView;
+	private final CensusView censusView;
+	private final BurregView burregView;
+	private final PolregView polregView;
+	private final ProbateView probateView;
+	private final SiblingsView siblingsView;
+	private DescendantCounterView descendantCounterView;
 
 	/**
 	 * Create the shell.
@@ -130,44 +129,50 @@ public class ArchiveSearcher extends Shell {
 
 		final TabItem tbtmPerson = new TabItem(tabFolder, SWT.NONE);
 		tbtmPerson.setText("Person");
-		individualComposite = new IndividualComposite(tabFolder, SWT.NONE);
-		tbtmPerson.setControl(individualComposite);
+		individualView = new IndividualView(tabFolder, SWT.NONE);
+		tbtmPerson.setControl(individualView);
 
 		final TabItem tbtmRelocations = new TabItem(tabFolder, SWT.NONE);
 		tbtmRelocations.setText("Flytninger");
-		relocationComposite = new RelocationComposite(tabFolder, SWT.NONE);
-		relocationComposite.setProperties(props);
-		tbtmRelocations.setControl(relocationComposite);
+		relocationView = new RelocationView(tabFolder, SWT.NONE);
+		relocationView.setProperties(props);
+		tbtmRelocations.setControl(relocationView);
 
 		final TabItem tbtmCensus = new TabItem(tabFolder, SWT.NONE);
 		tbtmCensus.setText("Folketællinger");
-		censusComposite = new CensusComposite(tabFolder, SWT.NONE);
-		censusComposite.setProperties(props);
-		tbtmCensus.setControl(censusComposite);
+		censusView = new CensusView(tabFolder, SWT.NONE);
+		censusView.setProperties(props);
+		tbtmCensus.setControl(censusView);
 
 		final TabItem tbtmProbate = new TabItem(tabFolder, SWT.NONE);
 		tbtmProbate.setText("Skifter");
-		probateComposite = new ProbateComposite(tabFolder, SWT.NONE);
-		probateComposite.setProperties(props);
-		tbtmProbate.setControl(probateComposite);
+		probateView = new ProbateView(tabFolder, SWT.NONE);
+		probateView.setProperties(props);
+		tbtmProbate.setControl(probateView);
 
 		final TabItem tbtmPolreg = new TabItem(tabFolder, SWT.NONE);
 		tbtmPolreg.setText("Politiets Registerblade");
-		polregComposite = new PolregComposite(tabFolder, SWT.NONE);
-		polregComposite.setProperties(props);
-		tbtmPolreg.setControl(polregComposite);
+		polregView = new PolregView(tabFolder, SWT.NONE);
+		polregView.setProperties(props);
+		tbtmPolreg.setControl(polregView);
 
 		final TabItem tbtmBurreg = new TabItem(tabFolder, SWT.NONE);
 		tbtmBurreg.setText("Kbhvn. begravelsesregister");
-		burregComposite = new BurregComposite(tabFolder, SWT.NONE);
-		burregComposite.setProperties(props);
-		tbtmBurreg.setControl(burregComposite);
+		burregView = new BurregView(tabFolder, SWT.NONE);
+		burregView.setProperties(props);
+		tbtmBurreg.setControl(burregView);
 
 		final TabItem tbtmSiblings = new TabItem(tabFolder, SWT.NONE);
 		tbtmSiblings.setText("Søskende");
-		siblingsComposite = new SiblingsComposite(tabFolder, SWT.NONE);
-		siblingsComposite.setProperties(props);
-		tbtmSiblings.setControl(siblingsComposite);
+		siblingsView = new SiblingsView(tabFolder, SWT.NONE);
+		siblingsView.setProperties(props);
+		tbtmSiblings.setControl(siblingsView);
+
+		TabItem tbtmEfterkommere = new TabItem(tabFolder, SWT.NONE);
+		tbtmEfterkommere.setText("Efterkommere");
+		descendantCounterView = new DescendantCounterView(tabFolder, SWT.NONE);
+		descendantCounterView.setProperties(props);
+		tbtmEfterkommere.setControl(descendantCounterView);
 
 		messageField = new Text(this, SWT.BORDER);
 		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -611,13 +616,14 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param e
 	 */
-	private void searchById(TypedEvent e) {
+	protected void searchById(TypedEvent e) {
 		searchBirth.setText("");
 		searchDeath.setText("");
 		searchFather.setText("");
 		searchMother.setText("");
 		searchName.setText("");
-		individualComposite.clear();
+		individualView.clear();
+		siblingsView.clear();
 
 		if (searchId.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -629,7 +635,7 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		final String Id = "@I" + searchId.getText() + "@";
+		final String Id = "@I" + searchId.getText().trim() + "@";
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
 			final IndividualModel individual = new IndividualModel(conn, Id, props.getProperty("vejbySchema"));
@@ -666,30 +672,30 @@ public class ArchiveSearcher extends Shell {
 			} catch (Exception e1) {
 			}
 
-			individualComposite.populate(individual);
+			individualView.populate(individual);
 
 			if (props.getProperty("relocationSearch").equals("true")) {
-				relocationComposite.populate(phonName, birthDate, deathDate);
+				relocationView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("censusSearch").equals("true")) {
-				censusComposite.populate(phonName, birthDate, deathDate);
+				censusView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("probateSearch").equals("true")) {
-				probateComposite.populate(phonName, birthDate, deathDate);
+				probateView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("polregSearch").equals("true")) {
-				polregComposite.populate(phonName, birthDate, deathDate);
+				polregView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("burregSearch").equals("true")) {
-				burregComposite.populate(phonName, birthDate, deathDate);
+				burregView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (individual.getParents() != null && individual.getParents().length() > 0) {
-				siblingsComposite.populate(individual.getParents());
+				siblingsView.populate(individual.getParents());
 			}
 
 		} catch (final SQLException e1) {
@@ -705,7 +711,8 @@ public class ArchiveSearcher extends Shell {
 	 */
 	private void searchByName(TypedEvent e) {
 		searchId.setText("");
-		individualComposite.clear();
+		individualView.clear();
+		siblingsView.clear();
 
 		if (searchName.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -740,27 +747,27 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			if (props.getProperty("relocationSearch").equals("true")) {
-				relocationComposite.populate(phonName, birthDate, deathDate);
+				relocationView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("censusSearch").equals("true")) {
-				censusComposite.populate(phonName, birthDate, deathDate);
+				censusView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("probateSearch").equals("true")) {
-				probateComposite.populate(phonName, birthDate, deathDate);
+				probateView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("polregSearch").equals("true")) {
-				polregComposite.populate(phonName, birthDate, deathDate);
+				polregView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("burregSearch").equals("true")) {
-				burregComposite.populate(phonName, birthDate, deathDate);
+				burregView.populate(phonName, birthDate, deathDate);
 			}
 
 			if (searchFather.getText().length() > 0 || searchMother.getText().length() > 0) {
-				siblingsComposite.populate(searchFather.getText(), searchMother.getText());
+				siblingsView.populate(searchFather.getText(), searchMother.getText());
 			}
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
@@ -777,7 +784,8 @@ public class ArchiveSearcher extends Shell {
 		searchDeath.setText("");
 		searchName.setText("");
 		searchId.setText("");
-		individualComposite.clear();
+		individualView.clear();
+		siblingsView.clear();
 
 		if (searchFather.getText().equals("") && searchMother.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -790,7 +798,7 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		try {
-			siblingsComposite.populate(searchFather.getText(), searchMother.getText());
+			siblingsView.populate(searchFather.getText(), searchMother.getText());
 			if (siblingsTable != null) {
 				siblingsTable.forceFocus();
 			}

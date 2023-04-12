@@ -19,7 +19,7 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
  * Wizard page to handle census imports
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class SettingsWizardPage2 extends WizardPage {
@@ -50,10 +50,6 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblKipCsvFil.setText("KIP csv fil sti");
 
 		txtCensusCsvFileDirectory = new Text(container, SWT.BORDER);
-		txtCensusCsvFileDirectory.addModifyListener(e -> {
-			// TODO Auto-generated method stub
-
-		});
 		txtCensusCsvFileDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtCensusCsvFileDirectory.addModifyListener(e -> {
 			settings.setCensusCsvFileDirectory(txtCensusCsvFileDirectory.getText());
@@ -90,10 +86,6 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblKipTextFilnavn.setText("KIP tekst filnavn uden sti");
 
 		txtKipTextFilename = new Text(container, SWT.BORDER);
-		txtKipTextFilename.addModifyListener(e -> {
-			// TODO Auto-generated method stub
-
-		});
 		txtKipTextFilename.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtKipTextFilename.addModifyListener(e -> {
 			settings.setKipTextFilename(txtKipTextFilename.getText());
@@ -112,10 +104,6 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblCensusDatabaseSti.setText("Census database sti");
 
 		txtCensusPath = new Text(container, SWT.BORDER);
-		txtCensusPath.addModifyListener(e -> {
-			// TODO Auto-generated method stub
-
-		});
 		txtCensusPath.addModifyListener(e -> {
 			settings.setCensusPath(txtCensusPath.getText());
 
@@ -152,10 +140,6 @@ public class SettingsWizardPage2 extends WizardPage {
 		lblCensusSchema.setText("Census database schema");
 
 		txtCensusSchema = new Text(container, SWT.BORDER);
-		txtCensusSchema.addModifyListener(e -> {
-			// TODO Auto-generated method stub
-
-		});
 		txtCensusSchema.addModifyListener(e -> {
 			settings.setCensusSchema(txtCensusSchema.getText());
 

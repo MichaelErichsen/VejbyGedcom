@@ -40,7 +40,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * @version 11. apr. 2023
  *
  */
-public class ProbateComposite extends Composite {
+public class ProbateView extends Composite {
 	private TableViewer probateTableViewer;
 	private Table probateTable;
 	private ASPopulator probateListener;
@@ -53,7 +53,7 @@ public class ProbateComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public ProbateComposite(Composite parent, int style) {
+	public ProbateView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 

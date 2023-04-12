@@ -39,10 +39,10 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
-public class SiblingsComposite extends Composite {
+public class SiblingsView extends Composite {
 	private TableViewer siblingsTableViewer;
 	private Table siblingsTable;
 	private ASPopulator siblingsListener;
@@ -56,7 +56,7 @@ public class SiblingsComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public SiblingsComposite(Composite parent, int style) {
+	public SiblingsView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
@@ -224,6 +224,15 @@ public class SiblingsComposite extends Composite {
 	}
 
 	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final SiblingsModel[] input = new SiblingsModel[0];
+		siblingsTableViewer.setInput(input);
+		siblingsTableViewer.refresh();
+	}
+
+	/**
 	 * Populate siblings table by father and mother
 	 *
 	 * @param phonName
@@ -261,6 +270,7 @@ public class SiblingsComposite extends Composite {
 
 	/**
 	 * @param display
+	 * @param event
 	 */
 	private void siblingsPopup(Display display) {
 		final TableItem[] tia = siblingsTable.getSelection();
@@ -281,7 +291,7 @@ public class SiblingsComposite extends Composite {
 		final String string = sb.toString();
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Søskende", null, string, MessageDialog.INFORMATION,
-				new String[] { "OK", "Kopier" }, 0);
+				new String[] { "OK", "Kopier", "Hop til søskende" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -289,6 +299,11 @@ public class SiblingsComposite extends Composite {
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
+		} else if (open == 2) {
+			String siblingsId = ti.getText(0);
+			ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+			grandParent.getSearchId().setText(siblingsId);
+			grandParent.searchById(null);
 		}
 	}
 }

@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * @version 11. apr. 2023
  *
  */
-public class RelocationComposite extends Composite {
+public class RelocationView extends Composite {
 	private TableViewer relocationTableViewer;
 	private Text txtRelocationGiven;
 	private Text txtRelocationSurname;
@@ -55,7 +55,7 @@ public class RelocationComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public RelocationComposite(Composite parent, int style) {
+	public RelocationView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
@@ -119,12 +119,11 @@ public class RelocationComposite extends Composite {
 		filters[1] = RelocationSurnameFilter.getInstance();
 		relocationTableViewer.setFilters(filters);
 		relocationTableViewer.setComparator(new RelocationComparator());
+		relocationTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		relocationTable = relocationTableViewer.getTable();
 		relocationTable.setLinesVisible(true);
 		relocationTable.setHeaderVisible(true);
-
-		relocationTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		final TableViewerColumn relocationTableViewerColumn = new TableViewerColumn(relocationTableViewer, SWT.NONE);
 		relocationTableViewerColumn.setLabelProvider(new ColumnLabelProvider() {

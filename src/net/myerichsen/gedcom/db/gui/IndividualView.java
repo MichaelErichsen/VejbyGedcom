@@ -16,7 +16,7 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
  * @version 11. apr. 2023
  *
  */
-public class IndividualComposite extends Composite {
+public class IndividualView extends Composite {
 	private final Text txtindividualid;
 	private final Text txtindividualname;
 	private final Text txtindividualsex;
@@ -35,7 +35,7 @@ public class IndividualComposite extends Composite {
 	 * @param style
 	 */
 
-	public IndividualComposite(Composite parent, int style) {
+	public IndividualView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 

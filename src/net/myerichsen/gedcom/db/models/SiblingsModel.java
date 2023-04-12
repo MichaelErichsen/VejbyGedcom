@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class SiblingsModel extends ASModel {
@@ -97,20 +97,6 @@ public class SiblingsModel extends ASModel {
 	}
 
 	/**
-	 * @param dbPath
-	 * @param phonName
-	 * @param birthDate2
-	 * @param deathDate
-	 * @return
-	 */
-	private static SiblingsModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate2,
-			String deathDate) {
-		// TODO Load siblings from database
-		System.out.println("Not yet implemented");
-		return null;
-	}
-
-	/**
 	 * Get a list of objects from the database
 	 *
 	 * @param sa
@@ -124,9 +110,6 @@ public class SiblingsModel extends ASModel {
 		}
 		case 4: {
 			return loadFromDatabase(args[0], args[1], args[2], args[3]);
-		}
-		case 5: {
-			return loadFromDatabase(args[0], args[1], args[2], args[3], args[4]);
 		}
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");
@@ -262,7 +245,7 @@ public class SiblingsModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return "SiblingsRecord [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "") + birthYear
+		return "SiblingsModel [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "") + birthYear
 				+ (name != null ? "name=" + name + ", " : "") + (parents != null ? "parents=" + parents + ", " : "")
 				+ (fatherPhonetic != null ? "fatherPhonetic=" + fatherPhonetic + ", " : "")
 				+ (motherPhonetic != null ? "motherPhonetic=" + motherPhonetic + ", " : "")

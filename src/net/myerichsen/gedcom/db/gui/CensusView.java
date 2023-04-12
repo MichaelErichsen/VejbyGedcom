@@ -1,9 +1,5 @@
 package net.myerichsen.gedcom.db.gui;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -52,10 +48,10 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
-public class CensusComposite extends Composite {
+public class CensusView extends Composite {
 	private Text txtCensusYear;
 	private Text txtCensusCounty;
 	private Text txtCensusParish;
@@ -75,7 +71,7 @@ public class CensusComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public CensusComposite(Composite parent, int style) {
+	public CensusView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
@@ -188,7 +184,6 @@ public class CensusComposite extends Composite {
 		final ScrolledComposite censusScroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		censusScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		censusScroller.setSize(0, 0);
-
 		censusScroller.setExpandHorizontal(true);
 		censusScroller.setExpandVertical(true);
 
@@ -211,6 +206,7 @@ public class CensusComposite extends Composite {
 		filters[6] = CensusAgeFilter.getInstance();
 		censusTableViewer.setFilters(filters);
 		censusTableViewer.setComparator(new CensusComparator());
+		censusTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		censusTable = censusTableViewer.getTable();
 		censusTable.setLinesVisible(true);
@@ -505,8 +501,6 @@ public class CensusComposite extends Composite {
 			}
 		});
 
-		censusTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-
 		txtCensusYear.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -572,86 +566,11 @@ public class CensusComposite extends Composite {
 			final Shell[] shells = getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 			messageBox.setText("Info");
-			messageBox.setMessage("Husstandens overhovede var " + getHeadOfHousehold(censusModel));
+			messageBox
+					.setMessage("Husstandens overhovede var " + CensusHousehold.getHeadOfHousehold(props, censusModel));
 			@SuppressWarnings("unused")
 			final int buttonID = messageBox.open();
 		}
-	}
-
-	/**
-	 * @param censusModel
-	 * @return
-	 * @throws SQLException
-	 */
-	private String getHeadOfHousehold(CensusModel censusModel) throws SQLException {
-		String SELECT_SCHEMA = "SET SCHEMA = ?";
-		String SELECT_HOUSEHOLD_HEAD_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
-		String SELECT_HOUSEHOLD_HEAD_2 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
-				+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
-
-		Connection conn1 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("censusPath"));
-		Connection conn2 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-		PreparedStatement statement1 = conn1.prepareStatement(SELECT_SCHEMA);
-		statement1.setString(1, props.getProperty("censusSchema"));
-		statement1.execute();
-
-		statement1 = conn1.prepareStatement(SELECT_HOUSEHOLD_HEAD_1);
-		statement1.setString(1, censusModel.getKIPnr());
-		statement1.setInt(2, censusModel.getLoebenr());
-		ResultSet rs = statement1.executeQuery();
-
-		PreparedStatement statement2;
-		int year;
-		String kipNr;
-		int loebeNr;
-		String ftDate;
-		String result = "ikke fundet";
-
-		if (rs.next()) {
-			year = rs.getInt("FTAAR");
-			kipNr = rs.getString("KIPNR");
-			loebeNr = rs.getInt("LOEBENR");
-
-			switch (year) {
-			case 1787:
-				ftDate = "1787-07-01";
-				break;
-			case 1834:
-				ftDate = "1834-02-18";
-				break;
-			case 1925:
-			case 1930:
-			case 1940:
-				ftDate = year + "-11-05";
-				break;
-			default:
-				ftDate = year + "-02-01";
-			}
-
-			statement2 = conn2.prepareStatement(SELECT_SCHEMA);
-			statement2.setString(1, props.getProperty("vejbySchema"));
-			statement2.execute();
-			statement2 = conn2.prepareStatement(SELECT_HOUSEHOLD_HEAD_2);
-			statement2.setString(1, ftDate);
-			statement2.setString(2, "%" + kipNr.trim() + ", " + loebeNr + "%");
-			ResultSet rs2 = statement2.executeQuery();
-
-			if (rs2.next()) {
-				result = rs2.getString("INDIVIDUAL");
-				conn2.close();
-			} else {
-				statement2.setString(2, "%" + loebeNr + ", " + kipNr.trim() + "%");
-				rs2 = statement2.executeQuery();
-
-				if (rs2.next()) {
-					result = rs2.getString("INDIVIDUAL");
-					conn2.close();
-				}
-			}
-		}
-
-		conn1.close();
-		return result;
 	}
 
 	@Override

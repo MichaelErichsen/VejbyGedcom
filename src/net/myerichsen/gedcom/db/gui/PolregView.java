@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * @version 11. apr. 2023
  *
  */
-public class PolregComposite extends Composite {
+public class PolregView extends Composite {
 	private TableViewer polregTableViewer;
 	private Table polregTable;
 	private ASPopulator polregListener;
@@ -56,7 +56,7 @@ public class PolregComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public PolregComposite(Composite parent, int style) {
+	public PolregView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 

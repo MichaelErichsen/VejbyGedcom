@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
  * @version 11. apr. 2023
  *
  */
-public class BurregComposite extends Composite {
+public class BurregView extends Composite {
 	private TableViewer burregTableViewer;
 	private Table burregTable;
 	private ASPopulator burregListener;
@@ -56,7 +56,7 @@ public class BurregComposite extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public BurregComposite(Composite parent, int style) {
+	public BurregView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
