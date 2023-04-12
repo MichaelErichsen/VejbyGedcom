@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -252,6 +253,9 @@ public class SiblingsView extends Composite {
 							.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+							.setMessage("Søskende er hentet"));
+
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}

@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -37,7 +38,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -210,6 +211,8 @@ public class ProbateView extends Composite {
 					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+							.setMessage("Skifter er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}

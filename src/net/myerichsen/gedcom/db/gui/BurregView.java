@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -38,7 +39,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -497,6 +498,8 @@ public class BurregView extends Composite {
 					final BurregModel[] burregRecords = (BurregModel[]) burregListener.loadFromDatabase(loadArgs);
 
 					Display.getDefault().asyncExec(() -> burregTableViewer.setInput(burregRecords));
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+							.setMessage("Begrevelsesregisteret er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}

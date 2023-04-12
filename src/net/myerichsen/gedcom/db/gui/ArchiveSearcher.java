@@ -53,9 +53,6 @@ import net.myerichsen.gedcom.util.Fonkod;
  */
 public class ArchiveSearcher extends Shell {
 	// TODO Find all relocations to and from an individual
-
-	// FIXME Census table has double Horizonal SCROLLbar
-
 	// TODO Change from Shell to ApplicationWindow @see
 	// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/DemonstratesTreeViewer.htm
 
@@ -815,7 +812,7 @@ public class ArchiveSearcher extends Shell {
 	 * @param string
 	 *
 	 */
-	private void setMessage(String string) {
+	public void setMessage(String string) {
 		messageField.setText(string);
 		messageField.redraw();
 		messageField.update();
