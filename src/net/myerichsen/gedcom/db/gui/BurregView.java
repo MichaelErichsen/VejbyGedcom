@@ -498,7 +498,7 @@ public class BurregView extends Composite {
 					final BurregModel[] burregRecords = (BurregModel[]) burregListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> burregTableViewer.setInput(burregRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Begrevelsesregisteret er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();

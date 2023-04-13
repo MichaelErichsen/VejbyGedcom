@@ -14,14 +14,18 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class IndividualModel extends ASModel {
 	/**
 	 * 
 	 */
-	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
+	private static final String SET_SCHEMA2 = "SET SCHEMA = ?";
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = SET_SCHEMA2;
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM INDIVIDUAL";
 	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
@@ -195,6 +199,36 @@ public class IndividualModel extends ASModel {
 		return ldbi;
 	}
 
+	/**
+	 * @param parents2
+	 * @return
+	 */
+	public static String[] splitParents(String parents2) {
+		String s = parents2.replaceAll("\\d", "").replace(".", "");
+		s = s.replace(", f.", "");
+		String[] sa = s.split(",");
+		final String[] words = sa[0].split(" ");
+
+		final String[] filter = { "af", "bager", "gamle", "gmd", "i", "inds", "junior", "kirkesanger", "pige", "pigen",
+				"portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed", "smedesvend",
+				"snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
+		final StringBuilder sb = new StringBuilder();
+
+		for (final String word : words) {
+			for (final String filterword : filter) {
+				if (word.equalsIgnoreCase(filterword)) {
+					continue;
+				}
+			}
+			sb.append(word + " ");
+		}
+
+		s = sb.toString();
+		sa = s.split(" og ");
+
+		return sa;
+	}
+
 	private String id = "";
 	private String name = "";
 	private String sex = "";
@@ -204,6 +238,7 @@ public class IndividualModel extends ASModel {
 	private String birthPlace = "";
 	private Date deathDate = null;
 	private String deathPlace = "";
+
 	private String parents = "";
 
 	/**
@@ -250,7 +285,7 @@ public class IndividualModel extends ASModel {
 
 		{
 			birthDate = rs.getDate("DATE");
-			birthPlace = rs.getString("PLACE");
+			birthPlace = (rs.getString("PLACE") == null ? "" : rs.getString("PLACE"));
 		}
 
 		statement = conn.prepareStatement(SELECT_DEATH_EVENT);
@@ -259,7 +294,7 @@ public class IndividualModel extends ASModel {
 
 		if (rs.next()) {
 			deathDate = rs.getDate("DATE");
-			deathPlace = rs.getString("PLACE");
+			deathPlace = (rs.getString("PLACE") == null ? "" : rs.getString("PLACE"));
 		}
 
 		statement.close();
@@ -434,35 +469,5 @@ public class IndividualModel extends ASModel {
 	@Override
 	public String[] toStringArray() {
 		return null;
-	}
-
-	/**
-	 * @param parents2
-	 * @return
-	 */
-	public static String[] splitParents(String parents2) {
-		String s = parents2.replaceAll("\\d", "").replace(".", "");
-		s = s.replace(", f.", "");
-		String[] sa = s.split(",");
-		final String[] words = sa[0].split(" ");
-
-		final String[] filter = { "af", "bager", "gamle", "gmd", "i", "inds", "junior", "kirkesanger", "pige", "pigen",
-				"portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed", "smedesvend",
-				"snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
-		final StringBuilder sb = new StringBuilder();
-
-		for (final String word : words) {
-			for (String filterword : filter) {
-				if (word.equalsIgnoreCase(filterword)) {
-					continue;
-				}
-			}
-			sb.append(word + " ");
-		}
-
-		s = sb.toString();
-		sa = s.split(" og ");
-
-		return sa;
 	}
 }

@@ -14,8 +14,7 @@ public class CensusPopulator implements ASPopulator {
 	@Override
 	public CensusModel[] load(String[] args) {
 		try {
-			final CensusModel[] censusRecords = CensusModel.load(args[0], args[1], args[2], args[3],
-					args[4]);
+			final CensusModel[] censusRecords = CensusModel.load(args[0], args[1], args[2], args[3], args[4]);
 			return censusRecords;
 		} catch (final SQLException e) {
 			e.printStackTrace();

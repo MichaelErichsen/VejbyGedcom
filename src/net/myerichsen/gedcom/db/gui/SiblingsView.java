@@ -201,6 +201,15 @@ public class SiblingsView extends Composite {
 	}
 
 	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final SiblingsModel[] input = new SiblingsModel[0];
+		siblingsTableViewer.setInput(input);
+		siblingsTableViewer.refresh();
+	}
+
+	/**
 	 * Populate siblings table by individual parent field
 	 *
 	 * @param parents
@@ -212,8 +221,7 @@ public class SiblingsView extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), parents };
-					final SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener
-							.load(loadArgs);
+					final SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(siblingRecords));
 				} catch (final Exception e) {
@@ -222,15 +230,6 @@ public class SiblingsView extends Composite {
 
 			}
 		}).start();
-	}
-
-	/**
-	 * Clear the table
-	 */
-	public void clear() {
-		final SiblingsModel[] input = new SiblingsModel[0];
-		siblingsTableViewer.setInput(input);
-		siblingsTableViewer.refresh();
 	}
 
 	/**
@@ -249,11 +248,10 @@ public class SiblingsView extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), fathersName, mothersName };
-					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener
-							.load(loadArgs);
+					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Søskende er hentet"));
 
 				} catch (final Exception e) {
@@ -304,8 +302,8 @@ public class SiblingsView extends Composite {
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		} else if (open == 2) {
-			String siblingsId = ti.getText(0);
-			ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+			final String siblingsId = ti.getText(0);
+			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(siblingsId);
 			grandParent.searchById(null);
 		}

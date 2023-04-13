@@ -18,14 +18,14 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class CensusModel extends ASModel {
 	/**
 	 * 
 	 */
-	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";

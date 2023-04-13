@@ -16,7 +16,7 @@ import java.util.List;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  */
 public abstract class LoadCphArch {
 	/**
@@ -62,9 +62,8 @@ public abstract class LoadCphArch {
 		}
 		if (string.equals("b'\\x00'")) {
 			return "TRUE";
-		} else {
-			return "FALSE";
 		}
+		return "FALSE";
 	}
 
 	/**

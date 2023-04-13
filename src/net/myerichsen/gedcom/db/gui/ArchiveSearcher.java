@@ -52,24 +52,24 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 public class ArchiveSearcher extends Shell {
-	public ArchiveSearcher() {
-	}
-	// TODO Find all relocations to and from an individual
-	// TODO Change from Shell to ApplicationWindow @see
-	// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/DemonstratesTreeViewer.htm
 	// FIXME Relocation, from, can display "NULL"
+
 	// TODO Filters: Coloured background for active filter fields
-	// FIXME Individual, view, birth place can display "NULL"
-	// TODO Check if we can search
-	// https://www.familysearch.org/search/record/results?q.givenName=caroline%20albine&q.surname=heitzman
-	// It requires a signin in-flight
+
 	// TODO Polreg day, month, year 1 1 1
+
 	// TODO Polreg sometimes displays national characters as Jens Andersen,
 	// 1849-05-14, HÃ¸ker, Baggesensgade, 32, 1, 1, 1, Baggesensgade 32, kÃ¦lderen,
-	// TODO New relocation view: Get all relocation events, display those with name
+	// String asciiEncodedString = new String(germanBytes,
+	// StandardCharsets.US_ASCII);
+	// public static boolean isAsciiPrintable(char ch) {
+	// return ch>=32&&ch<127;
+
+	// TODO Find all relocations to and from an individual
+	// New relocation view: Get all relocation events, display those with name
 	// and place
 
-//	private static Display display;
+	private static Display display;
 
 	/**
 	 * Launch the application.
@@ -77,91 +77,58 @@ public class ArchiveSearcher extends Shell {
 	 * @param args
 	 */
 	public static void main(String args[]) {
-//		try {
-//			display = Display.getDefault();
-//			final ArchiveSearcher shell = new ArchiveSearcher(display);
-//			shell.open();
-//			shell.layout();
-//			while (!shell.isDisposed()) {
-//				if (!display.readAndDispatch()) {
-//					display.sleep();
-//				}
-//			}
-//		} catch (final Exception e) {
-//			e.printStackTrace();
-//		}
 		try {
-			ArchiveSearcher window = new ArchiveSearcher();
-			window.open();
-		} catch (Exception e) {
+			display = Display.getDefault();
+			final ArchiveSearcher shell = new ArchiveSearcher(display);
+			shell.open();
+			shell.layout();
+			while (!shell.isDisposed()) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
+			}
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * Open the window.
-	 */
-	@Override
-	public void open() {
-		Display display = Display.getDefault();
-		createContents();
-		shell.open();
-		shell.layout();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
 	private Properties props;
-	private Text messageField;
+	private final Text messageField;
 	private Text searchId;
 
-	/**
-	 * @return the searchId
-	 */
-	public Text getSearchId() {
-		return searchId;
-	}
-
 	private Text searchName;
+
 	private Text searchBirth;
 	private Text searchDeath;
 	private Text searchFather;
 	private Text searchMother;
-	protected Shell shell;
+	private final Shell shell;
 	private Table siblingsTable;
-	private TabFolder tabFolder;
-	private IndividualView individualView;
-	private RelocationView relocationView;
-	private CensusView censusView;
-	private BurregView burregView;
-	private PolregView polregView;
-	private ProbateView probateView;
-	private SiblingsView siblingsView;
-	private DescendantCounterView descendantCounterView;
+	private final TabFolder tabFolder;
+	private final IndividualView individualView;
+	private final RelocationView relocationView;
+	private final CensusView censusView;
+	private final BurregView burregView;
+	private final PolregView polregView;
+	private final ProbateView probateView;
+	private final SiblingsView siblingsView;
+	private final DescendantCounterView descendantCounterView;
 
 	/**
 	 * Create the shell.
 	 *
 	 * @param display
 	 */
-//	public ArchiveSearcher(Display display) {
-	protected void createContents() {
-		shell = new Shell();
-		shell.setText("Arkivsøgning");
-		shell.setSize(1112, 625);
-//		super(display, SWT.SHELL_TRIM);
-
+	public ArchiveSearcher(Display display) {
+		super(display, SWT.SHELL_TRIM);
 		getProperties();
-		shell.setLayout(new GridLayout(1, false));
-//		shell = display.getActiveShell();
+		setLayout(new GridLayout(1, false));
+		shell = display.getActiveShell();
 		createMenuBar();
 
 		createSearchBar();
 
-		tabFolder = new TabFolder(shell, SWT.NONE);
+		tabFolder = new TabFolder(this, SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		final TabItem tbtmPerson = new TabItem(tabFolder, SWT.NONE);
@@ -205,27 +172,17 @@ public class ArchiveSearcher extends Shell {
 		siblingsView.setProperties(props);
 		tbtmSiblings.setControl(siblingsView);
 
-		TabItem tbtmEfterkommere = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmEfterkommere = new TabItem(tabFolder, SWT.NONE);
 		tbtmEfterkommere.setText("Efterkommere");
 		descendantCounterView = new DescendantCounterView(tabFolder, SWT.NONE);
 		descendantCounterView.setProperties(props);
 		tbtmEfterkommere.setControl(descendantCounterView);
 
-		messageField = new Text(shell, SWT.BORDER);
+		messageField = new Text(this, SWT.BORDER);
 		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-//		createContents();
+		createContents();
 	}
-
-//	/**
-//	 * Constructor
-//	 *
-//	 */
-//	public ArchiveSearcher() {
-//		this.censusView = null;
-//		// TODO Auto-generated constructor stub
-//		this.burregView = null;
-//	}
 
 	/**
 	 * Load burial registry
@@ -262,21 +219,21 @@ public class ArchiveSearcher extends Shell {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-//	/**
-//	 * Create contents of the shell.
-//	 */
-//	protected void createContents() {
-//		setText("Arkivsøgning");
-//		setSize(1112, 625);
-//
-//	}
+	/**
+	 * Create contents of the shell.
+	 */
+	protected void createContents() {
+		setText("Arkivsøgning");
+		setSize(1112, 625);
+
+	}
 
 	/**
 	 *
 	 */
 	private void createMenuBar() {
-		final Menu menu = new Menu(shell, SWT.BAR);
-		shell.setMenuBar(menu);
+		final Menu menu = new Menu(this, SWT.BAR);
+		setMenuBar(menu);
 
 		final MenuItem mntmFiler = new MenuItem(menu, SWT.CASCADE);
 		mntmFiler.setText("Filer");
@@ -416,7 +373,7 @@ public class ArchiveSearcher extends Shell {
 	 * Create the search bar
 	 */
 	private void createSearchBar() {
-		final Composite searchComposite = new Composite(shell, SWT.NONE);
+		final Composite searchComposite = new Composite(this, SWT.NONE);
 		searchComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		searchComposite.setLayout(new GridLayout(6, false));
 		final Label lblVlgEntenId = new Label(searchComposite, SWT.NONE);
@@ -596,6 +553,13 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * @return the searchId
+	 */
+	public Text getSearchId() {
+		return searchId;
+	}
+
+	/**
 	 * @param e
 	 */
 	private void kipFileLoader(SelectionEvent e) {
@@ -707,7 +671,7 @@ public class ArchiveSearcher extends Shell {
 			searchDeath.setText(deathDate);
 
 			try {
-				String[] parentPair = IndividualModel.splitParents(individual.getParents());
+				final String[] parentPair = IndividualModel.splitParents(individual.getParents());
 				if (parentPair.length > 0) {
 					searchFather.setText(parentPair[0]);
 
@@ -716,7 +680,7 @@ public class ArchiveSearcher extends Shell {
 				if (parentPair.length > 1) {
 					searchMother.setText(parentPair[1]);
 				}
-			} catch (Exception e1) {
+			} catch (final Exception e1) {
 			}
 
 			individualView.populate(individual);

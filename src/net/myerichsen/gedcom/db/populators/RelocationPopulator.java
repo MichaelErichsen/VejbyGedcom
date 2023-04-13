@@ -14,8 +14,8 @@ public class RelocationPopulator implements ASPopulator {
 	@Override
 	public RelocationModel[] load(String[] args) {
 		try {
-			final RelocationModel[] relocationRecords = RelocationModel.load(args[0], args[1], args[2],
-					args[3], args[4]);
+			final RelocationModel[] relocationRecords = RelocationModel.load(args[0], args[1], args[2], args[3],
+					args[4]);
 			return relocationRecords;
 		} catch (final SQLException e) {
 			e.printStackTrace();

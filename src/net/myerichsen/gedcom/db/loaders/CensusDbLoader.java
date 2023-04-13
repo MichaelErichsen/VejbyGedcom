@@ -21,7 +21,7 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  */
 public class CensusDbLoader {
 	/**

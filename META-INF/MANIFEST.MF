@@ -14,8 +14,6 @@ Bundle-ClassPath: VejbyGedcom.jar,
  db-derby-10.14.2.0-bin/lib/derbyclient.jar
 Automatic-Module-Name: VejbyGedcom
 Bundle-RequiredExecutionEnvironment: JavaSE-17
-Export-Package: net.myerichsen.gedcom.DDDCleaner,
- net.myerichsen.gedcom.DDDParser,
  net.myerichsen.gedcom.birthdatematcher,
  net.myerichsen.gedcom.db,
  net.myerichsen.gedcom.db.comparators;uses:="org.eclipse.jface.viewers",

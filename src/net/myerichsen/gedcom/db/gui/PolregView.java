@@ -348,7 +348,7 @@ public class PolregView extends Composite {
 					final PolregModel[] PolregRecords = (PolregModel[]) polregListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> polregTableViewer.setInput(PolregRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Politiets Registerblade er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();

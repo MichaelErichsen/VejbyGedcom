@@ -14,8 +14,7 @@ public class PolregPopulator implements ASPopulator {
 	@Override
 	public PolregModel[] load(String[] args) {
 		try {
-			final PolregModel[] PolregRecords = PolregModel.load(args[0], args[1], args[2], args[3],
-					args[4]);
+			final PolregModel[] PolregRecords = PolregModel.load(args[0], args[1], args[2], args[3], args[4]);
 			return PolregRecords;
 		} catch (final SQLException e) {
 			e.printStackTrace();

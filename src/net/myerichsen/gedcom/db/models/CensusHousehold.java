@@ -11,13 +11,17 @@ import java.util.Properties;
 
 /**
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "
 			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
-	private final static String SELECT_SCHEMA = "SET SCHEMA = ?";
+	private final static String SELECT_SCHEMA = SET_SCHEMA;
 	private final static String SELECT_HOUSEHOLD_HEAD_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
 	private final static String SELECT_HOUSEHOLD_HEAD_2 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
 			+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
@@ -108,7 +112,8 @@ public class CensusHousehold extends ASModel {
 		final List<CensusModel> cil = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
 		statement.setString(1, kipNr);

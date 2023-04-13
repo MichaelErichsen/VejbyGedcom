@@ -13,14 +13,14 @@ import java.util.List;
  * Class representing a police registry event
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class PolregModel extends ASModel {
 	/**
 	 * 
 	 */
-	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM POLICE_ADDRESS WHERE POLICE_ADDRESS.PERSON_ID = ?";
 	private static final String SELECT_POLICE_PERSON = "SELECT * FROM POLICE_PERSON WHERE POLICE_PERSON.PHONNAME = ?";
 	private static final String SELECT_POLICE_POSITION = "SELECT * FROM POLICE_POSITION WHERE POLICE_POSITION.PERSON_ID = ?";

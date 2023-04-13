@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class ProbateModel extends ASModel {

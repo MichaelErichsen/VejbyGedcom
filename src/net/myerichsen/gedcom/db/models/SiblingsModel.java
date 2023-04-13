@@ -14,14 +14,14 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 12. apr. 2023
  *
  */
 public class SiblingsModel extends ASModel {
 	/**
 	 * 
 	 */
-	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? AND MOTHERPHONETIC = ?";
 
 	/**
@@ -55,8 +55,8 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] load(String schema, String dbPath, String fathersName,
-			String mothersName) throws SQLException {
+	private static SiblingsModel[] load(String schema, String dbPath, String fathersName, String mothersName)
+			throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
 		SiblingsModel pr;

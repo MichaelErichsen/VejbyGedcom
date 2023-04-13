@@ -211,7 +211,7 @@ public class ProbateView extends Composite {
 					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Skifter er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();

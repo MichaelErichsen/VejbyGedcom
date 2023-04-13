@@ -256,11 +256,10 @@ public class RelocationView extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), phonName, birthDate, deathDate };
-					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener
-							.load(loadArgs);
+					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> relocationTableViewer.setInput(relocationRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Flytninger er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();

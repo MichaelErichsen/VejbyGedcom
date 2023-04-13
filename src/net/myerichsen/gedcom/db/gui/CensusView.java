@@ -192,7 +192,7 @@ public class CensusView extends Composite {
 		censusTableViewer.addDoubleClickListener(event -> {
 			try {
 				censusPopup();
-			} catch (SQLException e1) {
+			} catch (final SQLException e1) {
 				e1.printStackTrace();
 			}
 		});
@@ -517,7 +517,7 @@ public class CensusView extends Composite {
 
 	/**
 	 * Create the census popup
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	private void censusPopup() throws SQLException {
@@ -544,8 +544,8 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"),
-						ti.getText(21), ti.getText(5), props.getProperty("censusSchema"));
+				final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
+						ti.getText(5), props.getProperty("censusSchema"));
 				final StringBuilder sb2 = new StringBuilder();
 
 				for (final CensusModel element : lcr) {
@@ -561,9 +561,9 @@ public class CensusView extends Composite {
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
-			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"),
-					ti.getText(21), ti.getText(5), props.getProperty("censusSchema"));
-			CensusModel censusModel = lcr.get(0);
+			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
+					ti.getText(5), props.getProperty("censusSchema"));
+			final CensusModel censusModel = lcr.get(0);
 			final Shell[] shells = getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 			messageBox.setText("Info");
@@ -590,8 +590,7 @@ public class CensusView extends Composite {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, nr,
-				props.getProperty("censusSchema"));
+		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, nr, props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {
 			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
@@ -625,7 +624,7 @@ public class CensusView extends Composite {
 
 					Display.getDefault().asyncExec(() -> censusTableViewer.setInput(CensusRecords));
 
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Folketællinger er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();

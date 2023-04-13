@@ -13,14 +13,14 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 11. apr. 2023
  *
  */
 public class RelocationModel extends ASModel {
 	/**
 	 * 
 	 */
-	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_RELOCATION = "SELECT INDIVIDUAL.ID, INDIVIDUAL.GIVENNAME, "
 			+ "INDIVIDUAL.SURNAME, EVENT.DATE, EVENT.PLACE, EVENT.NOTE, EVENT.SOURCEDETAIL, "
 			+ "INDIVIDUAL.PARENTS FROM INDIVIDUAL, EVENT WHERE EVENT.SUBTYPE = 'Flytning' "

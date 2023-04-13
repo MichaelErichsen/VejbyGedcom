@@ -45,12 +45,9 @@ import net.myerichsen.gedcom.util.Fonkod;
  */
 public class GedcomLoader {
 	/**
-	 * 
-	 */
-	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
-	/**
 	 * Static constants and variables
 	 */
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String DELETE_EVENT = "DELETE FROM EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM INDIVIDUAL";
 	private static final String DELETE_FAMILY = "DELETE FROM FAMILY";
@@ -140,9 +137,9 @@ public class GedcomLoader {
 	private void execute(String[] args) throws Exception {
 		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn = DriverManager.getConnection(dbURL);
-		final PreparedStatement ps = conn.prepareStatement(SET_SCHEMA);
-		ps.setString(1, args[2]);
-		ps.execute();
+		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, args[2]);
+		statement.execute();
 
 		prepareStatements(conn);
 
@@ -299,7 +296,7 @@ public class GedcomLoader {
 
 		final StringWithCustomFacts subtype = familyEvent.getSubType();
 		if (subtype == null) {
-			psINSERT_FAMILY_EVENT.setString(2, "NULL");
+			psINSERT_FAMILY_EVENT.setString(2, "");
 		} else {
 			psINSERT_FAMILY_EVENT.setString(2, subtype.getValue());
 		}
@@ -315,14 +312,14 @@ public class GedcomLoader {
 
 		final Place place = familyEvent.getPlace();
 		if (place == null) {
-			psINSERT_FAMILY_EVENT.setString(5, "NULL");
+			psINSERT_FAMILY_EVENT.setString(5, "");
 		} else {
 			psINSERT_FAMILY_EVENT.setString(5, place.getPlaceName().replace("'", ""));
 		}
 
 		final List<NoteStructure> noteStructures = familyEvent.getNoteStructures();
 		if (noteStructures == null) {
-			psINSERT_FAMILY_EVENT.setString(6, "NULL");
+			psINSERT_FAMILY_EVENT.setString(6, "");
 		} else {
 			final List<String> lines = noteStructures.get(0).getLines();
 			final StringBuilder lineBuffer = new StringBuilder();
@@ -335,13 +332,13 @@ public class GedcomLoader {
 
 		final List<AbstractCitation> citations = familyEvent.getCitations();
 		if (citations == null) {
-			psINSERT_FAMILY_EVENT.setString(7, "NULL");
+			psINSERT_FAMILY_EVENT.setString(7, "");
 		} else {
 			final CitationWithSource cfs = (CitationWithSource) citations.get(0);
 			final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
 
 			if (whereInSource == null) {
-				psINSERT_FAMILY_EVENT.setString(7, "NULL");
+				psINSERT_FAMILY_EVENT.setString(7, "");
 			} else {
 				final List<CustomFact> customFacts = whereInSource.getCustomFacts();
 
@@ -349,7 +346,7 @@ public class GedcomLoader {
 					if (whereInSource.getValue() != null) {
 						psINSERT_FAMILY_EVENT.setString(7, whereInSource.getValue());
 					} else {
-						psINSERT_FAMILY_EVENT.setString(7, "NULL");
+						psINSERT_FAMILY_EVENT.setString(7, "");
 					}
 				} else {
 					final StringBuilder sb2 = new StringBuilder();
@@ -420,7 +417,7 @@ public class GedcomLoader {
 
 		final StringWithCustomFacts subtype = individualEvent.getSubType();
 		if (subtype == null) {
-			psINSERT_INDIVIDUAL_EVENT.setString(2, "NULL");
+			psINSERT_INDIVIDUAL_EVENT.setString(2, "");
 		} else {
 			psINSERT_INDIVIDUAL_EVENT.setString(2, subtype.getValue());
 		}
@@ -434,18 +431,18 @@ public class GedcomLoader {
 
 		psINSERT_INDIVIDUAL_EVENT.setString(4, individual.getXref());
 
-		psINSERT_INDIVIDUAL_EVENT.setString(5, "NULL");
+		psINSERT_INDIVIDUAL_EVENT.setString(5, "");
 
 		final Place place = individualEvent.getPlace();
 		if (place == null) {
-			psINSERT_INDIVIDUAL_EVENT.setString(6, "NULL");
+			psINSERT_INDIVIDUAL_EVENT.setString(6, "");
 		} else {
 			psINSERT_INDIVIDUAL_EVENT.setString(6, place.getPlaceName().replace("'", ""));
 		}
 
 		final List<NoteStructure> noteStructures = individualEvent.getNoteStructures();
 		if (noteStructures == null) {
-			psINSERT_INDIVIDUAL_EVENT.setString(7, "NULL");
+			psINSERT_INDIVIDUAL_EVENT.setString(7, "");
 		} else {
 			final List<String> lines = noteStructures.get(0).getLines();
 			final StringBuilder lineBuffer = new StringBuilder();
@@ -458,13 +455,13 @@ public class GedcomLoader {
 
 		final List<AbstractCitation> citations = individualEvent.getCitations();
 		if (citations == null) {
-			psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
+			psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 		} else {
 			final CitationWithSource cfs = (CitationWithSource) citations.get(0);
 			final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
 
 			if (whereInSource == null) {
-				psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
+				psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 			} else {
 				final List<CustomFact> customFacts = whereInSource.getCustomFacts();
 
@@ -472,7 +469,7 @@ public class GedcomLoader {
 					if (whereInSource.getValue() != null) {
 						psINSERT_INDIVIDUAL_EVENT.setString(8, whereInSource.getValue());
 					} else {
-						psINSERT_INDIVIDUAL_EVENT.setString(8, "NULL");
+						psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 					}
 				} else {
 					final StringBuilder sb2 = new StringBuilder();
