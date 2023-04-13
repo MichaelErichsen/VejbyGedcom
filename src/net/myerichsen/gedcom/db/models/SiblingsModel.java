@@ -14,10 +14,14 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 13. apr. 2023
  *
  */
 public class SiblingsModel extends ASModel {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? AND MOTHERPHONETIC = ?";
 
 	/**
@@ -28,7 +32,7 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] loadFromDatabase(String schema, String dbPath, String parents) throws SQLException {
+	private static SiblingsModel[] load(String schema, String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
 			return new SiblingsModel[0];
 		}
@@ -36,10 +40,10 @@ public class SiblingsModel extends ASModel {
 		final String[] p = IndividualModel.splitParents(parents);
 
 		if (p.length > 1) {
-			return loadFromDatabase(schema, dbPath, p[0], p[1]);
+			return load(schema, dbPath, p[0], p[1]);
 		}
 
-		return loadFromDatabase(schema, dbPath, p[0], "");
+		return load(schema, dbPath, p[0], "");
 	}
 
 	/**
@@ -51,7 +55,7 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] loadFromDatabase(String schema, String dbPath, String fathersName,
+	private static SiblingsModel[] load(String schema, String dbPath, String fathersName,
 			String mothersName) throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
@@ -70,7 +74,8 @@ public class SiblingsModel extends ASModel {
 			return new SiblingsModel[0];
 		}
 
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT);
 		statement.setString(1, fatherPhonetic);
@@ -103,13 +108,13 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
+	public static SiblingsModel[] load(String[] args) throws SQLException {
 		switch (args.length) {
 		case 3: {
-			return loadFromDatabase(args[0], args[1], args[2]);
+			return load(args[0], args[1], args[2]);
 		}
 		case 4: {
-			return loadFromDatabase(args[0], args[1], args[2], args[3]);
+			return load(args[0], args[1], args[2], args[3]);
 		}
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");

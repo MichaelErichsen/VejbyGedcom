@@ -208,7 +208,7 @@ public class ProbateView extends Composite {
 					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
 							props.getProperty("probatePath"), phonName, birthDate, deathDate,
 							props.getProperty("probateSource") };
-					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.loadFromDatabase(loadArgs);
+					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))

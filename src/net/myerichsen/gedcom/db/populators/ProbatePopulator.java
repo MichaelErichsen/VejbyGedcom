@@ -12,8 +12,8 @@ import net.myerichsen.gedcom.db.models.ProbateModel;
 public class ProbatePopulator implements ASPopulator {
 
 	@Override
-	public ProbateModel[] loadFromDatabase(String[] args) throws SQLException {
-		final ProbateModel[] probateRecords = ProbateModel.loadFromDatabase(args[0], args[1], args[2], args[3], args[4],
+	public ProbateModel[] load(String[] args) throws SQLException {
+		final ProbateModel[] probateRecords = ProbateModel.load(args[0], args[1], args[2], args[3], args[4],
 				args[5]);
 		return probateRecords;
 	}

@@ -16,9 +16,13 @@ import java.util.List;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 13. apr. 2023
  */
 public abstract class LoadCphArch {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	protected static int counter;
 	private Connection conn;
 
@@ -72,7 +76,8 @@ public abstract class LoadCphArch {
 	protected void execute(String[] args) throws Exception {
 		final String dbURL1 = "jdbc:derby:" + args[1];
 		conn = DriverManager.getConnection(dbURL1);
-		final PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + args[2]);
+		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, args[2]);
 		statement.execute();
 		loadTable(statement, args);
 		statement.close();

@@ -12,9 +12,9 @@ import net.myerichsen.gedcom.db.models.BurregModel;
 public class BurregPopulator implements ASPopulator {
 
 	@Override
-	public BurregModel[] loadFromDatabase(String[] args) {
+	public BurregModel[] load(String[] args) {
 		try {
-			final BurregModel[] BurregRecords = BurregModel.loadFromDatabase(args[0], args[1], args[2], args[3],
+			final BurregModel[] BurregRecords = BurregModel.load(args[0], args[1], args[2], args[3],
 					args[4]);
 			return BurregRecords;
 		} catch (final SQLException e) {

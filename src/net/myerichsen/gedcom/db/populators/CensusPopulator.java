@@ -12,9 +12,9 @@ import net.myerichsen.gedcom.db.models.CensusModel;
 public class CensusPopulator implements ASPopulator {
 
 	@Override
-	public CensusModel[] loadFromDatabase(String[] args) {
+	public CensusModel[] load(String[] args) {
 		try {
-			final CensusModel[] censusRecords = CensusModel.loadFromDatabase(args[0], args[1], args[2], args[3],
+			final CensusModel[] censusRecords = CensusModel.load(args[0], args[1], args[2], args[3],
 					args[4]);
 			return censusRecords;
 		} catch (final SQLException e) {

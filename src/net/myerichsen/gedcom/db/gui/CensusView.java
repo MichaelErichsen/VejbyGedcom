@@ -544,7 +544,7 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
+				final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"),
 						ti.getText(21), ti.getText(5), props.getProperty("censusSchema"));
 				final StringBuilder sb2 = new StringBuilder();
 
@@ -561,7 +561,7 @@ public class CensusView extends Composite {
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
-			final List<CensusModel> lcr = CensusHousehold.loadFromDatabase(props.getProperty("vejbyPath"),
+			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"),
 					ti.getText(21), ti.getText(5), props.getProperty("censusSchema"));
 			CensusModel censusModel = lcr.get(0);
 			final Shell[] shells = getDisplay().getShells();
@@ -590,7 +590,7 @@ public class CensusView extends Composite {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHousehold.loadFromDatabase(props.getProperty("censusPath"), kipNr, nr,
+		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, nr,
 				props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {
@@ -621,7 +621,7 @@ public class CensusView extends Composite {
 					final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
 							props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
 							deathDate.substring(0, 4) };
-					final CensusModel[] CensusRecords = (CensusModel[]) censusListener.loadFromDatabase(loadArgs);
+					final CensusModel[] CensusRecords = (CensusModel[]) censusListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> censusTableViewer.setInput(CensusRecords));
 

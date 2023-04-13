@@ -12,7 +12,7 @@ import net.myerichsen.gedcom.db.models.SiblingsModel;
 public class SiblingsPopulator implements ASPopulator {
 
 	@Override
-	public SiblingsModel[] loadFromDatabase(String[] args) throws SQLException {
-		return SiblingsModel.loadFromDatabase(args);
+	public SiblingsModel[] load(String[] args) throws SQLException {
+		return SiblingsModel.load(args);
 	}
 }

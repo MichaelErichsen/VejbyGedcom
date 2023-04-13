@@ -21,9 +21,13 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 13. apr. 2023
  */
 public class CensusDbLoader {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM CENSUS WHERE KIPNR = ?";
 	private static PreparedStatement statement;
 	private static int counter = 0;
@@ -62,7 +66,8 @@ public class CensusDbLoader {
 		final String dbURL = "jdbc:derby:" + args[2];
 		conn = DriverManager.getConnection(dbURL);
 		conn.setAutoCommit(false);
-		statement = conn.prepareStatement("SET SCHEMA = " + args[3]);
+		statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, args[3]);
 		statement.execute();
 	}
 

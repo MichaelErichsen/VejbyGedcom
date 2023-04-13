@@ -41,9 +41,13 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 13. apr. 2023
  */
 public class GedcomLoader {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	/**
 	 * Static constants and variables
 	 */
@@ -136,7 +140,8 @@ public class GedcomLoader {
 	private void execute(String[] args) throws Exception {
 		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn = DriverManager.getConnection(dbURL);
-		final PreparedStatement ps = conn.prepareStatement("SET SCHEMA = " + args[2]);
+		final PreparedStatement ps = conn.prepareStatement(SET_SCHEMA);
+		ps.setString(1, args[2]);
 		ps.execute();
 
 		prepareStatements(conn);
@@ -760,7 +765,7 @@ public class GedcomLoader {
 	 */
 	private void updateBirthDeathData(Connection conn, String schema) throws SQLException {
 		// Read all individuals into a list
-		final List<IndividualModel> ldbi = IndividualModel.loadFromDB(conn, schema);
+		final List<IndividualModel> ldbi = IndividualModel.load(conn, schema);
 
 		// Update all individual records in Derby
 		updateIndividualsBirthDeath(ldbi);

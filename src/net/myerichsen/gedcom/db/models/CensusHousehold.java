@@ -11,7 +11,7 @@ import java.util.Properties;
 
 /**
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 13. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
@@ -103,8 +103,7 @@ public class CensusHousehold extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusModel> loadFromDatabase(String dbPath, String kipNr, String nr, String schema)
-			throws SQLException {
+	public static List<CensusModel> load(String dbPath, String kipNr, String nr, String schema) throws SQLException {
 		CensusModel ci;
 		final List<CensusModel> cil = new ArrayList<>();
 

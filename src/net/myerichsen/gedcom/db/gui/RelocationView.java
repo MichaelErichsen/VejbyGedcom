@@ -257,7 +257,7 @@ public class RelocationView extends Composite {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), phonName, birthDate, deathDate };
 					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener
-							.loadFromDatabase(loadArgs);
+							.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> relocationTableViewer.setInput(relocationRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))

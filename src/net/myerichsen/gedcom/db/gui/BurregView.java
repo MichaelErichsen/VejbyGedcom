@@ -495,7 +495,7 @@ public class BurregView extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
 							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
-					final BurregModel[] burregRecords = (BurregModel[]) burregListener.loadFromDatabase(loadArgs);
+					final BurregModel[] burregRecords = (BurregModel[]) burregListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> burregTableViewer.setInput(burregRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))

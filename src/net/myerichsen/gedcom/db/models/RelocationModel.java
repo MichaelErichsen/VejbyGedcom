@@ -13,10 +13,14 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 13. apr. 2023
  *
  */
 public class RelocationModel extends ASModel {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	private static final String SELECT_RELOCATION = "SELECT INDIVIDUAL.ID, INDIVIDUAL.GIVENNAME, "
 			+ "INDIVIDUAL.SURNAME, EVENT.DATE, EVENT.PLACE, EVENT.NOTE, EVENT.SOURCEDETAIL, "
 			+ "INDIVIDUAL.PARENTS FROM INDIVIDUAL, EVENT WHERE EVENT.SUBTYPE = 'Flytning' "
@@ -32,13 +36,14 @@ public class RelocationModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static RelocationModel[] loadFromDatabase(String schema, String dbPath, String phonName, String birthDate,
+	public static RelocationModel[] load(String schema, String dbPath, String phonName, String birthDate,
 			String deathDate) throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		RelocationModel relocationRecord;
 		final List<RelocationModel> lr = new ArrayList<>();
 
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);

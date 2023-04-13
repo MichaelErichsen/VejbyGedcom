@@ -4,7 +4,7 @@ import net.myerichsen.gedcom.db.models.ASModel;
 
 /**
  * @author Michael Erichsen
- * @version 6. apr. 2023
+ * @version 13. apr. 2023
  *
  */
 public interface ASPopulator {
@@ -13,5 +13,5 @@ public interface ASPopulator {
 	 * @return
 	 * @throws Exception
 	 */
-	ASModel[] loadFromDatabase(String[] args) throws Exception;
+	ASModel[] load(String[] args) throws Exception;
 }

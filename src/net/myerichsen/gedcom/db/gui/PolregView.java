@@ -345,7 +345,7 @@ public class PolregView extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
 							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
-					final PolregModel[] PolregRecords = (PolregModel[]) polregListener.loadFromDatabase(loadArgs);
+					final PolregModel[] PolregRecords = (PolregModel[]) polregListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> polregTableViewer.setInput(PolregRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))

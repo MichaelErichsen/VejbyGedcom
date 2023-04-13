@@ -213,7 +213,7 @@ public class SiblingsView extends Composite {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), parents };
 					final SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener
-							.loadFromDatabase(loadArgs);
+							.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(siblingRecords));
 				} catch (final Exception e) {
@@ -250,7 +250,7 @@ public class SiblingsView extends Composite {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), fathersName, mothersName };
 					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener
-							.loadFromDatabase(loadArgs);
+							.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) (((TabFolder) getParent()).getParent()))

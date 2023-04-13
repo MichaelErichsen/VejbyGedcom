@@ -14,10 +14,14 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 13. apr. 2023
  *
  */
 public class IndividualModel extends ASModel {
+	/**
+	 * 
+	 */
+	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM INDIVIDUAL";
 	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM EVENT WHERE INDIVIDUAL = "
 			+ "? AND (TYPE = 'Birth' OR TYPE = 'Christening') ORDER BY DATE";
@@ -37,7 +41,8 @@ public class IndividualModel extends ASModel {
 	 */
 	private static String findParentsFromChristeningEvent(Connection conn, String id, String schema)
 			throws SQLException {
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_PARENTS_FROM_CHRISTENING);
 		statement.setString(1, id);
@@ -64,7 +69,8 @@ public class IndividualModel extends ASModel {
 	 * @throws SQLException
 	 */
 	private static String getNameFromId(Connection conn, String id, String schema) throws SQLException {
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
 		statement.setString(1, id);
@@ -84,7 +90,7 @@ public class IndividualModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IndividualModel> loadFromDB(Connection conn, String schema) throws SQLException {
+	public static List<IndividualModel> load(Connection conn, String schema) throws SQLException {
 		IndividualModel individual;
 		final List<IndividualModel> ldbi = new ArrayList<>();
 		String givenName = "";
@@ -95,7 +101,8 @@ public class IndividualModel extends ASModel {
 		String wifeName = "";
 
 		// Read all individuals into a list
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_INDIVIDUAL);
 		ResultSet rs = statement.executeQuery();
@@ -220,7 +227,8 @@ public class IndividualModel extends ASModel {
 			this.setId("@I" + id + "@");
 		}
 
-		PreparedStatement statement = conn.prepareStatement("SET SCHEMA = " + schema);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
 		statement.setString(1, this.id);
