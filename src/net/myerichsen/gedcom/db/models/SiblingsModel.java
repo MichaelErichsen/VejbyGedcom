@@ -19,7 +19,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  */
 public class SiblingsModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? AND MOTHERPHONETIC = ?";

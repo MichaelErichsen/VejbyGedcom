@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class RelocationModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_RELOCATION = "SELECT INDIVIDUAL.ID, INDIVIDUAL.GIVENNAME, "

@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ProbateModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_PROBATE = "SELECT * FROM EVENT "

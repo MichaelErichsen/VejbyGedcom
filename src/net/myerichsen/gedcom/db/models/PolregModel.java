@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class PolregModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM POLICE_ADDRESS WHERE POLICE_ADDRESS.PERSON_ID = ?";

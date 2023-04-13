@@ -25,7 +25,7 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  */
 public class CensusDbLoader {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM CENSUS WHERE KIPNR = ?";

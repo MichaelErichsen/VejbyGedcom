@@ -8,7 +8,7 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 13. apr. 2023
  *
  */
 public class SettingsModel {
@@ -22,6 +22,7 @@ public class SettingsModel {
 	private String cphDbPath;
 	private String cphSchema;
 	private String gedcomFilePath;
+	private String headSearch;
 	private String kipTextFilename;
 	private String policeAddress;
 	private String policePerson;
@@ -53,6 +54,7 @@ public class SettingsModel {
 		cphDbPath = props.getProperty("cphDbPath");
 		cphSchema = props.getProperty("cphSchema");
 		gedcomFilePath = props.getProperty("gedcomFilePath");
+		headSearch = props.getProperty("headSearch");
 		kipTextFilename = props.getProperty("kipTextFilename");
 		policeAddress = props.getProperty("policeAddress");
 		policePerson = props.getProperty("policePerson");
@@ -143,6 +145,13 @@ public class SettingsModel {
 	 */
 	public String getGedcomFilePath() {
 		return gedcomFilePath;
+	}
+
+	/**
+	 * @return the headSearch
+	 */
+	public String getHeadSearch() {
+		return headSearch;
 	}
 
 	/**
@@ -315,6 +324,13 @@ public class SettingsModel {
 	}
 
 	/**
+	 * @param headSearch the headSearch to set
+	 */
+	public void setHeadSearch(String headSearch) {
+		this.headSearch = headSearch;
+	}
+
+	/**
 	 * @param kipTextFilename the kipTextFilename to set
 	 */
 	public void setKipTextFilename(String kipTextFilename) {
@@ -419,6 +435,7 @@ public class SettingsModel {
 		props.setProperty("cphDbPath", cphDbPath);
 		props.setProperty("cphSchema", cphSchema);
 		props.setProperty("gedcomFilePath", gedcomFilePath);
+		props.setProperty("headSearch", headSearch);
 		props.setProperty("kipTextFilename", kipTextFilename);
 		props.setProperty("policeAddress", policeAddress);
 		props.setProperty("policePerson", policePerson);

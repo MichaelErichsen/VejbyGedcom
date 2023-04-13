@@ -19,7 +19,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  */
 public class BurregModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM BURIAL_PERSON_COMPLETE "

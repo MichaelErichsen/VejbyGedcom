@@ -19,11 +19,11 @@ import net.myerichsen.gedcom.util.Fonkod;
  */
 public class IndividualModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA2 = "SET SCHEMA = ?";
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = SET_SCHEMA2;
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM INDIVIDUAL";
@@ -285,7 +285,7 @@ public class IndividualModel extends ASModel {
 
 		{
 			birthDate = rs.getDate("DATE");
-			birthPlace = (rs.getString("PLACE") == null ? "" : rs.getString("PLACE"));
+			birthPlace = rs.getString("PLACE") == null ? "" : rs.getString("PLACE");
 		}
 
 		statement = conn.prepareStatement(SELECT_DEATH_EVENT);
@@ -294,7 +294,7 @@ public class IndividualModel extends ASModel {
 
 		if (rs.next()) {
 			deathDate = rs.getDate("DATE");
-			deathPlace = (rs.getString("PLACE") == null ? "" : rs.getString("PLACE"));
+			deathPlace = rs.getString("PLACE") == null ? "" : rs.getString("PLACE");
 		}
 
 		statement.close();

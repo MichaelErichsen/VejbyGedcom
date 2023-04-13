@@ -23,7 +23,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  */
 public class CensusModel extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";

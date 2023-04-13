@@ -20,7 +20,7 @@ import java.util.List;
  */
 public abstract class LoadCphArch {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	protected static int counter;

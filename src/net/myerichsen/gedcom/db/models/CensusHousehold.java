@@ -16,7 +16,7 @@ import java.util.Properties;
  */
 public class CensusHousehold extends ASModel {
 	/**
-	 * 
+	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "

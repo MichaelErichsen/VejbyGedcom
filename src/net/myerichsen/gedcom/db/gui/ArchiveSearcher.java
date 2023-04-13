@@ -65,10 +65,6 @@ public class ArchiveSearcher extends Shell {
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
 
-	// TODO Find all relocations to and from an individual
-	// New relocation view: Get all relocation events, display those with name
-	// and place
-
 	private static Display display;
 
 	/**
@@ -113,6 +109,7 @@ public class ArchiveSearcher extends Shell {
 	private final ProbateView probateView;
 	private final SiblingsView siblingsView;
 	private final DescendantCounterView descendantCounterView;
+	private final HouseholdHeadView householdHeadView;
 
 	/**
 	 * Create the shell.
@@ -172,6 +169,12 @@ public class ArchiveSearcher extends Shell {
 		siblingsView.setProperties(props);
 		tbtmSiblings.setControl(siblingsView);
 
+		TabItem tbtmHusbond = new TabItem(tabFolder, SWT.NONE);
+		tbtmHusbond.setText("Husbond");
+		householdHeadView = new HouseholdHeadView(tabFolder, SWT.NONE);
+		householdHeadView.setProperties(props);
+		tbtmHusbond.setControl(householdHeadView);
+
 		final TabItem tbtmEfterkommere = new TabItem(tabFolder, SWT.NONE);
 		tbtmEfterkommere.setText("Efterkommere");
 		descendantCounterView = new DescendantCounterView(tabFolder, SWT.NONE);
@@ -225,7 +228,6 @@ public class ArchiveSearcher extends Shell {
 	protected void createContents() {
 		setText("Arkivsøgning");
 		setSize(1112, 625);
-
 	}
 
 	/**
@@ -246,17 +248,8 @@ public class ArchiveSearcher extends Shell {
 			public void widgetSelected(SelectionEvent e) {
 				final SettingsWizard settingsWizard = new SettingsWizard(props);
 				final WizardDialog wizardDialog = new WizardDialog(shell, settingsWizard);
-
 				wizardDialog.setBlockOnOpen(true);
-
-//				final int returnCode =
 				wizardDialog.open();
-
-//				if (returnCode == Window.OK) {
-//					System.out.println("Ok pressed");
-//				} else {
-//					System.out.println("Cancel pressed");
-//				}
 			}
 		});
 		mntmIndstillinger.setText("Indstillinger");
@@ -533,6 +526,7 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("cphDbPath", Constants.CPHDB_PATH);
 			props.setProperty("cphSchema", Constants.CPHDB_SCHEMA);
 			props.setProperty("gedcomFilePath", Constants.GEDCOM_FILE_PATH);
+			props.setProperty("headSearch", "true");
 			props.setProperty("kipTextFilename", Constants.KIP_TEXT_FILENAME);
 			props.setProperty("policeAddress", Constants.HACK4DK_POLICE_ADDRESS);
 			props.setProperty("policePerson", Constants.HACK4DK_POLICE_PERSON);
@@ -709,6 +703,9 @@ public class ArchiveSearcher extends Shell {
 				siblingsView.populate(individual.getParents());
 			}
 
+			if (props.getProperty("headSearch").equals("true")) {
+				householdHeadView.populate(individual.getId());
+			}
 		} catch (final SQLException e1) {
 			messageField.setText(e1.getMessage());
 			e1.printStackTrace();
