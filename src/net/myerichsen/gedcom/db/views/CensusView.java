@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.gui;
+package net.myerichsen.gedcom.db.views;
 
 import java.sql.SQLException;
 import java.util.List;

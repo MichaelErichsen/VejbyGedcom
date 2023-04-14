@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.gui;
+package net.myerichsen.gedcom.db.views;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;

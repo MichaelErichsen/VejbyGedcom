@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.gui;
+package net.myerichsen.gedcom.db.views;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

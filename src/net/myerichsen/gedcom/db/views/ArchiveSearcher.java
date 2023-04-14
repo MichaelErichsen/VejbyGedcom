@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.gui;
+package net.myerichsen.gedcom.db.views;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

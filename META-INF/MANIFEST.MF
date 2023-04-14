@@ -18,7 +18,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
  net.myerichsen.gedcom.db,
  net.myerichsen.gedcom.db.comparators;uses:="org.eclipse.jface.viewers",
  net.myerichsen.gedcom.db.filters;uses:="org.eclipse.jface.viewers",
- net.myerichsen.gedcom.db.gui;
+ net.myerichsen.gedcom.db.views;
   uses:="org.eclipse.swt.events,
    net.myerichsen.gedcom.db.models,
    org.eclipse.swt.graphics,
