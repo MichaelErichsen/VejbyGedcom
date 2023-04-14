@@ -108,7 +108,8 @@ public class ProbatePerson {
 		}
 		if (month.equals("JUN")) {
 			return "06";
-		} else if (month.equals("JUL")) {
+		}
+		if (month.equals("JUL")) {
 			return "07";
 		} else if (month.equals("AUG")) {
 			return "08";

@@ -169,7 +169,7 @@ public class ArchiveSearcher extends Shell {
 		siblingsView.setProperties(props);
 		tbtmSiblings.setControl(siblingsView);
 
-		TabItem tbtmHusbond = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmHusbond = new TabItem(tabFolder, SWT.NONE);
 		tbtmHusbond.setText("Husbond");
 		householdHeadView = new HouseholdHeadView(tabFolder, SWT.NONE);
 		householdHeadView.setProperties(props);
