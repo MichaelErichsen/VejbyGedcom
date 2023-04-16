@@ -48,7 +48,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 15. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -65,6 +65,9 @@ public class ArchiveSearcher extends Shell {
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
 
+	// TODO Add button to recall latest ID
+
+	// TODO Search by name rydder ikke husbond
 	private static Display display;
 
 	/**
