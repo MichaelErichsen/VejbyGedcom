@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.RelocationComparator;
 import net.myerichsen.gedcom.db.filters.RelocationGivenFilter;
@@ -39,7 +40,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 16. apr. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -74,6 +75,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				RelocationGivenFilter.getInstance().setSearchText(txtRelocationGiven.getText());
 				relocationTableViewer.refresh();
 			}
@@ -87,6 +89,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				RelocationSurnameFilter.getInstance().setSearchText(txtRelocationSurname.getText());
 				relocationTableViewer.refresh();
 			}
@@ -100,6 +103,8 @@ public class RelocationView extends Composite {
 				RelocationSurnameFilter.getInstance().setSearchText("");
 				txtRelocationGiven.setText("");
 				txtRelocationSurname.setText("");
+				txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				relocationTableViewer.refresh();
 			}
 		});

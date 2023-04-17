@@ -16,6 +16,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -28,6 +30,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.BurregComparator;
 import net.myerichsen.gedcom.db.filters.BurregBirthDateFilter;
@@ -71,9 +74,11 @@ public class BurregView extends Composite {
 		bLabel.setText("Filtre: Fornavn");
 
 		txtBurregGiven = new Text(burregFilterComposite, SWT.BORDER);
+
 		txtBurregGiven.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				BurregGivenFilter.getInstance().setSearchText(txtBurregGiven.getText());
 				burregTableViewer.refresh();
 			}
@@ -86,6 +91,7 @@ public class BurregView extends Composite {
 		txtBurregSurname.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				BurregSurnameFilter.getInstance().setSearchText(txtBurregSurname.getText());
 				burregTableViewer.refresh();
 			}
@@ -98,12 +104,28 @@ public class BurregView extends Composite {
 		txtBurregBirthYear.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				BurregBirthDateFilter.getInstance().setSearchText(txtBurregBirthYear.getText());
 				burregTableViewer.refresh();
 			}
 		});
 
 		final Button btnRydFelterne_2 = new Button(burregFilterComposite, SWT.NONE);
+		btnRydFelterne_2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtBurregGiven.setText("");
+				BurregGivenFilter.getInstance().setSearchText("");
+				txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtBurregSurname.setText("");
+				BurregSurnameFilter.getInstance().setSearchText("");
+				txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtBurregBirthYear.setText("");
+				BurregBirthDateFilter.getInstance().setSearchText("");
+				burregTableViewer.refresh();
+			}
+		});
 		btnRydFelterne_2.setText("Ryd felterne");
 
 		final ScrolledComposite burregScroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);

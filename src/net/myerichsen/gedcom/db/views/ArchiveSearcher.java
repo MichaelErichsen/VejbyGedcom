@@ -48,15 +48,11 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 15. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
 	// FIXME Relocation, from, can display "NULL"
-
-	// TODO Filters: Coloured background for active filter fields
-
-	// TODO Polreg day, month, year 1 1 1
 
 	// TODO Polreg sometimes displays national characters as Jens Andersen,
 	// 1849-05-14, Høker, Baggesensgade, 32, 1, 1, 1, Baggesensgade 32, kælderen,
@@ -65,9 +61,8 @@ public class ArchiveSearcher extends Shell {
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
 
-	// TODO Add button to recall latest ID
+	// TODO search filter fields modified to length 0 removes yellow colour
 
-	// TODO Search by name rydder ikke husbond
 	private static Display display;
 
 	/**
@@ -94,9 +89,7 @@ public class ArchiveSearcher extends Shell {
 	private Properties props;
 	private final Text messageField;
 	private Text searchId;
-
 	private Text searchName;
-
 	private Text searchBirth;
 	private Text searchDeath;
 	private Text searchFather;
@@ -230,7 +223,7 @@ public class ArchiveSearcher extends Shell {
 	 */
 	protected void createContents() {
 		setText("Arkivs�gning");
-		setSize(1112, 625);
+		setSize(1244, 625);
 	}
 
 	/**
@@ -404,6 +397,7 @@ public class ArchiveSearcher extends Shell {
 		});
 		btnSearchId.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
 		btnSearchId.setText("S\u00F8g p\u00E5 ID");
+
 		new Label(searchComposite, SWT.NONE);
 		new Label(searchComposite, SWT.NONE);
 
@@ -557,6 +551,13 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * @return the searchName
+	 */
+	public Text getSearchName() {
+		return searchName;
+	}
+
+	/**
 	 * @param e
 	 */
 	private void kipFileLoader(SelectionEvent e) {
@@ -632,6 +633,7 @@ public class ArchiveSearcher extends Shell {
 		searchName.setText("");
 		individualView.clear();
 		siblingsView.clear();
+		householdHeadView.clear();
 
 		if (searchId.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -643,18 +645,20 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		final String Id = "@I" + searchId.getText().trim() + "@";
+		String idx = searchId.getText();
+		String id = (idx.contains("@") ? idx : "@I" + searchId.getText().trim() + "@");
+
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-			final IndividualModel individual = new IndividualModel(conn, Id, props.getProperty("vejbySchema"));
+			final IndividualModel individual = new IndividualModel(conn, id, props.getProperty("vejbySchema"));
 
 			if (individual.getName().equals("")) {
-				setMessage("ID " + Id + " findes ikke i databasen");
-				final Shell[] shells = e.widget.getDisplay().getShells();
-				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
-				messageBox.setText("Advarsel");
-				messageBox.setMessage("ID " + Id + "findes ikke i databasen");
-				messageBox.open();
+				setMessage("ID " + id + " findes ikke i databasen");
+//				final Shell[] shells = e.widget.getDisplay().getShells();
+//				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
+//				messageBox.setText("Advarsel");
+//				messageBox.setMessage("ID " + id + "findes ikke i databasen");
+//				messageBox.open();
 				searchId.setFocus();
 				return;
 			}
@@ -720,10 +724,11 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param e
 	 */
-	private void searchByName(TypedEvent e) {
+	protected void searchByName(TypedEvent e) {
 		searchId.setText("");
 		individualView.clear();
 		siblingsView.clear();
+		householdHeadView.clear();
 
 		if (searchName.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -797,6 +802,7 @@ public class ArchiveSearcher extends Shell {
 		searchId.setText("");
 		individualView.clear();
 		siblingsView.clear();
+		householdHeadView.clear();
 
 		if (searchFather.getText().equals("") && searchMother.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -844,4 +850,5 @@ public class ArchiveSearcher extends Shell {
 			e2.printStackTrace();
 		}
 	}
+
 }

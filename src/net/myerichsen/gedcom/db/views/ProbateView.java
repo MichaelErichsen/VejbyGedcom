@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.filters.ProbatePlaceFilter;
 import net.myerichsen.gedcom.db.models.ProbateModel;
@@ -38,7 +39,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
 
 /**
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 16. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -71,6 +72,7 @@ public class ProbateView extends Composite {
 		txtProbatePlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				ProbatePlaceFilter.getInstance().setSearchText(txtProbatePlace.getText());
 				probateTableViewer.refresh();
 			}
@@ -82,6 +84,7 @@ public class ProbateView extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				ProbatePlaceFilter.getInstance().setSearchText("");
 				txtProbatePlace.setText("");
+				txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				probateTableViewer.refresh();
 			}
 		});

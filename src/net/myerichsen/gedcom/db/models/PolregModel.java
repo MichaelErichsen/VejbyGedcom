@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a police registry event
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 16. apr. 2023
  *
  */
 public class PolregModel extends ASModel {
@@ -49,9 +49,9 @@ public class PolregModel extends ASModel {
 		final ResultSet rs = statement.executeQuery();
 		ResultSet rs2, rs3;
 		Date prBirthDate = null;
-		int day = 0;
-		int month = 0;
-		int year = 0;
+		int birthday = 0;
+		int birthmonth = 0;
+		int birthyear = 0;
 		String rsbd;
 
 		PolregModel pr;
@@ -62,17 +62,18 @@ public class PolregModel extends ASModel {
 			pr.setId(rs.getInt("ID"));
 			pr.setName(getField(rs, "FIRSTNAMES") + " " + getField(rs, "LASTNAME"));
 
-			day = rs.getInt("BIRTHDAY");
-			month = rs.getInt("BIRTHMONTH");
-			year = rs.getInt("BIRTHYEAR");
+			birthday = rs.getInt("BIRTHDAY");
+			birthmonth = rs.getInt("BIRTHMONTH");
+			birthyear = rs.getInt("BIRTHYEAR");
 
-			if (year == 0) {
+			if (birthyear == 0) {
 				continue;
 			}
 
-			day = day == 0 ? 1 : day;
-			month = month == 0 ? 1 : month;
-			rsbd = String.format("%04d", year) + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+			birthday = birthday == 0 ? 1 : birthday;
+			birthmonth = birthmonth == 0 ? 1 : birthmonth;
+			rsbd = String.format("%04d", birthyear) + "-" + String.format("%02d", birthmonth) + "-"
+					+ String.format("%02d", birthday);
 
 			prBirthDate = Date.valueOf(rsbd);
 
@@ -112,9 +113,21 @@ public class PolregModel extends ASModel {
 			rs3 = statement.executeQuery();
 
 			if (rs3.next()) {
-				pr3.setStreet(rs3.getString("STREET"));
-				pr3.setNumber(rs3.getInt("NUMBER"));
-				pr3.setLetter(rs3.getString("LETTER"));
+				try {
+					pr3.setStreet(rs3.getString("STREET"));
+				} catch (SQLException e2) {
+					pr3.setStreet("");
+				}
+				try {
+					pr3.setNumber(rs3.getInt("NUMBER"));
+				} catch (SQLException e2) {
+					pr3.setNumber(0);
+				}
+				try {
+					pr3.setLetter(rs3.getString("LETTER"));
+				} catch (SQLException e1) {
+					pr3.setLetter("");
+				}
 				try {
 					pr3.setFloor(rs.getString("FLOOR"));
 				} catch (final SQLException e) {
@@ -125,19 +138,31 @@ public class PolregModel extends ASModel {
 				} catch (final SQLException e) {
 					pr3.setPlace("");
 				}
-				pr3.setHost(rs3.getString("HOST"));
-				pr3.setDay(rs3.getInt("DAY"));
 				try {
-					pr3.setMonth(rs.getInt("MONTH"));
+					pr3.setHost(rs3.getString("HOST"));
+				} catch (SQLException e1) {
+					pr3.setHost("");
+				}
+				try {
+					pr3.setDay(rs3.getInt("DAY"));
+				} catch (SQLException e1) {
+					pr3.setDay(1);
+				}
+				try {
+					pr3.setMonth(rs3.getInt("MONTH"));
 				} catch (final SQLException e) {
 					pr3.setMonth(1);
 				}
 				try {
-					pr3.setYear(rs3.getInt("YEAR"));
+					pr3.setYear(rs3.getInt("XYEAR"));
 				} catch (final SQLException e) {
 					pr3.setYear(1);
 				}
-				pr3.setFullAddress(rs3.getString("FULL_ADDRESS"));
+				try {
+					pr3.setFullAddress(rs3.getString("FULL_ADDRESS"));
+				} catch (SQLException e) {
+					pr3.setFullAddress("");
+				}
 			}
 		}
 

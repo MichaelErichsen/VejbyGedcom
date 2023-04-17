@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.SiblingComparator;
 import net.myerichsen.gedcom.db.filters.SiblingsParentsFilter;
@@ -40,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 16. apr. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -74,6 +75,7 @@ public class SiblingsView extends Composite {
 		txtSiblingsPlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				SiblingsPlaceFilter.getInstance().setSearchText(txtSiblingsPlace.getText());
 				siblingsTableViewer.refresh();
 			}
@@ -86,6 +88,7 @@ public class SiblingsView extends Composite {
 		txtSiblingsParents.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				SiblingsParentsFilter.getInstance().setSearchText(txtSiblingsParents.getText());
 				siblingsTableViewer.refresh();
 			}
@@ -99,6 +102,8 @@ public class SiblingsView extends Composite {
 				SiblingsParentsFilter.getInstance().setSearchText("");
 				txtSiblingsPlace.setText("");
 				txtSiblingsParents.setText("");
+				txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				siblingsTableViewer.refresh();
 			}
 		});

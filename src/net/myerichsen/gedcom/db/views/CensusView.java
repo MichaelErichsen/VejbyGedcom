@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.CensusComparator;
 import net.myerichsen.gedcom.db.filters.CensusAgeFilter;
@@ -49,7 +50,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 16. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -95,6 +96,7 @@ public class CensusView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusCountyFilter.getInstance().setSearchText(txtCensusCounty.getText());
 				censusTableViewer.refresh();
 			}
@@ -107,6 +109,7 @@ public class CensusView extends Composite {
 		txtCensusParish.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusParishFilter.getInstance().setSearchText(txtCensusParish.getText());
 				censusTableViewer.refresh();
 			}
@@ -119,6 +122,7 @@ public class CensusView extends Composite {
 		txtCensusName.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusNameFilter.getInstance().setSearchText(txtCensusName.getText());
 				censusTableViewer.refresh();
 			}
@@ -131,6 +135,7 @@ public class CensusView extends Composite {
 		txtCensusSex.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusSexFilter.getInstance().setSearchText(txtCensusSex.getText());
 				censusTableViewer.refresh();
 			}
@@ -143,6 +148,7 @@ public class CensusView extends Composite {
 		txtCensusAge.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusAgeFilter.getInstance().setSearchText(txtCensusAge.getText());
 				censusTableViewer.refresh();
 			}
@@ -155,6 +161,7 @@ public class CensusView extends Composite {
 		txtCensusBirthPlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusBirthPlaceFilter.getInstance().setSearchText(txtCensusBirthPlace.getText());
 				censusTableViewer.refresh();
 			}
@@ -177,6 +184,13 @@ public class CensusView extends Composite {
 				txtCensusSex.setText("");
 				txtCensusAge.setText("");
 				txtCensusYear.setText("");
+				txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				censusTableViewer.refresh();
 			}
 		});
@@ -505,6 +519,7 @@ public class CensusView extends Composite {
 		txtCensusYear.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				CensusYearFilter.getInstance().setSearchText(txtCensusYear.getText());
 				censusTableViewer.refresh();
 			}
@@ -564,13 +579,19 @@ public class CensusView extends Composite {
 			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
 					ti.getText(5), props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);
+			final String headOfHousehold = CensusHousehold.getHeadOfHousehold(props, censusModel);
+
 			final Shell[] shells = getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 			messageBox.setText("Info");
-			messageBox
-					.setMessage("Husstandens overhovede var " + CensusHousehold.getHeadOfHousehold(props, censusModel));
-			@SuppressWarnings("unused")
+			messageBox.setMessage("Husstandens overhovede var " + headOfHousehold);
 			final int buttonID = messageBox.open();
+
+			if (buttonID == SWT.OK && headOfHousehold != null && headOfHousehold.length() > 0) {
+				final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+				grandParent.getSearchId().setText(headOfHousehold);
+				grandParent.searchById(null);
+			}
 		}
 	}
 

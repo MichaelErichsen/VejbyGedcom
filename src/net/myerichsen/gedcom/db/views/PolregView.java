@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.PolregComparator;
 import net.myerichsen.gedcom.db.filters.PolregAddressFilter;
@@ -40,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class PolregView extends Composite {
@@ -50,6 +51,8 @@ public class PolregView extends Composite {
 	private Properties props;
 	private Text txtPolregAddress;
 	private Text txtPolregBirthDate;
+
+	// TODO Add a name filter
 
 	/**
 	 * Create the composite.
@@ -74,6 +77,7 @@ public class PolregView extends Composite {
 		txtPolregAddress.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				PolregAddressFilter.getInstance().setSearchText(txtPolregAddress.getText());
 				polregTableViewer.refresh();
 			}
@@ -86,6 +90,7 @@ public class PolregView extends Composite {
 		txtPolregBirthDate.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
+				txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				PolregBirthdateFilter.getInstance().setSearchText(txtPolregBirthDate.getText());
 				polregTableViewer.refresh();
 			}
@@ -99,6 +104,8 @@ public class PolregView extends Composite {
 				PolregAddressFilter.getInstance().setSearchText("");
 				txtPolregBirthDate.setText("");
 				txtPolregAddress.setText("");
+				txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				polregTableViewer.refresh();
 			}
 		});
@@ -283,7 +290,7 @@ public class PolregView extends Composite {
 
 		final TableViewerColumn tableViewerColumn_12 = new TableViewerColumn(polregTableViewer, SWT.NONE);
 		final TableColumn tblclmnAdresse_1 = tableViewerColumn_12.getColumn();
-		tblclmnAdresse_1.setWidth(100);
+		tblclmnAdresse_1.setWidth(300);
 		tblclmnAdresse_1.setText("Adresse");
 		tableViewerColumn_12.setLabelProvider(new ColumnLabelProvider() {
 
