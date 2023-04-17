@@ -9,50 +9,7 @@ The documentation folder contains .csv KIP files for Vejby from Dansk Demografis
 
 The result of loading Vejby censuses into Gedcom can be followed at https://www.myerichsen.net/vejby/.
 
-## DDDParser
-DDDParser needs a kipdata.txt and a set of KIP csv files as input.
- 
-It uses a hardcoded list of villages within a parish to find all persons in
-the csv files, who were born in one of these villages. You can update the
-list in the initVillages() method.
- 
-The output is sent to a text file.
- 
-## DescendantCounter
-DescendantCounter reads a GEDCOM file and finds the ancestors with most descendants.
+## ArchiveSearcher
+ArchiveSearcher is a tool to search downloaded database from Danish Probare extracts, Census transcriptions and transcription of Copenhagen Police Registry og Burial registers
 
-## ParentFinder 
-ParentFinder finds parents for each person born or christened in a given location.
-
-Parameters:
-<ul>
-<li>Location name (e. g. village), where each character of [Ê¯Â∆ÿ≈] must be replaced with a "."</li>
-<li>Full path to GEDCOM file</li>
-<li>Path to an existing output directory</li>
-<li>[Optional]"P" to add parent candidates</li>
-</ul>
- 
-The program produces a .csv file with a row for each person found.
- 
-Parents are either extracted from the GEDCOM family record or from the citation source detail for the Christening event. When not using the family record, the first line of the citation detail must contain the location and the names of one or both parents.
-
-## RelocationFinder 
-RelocationFinder finds events with subtype "Flytning" for each person relocating to and from given location.
-
-Parameters:
-<ul>
-<li>Location name (e. g. village), where each character of [Ê¯Â∆ÿ≈] must be replaced with a "."</li>
-<li>Full path to GEDCOM file</li>
-<li>Path to an existing output directory</li>
-</ul>
- 
-The program produces a .csv file with a row for each relocation found.
-
-##BirthdateMatcher
-BirthdateMatcher finds persons with the same birth date, requiring a full date, not just a year.
-
-Parameters:
-<ul>
-<li>Full path to GEDCOM file</li>
-<li>Path to an existing output directory</li>
-</ul>
+It is being developed for the same Vejby project, but should be useful elsewhere

@@ -39,8 +39,10 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.RelocationPopulator;
 
 /**
+ * Relocation view
+ *
  * @author Michael Erichsen
- * @version 16. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -248,6 +250,19 @@ public class RelocationView extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final RelocationModel[] input = new RelocationModel[0];
+		relocationTableViewer.setInput(input);
+		relocationTableViewer.refresh();
+		txtRelocationGiven.setText("");
+		txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtRelocationSurname.setText("");
+		txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 	}
 
 	/**

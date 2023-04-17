@@ -6,14 +6,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.models.IndividualModel;
 
 /**
- * Individual tab composite
+ * Individual view
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class IndividualView extends Composite {
@@ -139,6 +140,16 @@ public class IndividualView extends Composite {
 		txtindividualdeathdate.setText("");
 		txtindividualdeathplace.setText("");
 		txtindividualparents.setText("");
+		txtindividualid.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualsex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualfamc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualphonname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualbirthdate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualbirthplace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualdeathdate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualdeathplace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtindividualparents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 	}
 
 	/**

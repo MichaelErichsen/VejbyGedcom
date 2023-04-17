@@ -40,8 +40,10 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
 
 /**
+ * Siblings view
+ *
  * @author Michael Erichsen
- * @version 16. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -212,6 +214,10 @@ public class SiblingsView extends Composite {
 		final SiblingsModel[] input = new SiblingsModel[0];
 		siblingsTableViewer.setInput(input);
 		siblingsTableViewer.refresh();
+		txtSiblingsParents.setText("");
+		txtSiblingsPlace.setText("");
+		txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 	}
 
 	/**

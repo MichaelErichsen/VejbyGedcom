@@ -38,8 +38,10 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.ProbatePopulator;
 
 /**
+ * Probate view
+ *
  * @author Michael Erichsen
- * @version 16. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -194,6 +196,17 @@ public class ProbateView extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final ProbateModel[] input = new ProbateModel[0];
+		probateTableViewer.setInput(input);
+		probateTableViewer.refresh();
+		txtProbatePlace.setText("");
+		txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 	}
 
 	/**

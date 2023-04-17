@@ -61,8 +61,6 @@ public class ArchiveSearcher extends Shell {
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
 
-	// TODO search filter fields modified to length 0 removes yellow colour
-
 	private static Display display;
 
 	/**
@@ -411,6 +409,14 @@ public class ArchiveSearcher extends Shell {
 				searchId.setText("");
 				searchMother.setText("");
 				searchName.setText("");
+				burregView.clear();
+				censusView.clear();
+				householdHeadView.clear();
+				individualView.clear();
+				polregView.clear();
+				probateView.clear();
+				relocationView.clear();
+				siblingsView.clear();
 				searchId.setFocus();
 			}
 		});

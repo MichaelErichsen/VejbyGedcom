@@ -49,8 +49,10 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.CensusPopulator;
 
 /**
+ * Census view
+ *
  * @author Michael Erichsen
- * @version 16. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -598,6 +600,30 @@ public class CensusView extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final CensusModel[] input = new CensusModel[0];
+		censusTableViewer.setInput(input);
+		censusTableViewer.refresh();
+		txtCensusAge.setText("");
+		txtCensusBirthPlace.setText("");
+		txtCensusCounty.setText("");
+		txtCensusName.setText("");
+		txtCensusParish.setText("");
+		txtCensusSex.setText("");
+		txtCensusYear.setText("");
+		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+
 	}
 
 	/**

@@ -40,6 +40,8 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.PolregPopulator;
 
 /**
+ * Police registry view
+ *
  * @author Michael Erichsen
  * @version 17. apr. 2023
  *
@@ -51,8 +53,7 @@ public class PolregView extends Composite {
 	private Properties props;
 	private Text txtPolregAddress;
 	private Text txtPolregBirthDate;
-
-	// TODO Add a name filter
+	private Text txtPolregName;
 
 	/**
 	 * Create the composite.
@@ -71,7 +72,20 @@ public class PolregView extends Composite {
 		PolregFilterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		final Label aLabel = new Label(PolregFilterComposite, SWT.NONE);
-		aLabel.setText("Filtre: Adresse");
+		aLabel.setText("Filtre: Navn");
+
+		txtPolregName = new Text(PolregFilterComposite, SWT.BORDER);
+		txtPolregName.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				PolregAddressFilter.getInstance().setSearchText(txtPolregName.getText());
+				polregTableViewer.refresh();
+			}
+		});
+
+		final Label lblAdresse = new Label(PolregFilterComposite, SWT.NONE);
+		lblAdresse.setText("Adresse");
 
 		txtPolregAddress = new Text(PolregFilterComposite, SWT.BORDER);
 		txtPolregAddress.addKeyListener(new KeyAdapter() {
@@ -309,6 +323,22 @@ public class PolregView extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final PolregModel[] input = new PolregModel[0];
+		polregTableViewer.setInput(input);
+		polregTableViewer.refresh();
+		txtPolregAddress.setText("");
+		txtPolregBirthDate.setText("");
+		txtPolregName.setText("");
+		txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+
 	}
 
 	/**

@@ -41,8 +41,10 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.BurregPopulator;
 
 /**
+ * Burial registry view
+ *
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 17. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -501,6 +503,21 @@ public class BurregView extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		final BurregModel[] input = new BurregModel[0];
+		burregTableViewer.setInput(input);
+		burregTableViewer.refresh();
+		txtBurregBirthYear.setText("");
+		txtBurregGiven.setText("");
+		txtBurregSurname.setText("");
+		txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 	}
 
 	/**
