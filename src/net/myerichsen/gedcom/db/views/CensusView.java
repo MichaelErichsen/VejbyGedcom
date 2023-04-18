@@ -52,7 +52,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 18. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -172,28 +172,7 @@ public class CensusView extends Composite {
 		btnRydFelterneCensus.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				CensusBirthPlaceFilter.getInstance().setSearchText("");
-				CensusCountyFilter.getInstance().setSearchText("");
-				CensusNameFilter.getInstance().setSearchText("");
-				CensusParishFilter.getInstance().setSearchText("");
-				CensusSexFilter.getInstance().setSearchText("");
-				CensusAgeFilter.getInstance().setSearchText("");
-				CensusYearFilter.getInstance().setSearchText("");
-				txtCensusBirthPlace.setText("");
-				txtCensusCounty.setText("");
-				txtCensusName.setText("");
-				txtCensusParish.setText("");
-				txtCensusSex.setText("");
-				txtCensusAge.setText("");
-				txtCensusYear.setText("");
-				txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				censusTableViewer.refresh();
+				clearFilters();
 			}
 		});
 		btnRydFelterneCensus.setText("Ryd felterne");
@@ -608,13 +587,26 @@ public class CensusView extends Composite {
 	public void clear() {
 		final CensusModel[] input = new CensusModel[0];
 		censusTableViewer.setInput(input);
-		censusTableViewer.refresh();
-		txtCensusAge.setText("");
+		clearFilters();
+	}
+
+	/**
+	 *
+	 */
+	private void clearFilters() {
+		CensusBirthPlaceFilter.getInstance().setSearchText("");
+		CensusCountyFilter.getInstance().setSearchText("");
+		CensusNameFilter.getInstance().setSearchText("");
+		CensusParishFilter.getInstance().setSearchText("");
+		CensusSexFilter.getInstance().setSearchText("");
+		CensusAgeFilter.getInstance().setSearchText("");
+		CensusYearFilter.getInstance().setSearchText("");
 		txtCensusBirthPlace.setText("");
 		txtCensusCounty.setText("");
 		txtCensusName.setText("");
 		txtCensusParish.setText("");
 		txtCensusSex.setText("");
+		txtCensusAge.setText("");
 		txtCensusYear.setText("");
 		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -623,7 +615,7 @@ public class CensusView extends Composite {
 		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-
+		censusTableViewer.refresh();
 	}
 
 	/**

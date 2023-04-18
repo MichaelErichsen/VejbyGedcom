@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 18. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -116,16 +116,7 @@ public class BurregView extends Composite {
 		btnRydFelterne_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtBurregGiven.setText("");
-				BurregGivenFilter.getInstance().setSearchText("");
-				txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtBurregSurname.setText("");
-				BurregSurnameFilter.getInstance().setSearchText("");
-				txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtBurregBirthYear.setText("");
-				BurregBirthDateFilter.getInstance().setSearchText("");
-				burregTableViewer.refresh();
+				clearFilters();
 			}
 		});
 		btnRydFelterne_2.setText("Ryd felterne");
@@ -511,13 +502,23 @@ public class BurregView extends Composite {
 	public void clear() {
 		final BurregModel[] input = new BurregModel[0];
 		burregTableViewer.setInput(input);
-		burregTableViewer.refresh();
-		txtBurregBirthYear.setText("");
-		txtBurregGiven.setText("");
-		txtBurregSurname.setText("");
-		txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		clearFilters();
+	}
+
+	/**
+	 *
+	 */
+	private void clearFilters() {
 		txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtBurregGiven.setText("");
+		BurregGivenFilter.getInstance().setSearchText("");
 		txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtBurregSurname.setText("");
+		BurregSurnameFilter.getInstance().setSearchText("");
+		txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtBurregBirthYear.setText("");
+		BurregBirthDateFilter.getInstance().setSearchText("");
+		burregTableViewer.refresh();
 	}
 
 	/**

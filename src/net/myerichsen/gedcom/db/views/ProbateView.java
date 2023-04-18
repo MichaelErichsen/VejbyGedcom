@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 18. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -84,10 +84,7 @@ public class ProbateView extends Composite {
 		btnRydFelterneProbate.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ProbatePlaceFilter.getInstance().setSearchText("");
-				txtProbatePlace.setText("");
-				txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				probateTableViewer.refresh();
+				clearFilters();
 			}
 		});
 		btnRydFelterneProbate.setText("Ryd felterne");
@@ -204,9 +201,17 @@ public class ProbateView extends Composite {
 	public void clear() {
 		final ProbateModel[] input = new ProbateModel[0];
 		probateTableViewer.setInput(input);
-		probateTableViewer.refresh();
+		clearFilters();
+	}
+
+	/**
+	 *
+	 */
+	private void clearFilters() {
+		ProbatePlaceFilter.getInstance().setSearchText("");
 		txtProbatePlace.setText("");
 		txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		probateTableViewer.refresh();
 	}
 
 	/**

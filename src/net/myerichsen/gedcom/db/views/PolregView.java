@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 18. apr. 2023
  *
  */
 public class PolregView extends Composite {
@@ -114,13 +114,7 @@ public class PolregView extends Composite {
 		btnRydFelternePolreg.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				PolregBirthdateFilter.getInstance().setSearchText("");
-				PolregAddressFilter.getInstance().setSearchText("");
-				txtPolregBirthDate.setText("");
-				txtPolregAddress.setText("");
-				txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				polregTableViewer.refresh();
+				clearFilters();
 			}
 		});
 		btnRydFelternePolreg.setText("Ryd felterne");
@@ -331,14 +325,20 @@ public class PolregView extends Composite {
 	public void clear() {
 		final PolregModel[] input = new PolregModel[0];
 		polregTableViewer.setInput(input);
-		polregTableViewer.refresh();
-		txtPolregAddress.setText("");
+		clearFilters();
+	}
+
+	/**
+	 *
+	 */
+	private void clearFilters() {
+		PolregBirthdateFilter.getInstance().setSearchText("");
+		PolregAddressFilter.getInstance().setSearchText("");
 		txtPolregBirthDate.setText("");
-		txtPolregName.setText("");
+		txtPolregAddress.setText("");
 		txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-
+		polregTableViewer.refresh();
 	}
 
 	/**

@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 18. apr. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -100,13 +100,7 @@ public class SiblingsView extends Composite {
 		btnRydFelterneSiblings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				SiblingsPlaceFilter.getInstance().setSearchText("");
-				SiblingsParentsFilter.getInstance().setSearchText("");
-				txtSiblingsPlace.setText("");
-				txtSiblingsParents.setText("");
-				txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				siblingsTableViewer.refresh();
+				clearFilters();
 			}
 		});
 		btnRydFelterneSiblings.setText("Ryd felterne");
@@ -213,11 +207,20 @@ public class SiblingsView extends Composite {
 	public void clear() {
 		final SiblingsModel[] input = new SiblingsModel[0];
 		siblingsTableViewer.setInput(input);
-		siblingsTableViewer.refresh();
-		txtSiblingsParents.setText("");
+		clearFilters();
+	}
+
+	/**
+	 *
+	 */
+	private void clearFilters() {
+		SiblingsPlaceFilter.getInstance().setSearchText("");
+		SiblingsParentsFilter.getInstance().setSearchText("");
 		txtSiblingsPlace.setText("");
+		txtSiblingsParents.setText("");
 		txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		siblingsTableViewer.refresh();
 	}
 
 	/**

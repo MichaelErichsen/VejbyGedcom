@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 18. apr. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -101,13 +101,7 @@ public class RelocationView extends Composite {
 		btnRydFelterneRelocation.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				RelocationGivenFilter.getInstance().setSearchText("");
-				RelocationSurnameFilter.getInstance().setSearchText("");
-				txtRelocationGiven.setText("");
-				txtRelocationSurname.setText("");
-				txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				relocationTableViewer.refresh();
+				clearFilters();
 			}
 		});
 		btnRydFelterneRelocation.setText("Ryd felterne");
@@ -258,11 +252,20 @@ public class RelocationView extends Composite {
 	public void clear() {
 		final RelocationModel[] input = new RelocationModel[0];
 		relocationTableViewer.setInput(input);
-		relocationTableViewer.refresh();
+		clearFilters();
+	}
+
+	/**
+	 *
+	 */
+	private void clearFilters() {
+		RelocationGivenFilter.getInstance().setSearchText("");
+		RelocationSurnameFilter.getInstance().setSearchText("");
 		txtRelocationGiven.setText("");
-		txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtRelocationSurname.setText("");
+		txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		relocationTableViewer.refresh();
 	}
 
 	/**
