@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 18. apr. 2023
+ * @version 19. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -539,7 +539,7 @@ public class BurregView extends Composite {
 
 					Display.getDefault().asyncExec(() -> burregTableViewer.setInput(burregRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Begrevelsesregisteret er hentet"));
+							.setMessage("Begravelsesregisteret er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}

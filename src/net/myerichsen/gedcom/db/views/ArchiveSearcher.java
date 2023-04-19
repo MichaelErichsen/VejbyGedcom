@@ -48,7 +48,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 19. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -60,6 +60,8 @@ public class ArchiveSearcher extends Shell {
 	// StandardCharsets.US_ASCII);
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
+
+	// TODO Kill mechanism for threads when clear button is pressed
 
 	private static Display display;
 
@@ -174,6 +176,12 @@ public class ArchiveSearcher extends Shell {
 		descendantCounterView = new DescendantCounterView(tabFolder, SWT.NONE);
 		descendantCounterView.setProperties(props);
 		tbtmEfterkommere.setControl(descendantCounterView);
+
+		TabItem tbtmFtDubletter = new TabItem(tabFolder, SWT.NONE);
+		tbtmFtDubletter.setText("Ft. dubletter");
+		CensusdupView censusdupView = new CensusdupView(tabFolder, SWT.NONE);
+		censusdupView.setProperties(props);
+		tbtmFtDubletter.setControl(censusdupView);
 
 		messageField = new Text(this, SWT.BORDER);
 		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

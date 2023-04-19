@@ -6,7 +6,7 @@ import net.myerichsen.gedcom.db.models.BurregModel;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 19. apr. 2023
  *
  */
 public class BurregPopulator implements ASPopulator {
@@ -14,8 +14,8 @@ public class BurregPopulator implements ASPopulator {
 	@Override
 	public BurregModel[] load(String[] args) {
 		try {
-			final BurregModel[] BurregRecords = BurregModel.load(args[0], args[1], args[2], args[3], args[4]);
-			return BurregRecords;
+			final BurregModel[] burregRecords = BurregModel.load(args[0], args[1], args[2], args[3], args[4]);
+			return burregRecords;
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
