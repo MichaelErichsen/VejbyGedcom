@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
 import net.myerichsen.gedcom.db.models.SettingsModel;
@@ -19,7 +20,7 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
  * Wizard page to handle Copenhagen registries
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class SettingsWizardPage4 extends WizardPage {
@@ -40,6 +41,9 @@ public class SettingsWizardPage4 extends WizardPage {
 
 	private SettingsModel settings;
 	private Button btnHusbond;
+	private Label lblMeddelelsesloglngde;
+	private Slider sliderMsgLogLen;
+	private Text txtMsgLogLen;
 
 	public SettingsWizardPage4() {
 		super("wizardPage");
@@ -279,5 +283,27 @@ public class SettingsWizardPage4 extends WizardPage {
 		btnHusbond.setText("Husbond");
 
 		setControl(container);
+
+		lblMeddelelsesloglngde = new Label(container, SWT.NONE);
+		lblMeddelelsesloglngde.setText("Meddelelseslogl\u00E6ngde");
+
+		sliderMsgLogLen = new Slider(container, SWT.NONE);
+		sliderMsgLogLen.setMinimum(1);
+		sliderMsgLogLen.setMaximum(100);
+		sliderMsgLogLen.setIncrement(1);
+		sliderMsgLogLen.setSelection(Integer.parseInt(settings.getMsgLogLen()));
+		sliderMsgLogLen.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final int selection = sliderMsgLogLen.getSelection();
+				txtMsgLogLen.setText(selection + "");
+				settings.setMsgLogLen(Integer.toString(selection));
+			}
+		});
+
+		txtMsgLogLen = new Text(container, SWT.BORDER);
+		txtMsgLogLen.setEditable(false);
+		txtMsgLogLen.setText(settings.getMsgLogLen());
+		txtMsgLogLen.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 	}
 }

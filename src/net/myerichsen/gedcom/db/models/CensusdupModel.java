@@ -10,11 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class representing a census duplicate
+ *
  * @author Michael Erichsen
- * @version 19. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class CensusdupModel extends ASModel {
+	/*
+	 * Constants
+	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT = "SELECT * FROM VEJBY.EVENT WHERE TYPE = 'Census'";
 

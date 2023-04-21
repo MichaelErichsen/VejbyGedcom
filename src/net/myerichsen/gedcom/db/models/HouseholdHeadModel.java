@@ -17,10 +17,12 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing a HouseholdHead relocation event
  *
  * @author Michael Erichsen
- * @version 20. apr. 2023
- *
+ * @version 21. apr. 2023
  */
 
+/*
+ * Constants
+ */
 public class HouseholdHeadModel extends ASModel implements Cloneable {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_NAME = "SELECT GIVENNAME, SURNAME FROM INDIVIDUAL WHERE ID = ?";
@@ -320,7 +322,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 		statement = conn.prepareStatement(SELECT_7);
 		statement.setString(1, date);
 		statement.setString(2, sourceDetail);
-		ResultSet rs = statement.executeQuery();
+		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			ls.add(rs.getString("INDIVIDUAL").trim());

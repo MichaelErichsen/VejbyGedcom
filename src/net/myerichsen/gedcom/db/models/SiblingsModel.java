@@ -14,12 +14,12 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class SiblingsModel extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static String SELECT = "SELECT * FROM PARENTS WHERE FATHERPHONETIC = ? AND MOTHERPHONETIC = ?";

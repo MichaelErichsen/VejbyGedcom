@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 18. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -52,6 +52,7 @@ public class RelocationView extends Composite {
 	private Table relocationTable;
 	private ASPopulator relocationListener;
 	private Properties props;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -250,6 +251,9 @@ public class RelocationView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final RelocationModel[] input = new RelocationModel[0];
 		relocationTableViewer.setInput(input);
 		clearFilters();
@@ -274,7 +278,7 @@ public class RelocationView extends Composite {
 	 * @param deathDate
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (relocationListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
@@ -285,10 +289,12 @@ public class RelocationView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Flytninger er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

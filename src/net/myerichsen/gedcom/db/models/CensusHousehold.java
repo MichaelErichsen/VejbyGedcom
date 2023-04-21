@@ -10,13 +10,15 @@ import java.util.List;
 import java.util.Properties;
 
 /**
+ * Class representing a census household
+ *
  * @author Michael Erichsen
  * @version 12. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "

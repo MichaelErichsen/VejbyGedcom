@@ -13,7 +13,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 /**
- * Main user interface for the Vejby Gedcom application. Implements tabbed
+ * Test user interface for the Vejby Gedcom application. Implements tabbed
  * panels to do the work.
  *
  * @author Michael Erichsen

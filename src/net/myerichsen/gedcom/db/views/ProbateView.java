@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 18. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -50,6 +50,7 @@ public class ProbateView extends Composite {
 	private ASPopulator probateListener;
 	private Properties props;
 	private Text txtProbatePlace;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -199,6 +200,9 @@ public class ProbateView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final ProbateModel[] input = new ProbateModel[0];
 		probateTableViewer.setInput(input);
 		clearFilters();
@@ -223,7 +227,7 @@ public class ProbateView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (probateListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
@@ -235,10 +239,12 @@ public class ProbateView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Skifter er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

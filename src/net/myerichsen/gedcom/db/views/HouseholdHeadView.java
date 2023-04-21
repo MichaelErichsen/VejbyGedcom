@@ -41,7 +41,7 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 20. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -52,6 +52,7 @@ public class HouseholdHeadView extends Composite {
 	private Text txtHouseholdPlace;
 	private Text txtHouseholdRelocatorName;
 	private Combo txtHouseholdEventType;
+	private Thread thread;
 
 	// FIXME Place filter not perfect (e.g. Rågeleje)
 
@@ -279,6 +280,10 @@ public class HouseholdHeadView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
+
 		final HouseholdHeadModel[] input = new HouseholdHeadModel[0];
 		householdHeadTableViewer.setInput(input);
 		clearFilters();
@@ -325,14 +330,14 @@ public class HouseholdHeadView extends Composite {
 		try {
 			ls = HouseholdHeadModel.populatePopup(props.getProperty("vejbyPath"), props.getProperty("vejbySchema"),
 					ti.getText(2), ti.getText(7));
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			grandParent.setMessage(e.getMessage());
 			return;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-		for (String id : ls) {
+		for (final String id : ls) {
 			sb.append(id + ", ");
 		}
 
@@ -349,7 +354,7 @@ public class HouseholdHeadView extends Composite {
 	 * @param deathDate
 	 */
 	public void populate(String headId) {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (householdHeadListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
@@ -362,10 +367,12 @@ public class HouseholdHeadView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Husbond er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

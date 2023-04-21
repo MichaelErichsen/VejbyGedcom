@@ -52,7 +52,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 18. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -68,6 +68,7 @@ public class CensusView extends Composite {
 	private ASPopulator censusListener;
 	private List<CensusModel> household;
 	private Properties props;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -585,6 +586,9 @@ public class CensusView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final CensusModel[] input = new CensusModel[0];
 		censusTableViewer.setInput(input);
 		clearFilters();
@@ -653,7 +657,7 @@ public class CensusView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (censusListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
@@ -666,10 +670,12 @@ public class CensusView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Folketællinger er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

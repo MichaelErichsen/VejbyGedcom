@@ -39,7 +39,7 @@ public class DBRelocation {
 	private static Logger logger;
 
 	/**
-	 * Main method
+	 * Test method
 	 *
 	 * @param args
 	 */

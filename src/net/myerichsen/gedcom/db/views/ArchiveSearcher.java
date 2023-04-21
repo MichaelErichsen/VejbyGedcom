@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 import org.eclipse.jface.wizard.WizardDialog;
@@ -20,6 +22,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -48,7 +51,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 19. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -60,8 +63,6 @@ public class ArchiveSearcher extends Shell {
 	// StandardCharsets.US_ASCII);
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
-
-	// TODO Kill mechanism for threads when clear button is pressed
 
 	private static Display display;
 
@@ -87,7 +88,7 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	private Properties props;
-	private final Text messageField;
+	private final Combo messageComboBox;
 	private Text searchId;
 	private Text searchName;
 	private Text searchBirth;
@@ -106,6 +107,7 @@ public class ArchiveSearcher extends Shell {
 	private final SiblingsView siblingsView;
 	private final DescendantCounterView descendantCounterView;
 	private final HouseholdHeadView householdHeadView;
+	private final CensusdupView censusdupView;
 
 	/**
 	 * Create the shell.
@@ -177,14 +179,14 @@ public class ArchiveSearcher extends Shell {
 		descendantCounterView.setProperties(props);
 		tbtmEfterkommere.setControl(descendantCounterView);
 
-		TabItem tbtmFtDubletter = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmFtDubletter = new TabItem(tabFolder, SWT.NONE);
 		tbtmFtDubletter.setText("Ft. dubletter");
-		CensusdupView censusdupView = new CensusdupView(tabFolder, SWT.NONE);
+		censusdupView = new CensusdupView(tabFolder, SWT.NONE);
 		censusdupView.setProperties(props);
 		tbtmFtDubletter.setControl(censusdupView);
 
-		messageField = new Text(this, SWT.BORDER);
-		messageField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		messageComboBox = new Combo(this, SWT.BORDER);
+		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		createContents();
 	}
@@ -211,7 +213,7 @@ public class ArchiveSearcher extends Shell {
 						props.getProperty("cphSchema") };
 				final String message = LoadBurialPersonComplete.loadCsvFiles(sa);
 
-				messageField.getDisplay().asyncExec(() -> setMessage(message));
+				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();
 			break;
 		case SWT.CANCEL:
@@ -225,11 +227,35 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Clear search fields and stop all searches
+	 */
+	private void clear() {
+		searchBirth.setText("");
+		searchDeath.setText("");
+		searchFather.setText("");
+		searchId.setText("");
+		searchMother.setText("");
+		searchName.setText("");
+		burregView.clear();
+		censusView.clear();
+		householdHeadView.clear();
+		individualView.clear();
+		polregView.clear();
+		probateView.clear();
+		relocationView.clear();
+		siblingsView.clear();
+		descendantCounterView.clear();
+		householdHeadView.clear();
+		censusdupView.clear();
+		searchId.setFocus();
+	}
+
+	/**
 	 * Create contents of the shell.
 	 */
 	protected void createContents() {
 		setText("Arkivsøgning");
-		setSize(1244, 625);
+		setSize(1037, 625);
 	}
 
 	/**
@@ -260,6 +286,7 @@ public class ArchiveSearcher extends Shell {
 		mntmAfslut.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				clear();
 				e.display.dispose();
 			}
 		});
@@ -409,27 +436,14 @@ public class ArchiveSearcher extends Shell {
 
 		final Button btnRydFelterne = new Button(searchComposite, SWT.NONE);
 		btnRydFelterne.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				searchBirth.setText("");
-				searchDeath.setText("");
-				searchFather.setText("");
-				searchId.setText("");
-				searchMother.setText("");
-				searchName.setText("");
-				burregView.clear();
-				censusView.clear();
-				householdHeadView.clear();
-				individualView.clear();
-				polregView.clear();
-				probateView.clear();
-				relocationView.clear();
-				siblingsView.clear();
-				searchId.setFocus();
+				clear();
 			}
 		});
 		btnRydFelterne.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
-		btnRydFelterne.setText("Ryd felterne");
+		btnRydFelterne.setText("Ryd felterne og stop s\u00F8gninger");
 
 		final Label lblNewLabel_1 = new Label(searchComposite, SWT.NONE);
 		lblNewLabel_1.setText("Navn");
@@ -508,7 +522,7 @@ public class ArchiveSearcher extends Shell {
 						props.getProperty("vejbySchema") };
 				final String message = GedcomLoader.loadCsvFiles(sa);
 
-				messageField.getDisplay().asyncExec(() -> setMessage(message));
+				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
 
 			}).start();
 			break;
@@ -551,6 +565,7 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("siblingSearch", "true");
 			props.setProperty("vejbyPath", Constants.VEJBYDB_PATH);
 			props.setProperty("vejbySchema", Constants.VEJBYDB_SCHEMA);
+			props.setProperty("msgLogLen", "20");
 
 			storeProperties();
 			System.out.println("Egenskaber gemt i " + Constants.PROPERTIES_PATH);
@@ -592,7 +607,7 @@ public class ArchiveSearcher extends Shell {
 						props.getProperty("censusSchema") };
 				final String message = CensusDbLoader.loadCsvFiles(sa);
 
-				messageField.getDisplay().asyncExec(() -> setMessage(message));
+				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();
 
 			break;
@@ -620,12 +635,12 @@ public class ArchiveSearcher extends Shell {
 				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath"),
 						props.getProperty("cphSchema") };
 				final String message1 = LoadPoliceAddress.loadCsvFiles(sa);
-				messageField.getDisplay().asyncExec(() -> setMessage(message1));
+				messageComboBox.getDisplay().asyncExec(() -> setMessage(message1));
 
 				final String message2 = LoadPolicePosition.loadCsvFiles(sa);
-				messageField.getDisplay().asyncExec(() -> setMessage(message2));
+				messageComboBox.getDisplay().asyncExec(() -> setMessage(message2));
 				final String message3 = LoadPolicePerson.loadCsvFiles(sa);
-				messageField.getDisplay().asyncExec(() -> setMessage(message3));
+				messageComboBox.getDisplay().asyncExec(() -> setMessage(message3));
 
 			}).start();
 			break;
@@ -659,8 +674,8 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		String idx = searchId.getText();
-		String id = (idx.contains("@") ? idx : "@I" + searchId.getText().trim() + "@");
+		final String idx = searchId.getText();
+		final String id = idx.contains("@") ? idx : "@I" + searchId.getText().trim() + "@";
 
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
@@ -728,7 +743,7 @@ public class ArchiveSearcher extends Shell {
 				householdHeadView.populate(individual.getId());
 			}
 		} catch (final SQLException e1) {
-			messageField.setText(e1.getMessage());
+			messageComboBox.setText(e1.getMessage());
 			e1.printStackTrace();
 		}
 	}
@@ -841,15 +856,22 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Set the message in the message field
+	 * Set the message in the message combo box
 	 *
 	 * @param string
 	 *
 	 */
 	public void setMessage(String string) {
-		messageField.setText(string);
-		messageField.redraw();
-		messageField.update();
+
+		final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+		final LocalTime localTime = LocalTime.now();
+		messageComboBox.add(dtf.format(localTime) + " " + string, 0);
+		messageComboBox.select(0);
+		final int lastItem = Integer.parseInt(props.getProperty("msgLogLen"));
+
+		if (messageComboBox.getItemCount() > lastItem) {
+			messageComboBox.remove(lastItem);
+		}
 	}
 
 	/**

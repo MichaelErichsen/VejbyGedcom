@@ -8,7 +8,7 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class SettingsModel {
@@ -36,6 +36,7 @@ public class SettingsModel {
 	private String siblingSearch;
 	private String vejbyPath;
 	private String vejbySchema;
+	private String msgLogLen;
 
 	/**
 	 * Constructor
@@ -68,6 +69,7 @@ public class SettingsModel {
 		siblingSearch = props.getProperty("siblingSearch");
 		vejbyPath = props.getProperty("vejbyPath");
 		vejbySchema = props.getProperty("vejbySchema");
+		msgLogLen = props.getProperty("msgLogLen");
 	}
 
 	/**
@@ -159,6 +161,13 @@ public class SettingsModel {
 	 */
 	public String getKipTextFilename() {
 		return kipTextFilename;
+	}
+
+	/**
+	 * @return the msgLogLen
+	 */
+	public String getMsgLogLen() {
+		return msgLogLen;
 	}
 
 	/**
@@ -335,6 +344,13 @@ public class SettingsModel {
 	 */
 	public void setKipTextFilename(String kipTextFilename) {
 		this.kipTextFilename = kipTextFilename;
+	}
+
+	/**
+	 * @param msgLogLen the msgLogLen to set
+	 */
+	public void setMsgLogLen(String msgLogLen) {
+		this.msgLogLen = msgLogLen;
 	}
 
 	/**

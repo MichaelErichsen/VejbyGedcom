@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
  * Individual view
  *
  * @author Michael Erichsen
- * @version 17. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class IndividualView extends Composite {

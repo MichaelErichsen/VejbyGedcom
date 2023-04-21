@@ -36,7 +36,7 @@ import org.gedcom4j.parser.GedcomParser;
 public class ProbateFinder {
 
 	/**
-	 * Main method
+	 * Test method
 	 *
 	 * @param args
 	 */

@@ -9,13 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class representing a probate event
+ *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class ProbateModel extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_PROBATE = "SELECT * FROM EVENT "

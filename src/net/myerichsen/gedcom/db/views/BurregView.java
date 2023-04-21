@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 19. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -55,6 +55,7 @@ public class BurregView extends Composite {
 	private Text txtBurregSurname;
 	private Text txtBurregBirthYear;
 	private Text txtBurregGiven;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -500,6 +501,9 @@ public class BurregView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final BurregModel[] input = new BurregModel[0];
 		burregTableViewer.setInput(input);
 		clearFilters();
@@ -530,7 +534,7 @@ public class BurregView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (burregListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
@@ -541,10 +545,12 @@ public class BurregView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Begravelsesregisteret er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

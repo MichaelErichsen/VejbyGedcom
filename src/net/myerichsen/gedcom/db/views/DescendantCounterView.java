@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -27,7 +28,7 @@ import net.myerichsen.gedcom.db.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 19. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class DescendantCounterView extends Composite {
@@ -35,6 +36,7 @@ public class DescendantCounterView extends Composite {
 	private ASPopulator descendantListener;
 	private TableViewer descendantTableViewer;
 	private Properties props;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -126,21 +128,38 @@ public class DescendantCounterView extends Composite {
 	}
 
 	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
+		final DescendantModel[] input = new DescendantModel[0];
+		descendantTableViewer.setInput(input);
+		descendantTableViewer.refresh();
+	}
+
+	/**
 	 * @param gedcomFileName
 	 */
 	public void populate() {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (descendantListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("gedcomFilePath") };
 					final DescendantModel[] descendantRecords = (DescendantModel[]) descendantListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> descendantTableViewer.setInput(descendantRecords));
+
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+							.setMessage("Efterkommere er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

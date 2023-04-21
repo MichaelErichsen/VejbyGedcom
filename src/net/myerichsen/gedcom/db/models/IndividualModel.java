@@ -14,17 +14,14 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class IndividualModel extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA2 = "SET SCHEMA = ?";
-	/**
-	 *
-	 */
 	private static final String SET_SCHEMA = SET_SCHEMA2;
 	private static final String SELECT_INDIVIDUAL = "SELECT * FROM INDIVIDUAL";
 	private static final String SELECT_BIRTH_EVENT = "SELECT * FROM EVENT WHERE INDIVIDUAL = "

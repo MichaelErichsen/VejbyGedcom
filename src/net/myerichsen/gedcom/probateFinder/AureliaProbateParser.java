@@ -30,7 +30,7 @@ import org.gedcom4j.exception.GedcomParserException;
  */
 public class AureliaProbateParser {
 	/**
-	 * Main method
+	 * Test method
 	 *
 	 * @param args
 	 */

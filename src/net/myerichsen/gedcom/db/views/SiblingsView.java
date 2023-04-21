@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 18. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -53,6 +53,7 @@ public class SiblingsView extends Composite {
 	private Properties props;
 	private Text txtSiblingsPlace;
 	private Text txtSiblingsParents;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -205,6 +206,9 @@ public class SiblingsView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final SiblingsModel[] input = new SiblingsModel[0];
 		siblingsTableViewer.setInput(input);
 		clearFilters();
@@ -255,9 +259,7 @@ public class SiblingsView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String fathersName, String mothersName) throws SQLException {
-		siblingsTable.removeAll();
-
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (siblingsListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
@@ -269,11 +271,12 @@ public class SiblingsView extends Composite {
 							.setMessage("Søskende er hentet"));
 
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
-
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

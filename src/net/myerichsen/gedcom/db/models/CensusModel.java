@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,12 +17,12 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class CensusModel extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
@@ -38,7 +37,6 @@ public class CensusModel extends ASModel {
 			+ "'%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
 	private static final String SELECT_CENSUS = "SELECT * FROM CENSUS WHERE FONNAVN = ? "
 			+ "AND FTAAR >= ? AND FTAAR <= ?";
-	private static Logger logger = Logger.getLogger("CensusRecord");
 
 	/**
 	 * Get a list of census records from the Derby table
@@ -48,7 +46,7 @@ public class CensusModel extends ASModel {
 	 * @throws SQLException
 	 */
 	public static CensusModel[] load(String schema, String dbPath, String phonName, String birthYear, String deathYear)
-			throws SQLException {
+			throws Exception {
 		CensusModel ci;
 		final List<CensusModel> cil = new ArrayList<>();
 
@@ -87,7 +85,6 @@ public class CensusModel extends ASModel {
 			ci.setFTaar(rs.getInt("FTaar"));
 			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
-			logger.fine(ci.toString());
 			cil.add(ci);
 		}
 

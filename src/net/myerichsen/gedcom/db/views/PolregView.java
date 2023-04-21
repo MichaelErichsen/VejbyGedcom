@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 18. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class PolregView extends Composite {
@@ -54,6 +54,7 @@ public class PolregView extends Composite {
 	private Text txtPolregAddress;
 	private Text txtPolregBirthDate;
 	private Text txtPolregName;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -323,6 +324,9 @@ public class PolregView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final PolregModel[] input = new PolregModel[0];
 		polregTableViewer.setInput(input);
 		clearFilters();
@@ -377,7 +381,7 @@ public class PolregView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (polregListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
@@ -388,10 +392,12 @@ public class PolregView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Politiets Registerblade er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

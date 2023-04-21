@@ -13,12 +13,12 @@ import java.util.List;
  * Class representing a police registry event
  *
  * @author Michael Erichsen
- * @version 16. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class PolregModel extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_POLICE_ADDRESS = "SELECT * FROM POLICE_ADDRESS WHERE POLICE_ADDRESS.PERSON_ID = ?";
@@ -115,17 +115,17 @@ public class PolregModel extends ASModel {
 			if (rs3.next()) {
 				try {
 					pr3.setStreet(rs3.getString("STREET"));
-				} catch (SQLException e2) {
+				} catch (final SQLException e2) {
 					pr3.setStreet("");
 				}
 				try {
 					pr3.setNumber(rs3.getInt("NUMBER"));
-				} catch (SQLException e2) {
+				} catch (final SQLException e2) {
 					pr3.setNumber(0);
 				}
 				try {
 					pr3.setLetter(rs3.getString("LETTER"));
-				} catch (SQLException e1) {
+				} catch (final SQLException e1) {
 					pr3.setLetter("");
 				}
 				try {
@@ -140,12 +140,12 @@ public class PolregModel extends ASModel {
 				}
 				try {
 					pr3.setHost(rs3.getString("HOST"));
-				} catch (SQLException e1) {
+				} catch (final SQLException e1) {
 					pr3.setHost("");
 				}
 				try {
 					pr3.setDay(rs3.getInt("DAY"));
-				} catch (SQLException e1) {
+				} catch (final SQLException e1) {
 					pr3.setDay(1);
 				}
 				try {
@@ -160,7 +160,7 @@ public class PolregModel extends ASModel {
 				}
 				try {
 					pr3.setFullAddress(rs3.getString("FULL_ADDRESS"));
-				} catch (SQLException e) {
+				} catch (final SQLException e) {
 					pr3.setFullAddress("");
 				}
 			}

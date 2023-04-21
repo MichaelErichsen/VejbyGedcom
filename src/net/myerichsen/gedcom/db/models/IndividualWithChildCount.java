@@ -3,14 +3,15 @@ package net.myerichsen.gedcom.db.models;
 import org.gedcom4j.model.Individual;
 
 /**
- * An individual with count of descendants
+ * Class representing an individual with count of descendants
  *
  * @author michael
+ * @version 21. apr. 2023
  *
  */
 public class IndividualWithChildCount extends Individual implements Comparable<IndividualWithChildCount> {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final long serialVersionUID = 1L;
 	private int descendantCount = 0;

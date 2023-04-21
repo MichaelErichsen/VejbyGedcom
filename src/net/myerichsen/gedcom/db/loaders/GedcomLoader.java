@@ -85,7 +85,7 @@ public class GedcomLoader {
 	private static Gedcom gedcom;
 
 	/**
-	 * Main called method
+	 * Test called method
 	 *
 	 * @param args
 	 * @return

@@ -35,7 +35,7 @@ import net.myerichsen.gedcom.db.populators.CensusdupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 19. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class CensusdupView extends Composite {
@@ -43,6 +43,7 @@ public class CensusdupView extends Composite {
 	private Table censusdupTable;
 	private ASPopulator censusdupListener;
 	private Properties props;
+	private Thread thread;
 
 	/**
 	 * Create the composite.
@@ -58,7 +59,7 @@ public class CensusdupView extends Composite {
 
 		final ScrolledComposite censusdupScroller = new ScrolledComposite(this,
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		GridData gd_censusdupScroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		final GridData gd_censusdupScroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_censusdupScroller.widthHint = 617;
 		censusdupScroller.setLayoutData(gd_censusdupScroller);
 		censusdupScroller.setSize(0, 0);
@@ -128,20 +129,20 @@ public class CensusdupView extends Composite {
 		censusdupScroller.setContent(censusdupTable);
 		censusdupScroller.setMinSize(censusdupTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
-		Composite buttonComposite = new Composite(this, SWT.BORDER);
+		final Composite buttonComposite = new Composite(this, SWT.BORDER);
 		buttonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		Label lblDanListeOver = new Label(buttonComposite, SWT.NONE);
+		final Label lblDanListeOver = new Label(buttonComposite, SWT.NONE);
 		lblDanListeOver
 				.setText("Dan liste over personer med flere folket\u00E6llingsh\u00E6ndelser p\u00E5 samme dato");
 
-		Button btnFind = new Button(buttonComposite, SWT.NONE);
+		final Button btnFind = new Button(buttonComposite, SWT.NONE);
 		btnFind.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					populate();
-				} catch (SQLException e1) {
+				} catch (final SQLException e1) {
 					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
 				}
 			}
@@ -192,6 +193,9 @@ public class CensusdupView extends Composite {
 	 * Clear the table
 	 */
 	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
 		final CensusdupModel[] input = new CensusdupModel[0];
 		censusdupTableViewer.setInput(input);
 		censusdupTableViewer.refresh();
@@ -203,7 +207,7 @@ public class CensusdupView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate() throws SQLException {
-		new Thread(() -> {
+		thread = new Thread(() -> {
 			if (censusdupListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
@@ -214,10 +218,12 @@ public class CensusdupView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Folketællingsdubletter er hentet"));
 				} catch (final Exception e) {
-					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}
-		}).start();
+		});
+		thread.start();
 	}
 
 	/**

@@ -14,12 +14,12 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 21. apr. 2023
  *
  */
 public class BurregModel extends ASModel {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM BURIAL_PERSON_COMPLETE "
