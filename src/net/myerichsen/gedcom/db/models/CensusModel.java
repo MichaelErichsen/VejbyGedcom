@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,8 +32,8 @@ public class CensusModel extends ASModel {
 			+ "KILDESTEDNAVN, HUSSTANDS_FAMILIENR, MATR_NR_ADRESSE, KILDENAVN, FONNAVN, "
 			+ "KOEN, ALDER, CIVILSTAND, KILDEERHVERV, STILLING_I_HUSSTANDEN, "
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "
-			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES ('%s',%d,'%s','%s', '%s', '%s', '%s', '%s', "
-			+ "'%s', '%s', '%s', %d, '%s', '%s', '%s', '%s', '%s', %d, '%s', '%s', '%s', %d, '%s', '%s')";
+			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
+			+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String SELECT_CENSUS = "SELECT * FROM CENSUS WHERE FONNAVN = ? "
 			+ "AND FTAAR >= ? AND FTAAR <= ?";
 
@@ -304,13 +303,34 @@ public class CensusModel extends ASModel {
 	 * @param statement
 	 * @throws SQLException
 	 */
-	public void insertIntoDb(Statement statement) throws SQLException {
-		final String query = String.format(INSERT, KIPnr, Loebenr, Amt, Herred, Sogn, Kildestednavn,
-				Husstands_familienr, Matr_nr_Adresse, Kildenavn, Fonnavn, Koen, Alder, Civilstand, Kildeerhverv,
-				Stilling_i_husstanden, Kildefoedested, Foedt_kildedato, Foedeaar, Adresse, Matrikel, Gade_nr, FTaar,
-				Kildehenvisning, Kildekommentar);
+	public void insertIntoDb(Connection conn) throws SQLException {
+		PreparedStatement statement = conn.prepareStatement(INSERT);
+		statement.setString(1, KIPnr);
+		statement.setInt(2, Loebenr);
+		statement.setString(3, Amt);
+		statement.setString(4, Herred);
+		statement.setString(5, Sogn);
+		statement.setString(6, Kildestednavn);
+		statement.setString(7, Husstands_familienr);
+		statement.setString(8, Matr_nr_Adresse);
+		statement.setString(9, Kildenavn);
+		statement.setString(10, Fonnavn);
+		statement.setString(11, Koen);
+		statement.setInt(12, Alder);
+		statement.setString(13, Civilstand);
+		statement.setString(14, Kildeerhverv);
+		statement.setString(15, Stilling_i_husstanden);
+		statement.setString(16, Kildefoedested);
+		statement.setString(17, Foedt_kildedato);
+		statement.setInt(18, Foedeaar);
+		statement.setString(19, Adresse);
+		statement.setString(20, Matrikel);
+		statement.setString(21, Gade_nr);
+		statement.setInt(22, FTaar);
+		statement.setString(23, Kildehenvisning);
+		statement.setString(24, Kildekommentar);
 
-		statement.execute(query);
+		statement.execute();
 	}
 
 	/**

@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.swt.widgets.Display;
 import org.gedcom4j.exception.GedcomParserException;
 import org.gedcom4j.model.AbstractCitation;
 import org.gedcom4j.model.CitationWithSource;
@@ -35,13 +36,14 @@ import org.gedcom4j.model.enumerations.IndividualEventType;
 import org.gedcom4j.parser.GedcomParser;
 
 import net.myerichsen.gedcom.db.models.IndividualModel;
+import net.myerichsen.gedcom.db.views.ArchiveSearcher;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Read a GEDCOM and load data into a Derby database to use for analysis.
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 22. apr. 2023
  */
 public class GedcomLoader {
 	/**
@@ -88,13 +90,14 @@ public class GedcomLoader {
 	 * Test called method
 	 *
 	 * @param args
+	 * @param shells
 	 * @return
 	 */
-	public static String loadCsvFiles(String[] args) {
+	public static String loadCsvFiles(String[] args, ArchiveSearcher as) {
 		final GedcomLoader ir = new GedcomLoader();
 
 		try {
-			ir.execute(args);
+			ir.execute(args, as);
 		} catch (final Exception e) {
 			e.printStackTrace();
 			return e.getMessage();
@@ -132,9 +135,10 @@ public class GedcomLoader {
 	 * Worker method
 	 *
 	 * @param args
+	 * @param shells
 	 * @throws Exception
 	 */
-	private void execute(String[] args) throws Exception {
+	private void execute(String[] args, ArchiveSearcher as) throws Exception {
 		final String dbURL = "jdbc:derby:" + args[1];
 		final Connection conn = DriverManager.getConnection(dbURL);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -144,16 +148,22 @@ public class GedcomLoader {
 		prepareStatements(conn);
 
 		readGedcom(args[0]);
+		Display.getDefault().asyncExec(() -> as.setMessage("GEDCOM fil læst"));
 
 		clearTables(conn);
+		Display.getDefault().asyncExec(() -> as.setMessage("Tabellerne ryddet"));
 
 		parseAllFamilies();
+		Display.getDefault().asyncExec(() -> as.setMessage("Familier analyseret"));
 
 		parseAllIndividuals();
+		Display.getDefault().asyncExec(() -> as.setMessage("Personer analyseret"));
 
 		updateBirthDeathData(conn, args[2]);
+		Display.getDefault().asyncExec(() -> as.setMessage("Fødsels- og dødsdata opdateret"));
 
 		parseParents();
+		Display.getDefault().asyncExec(() -> as.setMessage("Forældre analuseret"));
 
 		conn.close();
 

@@ -55,7 +55,8 @@ public class HouseholdHeadView extends Composite {
 	private Thread thread;
 
 	// FIXME Place filter not perfect (e.g. Rågeleje)
-	// FIXME Household ID list not working properly
+	// FIXME Household ID list not working properly: Only first name in household
+	// displays IDs
 
 	/**
 	 * Create the composite.
@@ -313,16 +314,16 @@ public class HouseholdHeadView extends Composite {
 		final TableItem[] tia = householdHeadTable.getSelection();
 		final TableItem ti = tia[0];
 
-		final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+		final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 
 		if (ti.getText(8) == null || !ti.getText(8).equals("Folketælling")) {
-			grandParent.setMessage("Vælg venligst en folketælling");
+			as.setMessage("Vælg venligst en folketælling");
 			return;
 		}
 
 		if (ti.getText(2) == null || ti.getText(2).length() == 0 || ti.getText(4) == null
 				|| ti.getText(4).length() == 0) {
-			grandParent.setMessage("Dato eller sted mangler");
+			as.setMessage("Dato eller sted mangler");
 			return;
 		}
 
@@ -332,7 +333,7 @@ public class HouseholdHeadView extends Composite {
 			ls = HouseholdHeadModel.populatePopup(props.getProperty("vejbyPath"), props.getProperty("vejbySchema"),
 					ti.getText(2), ti.getText(4), ti.getText(7));
 		} catch (final SQLException e) {
-			grandParent.setMessage(e.getMessage());
+			as.setMessage(e.getMessage());
 			return;
 		}
 

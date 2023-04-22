@@ -12,8 +12,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
+
 import net.myerichsen.gedcom.db.models.CensusModel;
 import net.myerichsen.gedcom.db.models.KipTextEntry;
+import net.myerichsen.gedcom.db.views.ArchiveSearcher;
 
 /**
  * This program needs a kipdata.txt and a set of KIP csv files as input.
@@ -21,11 +24,11 @@ import net.myerichsen.gedcom.db.models.KipTextEntry;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 22. apr. 2023
  */
 public class CensusDbLoader {
 	/**
-	 *
+	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM CENSUS WHERE KIPNR = ?";
@@ -37,11 +40,11 @@ public class CensusDbLoader {
 	 *
 	 * @param args
 	 */
-	public static String loadCsvFiles(String[] args) {
+	public static String loadCsvFiles(String[] args, ArchiveSearcher as) {
 		final CensusDbLoader censusDbLoader = new CensusDbLoader();
 
 		try {
-			censusDbLoader.execute(args);
+			censusDbLoader.execute(args, as);
 
 		} catch (final Exception e) {
 
@@ -75,23 +78,26 @@ public class CensusDbLoader {
 	 * Worker method
 	 *
 	 * @param args
+	 * @param as
 	 * @throws Exception
 	 */
-	private void execute(String[] args) throws Exception {
+	private void execute(String[] args, ArchiveSearcher as) throws Exception {
 
 		// Connect to Derby
 		connectToDB(args);
 
 		// Find all census csv files from the index file
+		Display.getDefault().asyncExec(() -> as.setMessage("Finder alle folketællinger i " + args[1] + "/" + args[0]));
 		final List<KipTextEntry> lkte = parseKipText(args);
 
 		// Remove header line
 		lkte.remove(0);
 
-		// Parse and store contens of each census file in a single table
+		// Parse and store contents of each census file in a single table
+		Display.getDefault().asyncExec(() -> as.setMessage("Hver folketællingsfil behandles"));
 		for (final KipTextEntry kipTextEntry : lkte) {
 			if (!kipTextEntry.getAar().equals("1771")) {
-				parseCensusFile(args, kipTextEntry);
+				parseCensusFile(args, kipTextEntry, as);
 			}
 		}
 
@@ -142,9 +148,10 @@ public class CensusDbLoader {
 	 *
 	 * @param args
 	 * @param kipTextEntry
+	 * @param as
 	 * @throws Exception
 	 */
-	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
+	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry, ArchiveSearcher as) throws Exception {
 		statement = conn.prepareStatement(SELECT_COUNT);
 		statement.setString(1, kipTextEntry.getKipNr());
 		final ResultSet rs = statement.executeQuery();
@@ -161,6 +168,8 @@ public class CensusDbLoader {
 
 		statement.getConnection().commit();
 
+		Display.getDefault().asyncExec(() -> as.setMessage("Behandler " + kipTextEntry.getAar() + ", "
+				+ kipTextEntry.getAmt() + ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn()));
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
 		CensusModel ci;
 		String[] fields;
@@ -294,7 +303,7 @@ public class CensusDbLoader {
 			}
 
 			try {
-				ci.insertIntoDb(statement);
+				ci.insertIntoDb(statement.getConnection());
 			} catch (final SQLException e30) {
 				// Handle duplicates
 				if (!e30.getSQLState().equals("23505")) {

@@ -520,7 +520,7 @@ public class ArchiveSearcher extends Shell {
 			new Thread(() -> {
 				final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
 						props.getProperty("vejbySchema") };
-				final String message = GedcomLoader.loadCsvFiles(sa);
+				final String message = GedcomLoader.loadCsvFiles(sa, this);
 
 				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
 
@@ -605,7 +605,7 @@ public class ArchiveSearcher extends Shell {
 				final String[] sa = new String[] { props.getProperty("kipTextFilename"),
 						props.getProperty("censusCsvFileDirectory"), props.getProperty("censusPath"),
 						props.getProperty("censusSchema") };
-				final String message = CensusDbLoader.loadCsvFiles(sa);
+				final String message = CensusDbLoader.loadCsvFiles(sa, this);
 
 				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();

@@ -351,7 +351,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 
 		for (String[] sa1 : lsa) {
 			if (sa1[1].contains(detailparts[1] + ",") && sa1[1].contains(detailparts[3] + ",")) {
-				System.out.println(sa1[0] + ";" + detail + ";" + sa1[1]);
+				System.out.println(sa1[0] + ";" + sa1[1]);
 				ls.add(sa1[0]);
 			}
 		}
