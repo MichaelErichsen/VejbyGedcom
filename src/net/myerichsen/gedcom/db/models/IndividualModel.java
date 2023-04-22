@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class IndividualModel extends ASModel {
@@ -461,10 +461,5 @@ public class IndividualModel extends ASModel {
 
 		return id.replace("I", "").replace("@", "") + ";" + name + ";" + birthDate + ";" + dy + ";" + birthPlace + ";"
 				+ parents + ";" + phonName;
-	}
-
-	@Override
-	public String[] toStringArray() {
-		return null;
 	}
 }

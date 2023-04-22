@@ -51,7 +51,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
@@ -185,7 +185,7 @@ public class ArchiveSearcher extends Shell {
 		censusdupView.setProperties(props);
 		tbtmFtDubletter.setControl(censusdupView);
 
-		messageComboBox = new Combo(this, SWT.BORDER);
+		messageComboBox = new Combo(this, SWT.READ_ONLY);
 		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		createContents();
@@ -661,8 +661,8 @@ public class ArchiveSearcher extends Shell {
 		searchMother.setText("");
 		searchName.setText("");
 		individualView.clear();
-		siblingsView.clear();
-		householdHeadView.clear();
+		descendantCounterView.clear();
+		censusdupView.clear();
 
 		if (searchId.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -683,11 +683,6 @@ public class ArchiveSearcher extends Shell {
 
 			if (individual.getName().equals("")) {
 				setMessage("ID " + id + " findes ikke i databasen");
-//				final Shell[] shells = e.widget.getDisplay().getShells();
-//				final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
-//				messageBox.setText("Advarsel");
-//				messageBox.setMessage("ID " + id + "findes ikke i databasen");
-//				messageBox.open();
 				searchId.setFocus();
 				return;
 			}
@@ -735,7 +730,8 @@ public class ArchiveSearcher extends Shell {
 				burregView.populate(phonName, birthDate, deathDate);
 			}
 
-			if (individual.getParents() != null && individual.getParents().length() > 0) {
+			if (props.getProperty("siblingSearch").equals("true") && individual.getParents() != null
+					&& individual.getParents().length() > 0) {
 				siblingsView.populate(individual.getParents());
 			}
 

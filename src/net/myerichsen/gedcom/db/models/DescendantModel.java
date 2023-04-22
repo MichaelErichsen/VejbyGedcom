@@ -16,7 +16,7 @@ import org.gedcom4j.parser.GedcomParser;
  * Class representing an individual with count of descendants
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class DescendantModel extends ASModel {
@@ -134,15 +134,6 @@ public class DescendantModel extends ASModel {
 	@Override
 	public String toString() {
 		return String.format("%08d %s; %s", descendantCount, id, name);
-	}
-
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[3];
-		sa[0] = descendantCount + "";
-		sa[1] = id;
-		sa[2] = name;
-		return sa;
 	}
 
 }

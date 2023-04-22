@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class BurregModel extends ASModel {
@@ -505,39 +505,6 @@ public class BurregModel extends ASModel {
 				+ (occupationRelationTypes != null ? "occupationRelationTypes=" + occupationRelationTypes + ", " : "")
 				+ (deathCauses != null ? "deathCauses=" + deathCauses + ", " : "")
 				+ (deathCausesDanish != null ? "deathCausesDanish=" + deathCausesDanish : "") + "]";
-	}
-
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[25];
-
-		sa[0] = firstNames;
-		sa[1] = lastName;
-		sa[2] = dateOfDeath;
-		sa[3] = yearOfBirth;
-		sa[4] = deathPlace;
-		sa[5] = civilStatus;
-		sa[6] = adressOutsideCph;
-		sa[7] = sex;
-		sa[8] = comment;
-		sa[9] = cemetary;
-		sa[10] = chapel;
-		sa[11] = parish;
-		sa[12] = street;
-		sa[13] = hood;
-		sa[14] = streetNumber;
-		sa[15] = letter;
-		sa[16] = floor;
-		sa[17] = institution;
-		sa[18] = institutionStreet;
-		sa[19] = institutionHood;
-		sa[20] = institutionStreetNumber;
-		sa[21] = occuptations;
-		sa[22] = occupationRelationTypes;
-		sa[23] = deathCauses;
-		sa[24] = deathCausesDanish;
-
-		return sa;
 	}
 
 }

@@ -13,7 +13,7 @@ import java.util.Properties;
  * Class representing a census household
  *
  * @author Michael Erichsen
- * @version 12. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
@@ -168,16 +168,5 @@ public class CensusHousehold extends ASModel {
 	 */
 	public void setHousehold(List<CensusModel> household) {
 		this.household = household;
-	}
-
-	@Override
-	public String[] toStringArray() {
-		final List<String> ls = new ArrayList<>();
-
-		for (final CensusModel censusRecord : household) {
-			ls.add(censusRecord.toString());
-		}
-
-		return (String[]) ls.toArray();
 	}
 }

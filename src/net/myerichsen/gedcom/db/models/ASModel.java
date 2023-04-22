@@ -9,7 +9,7 @@ import java.sql.Statement;
  * Abstract superclass for ArchiveSearcher model classes
  *
  * @author Michael Erichsen
- * @version 7. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public abstract class ASModel {
@@ -86,6 +86,6 @@ public abstract class ASModel {
 	 *
 	 * @return
 	 */
-	abstract public String[] toStringArray();
+//	abstract public String[] toStringArray();
 
 }

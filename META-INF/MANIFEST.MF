@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: VejbyGedcom
 Bundle-SymbolicName: VejbyGedcom
+Bundle-Vendor: Michael Erichsen
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: VejbyGedcom.jar,
  AnselCharset-1.0.jar,
@@ -14,10 +15,13 @@ Bundle-ClassPath: VejbyGedcom.jar,
  db-derby-10.14.2.0-bin/lib/derbyclient.jar
 Automatic-Module-Name: VejbyGedcom
 Bundle-RequiredExecutionEnvironment: JavaSE-17
- net.myerichsen.gedcom.birthdatematcher,
- net.myerichsen.gedcom.db,
+Export-Package: net.myerichsen.gedcom.db,
  net.myerichsen.gedcom.db.comparators;uses:="org.eclipse.jface.viewers",
  net.myerichsen.gedcom.db.filters;uses:="org.eclipse.jface.viewers",
+ net.myerichsen.gedcom.db.loaders,
+ net.myerichsen.gedcom.db.models;uses:="org.gedcom4j.model",
+ net.myerichsen.gedcom.db.populators,
+ net.myerichsen.gedcom.db.tablecreators,
  net.myerichsen.gedcom.db.views;
   uses:="org.eclipse.swt.events,
    net.myerichsen.gedcom.db.models,
@@ -25,11 +29,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
    org.eclipse.swt.widgets,
    org.eclipse.jface.dialogs,
    org.eclipse.jface.wizard",
- net.myerichsen.gedcom.db.loaders,
- net.myerichsen.gedcom.db.models;uses:="org.gedcom4j.model",
- net.myerichsen.gedcom.db.populators,
- net.myerichsen.gedcom.db.tablecreators,
- net.myerichsen.gedcom.parentFinder,
  net.myerichsen.gedcom.probateFinder;uses:="org.gedcom4j.model",
  net.myerichsen.gedcom.util,
  net.myerichsen.vejby.census;uses:="net.myerichsen.vejby.gedcom",

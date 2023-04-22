@@ -12,7 +12,7 @@ import java.util.List;
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class ProbateModel extends ASModel {
@@ -159,22 +159,5 @@ public class ProbateModel extends ASModel {
 	 */
 	public void setToDate(String toDate) {
 		this.toDate = toDate;
-	}
-
-	/**
-	 * return the object as a String Array
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[6];
-		sa[0] = name;
-		sa[1] = fromDate;
-		sa[2] = toDate;
-		sa[3] = place;
-		sa[4] = data;
-		sa[5] = source;
-		return sa;
 	}
 }

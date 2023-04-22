@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class RelocationModel extends ASModel {
@@ -312,25 +312,5 @@ public class RelocationModel extends ASModel {
 		return id + ";" + givenName + ";" + surName + ";" + relocationDate + ";" + place + ";" + note + ";"
 				+ sourceDetail + ";" + birthDate + ";" + parents;
 
-	}
-
-	/**
-	 * Return the object as a String Array
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[9];
-		sa[0] = id;
-		sa[1] = givenName;
-		sa[2] = surName;
-		sa[3] = relocationDate.toString();
-		sa[4] = place;
-		sa[5] = note;
-		sa[6] = sourceDetail.equals("NULL") ? "" : sourceDetail;
-		sa[7] = birthDate.toString();
-		sa[8] = parents.equals("NULL") ? "" : parents;
-		return sa;
 	}
 }

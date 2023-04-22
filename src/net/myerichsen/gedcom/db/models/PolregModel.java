@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a police registry event
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class PolregModel extends ASModel {
@@ -405,30 +405,5 @@ public class PolregModel extends ASModel {
 				+ (place != null ? "place=" + place + ", " : "") + (host != null ? "host=" + host + ", " : "") + "day="
 				+ day + ", month=" + month + ", year=" + year + ", "
 				+ (fullAddress != null ? "fullAddress=" + fullAddress : "") + "]";
-	}
-
-	/**
-	 * Return the object as a String Array
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[13];
-
-		sa[0] = name;
-		sa[1] = birthDate.toString();
-		sa[2] = occupation;
-		sa[3] = street;
-		sa[4] = number + "";
-		sa[5] = letter;
-		sa[6] = floor;
-		sa[7] = place;
-		sa[8] = host;
-		sa[9] = day + "";
-		sa[10] = month + "";
-		sa[11] = year + "";
-		sa[12] = fullAddress;
-		return sa;
 	}
 }

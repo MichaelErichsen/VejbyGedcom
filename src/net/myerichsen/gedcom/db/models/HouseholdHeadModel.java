@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.myerichsen.gedcom.util.Fonkod;
-
 /**
  * Class representing a HouseholdHead relocation event
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  */
 
 /*
@@ -37,12 +35,14 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 			+ "AND HUSSTANDS_FAMILIENR = ?";
 	private static final String SELECT_4 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ?"
 			+ "AND HUSSTANDS_FAMILIENR = ? AND LOEBENR != ?";
-	private static final String SELECT_5 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
-			+ "AND HUSSTANDS_FAMILIENR = ?";
-	private static final String SELECT_6 = "SELECT * FROM INDIVIDUAL WHERE PHONNAME = ? AND ID IN "
-			+ "( SELECT INDIVIDUAL FROM VEJBY.EVENT WHERE TYPE = 'Census' AND DATE = ? AND SOURCEDETAIL LIKE ? )";
-	private static final String SELECT_7 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
-			+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
+//	private static final String SELECT_5 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
+//			+ "AND HUSSTANDS_FAMILIENR = ?";
+//	private static final String SELECT_6 = "SELECT * FROM INDIVIDUAL WHERE PHONNAME = ? AND ID IN "
+//			+ "( SELECT INDIVIDUAL FROM VEJBY.EVENT WHERE TYPE = 'Census' AND DATE = ? AND SOURCEDETAIL LIKE ? )";
+//	private static final String SELECT_6 = "SELECT * FROM INDIVIDUAL WHERE ID IN "
+//			+ "( SELECT INDIVIDUAL FROM VEJBY.EVENT WHERE TYPE = 'Census' AND DATE = ? AND SOURCEDETAIL LIKE ? )";
+	private static final String SELECT_7 = "SELECT INDIVIDUAL, SOURCEDETAIL FROM EVENT WHERE TYPE = 'Census' "
+			+ "AND DATE = ? AND PLACE = ?";
 
 	/**
 	 * @param p
@@ -90,7 +90,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 */
 	private static List<HouseholdHeadModel> getCensusEvents(String vejbySchema, String vejbyDbPath, String censusSchema,
 			String censusDbPath, String headId) throws Exception {
-		final Fonkod fk = new Fonkod();
+//		final Fonkod fk = new Fonkod();
 
 		Connection conn = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -158,6 +158,8 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 				continue nextLtr;
 			}
 
+//			System.out.println(hhm.kipNr + ";" + hhm.loebeNr + ";" + hhm.place + ";" + hhm.husstandsFamilieNr);
+
 			statement = conn.prepareStatement(SELECT_4);
 			statement.setString(1, hhm.getKipNr());
 			statement.setString(2, hhm.getKildestednavn());
@@ -169,45 +171,52 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 				hhm1 = (HouseholdHeadModel) hhm.clone();
 				hhm1.setLoebeNr(rs.getInt("LOEBENR"));
 				hhm1.setRelocatorName(rs.getString("KILDENAVN"));
+				hhm1.setSourceDetail(hhm1.getKipNr() + "; " + hhm1.getLoebeNr() + "; " + hhm1.getPlace() + "; "
+						+ hhm1.getHusstandsFamilieNr());
+//				
 				lhhm1.add(hhm1);
 			}
 		}
 
 		// Get list of id's in the household
-		final List<String> idList = new ArrayList<>();
-		statement = conn.prepareStatement(SELECT_5);
+//		final List<String> idList = new ArrayList<>();
+//		statement = conn.prepareStatement(SELECT_5);
 
-		// FIXME Too many identical results
-		for (final HouseholdHeadModel hhm2 : lhhm1) {
-			statement.setString(1, hhm2.getKipNr());
-			statement.setString(2, hhm2.getKildestednavn());
-			statement.setString(3, hhm2.getHusstandsFamilieNr());
-			rs = statement.executeQuery();
+//		for (HouseholdHeadModel a : lhhm1)
+//			System.out.println(
+//					a.kipNr + ";" + a.loebeNr + ";" + a.place + ";" + a.husstandsFamilieNr + ";" + a.relocatorName);
 
-			while (rs.next()) {
-				idList.add(rs.getString("FONNAVN"));
-			}
-		}
+//		for (final HouseholdHeadModel hhm2 : lhhm1) {
+//			statement.setString(1, hhm2.getKipNr());
+//			statement.setString(2, hhm2.getKildestednavn());
+//			statement.setString(3, hhm2.getHusstandsFamilieNr());
+//			rs = statement.executeQuery();
+//
+//			while (rs.next()) {
+//				idList.add(rs.getString("FONNAVN"));
+//			}
+//		}
 
-		conn = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
-		statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, vejbySchema);
-		statement.execute();
-
-		statement = conn.prepareStatement(SELECT_6);
-
-		for (final HouseholdHeadModel hhm2 : lhhm1) {
-
-			statement.setString(1, fk.generateKey(hhm2.getRelocatorName()));
-			statement.setDate(2, hhm2.getEventDate());
-			statement.setString(3, hhm2.getSourceDetail() + "%");
-			rs = statement.executeQuery();
-
-			if (rs.next()) {
-				hhm2.setRelocatorId(rs.getString("ID"));
-				break;
-			}
-		}
+//		conn = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
+//		statement = conn.prepareStatement(SET_SCHEMA);
+//		statement.setString(1, vejbySchema);
+//		statement.execute();
+//
+//		statement = conn.prepareStatement(SELECT_6);
+//
+//		for (final HouseholdHeadModel hhm2 : lhhm1) {
+//
+////			statement.setString(1, fk.generateKey(hhm2.getRelocatorName()));
+//			statement.setDate(1, hhm2.getEventDate());
+//			statement.setString(2, hhm2.getSourceDetail());
+//			rs = statement.executeQuery();
+//
+////			if (rs.next()) {
+////				hhm2.setRelocatorId(rs.getString("ID"));
+////				hhm2.setSourceDetail(hhm2.getKipNr() + ", " + hhm2.getLoebeNr() + ", " + hhm2.getPlace());
+//////				break;
+////			}
+//		}
 		return lhhm1;
 	}
 
@@ -303,6 +312,8 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	}
 
 	/**
+	 * Find individual ID's in the household
+	 * 
 	 * @param vejbyDbPath
 	 * @param vejbySchema
 	 * @param id
@@ -310,9 +321,11 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<String> populatePopup(String vejbyDbPath, String vejbySchema, String date, String sourceDetail)
-			throws SQLException {
-		final List<String> ls = new ArrayList<>();
+	public static List<String> populatePopup(String vejbyDbPath, String vejbySchema, String date, String place,
+			String detail) throws SQLException {
+		List<String> ls = new ArrayList<>();
+		final List<String[]> lsa = new ArrayList<String[]>();
+		String[] sa;
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -321,15 +334,27 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 
 		statement = conn.prepareStatement(SELECT_7);
 		statement.setString(1, date);
-		statement.setString(2, sourceDetail);
+		statement.setString(2, place);
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			ls.add(rs.getString("INDIVIDUAL").trim());
+			sa = new String[2];
+			sa[0] = rs.getString("INDIVIDUAL").trim();
+			sa[1] = rs.getString("SOURCEDETAIL").toLowerCase();
+			lsa.add(sa);
 		}
 
 		statement.close();
 		conn.close();
+
+		String[] detailparts = detail.toLowerCase().split("; ");
+
+		for (String[] sa1 : lsa) {
+			if (sa1[1].contains(detailparts[1] + ",") && sa1[1].contains(detailparts[3] + ",")) {
+				System.out.println(sa1[0] + ";" + detail + ";" + sa1[1]);
+				ls.add(sa1[0]);
+			}
+		}
 
 		return ls;
 	}
@@ -544,27 +569,6 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 				+ relocatorId + ", relocatorName=" + relocatorName + ", eventType=" + eventType + ", kildestednavn="
 				+ kildestednavn + ", husstandsFamilieNr=" + husstandsFamilieNr + ", kipNr=" + kipNr + ", loebeNr="
 				+ loebeNr + "]";
-	}
-
-	/**
-	 * Return the object as a String Array
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[9];
-		sa[0] = headId;
-		sa[1] = headName;
-		sa[2] = eventDate.toString();
-		sa[3] = place;
-		sa[4] = note;
-		sa[5] = note;
-		sa[6] = sourceDetail.equals("NULL") ? "" : sourceDetail;
-		sa[7] = relocatorId;
-		sa[8] = relocatorName;
-		sa[9] = eventType;
-		return sa;
 	}
 
 }

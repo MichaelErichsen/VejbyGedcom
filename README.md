@@ -1,5 +1,5 @@
 # VejbyGedcom
-This repository contains a number of GEDCOM-related Java tools.
+This repository contains some GEDCOM-related Java tools.
 
 ## GedcomFile
 GedcomFile is a tool to create GEDCOM files for various online genealogical resources for Vejby, Holbo, Frederiksborg, Denmark, such as census files and church registries.

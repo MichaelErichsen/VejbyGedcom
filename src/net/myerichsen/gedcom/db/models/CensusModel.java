@@ -17,7 +17,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class CensusModel extends ASModel {
@@ -573,42 +573,5 @@ public class CensusModel extends ASModel {
 				+ (Kildehenvisning.length() > 0 ? Kildehenvisning + ", " : "")
 				+ (Kildekommentar.length() > 0 ? Kildekommentar + ", " : "")
 				+ (Kildedetaljer.length() > 0 ? Kildedetaljer + ", " : "");
-	}
-
-	/**
-	 * Return the object as a String Array
-	 *
-	 * @return
-	 */
-	@Override
-	public String[] toStringArray() {
-		final String[] sa = new String[24];
-
-		sa[0] = FTaar + "";
-		sa[1] = Amt;
-		sa[2] = Herred;
-		sa[3] = Sogn;
-		sa[4] = Kildestednavn;
-		sa[5] = Husstands_familienr;
-		sa[6] = Matr_nr_Adresse;
-		sa[7] = Kildenavn;
-		sa[8] = Koen;
-		sa[9] = Alder + "";
-		sa[10] = Civilstand;
-		sa[11] = Kildeerhverv;
-		sa[12] = Stilling_i_husstanden;
-		sa[13] = Kildefoedested;
-		sa[14] = Foedt_kildedato;
-		sa[15] = Foedeaar + "";
-		sa[16] = Adresse;
-		sa[17] = Matrikel;
-		sa[18] = Gade_nr;
-		sa[19] = Kildehenvisning;
-		sa[20] = Kildekommentar;
-		sa[21] = KIPnr;
-		sa[22] = Loebenr + "";
-		sa[23] = Kildedetaljer;
-
-		return sa;
 	}
 }

@@ -4,7 +4,7 @@ package net.myerichsen.gedcom.db.models;
  * Class representing an event in the derby database
  *
  * @author Michael Erichsen
- * @version 31. mar. 2023
+ * @version 22. apr. 2023
  *
  */
 public class EventRecord extends ASModel {
@@ -78,10 +78,5 @@ public class EventRecord extends ASModel {
 		}
 
 		return false;
-	}
-
-	@Override
-	public String[] toStringArray() {
-		return null;
 	}
 }

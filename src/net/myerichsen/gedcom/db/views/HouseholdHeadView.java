@@ -41,20 +41,21 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 22. apr. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
 	private TableViewer householdHeadTableViewer;
 	private Table householdHeadTable;
 	private ASPopulator householdHeadListener;
-	private Properties props;
 	private Text txtHouseholdPlace;
 	private Text txtHouseholdRelocatorName;
 	private Combo txtHouseholdEventType;
+	private Properties props;
 	private Thread thread;
 
 	// FIXME Place filter not perfect (e.g. Rågeleje)
+	// FIXME Household ID list not working properly
 
 	/**
 	 * Create the composite.
@@ -306,7 +307,7 @@ public class HouseholdHeadView extends Composite {
 	}
 
 	/**
-	 *
+	 * Display individual ID's in the household
 	 */
 	private void HouseholdHeadPopup() {
 		final TableItem[] tia = householdHeadTable.getSelection();
@@ -319,9 +320,9 @@ public class HouseholdHeadView extends Composite {
 			return;
 		}
 
-		if (ti.getText(2) == null || ti.getText(2).length() == 0 || ti.getText(7) == null
-				|| ti.getText(7).length() == 0) {
-			grandParent.setMessage("Dato eller detaljer mangler");
+		if (ti.getText(2) == null || ti.getText(2).length() == 0 || ti.getText(4) == null
+				|| ti.getText(4).length() == 0) {
+			grandParent.setMessage("Dato eller sted mangler");
 			return;
 		}
 
@@ -329,7 +330,7 @@ public class HouseholdHeadView extends Composite {
 
 		try {
 			ls = HouseholdHeadModel.populatePopup(props.getProperty("vejbyPath"), props.getProperty("vejbySchema"),
-					ti.getText(2), ti.getText(7));
+					ti.getText(2), ti.getText(4), ti.getText(7));
 		} catch (final SQLException e) {
 			grandParent.setMessage(e.getMessage());
 			return;
