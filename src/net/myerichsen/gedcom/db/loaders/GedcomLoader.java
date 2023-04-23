@@ -33,6 +33,7 @@ import org.gedcom4j.model.PersonalName;
 import org.gedcom4j.model.Place;
 import org.gedcom4j.model.StringWithCustomFacts;
 import org.gedcom4j.model.enumerations.IndividualEventType;
+import org.gedcom4j.model.thirdpartyadapters.FamilyHistorianAdapter;
 import org.gedcom4j.parser.GedcomParser;
 
 import net.myerichsen.gedcom.db.models.IndividualModel;
@@ -40,10 +41,10 @@ import net.myerichsen.gedcom.db.views.ArchiveSearcher;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
- * Read a GEDCOM and load data into a Derby database to use for analysis.
+ * Read and analyze a GEDCOM and load data into a Derby database
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 23. apr. 2023
  */
 public class GedcomLoader {
 	/**
@@ -84,6 +85,7 @@ public class GedcomLoader {
 	private static PreparedStatement psUPDATE_FAMILY_HUSBAND;
 
 	private static Fonkod fonkod = new Fonkod();
+	private static FamilyHistorianAdapter fha = new FamilyHistorianAdapter();
 	private static Gedcom gedcom;
 
 	/**
@@ -148,7 +150,7 @@ public class GedcomLoader {
 		prepareStatements(conn);
 
 		readGedcom(args[0]);
-		Display.getDefault().asyncExec(() -> as.setMessage("GEDCOM fil læst"));
+		Display.getDefault().asyncExec(() -> as.setMessage("GEDCOM fil indlæst"));
 
 		clearTables(conn);
 		Display.getDefault().asyncExec(() -> as.setMessage("Tabellerne ryddet"));
@@ -450,17 +452,29 @@ public class GedcomLoader {
 			psINSERT_INDIVIDUAL_EVENT.setString(6, place.getPlaceName().replace("'", ""));
 		}
 
-		final List<NoteStructure> noteStructures = individualEvent.getNoteStructures();
-		if (noteStructures == null) {
-			psINSERT_INDIVIDUAL_EVENT.setString(7, "");
-		} else {
-			final List<String> lines = noteStructures.get(0).getLines();
-			final StringBuilder lineBuffer = new StringBuilder();
+		final IndividualEventType type = individualEvent.getType();
+		if (type.getDisplay().equals("Census")) {
+			final StringBuilder sb = new StringBuilder();
+			final List<CustomFact> witnessReferences = fha.getWitnessReferences(individualEvent);
 
-			for (final String string : lines) {
-				lineBuffer.append(string + " ");
+			for (final CustomFact cf : witnessReferences) {
+				sb.append(cf.getDescription().getValue() + " ");
 			}
-			psINSERT_INDIVIDUAL_EVENT.setString(7, lineBuffer.toString().replace("'", "¤"));
+
+			psINSERT_INDIVIDUAL_EVENT.setString(7, sb.toString());
+		} else {
+			final List<NoteStructure> noteStructures = individualEvent.getNoteStructures();
+			if (noteStructures == null) {
+				psINSERT_INDIVIDUAL_EVENT.setString(7, "");
+			} else {
+				final List<String> lines = noteStructures.get(0).getLines();
+				final StringBuilder lineBuffer = new StringBuilder();
+
+				for (final String string : lines) {
+					lineBuffer.append(string + " ");
+				}
+				psINSERT_INDIVIDUAL_EVENT.setString(7, lineBuffer.toString().replace("'", "¤"));
+			}
 		}
 
 		final List<AbstractCitation> citations = individualEvent.getCitations();
