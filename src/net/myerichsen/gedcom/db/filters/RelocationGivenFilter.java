@@ -34,7 +34,6 @@ public class RelocationGivenFilter extends ViewerFilter {
 	 *
 	 */
 	private RelocationGivenFilter() {
-		super();
 	}
 
 	@Override

@@ -34,7 +34,6 @@ public class HouseholdHeadTypeFilter extends ViewerFilter {
 	 *
 	 */
 	private HouseholdHeadTypeFilter() {
-		super();
 	}
 
 	@Override

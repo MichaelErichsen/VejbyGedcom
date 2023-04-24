@@ -34,7 +34,6 @@ public class SiblingsPlaceFilter extends ViewerFilter {
 	 *
 	 */
 	private SiblingsPlaceFilter() {
-		super();
 	}
 
 	@Override

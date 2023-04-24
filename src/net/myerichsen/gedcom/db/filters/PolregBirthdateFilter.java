@@ -34,7 +34,6 @@ public class PolregBirthdateFilter extends ViewerFilter {
 	 *
 	 */
 	private PolregBirthdateFilter() {
-		super();
 	}
 
 	@Override

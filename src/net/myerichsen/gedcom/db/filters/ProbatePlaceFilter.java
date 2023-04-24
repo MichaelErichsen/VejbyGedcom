@@ -34,7 +34,6 @@ public class ProbatePlaceFilter extends ViewerFilter {
 	 *
 	 */
 	private ProbatePlaceFilter() {
-		super();
 	}
 
 	@Override

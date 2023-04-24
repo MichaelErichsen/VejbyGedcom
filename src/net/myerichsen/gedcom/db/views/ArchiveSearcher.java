@@ -64,6 +64,12 @@ public class ArchiveSearcher extends Shell {
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
 
+	/**
+	 * @author Michael Erichsen
+	 * @version 24. apr. 2023
+	 *
+	 */
+
 	private static Display display;
 
 	/**
@@ -74,7 +80,9 @@ public class ArchiveSearcher extends Shell {
 	public static void main(String args[]) {
 		try {
 			display = Display.getDefault();
+
 			final ArchiveSearcher shell = new ArchiveSearcher(display);
+
 			shell.open();
 			shell.layout();
 			while (!shell.isDisposed()) {
@@ -127,60 +135,60 @@ public class ArchiveSearcher extends Shell {
 		tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		final TabItem tbtmPerson = new TabItem(tabFolder, SWT.NONE);
-		tbtmPerson.setText("Person");
+		tbtmPerson.setText("&Person");
 		individualView = new IndividualView(tabFolder, SWT.NONE);
 		tbtmPerson.setControl(individualView);
 
 		final TabItem tbtmRelocations = new TabItem(tabFolder, SWT.NONE);
-		tbtmRelocations.setText("Flytninger");
+		tbtmRelocations.setText("F&lytninger");
 		relocationView = new RelocationView(tabFolder, SWT.NONE);
 		relocationView.setProperties(props);
 		tbtmRelocations.setControl(relocationView);
 
 		final TabItem tbtmCensus = new TabItem(tabFolder, SWT.NONE);
-		tbtmCensus.setText("Folketællinger");
+		tbtmCensus.setText("F&olket\u00E6llinger");
 		censusView = new CensusView(tabFolder, SWT.NONE);
 		censusView.setProperties(props);
 		tbtmCensus.setControl(censusView);
 
 		final TabItem tbtmProbate = new TabItem(tabFolder, SWT.NONE);
-		tbtmProbate.setText("Skifter");
+		tbtmProbate.setText("S&kifter");
 		probateView = new ProbateView(tabFolder, SWT.NONE);
 		probateView.setProperties(props);
 		tbtmProbate.setControl(probateView);
 
 		final TabItem tbtmPolreg = new TabItem(tabFolder, SWT.NONE);
-		tbtmPolreg.setText("Politiets Registerblade");
+		tbtmPolreg.setText("Pol&itiets Registerblade");
 		polregView = new PolregView(tabFolder, SWT.NONE);
 		polregView.setProperties(props);
 		tbtmPolreg.setControl(polregView);
 
 		final TabItem tbtmBurreg = new TabItem(tabFolder, SWT.NONE);
-		tbtmBurreg.setText("Kbhvn. begravelsesregister");
+		tbtmBurreg.setText("Kbhvn. &begravelsesregister");
 		burregView = new BurregView(tabFolder, SWT.NONE);
 		burregView.setProperties(props);
 		tbtmBurreg.setControl(burregView);
 
 		final TabItem tbtmSiblings = new TabItem(tabFolder, SWT.NONE);
-		tbtmSiblings.setText("Søskende");
+		tbtmSiblings.setText("&S\u00F8skende");
 		siblingsView = new SiblingsView(tabFolder, SWT.NONE);
 		siblingsView.setProperties(props);
 		tbtmSiblings.setControl(siblingsView);
 
 		final TabItem tbtmHusbond = new TabItem(tabFolder, SWT.NONE);
-		tbtmHusbond.setText("Husbond");
+		tbtmHusbond.setText("&Husbond");
 		householdHeadView = new HouseholdHeadView(tabFolder, SWT.NONE);
 		householdHeadView.setProperties(props);
 		tbtmHusbond.setControl(householdHeadView);
 
 		final TabItem tbtmEfterkommere = new TabItem(tabFolder, SWT.NONE);
-		tbtmEfterkommere.setText("Efterkommere");
+		tbtmEfterkommere.setText("&Efterkommere");
 		descendantCounterView = new DescendantCounterView(tabFolder, SWT.NONE);
 		descendantCounterView.setProperties(props);
 		tbtmEfterkommere.setControl(descendantCounterView);
 
 		final TabItem tbtmFtDubletter = new TabItem(tabFolder, SWT.NONE);
-		tbtmFtDubletter.setText("Ft. dubletter");
+		tbtmFtDubletter.setText("Ft. &dubletter");
 		censusdupView = new CensusdupView(tabFolder, SWT.NONE);
 		censusdupView.setProperties(props);
 		tbtmFtDubletter.setControl(censusdupView);
@@ -429,7 +437,7 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		btnSearchId.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
-		btnSearchId.setText("S\u00F8g p\u00E5 ID");
+		btnSearchId.setText("S\u00F8g p\u00E5 &ID");
 
 		new Label(searchComposite, SWT.NONE);
 		new Label(searchComposite, SWT.NONE);
@@ -443,7 +451,7 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		btnRydFelterne.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
-		btnRydFelterne.setText("Ryd felterne og stop s\u00F8gninger");
+		btnRydFelterne.setText("&Ryd felterne og stop s\u00F8gninger");
 
 		final Label lblNewLabel_1 = new Label(searchComposite, SWT.NONE);
 		lblNewLabel_1.setText("Navn");
@@ -485,7 +493,7 @@ public class ArchiveSearcher extends Shell {
 
 		});
 		btnSearchName.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
-		btnSearchName.setText("S\u00F8g p\u00E5 navn");
+		btnSearchName.setText("S\u00F8g p\u00E5 &navn");
 
 		final Button btnSgPForldre = new Button(searchComposite, SWT.NONE);
 		btnSgPForldre.addSelectionListener(new SelectionAdapter() {
@@ -495,7 +503,7 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		btnSgPForldre.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
-		btnSgPForldre.setText("S\u00F8g p\u00E5 for\u00E6ldre");
+		btnSgPForldre.setText("S\u00F8g p\u00E5 &for\u00E6ldre");
 
 		final Composite composite = new Composite(searchComposite, SWT.NONE);
 		composite.setLayout(new RowLayout(SWT.HORIZONTAL));

@@ -43,7 +43,6 @@ public abstract class ASModel {
 	 *
 	 */
 	public ASModel() {
-		super();
 	}
 
 	/**

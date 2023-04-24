@@ -34,7 +34,6 @@ public class RelocationSurnameFilter extends ViewerFilter {
 	 *
 	 */
 	private RelocationSurnameFilter() {
-		super();
 	}
 
 	@Override

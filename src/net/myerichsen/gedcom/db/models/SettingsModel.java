@@ -44,7 +44,6 @@ public class SettingsModel {
 	 * @param props
 	 */
 	public SettingsModel(Properties props) {
-		super();
 		burialPersonComplete = props.getProperty("burialPersonComplete");
 		burregSearch = props.getProperty("burregSearch");
 		censusCsvFileDirectory = props.getProperty("censusCsvFileDirectory");

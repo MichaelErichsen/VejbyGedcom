@@ -138,7 +138,6 @@ public class RelocationModel extends ASModel {
 	 */
 	public RelocationModel(String id, String givenName, String surName, Date relocationDate, String place, String note,
 			String sourceDetail, String parents) {
-		super();
 		this.id = id;
 		this.givenName = givenName;
 		this.surName = surName;

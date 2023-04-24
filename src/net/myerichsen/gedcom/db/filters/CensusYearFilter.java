@@ -34,7 +34,6 @@ public class CensusYearFilter extends ViewerFilter {
 	 *
 	 */
 	private CensusYearFilter() {
-		super();
 	}
 
 	@Override

@@ -34,7 +34,6 @@ public class PolregAddressFilter extends ViewerFilter {
 	 *
 	 */
 	private PolregAddressFilter() {
-		super();
 	}
 
 	@Override

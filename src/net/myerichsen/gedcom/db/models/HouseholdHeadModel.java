@@ -108,8 +108,9 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 
 			// Use list of witnesses if present
 			sd = rs.getString("NOTE");
-			if (sd.length() == 0)
+			if (sd.length() == 0) {
 				sd = rs.getString("SOURCEDETAIL");
+			}
 			hhm0.setSourceDetail(sd);
 
 			hhm0.setEventType("Folketælling");
@@ -139,7 +140,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 			if (hhm.getSourceDetail().startsWith("@I")) {
 				witnesses = hhm.getSourceDetail().split(" ");
 
-				for (String id : witnesses) {
+				for (final String id : witnesses) {
 					statement.setString(1, id);
 					rs = statement.executeQuery();
 

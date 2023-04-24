@@ -34,7 +34,6 @@ public class BurregGivenFilter extends ViewerFilter {
 	 *
 	 */
 	private BurregGivenFilter() {
-		super();
 	}
 
 	@Override

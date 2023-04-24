@@ -304,7 +304,7 @@ public class CensusModel extends ASModel {
 	 * @throws SQLException
 	 */
 	public void insertIntoDb(Connection conn) throws SQLException {
-		PreparedStatement statement = conn.prepareStatement(INSERT);
+		final PreparedStatement statement = conn.prepareStatement(INSERT);
 		statement.setString(1, KIPnr);
 		statement.setInt(2, Loebenr);
 		statement.setString(3, Amt);

@@ -34,7 +34,6 @@ public class CensusAgeFilter extends ViewerFilter {
 	 *
 	 */
 	private CensusAgeFilter() {
-		super();
 	}
 
 	@Override

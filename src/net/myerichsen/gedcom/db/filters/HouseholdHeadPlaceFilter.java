@@ -34,7 +34,6 @@ public class HouseholdHeadPlaceFilter extends ViewerFilter {
 	 *
 	 */
 	private HouseholdHeadPlaceFilter() {
-		super();
 	}
 
 	@Override

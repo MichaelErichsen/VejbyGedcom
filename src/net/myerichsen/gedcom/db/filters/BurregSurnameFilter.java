@@ -34,7 +34,6 @@ public class BurregSurnameFilter extends ViewerFilter {
 	 *
 	 */
 	private BurregSurnameFilter() {
-		super();
 	}
 
 	@Override
