@@ -14,7 +14,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Michael Erichsen
- * @version 10. apr. 2023
+ * @version 24. apr. 2023
  *
  */
 public class HelpDialog extends Dialog {
@@ -99,12 +99,10 @@ public class HelpDialog extends Dialog {
 		lblProgrammetForventerAt.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		final GridData gd_lblProgrammetForventerAt = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_lblProgrammetForventerAt.widthHint = 836;
-		gd_lblProgrammetForventerAt.heightHint = 47;
+		gd_lblProgrammetForventerAt.heightHint = 68;
 		lblProgrammetForventerAt.setLayoutData(gd_lblProgrammetForventerAt);
-		lblProgrammetForventerAt
-				.setText("Programmet forventer, at flytninger fra Til-og afgangslisterne i kirkeb\u00F8gerne har "
-						+ "afgangssted som note(\"fra Vejby\") og h\u00E5ndtering som kildereferencedetalje (\"Tj "
-						+ "gmd Niels Nielsen i Vejby\").");
+		lblProgrammetForventerAt.setText(
+				"Programmet forventer, at flytninger fra Til-og afgangslisterne i kirkeb\u00F8gerne har afgangssted som note(\"fra Vejby\") og h\u00E5ndtering som kildereferencedetalje (\"Tj gmd Niels Nielsen i Vejby\"). Det forventer ogs\u00E5, at teksten fra folket\u00E6llingerne i DDD er indkopieret som kildereferencedetalje i folket\u00E6llingerne.");
 
 		final Label lblDetForventerEndvidere = new Label(container, SWT.WRAP);
 		lblDetForventerEndvidere.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
@@ -129,7 +127,7 @@ public class HelpDialog extends Dialog {
 		final Label lblProgrammetErSkrevet_1 = new Label(container, SWT.NONE);
 		lblProgrammetErSkrevet_1.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.NORMAL));
 		lblProgrammetErSkrevet_1.setText(
-				"Programmet er skrevet af Michael Erichsen og er til fri afbenyttelse til ikke-kommercielt brug.");
+				"Programmet er skrevet af Michael Erichsen i 2023 og er til fri afbenyttelse til ikke-kommercielt brug.");
 
 		return container;
 	}

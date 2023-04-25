@@ -37,6 +37,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.CensusComparator;
 import net.myerichsen.gedcom.db.filters.CensusAgeFilter;
+import net.myerichsen.gedcom.db.filters.CensusBirthDateFilter;
 import net.myerichsen.gedcom.db.filters.CensusBirthPlaceFilter;
 import net.myerichsen.gedcom.db.filters.CensusCountyFilter;
 import net.myerichsen.gedcom.db.filters.CensusNameFilter;
@@ -52,7 +53,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -61,9 +62,10 @@ public class CensusView extends Composite {
 	private Text txtCensusParish;
 	private Text txtCensusName;
 	private Text txtCensusSex;
-	private TableViewer censusTableViewer;
 	private Text txtCensusAge;
 	private Text txtCensusBirthPlace;
+	private Text txtCensusBirthDate;
+	private TableViewer censusTableViewer;
 	private Table censusTable;
 	private ASPopulator censusListener;
 	private List<CensusModel> household;
@@ -71,7 +73,7 @@ public class CensusView extends Composite {
 	private Thread thread;
 
 	/**
-	 * Create the composite.
+	 * Create the view
 	 *
 	 * @param parent
 	 * @param style
@@ -169,6 +171,19 @@ public class CensusView extends Composite {
 				censusTableViewer.refresh();
 			}
 		});
+
+		Label lblFdedato = new Label(censusFilterComposite, SWT.NONE);
+		lblFdedato.setText("F\u00F8dedato");
+
+		txtCensusBirthDate = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusBirthDate.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				CensusBirthDateFilter.getInstance().setSearchText(txtCensusBirthDate.getText());
+				censusTableViewer.refresh();
+			}
+		});
 		final Button btnRydFelterneCensus = new Button(censusFilterComposite, SWT.NONE);
 		btnRydFelterneCensus.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -193,7 +208,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final ViewerFilter[] filters = new ViewerFilter[7];
+		final ViewerFilter[] filters = new ViewerFilter[8];
 		filters[0] = CensusBirthPlaceFilter.getInstance();
 		filters[1] = CensusCountyFilter.getInstance();
 		filters[2] = CensusNameFilter.getInstance();
@@ -201,6 +216,7 @@ public class CensusView extends Composite {
 		filters[4] = CensusSexFilter.getInstance();
 		filters[5] = CensusYearFilter.getInstance();
 		filters[6] = CensusAgeFilter.getInstance();
+		filters[7] = CensusBirthDateFilter.getInstance();
 		censusTableViewer.setFilters(filters);
 		censusTableViewer.setComparator(new CensusComparator());
 		censusTableViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -595,10 +611,11 @@ public class CensusView extends Composite {
 	}
 
 	/**
-	 *
+	 * Clear filters
 	 */
 	private void clearFilters() {
 		CensusBirthPlaceFilter.getInstance().setSearchText("");
+		CensusBirthDateFilter.getInstance().setSearchText("");
 		CensusCountyFilter.getInstance().setSearchText("");
 		CensusNameFilter.getInstance().setSearchText("");
 		CensusParishFilter.getInstance().setSearchText("");
@@ -606,6 +623,7 @@ public class CensusView extends Composite {
 		CensusAgeFilter.getInstance().setSearchText("");
 		CensusYearFilter.getInstance().setSearchText("");
 		txtCensusBirthPlace.setText("");
+		txtCensusBirthDate.setText("");
 		txtCensusCounty.setText("");
 		txtCensusName.setText("");
 		txtCensusParish.setText("");
@@ -614,6 +632,7 @@ public class CensusView extends Composite {
 		txtCensusYear.setText("");
 		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -623,6 +642,8 @@ public class CensusView extends Composite {
 	}
 
 	/**
+	 * Get the census household
+	 * 
 	 * @param property
 	 * @param text
 	 * @param text2
