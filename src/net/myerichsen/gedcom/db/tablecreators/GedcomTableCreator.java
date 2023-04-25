@@ -10,7 +10,7 @@ import java.util.Properties;
  * Class to create Derby tables for the program
  *
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class GedcomTableCreator {
@@ -56,7 +56,8 @@ public class GedcomTableCreator {
 
 	public static String createTables(Properties props) {
 		try {
-			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
+			final Connection conn = DriverManager
+					.getConnection("jdbc:derby:" + props.getProperty("vejbyPath") + ";create=true");
 			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("vejbySchema"));
 			statement.execute();

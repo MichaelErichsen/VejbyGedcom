@@ -8,7 +8,7 @@ import java.util.Properties;
 
 /**
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class ProbateTableCreator {
@@ -31,7 +31,8 @@ public class ProbateTableCreator {
 
 	public static String createTables(Properties props) {
 		try {
-			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("probatePath"));
+			final Connection conn = DriverManager
+					.getConnection("jdbc:derby:" + props.getProperty("probatePath") + ";create=true");
 			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("probateSchema"));
 			statement.execute();

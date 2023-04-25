@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Read and analyze a GEDCOM and load data into a Derby database
  *
  * @author Michael Erichsen
- * @version 23. apr. 2023
+ * @version 25. apr. 2023
  */
 public class GedcomLoader {
 	/**
@@ -165,7 +165,7 @@ public class GedcomLoader {
 		Display.getDefault().asyncExec(() -> as.setMessage("Fødsels- og dødsdata opdateret"));
 
 		parseParents();
-		Display.getDefault().asyncExec(() -> as.setMessage("Forældre analuseret"));
+		Display.getDefault().asyncExec(() -> as.setMessage("Forældre analyseret"));
 
 		conn.close();
 
@@ -677,6 +677,12 @@ public class GedcomLoader {
 					birthYear = extractBirthYear(christening.getDate().getValue());
 					sted = christening.getPlace().getPlaceName().toString();
 				} catch (final Exception e) {
+					try {
+						christening = individual.getEventsOfType(IndividualEventType.BIRTH).get(0);
+						birthYear = extractBirthYear(christening.getDate().getValue());
+						sted = christening.getPlace().getPlaceName().toString();
+					} catch (final Exception e1) {
+					}
 				}
 			} else {
 				parents = getParentsFromSource(individual);

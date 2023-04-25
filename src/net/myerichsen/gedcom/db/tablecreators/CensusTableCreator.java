@@ -8,7 +8,7 @@ import java.util.Properties;
 
 /**
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class CensusTableCreator {
@@ -34,7 +34,8 @@ public class CensusTableCreator {
 
 	public static String createTables(Properties props) {
 		try {
-			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("censusPath"));
+			final Connection conn = DriverManager
+					.getConnection("jdbc:derby:" + props.getProperty("censusPath") + ";create=true");
 			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("censusSchema"));
 			statement.execute();

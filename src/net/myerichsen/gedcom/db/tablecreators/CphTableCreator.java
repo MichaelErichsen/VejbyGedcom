@@ -8,7 +8,7 @@ import java.util.Properties;
 
 /**
  * @author Michael Erichsen
- * @version 13. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class CphTableCreator {
@@ -61,7 +61,8 @@ public class CphTableCreator {
 
 	public static String createTables(Properties props) {
 		try {
-			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("cphDbPath"));
+			final Connection conn = DriverManager
+					.getConnection("jdbc:derby:" + props.getProperty("cphDbPath") + ";create=true");
 			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("cphSchema"));
 			statement.execute();

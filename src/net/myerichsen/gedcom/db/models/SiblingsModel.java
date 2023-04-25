@@ -14,9 +14,10 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 25. apr. 2023
  *
  */
+
 public class SiblingsModel extends ASModel {
 	/**
 	 * Constants
@@ -77,6 +78,7 @@ public class SiblingsModel extends ASModel {
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
+
 		statement = conn.prepareStatement(SELECT);
 		statement.setString(1, fatherPhonetic);
 		statement.setString(2, motherPhonetic);
