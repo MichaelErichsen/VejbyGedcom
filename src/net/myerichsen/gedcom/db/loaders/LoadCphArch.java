@@ -8,22 +8,33 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 25. apr. 2023
+ */
+/**
+ * @author Michael Erichsen
+ * @version 25. apr. 2023
+ *
  */
 public abstract class LoadCphArch {
 	/**
 	 *
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
+	private static final String SELECT_COLUMN_METADATA = "SELECT SYS.SYSCOLUMNS.REFERENCEID, SYS.SYSCOLUMNS.COLUMNNUMBER, "
+			+ "SYS.SYSCOLUMNS.COLUMNDATATYPE FROM SYS.SYSCOLUMNS "
+			+ "INNER JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID = SYS.SYSTABLES.TABLEID "
+			+ "WHERE SYS.SYSTABLES.TABLENAME = ? ORDER BY SYS.SYSCOLUMNS.COLUMNNUMBER";
 	protected static int counter;
+	private static Fonkod fk = new Fonkod();
 	private Connection conn;
 
 	/**
@@ -78,30 +89,26 @@ public abstract class LoadCphArch {
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, args[2]);
 		statement.execute();
-		loadTable(statement, args);
+		loadTable(conn, args);
 		statement.close();
+		conn.close();
 
 	}
 
 	/**
 	 * Get column types from database catalog
 	 *
-	 * @param statement
+	 * @param conn
 	 * @param tableName
 	 * @return
 	 * @throws SQLException
 	 */
-	protected List<String> getColumnTypes(Statement statement, String tableName) throws SQLException {
-		final String query = "SELECT SYS.SYSCOLUMNS.REFERENCEID, SYS.SYSCOLUMNS.COLUMNNUMBER, "
-				+ "SYS.SYSCOLUMNS.COLUMNDATATYPE FROM SYS.SYSCOLUMNS "
-				+ "INNER JOIN SYS.SYSTABLES ON SYS.SYSCOLUMNS.REFERENCEID = SYS.SYSTABLES.TABLEID "
-				+ "WHERE SYS.SYSTABLES.TABLENAME = '" + tableName + "' ORDER BY SYS.SYSCOLUMNS.COLUMNNUMBER";
-
-		statement.execute(query);
-
+	protected List<String> getColumnTypes(Connection conn, String tableName) throws SQLException {
 		final List<String> ls = new ArrayList<>();
 
-		final ResultSet rs = statement.executeQuery(query);
+		final PreparedStatement ps = conn.prepareStatement(SELECT_COLUMN_METADATA);
+		ps.setString(1, tableName);
+		final ResultSet rs = ps.executeQuery();
 
 		while (rs.next()) {
 			ls.add(rs.getString("COLUMNDATATYPE"));
@@ -129,22 +136,22 @@ public abstract class LoadCphArch {
 	/**
 	 * Load lines into Derby table
 	 *
-	 * @param statement
+	 * @param conn
 	 * @param args
 	 * @return
 	 * @throws Exception
 	 */
-	protected void loadTable(PreparedStatement statement, String[] args) throws Exception {
+	protected void loadTable(Connection conn, String[] args) throws Exception {
 		String[] columns;
 		StringBuilder sb = new StringBuilder();
 		String query = "";
 
-		final List<String> columnTypes = getColumnTypes(statement, getTablename());
+		final List<String> columnTypes = getColumnTypes(conn, getTablename());
 
-		statement = conn.prepareStatement(getDelete());
-		statement.execute();
+		PreparedStatement ps = conn.prepareStatement(getDelete());
+		ps.execute();
 
-		final BufferedReader br = new BufferedReader(new FileReader(new File(args[1])));
+		final BufferedReader br = new BufferedReader(new FileReader(new File(args[0] + "/" + args[3])));
 		String line;
 
 		// Ignore header line
@@ -169,19 +176,24 @@ public abstract class LoadCphArch {
 				continue;
 			}
 
-			for (int i = 0; i < columnTypes.size(); i++) {
+			for (int i = 0; i < columns.length; i++) {
 				sb.append(convertString(columnTypes.get(i), columns[i]));
 
-				if (i < columnTypes.size() - 1) {
+				if (i < columns.length - 1) {
 					sb.append(", ");
 				}
+			}
+
+			// TODO Append phonetic name
+			if (columnTypes.size() > columns.length) {
+				sb.append(", '" + generatePhonName(columns) + "'");
 			}
 
 			try {
 				sb.append(")");
 				query = sb.toString();
-				statement = conn.prepareStatement(query);
-				statement.execute();
+				ps = conn.prepareStatement(query);
+				ps.execute();
 				counter++;
 			} catch (final SQLException e) {
 				if (!e.getSQLState().equals("42821")) {
@@ -194,6 +206,19 @@ public abstract class LoadCphArch {
 
 		br.close();
 
+	}
+
+	/**
+	 * Generate phonetic name
+	 * 
+	 * @param givenName
+	 * @param lastname
+	 * @return
+	 * @throws Exception
+	 */
+	protected String generatePhonName(String[] column) throws Exception {
+		String s = column[2] + " " + column[3];
+		return fk.generateKey(s.replace("\"", ""));
 	}
 
 }

@@ -15,6 +15,7 @@ public class ProbateTableCreator {
 	/**
 	 *
 	 */
+	private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String CR1 = "CREATE TABLE INDIVIDUAL ( ID CHAR(8) NOT NULL, NAME CHAR(100), FONKOD CHAR(50), EVENT_ID CHAR(8), SOURCE CHAR(100) NOT NULL )";
 	private static final String CR2 = "CREATE TABLE EVENT ( ID CHAR(8) NOT NULL, FROMDATE DATE, TODATE DATE, PLACE CHAR(50), EVENTTYPE CHAR(30), VITALTYPE CHAR(30), COVERED_DATA VARCHAR(3600), SOURCE CHAR(100) NOT NULL, CAPTION CHAR(50) )";
@@ -25,7 +26,7 @@ public class ProbateTableCreator {
 	private static final String CR7 = "CREATE UNIQUE INDEX SQL111222132041940 ON EVENT (ID ASC, SOURCE ASC)";
 	private static final String CR8 = "CREATE INDEX IX4 ON EVENT (PLACE ASC)";
 	private static final String CR9 = "CREATE UNIQUE INDEX SQL111222132042200 ON INDIVIDUAL (ID ASC, SOURCE ASC)";
-	private static final String CRA = "ALTER TABLE EVENT ADD CONSTRAINT SQL111222132041940 <PRIMARY KEY ( ID, SOURCE)";
+	private static final String CRA = "ALTER TABLE EVENT ADD CONSTRAINT SQL111222132041940 PRIMARY KEY ( ID, SOURCE)";
 	private static final String CRB = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT SQL111222132042200 PRIMARY KEY ( ID, SOURCE)";
 	private static final String CRC = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT SQL111222132042201 FOREIGN KEY (EVENT_ID, SOURCE) REFERENCES EVENT (ID, SOURCE)";
 
@@ -33,7 +34,9 @@ public class ProbateTableCreator {
 		try {
 			final Connection conn = DriverManager
 					.getConnection("jdbc:derby:" + props.getProperty("probatePath") + ";create=true");
-			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("probateSchema"));
+			statement.execute();
+			statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("probateSchema"));
 			statement.execute();
 			statement = conn.prepareStatement(CR1);

@@ -15,6 +15,7 @@ public class CphTableCreator {
 	/**
 	 *
 	 */
+	private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
 	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	private static final String CRA = "CREATE TABLE BURIAL_PERSON_COMPLETE ( ID INTEGER NOT NULL, NUMBER INTEGER DEFAULT NULL, "
 			+ "FIRSTNAMES CHAR(100) DEFAULT 'NULL', LASTNAME CHAR(100) DEFAULT 'NULL', BIRTHNAME CHAR(100) DEFAULT 'NULL', "
@@ -34,7 +35,7 @@ public class CphTableCreator {
 			+ "ISCO_MAJOR_GROUP CHAR(5) DEFAULT 'NULL', ISCO_SUBMAJOR_GROUP CHAR(5) DEFAULT 'NULL', "
 			+ "ISCO_MINOR_GROUP CHAR(5) DEFAULT 'NULL', ISCO_UNIT CHAR(5) DEFAULT 'NULL' )";
 	private static final String CRC = "CREATE TABLE POLICE_PERSON ( ID INTEGER NOT NULL, FIRSTNAMES CHAR(80) DEFAULT 'NULL', "
-			+ "LASTNAME CHAR(50) DEFAULT 'NULL', MAIDENNAME CHAR(50) DEFAULT 'NULL', MARRIED null, TYPE CHAR(6) DEFAULT 'NULL', "
+			+ "LASTNAME CHAR(50) DEFAULT 'NULL', MAIDENNAME CHAR(50) DEFAULT 'NULL', MARRIED BOOLEAN DEFAULT NULL, TYPE CHAR(6) DEFAULT 'NULL', "
 			+ "GENDER INTEGER DEFAULT NULL, BIRTHPLACE CHAR(100) DEFAULT 'NULL', BIRTHDAY INTEGER DEFAULT NULL, "
 			+ "BIRTHMONTH INTEGER DEFAULT NULL, BIRTHYEAR INTEGER DEFAULT NULL, DEATHDAY INTEGER DEFAULT NULL, "
 			+ "DEATHMONTH INTEGER DEFAULT NULL, DEATHYEAR INTEGER DEFAULT NULL, PHONNAME CHAR(64) DEFAULT 'NULL' )";
@@ -55,7 +56,7 @@ public class CphTableCreator {
 	private static final String CRN = "ALTER TABLE POLICE_POSITION ADD CONSTRAINT SQL230129182253090 PRIMARY KEY (ID)";
 	private static final String CRO = "ALTER TABLE POLICE_PERSON ADD CONSTRAINT SQL230129182252820 PRIMARY KEY (ID)";
 	private static final String CRP = "ALTER TABLE POLICE_POSITION ADD CONSTRAINT POLICE_P_POLICE_FK FOREIGN KEY (PERSON_ID) REFERENCES POLICE_PERSON (ID) ON DELETE CASCADE";
-	private static final String CRQ = "ALTER TABLE POLICE_ADDRESS ADD CONSTRAINT POLICE__POLICE_FK FOREIGN KEY (PERSON_ID) REFERENCES POLICE_PERSON (ID) ON DELETE CASCADE";
+//	private static final String CRQ = "ALTER TABLE POLICE_ADDRESS ADD CONSTRAINT POLICE__POLICE_FK FOREIGN KEY (PERSON_ID) REFERENCES POLICE_PERSON (ID) ON DELETE CASCADE";
 	private static final String CRR = "CREATE INDEX BURIAL_PHON_IX ON BURIAL_PERSON_COMPLETE (PHONNAME ASC)";
 	private static final String CRS = "CREATE INDEX POLICE_PHON_IX ON POLICE_PERSON (PHONNAME ASC)";
 
@@ -63,7 +64,9 @@ public class CphTableCreator {
 		try {
 			final Connection conn = DriverManager
 					.getConnection("jdbc:derby:" + props.getProperty("cphDbPath") + ";create=true");
-			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("cphSchema"));
+			statement.execute();
+			statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("cphSchema"));
 			statement.execute();
 			statement = conn.prepareStatement(CRA);
@@ -98,8 +101,8 @@ public class CphTableCreator {
 			statement.execute();
 			statement = conn.prepareStatement(CRP);
 			statement.execute();
-			statement = conn.prepareStatement(CRQ);
-			statement.execute();
+//			statement = conn.prepareStatement(CRQ);
+//			statement.execute();
 			statement = conn.prepareStatement(CRR);
 			statement.execute();
 			statement = conn.prepareStatement(CRS);

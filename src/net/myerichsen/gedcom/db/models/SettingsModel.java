@@ -8,7 +8,7 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class SettingsModel {
@@ -439,7 +439,7 @@ public class SettingsModel {
 	/**
 	 * @param props
 	 */
-	public void storeProperties(Properties props) {
+	public String storeProperties(Properties props) {
 		props.setProperty("burialPersonComplete", burialPersonComplete);
 		props.setProperty("burregSearch", burregSearch);
 		props.setProperty("censusCsvFileDirectory", censusCsvFileDirectory);
@@ -464,15 +464,16 @@ public class SettingsModel {
 		props.setProperty("siblingSearch", siblingSearch);
 		props.setProperty("vejbyPath", vejbyPath);
 		props.setProperty("vejbySchema", vejbySchema);
+		props.setProperty("msgLogLen", msgLogLen);
 
 		final String path = System.getProperty("user.home") + "/ArchiveSearcher.properties";
 
 		try {
 			final OutputStream output = new FileOutputStream(path);
 			props.store(output, "Archive searcher properties");
+			return "Indstillinger er gemt i " + path;
 		} catch (final Exception e2) {
-			System.out.println("Kan ikke gemme egenskaber i " + path);
-			e2.printStackTrace();
+			return "Kan ikke gemme indstillinger i " + path;
 		}
 	}
 

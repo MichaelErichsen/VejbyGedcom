@@ -17,10 +17,8 @@ public class GedcomTableCreator {
 	/**
 	 *
 	 */
+	private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
 	private static final String SET_SCHEMA2 = "SET SCHEMA = ?";
-	/**
-	 *
-	 */
 	private static final String SET_SCHEMA = SET_SCHEMA2;
 	private static String TABLE_EVENT = "CREATE TABLE EVENT ("
 			+ " ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY, TYPE CHAR(12),"
@@ -33,14 +31,13 @@ public class GedcomTableCreator {
 	private static String TABLE_PARENTS = "CREATE TABLE PARENTS ( INDIVIDUALKEY CHAR(12) NOT NULL, "
 			+ " BIRTHYEAR INT, NAME VARCHAR(128), PARENTS VARCHAR(256), "
 			+ " FATHERPHONETIC CHAR(64), MOTHERPHONETIC CHAR(64), PLACE VARCHAR(256) )";
-
+	private static String TABLE_FAMILY = "CREATE TABLE FAMILY ( ID CHAR(12) PRIMARY KEY NOT NULL, HUSBAND CHAR(12), WIFE CHAR(12) )";
 	private static final String CRA = "CREATE INDEX EVENT_TYPE ON EVENT (TYPE ASC)";
 	private static final String CRB = "CREATE INDEX EVENT_SUBTYPE ON EVENT (SUBTYPE ASC)";
 	private static final String CRC = "CREATE INDEX IND_PHONNAME ON INDIVIDUAL (PHONNAME ASC)";
 	private static final String CRD = "CREATE INDEX SQL230124103427890 ON INDIVIDUAL (FAMC ASC)";
 	private static final String CRE = "CREATE UNIQUE INDEX SQL230124103427450 ON EVENT (ID ASC)";
 	private static final String CRF = "CREATE UNIQUE INDEX SQL230124103426740 ON INDIVIDUAL (ID ASC)";
-	private static final String CRG = "CREATE UNIQUE INDEX CENSUS_UI ON CENSUS (KIPNR ASC, LOEBENR ASC)";
 	private static final String CRH = "CREATE UNIQUE INDEX SQL230124103427660 ON FAMILY (ID ASC)";
 	private static final String CRI = "CREATE INDEX SQL230124103428330 ON EVENT (INDIVIDUAL ASC)";
 	private static final String CRJ = "CREATE INDEX SQL230124103429560 ON FAMILY (HUSBAND ASC)";
@@ -48,7 +45,7 @@ public class GedcomTableCreator {
 	private static final String CRL = "CREATE INDEX SQL230124103428540 ON FAMILY (WIFE ASC)";
 	private static final String CRM = "ALTER TABLE EVENT ADD CONSTRAINT Event_PK PRIMARY KEY (ID)";
 	private static final String CRN = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT Individual_PK PRIMARY KEY (ID)";
-	private static final String CRO = "ALTER TABLE FAMILY ADD CONSTRAINT Family_PK PRIMARY KEY (ID)";
+//	private static final String CRO = "ALTER TABLE FAMILY ADD CONSTRAINT Family_PK PRIMARY KEY (ID)";
 	private static final String CRP = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F1 FOREIGN KEY (HUSBAND) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
 	private static final String CRQ = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT INDIVIDUA_FAMIL_FK FOREIGN KEY (FAMC) REFERENCES FAMILY (ID) ON DELETE CASCADE";
 	private static final String CRR = "ALTER TABLE EVENT ADD CONSTRAINT EVEN_INDIVIDUA_FK FOREIGN KEY (INDIVIDUAL) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
@@ -58,7 +55,9 @@ public class GedcomTableCreator {
 		try {
 			final Connection conn = DriverManager
 					.getConnection("jdbc:derby:" + props.getProperty("vejbyPath") + ";create=true");
-			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("vejbySchema"));
+			statement.execute();
+			statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("vejbySchema"));
 			statement.execute();
 			statement = conn.prepareStatement(TABLE_EVENT);
@@ -66,6 +65,8 @@ public class GedcomTableCreator {
 			statement = conn.prepareStatement(TABLE_INDIVIDUAL);
 			statement.execute();
 			statement = conn.prepareStatement(TABLE_PARENTS);
+			statement.execute();
+			statement = conn.prepareStatement(TABLE_FAMILY);
 			statement.execute();
 			statement = conn.prepareStatement(CRA);
 			statement.execute();
@@ -78,8 +79,6 @@ public class GedcomTableCreator {
 			statement = conn.prepareStatement(CRE);
 			statement.execute();
 			statement = conn.prepareStatement(CRF);
-			statement.execute();
-			statement = conn.prepareStatement(CRG);
 			statement.execute();
 			statement = conn.prepareStatement(CRH);
 			statement.execute();
@@ -94,8 +93,6 @@ public class GedcomTableCreator {
 			statement = conn.prepareStatement(CRM);
 			statement.execute();
 			statement = conn.prepareStatement(CRN);
-			statement.execute();
-			statement = conn.prepareStatement(CRO);
 			statement.execute();
 			statement = conn.prepareStatement(CRP);
 			statement.execute();

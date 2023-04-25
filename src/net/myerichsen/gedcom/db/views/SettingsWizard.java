@@ -10,16 +10,18 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
  * Settings wizard
  *
  * @author Michael Erichsen
- * @version 10. apr. 2023
+ * @version 25. apr. 2023
  *
  */
 public class SettingsWizard extends Wizard {
 	private final Properties props;
 	private SettingsModel settings;
+	private ArchiveSearcher as;
 
-	public SettingsWizard(Properties props) {
+	public SettingsWizard(Properties props, ArchiveSearcher as) {
 		setWindowTitle("Indstillinger");
 		this.props = props;
+		this.as = as;
 		settings = new SettingsModel(props);
 	}
 
@@ -40,7 +42,8 @@ public class SettingsWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		settings.storeProperties(props);
+		String string = settings.storeProperties(props);
+		as.setMessage(string);
 		return true;
 	}
 

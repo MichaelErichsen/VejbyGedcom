@@ -4,7 +4,7 @@ package net.myerichsen.gedcom.db.loaders;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 11. apr. feb. 2023
+ * @version 11. apr. 2023
  *
  */
 public class LoadPolicePerson extends LoadCphArch {

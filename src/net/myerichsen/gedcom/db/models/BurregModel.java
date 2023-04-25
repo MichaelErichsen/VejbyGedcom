@@ -86,7 +86,7 @@ public class BurregModel extends ASModel {
 			br.setInstitutionStreet(rs.getString("INSTITUTION_STREET"));
 			br.setInstitutionHood(rs.getString("INSTITUTION_HOOD"));
 			br.setInstitutionStreetNumber(rs.getString("INSTITUTION_STREET_NUMBER"));
-			br.setOccuptations(rs.getString("OCCUPTATIONS"));
+			br.setOccuptations(rs.getString("OCCUPATIONS"));
 			br.setOccupationRelationTypes(rs.getString("OCCUPATION_RELATION_TYPES"));
 			br.setDeathCauses(rs.getString("DEATHCAUSES"));
 			br.setDeathCausesDanish(rs.getString("DEATHCAUSES_DANISH"));

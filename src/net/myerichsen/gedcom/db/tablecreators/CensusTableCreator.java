@@ -15,6 +15,7 @@ public class CensusTableCreator {
 	/**
 	 *
 	 */
+	private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
 	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	private static final String TABLE_CENSUS = "CREATE TABLE CENSUS ( KIPNR CHAR(8) NOT NULL,"
 			+ " LOEBENR INTEGER NOT NULL, AMT VARCHAR(256), HERRED VARCHAR(256),"
@@ -36,7 +37,9 @@ public class CensusTableCreator {
 		try {
 			final Connection conn = DriverManager
 					.getConnection("jdbc:derby:" + props.getProperty("censusPath") + ";create=true");
-			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("censusSchema"));
+			statement.execute();
+			statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("censusSchema"));
 			statement.execute();
 			statement = conn.prepareStatement(TABLE_CENSUS);

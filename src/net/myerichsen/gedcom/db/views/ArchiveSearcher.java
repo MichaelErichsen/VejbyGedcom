@@ -64,12 +64,6 @@ public class ArchiveSearcher extends Shell {
 	// public static boolean isAsciiPrintable(char ch) {
 	// return ch>=32&&ch<127;
 
-	/**
-	 * @author Michael Erichsen
-	 * @version 24. apr. 2023
-	 *
-	 */
-
 	private static Display display;
 
 	/**
@@ -213,12 +207,14 @@ public class ArchiveSearcher extends Shell {
 
 		switch (buttonID) {
 		case SWT.OK:
-			setMessage("Data hentes fra " + props.getProperty("cphDbPath") + " ind i tabellerne i "
-					+ props.getProperty("cphPath"));
+			setMessage("Data hentes fra " + props.getProperty("cphCsvFileDirectory") + "/"
+					+ props.getProperty("burialPersonComplete") + " ind i tabellerne i "
+					+ props.getProperty("cphDbPath"));
 
 			new Thread(() -> {
-				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath"),
-						props.getProperty("cphSchema") };
+				final String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"),
+						props.getProperty("cphDbPath"), props.getProperty("cphSchema"),
+						props.getProperty("burialPersonComplete") };
 				final String message = LoadBurialPersonComplete.loadCsvFiles(sa);
 
 				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
@@ -267,7 +263,7 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 *
+	 * Create the menu bar
 	 */
 	private void createMenuBar() {
 		final Menu menu = new Menu(this, SWT.BAR);
@@ -282,7 +278,10 @@ public class ArchiveSearcher extends Shell {
 		mntmIndstillinger.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				final SettingsWizard settingsWizard = new SettingsWizard(props);
+				MenuItem mi = (MenuItem) e.getSource();
+				Menu m = mi.getParent();
+				ArchiveSearcher as = (ArchiveSearcher) m.getParent();
+				final SettingsWizard settingsWizard = new SettingsWizard(props, as);
 				final WizardDialog wizardDialog = new WizardDialog(shell, settingsWizard);
 				wizardDialog.setBlockOnOpen(true);
 				wizardDialog.open();
@@ -636,17 +635,22 @@ public class ArchiveSearcher extends Shell {
 
 		switch (buttonID) {
 		case SWT.OK:
-			setMessage("Data hentes fra " + props.getProperty("cphDbPath") + " ind i tabellerne i "
-					+ props.getProperty("cphPath"));
+			setMessage("Data hentes fra " + props.getProperty("cphCsvFileDirectory") + " ind i tabellerne i "
+					+ props.getProperty("cphDbPath"));
 
 			new Thread(() -> {
-				final String[] sa = new String[] { props.getProperty("cphDbPath"), props.getProperty("cphPath"),
-						props.getProperty("cphSchema") };
+				String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+						props.getProperty("cphSchema"), props.getProperty("policeAddress") };
 				final String message1 = LoadPoliceAddress.loadCsvFiles(sa);
 				messageComboBox.getDisplay().asyncExec(() -> setMessage(message1));
 
+				sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+						props.getProperty("cphSchema"), props.getProperty("policePosition") };
 				final String message2 = LoadPolicePosition.loadCsvFiles(sa);
 				messageComboBox.getDisplay().asyncExec(() -> setMessage(message2));
+
+				sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+						props.getProperty("cphSchema"), props.getProperty("policePerson") };
 				final String message3 = LoadPolicePerson.loadCsvFiles(sa);
 				messageComboBox.getDisplay().asyncExec(() -> setMessage(message3));
 
