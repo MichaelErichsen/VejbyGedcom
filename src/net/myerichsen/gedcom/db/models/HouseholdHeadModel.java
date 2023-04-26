@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * Class representing a HouseholdHead relocation event
  *
  * @author Michael Erichsen
- * @version 23. apr. 2023
+ * @version 26. apr. 2023
  */
 
 /*
@@ -85,15 +85,20 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	private static List<HouseholdHeadModel> getCensusEvents(String vejbySchema, String vejbyDbPath, String censusSchema,
 			String censusDbPath, String headId) throws Exception {
 
-		Connection conn = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, vejbySchema);
-		statement.execute();
+		Connection connV = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
+		PreparedStatement statementV = connV.prepareStatement(SET_SCHEMA);
+		statementV.setString(1, vejbySchema);
+		statementV.execute();
+
+		Connection connC = DriverManager.getConnection("jdbc:derby:" + censusDbPath);
+		PreparedStatement statementC = connC.prepareStatement(SET_SCHEMA);
+		statementC.setString(1, censusSchema);
+		statementC.execute();
 
 		// Get a list of census events for this individual
-		statement = conn.prepareStatement(SELECT_1);
-		statement.setString(1, headId);
-		ResultSet rs = statement.executeQuery();
+		statementV = connV.prepareStatement(SELECT_1);
+		statementV.setString(1, headId);
+		ResultSet rs = statementV.executeQuery();
 
 		HouseholdHeadModel hhm0, hhm1, hhm2;
 		final List<HouseholdHeadModel> lhhm0 = new ArrayList<>();
@@ -117,11 +122,11 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 			lhhm0.add(hhm0);
 		}
 
-		statement = conn.prepareStatement(SELECT_6);
+		statementV = connV.prepareStatement(SELECT_6);
 
 		for (final HouseholdHeadModel hhm : lhhm0) {
-			statement.setString(1, headId);
-			rs = statement.executeQuery();
+			statementV.setString(1, headId);
+			rs = statementV.executeQuery();
 
 			if (rs.next()) {
 				hhm.setHeadName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
@@ -141,8 +146,8 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 				witnesses = hhm.getSourceDetail().split(" ");
 
 				for (final String id : witnesses) {
-					statement.setString(1, id);
-					rs = statement.executeQuery();
+					statementV.setString(1, id);
+					rs = statementV.executeQuery();
 
 					if (rs.next()) {
 						hhm2 = (HouseholdHeadModel) hhm.clone();
@@ -167,37 +172,32 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 				hhm.setKipNr(findParts[0]);
 				hhm.setLoebeNr(Integer.parseInt(findParts[1]));
 
-				conn = DriverManager.getConnection("jdbc:derby:" + censusDbPath);
-				statement = conn.prepareStatement(SET_SCHEMA);
-				statement.setString(1, censusSchema);
-				statement.execute();
-
-				statement = conn.prepareStatement(SELECT_2);
-				statement.setString(1, hhm.getKipNr());
-				statement.setInt(2, hhm.getLoebeNr());
-				rs = statement.executeQuery();
+				statementC = connC.prepareStatement(SELECT_2);
+				statementC.setString(1, hhm.getKipNr());
+				statementC.setInt(2, hhm.getLoebeNr());
+				rs = statementC.executeQuery();
 
 				if (rs.next()) {
 					hhm.setKildestednavn(rs.getString("KILDESTEDNAVN"));
 					hhm.setHusstandsFamilieNr(rs.getString("HUSSTANDS_FAMILIENR"));
 				}
 
-				statement = conn.prepareStatement(SELECT_3);
-				statement.setString(1, hhm.getKipNr());
-				statement.setString(2, hhm.getKildestednavn());
-				statement.setString(3, hhm.getHusstandsFamilieNr());
-				rs = statement.executeQuery();
+				statementC = connC.prepareStatement(SELECT_3);
+				statementC.setString(1, hhm.getKipNr());
+				statementC.setString(2, hhm.getKildestednavn());
+				statementC.setString(3, hhm.getHusstandsFamilieNr());
+				rs = statementC.executeQuery();
 
 				if (!rs.next() || rs.getInt("MINLNR") != hhm.getLoebeNr()) {
 					continue ltrLoop;
 				}
 
-				statement = conn.prepareStatement(SELECT_4);
-				statement.setString(1, hhm.getKipNr());
-				statement.setString(2, hhm.getKildestednavn());
-				statement.setString(3, hhm.getHusstandsFamilieNr());
-				statement.setInt(4, hhm.getLoebeNr());
-				rs = statement.executeQuery();
+				statementC = connC.prepareStatement(SELECT_4);
+				statementC.setString(1, hhm.getKipNr());
+				statementC.setString(2, hhm.getKildestednavn());
+				statementC.setString(3, hhm.getHusstandsFamilieNr());
+				statementC.setInt(4, hhm.getLoebeNr());
+				rs = statementC.executeQuery();
 
 				while (rs.next()) {
 					hhm1 = (HouseholdHeadModel) hhm.clone();

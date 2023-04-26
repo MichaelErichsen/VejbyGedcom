@@ -77,7 +77,11 @@ public class ProbateView extends Composite {
 		txtProbatePlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtProbatePlace.getText().length() > 0) {
+					txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				ProbatePlaceFilter.getInstance().setSearchText(txtProbatePlace.getText());
 				probateTableViewer.refresh();
 			}
@@ -90,7 +94,11 @@ public class ProbateView extends Composite {
 		txtProbateSource.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtProbateSource.getText().length() > 0) {
+					txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				ProbateSourceFilter.getInstance().setSearchText(txtProbateSource.getText());
 				probateTableViewer.refresh();
 			}

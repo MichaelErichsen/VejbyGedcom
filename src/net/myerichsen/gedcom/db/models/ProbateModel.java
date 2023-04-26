@@ -51,9 +51,12 @@ public class ProbateModel extends ASModel {
 		if (m.find()) {
 			String group = m.group(0);
 			int year = Integer.parseInt(group);
-			year = year += 5;
-			String newYear = Integer.toString(year);
-			deathDate = deathDate.replace(group, newYear);
+
+			if (year < 9000) {
+				year = year += 5;
+				String newYear = Integer.toString(year);
+				deathDate = deathDate.replace(group, newYear);
+			}
 		}
 
 		statement = conn.prepareStatement(SELECT);

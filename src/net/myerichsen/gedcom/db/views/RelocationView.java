@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -78,7 +78,11 @@ public class RelocationView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtRelocationGiven.getText().length() > 0) {
+					txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				RelocationGivenFilter.getInstance().setSearchText(txtRelocationGiven.getText());
 				relocationTableViewer.refresh();
 			}
@@ -92,7 +96,11 @@ public class RelocationView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtRelocationSurname.getText().length() > 0) {
+					txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				RelocationSurnameFilter.getInstance().setSearchText(txtRelocationSurname.getText());
 				relocationTableViewer.refresh();
 			}

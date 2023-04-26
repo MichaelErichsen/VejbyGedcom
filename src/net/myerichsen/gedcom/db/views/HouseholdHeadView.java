@@ -37,7 +37,7 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 23. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -76,7 +76,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtHouseholdPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtHouseholdPlace.getText().length() > 0) {
+					txtHouseholdPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtHouseholdPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				HouseholdHeadPlaceFilter.getInstance().setSearchText(txtHouseholdPlace.getText());
 				householdHeadTableViewer.refresh();
 			}
@@ -90,7 +94,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtHouseholdRelocatorName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtHouseholdRelocatorName.getText().length() > 0) {
+					txtHouseholdRelocatorName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtHouseholdRelocatorName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				HouseholdHeadNameFilter.getInstance().setSearchText(txtHouseholdRelocatorName.getText());
 				householdHeadTableViewer.refresh();
 			}
@@ -103,7 +111,11 @@ public class HouseholdHeadView extends Composite {
 		txtHouseholdEventType.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				txtHouseholdEventType.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtHouseholdEventType.getText().length() > 0) {
+					txtHouseholdEventType.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtHouseholdEventType.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				HouseholdHeadTypeFilter.getInstance().setSearchText(txtHouseholdEventType.getText());
 				householdHeadTableViewer.refresh();
 

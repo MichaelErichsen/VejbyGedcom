@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class PolregView extends Composite {
@@ -79,7 +79,11 @@ public class PolregView extends Composite {
 		txtPolregName.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtPolregName.getText().length() > 0) {
+					txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				PolregAddressFilter.getInstance().setSearchText(txtPolregName.getText());
 				polregTableViewer.refresh();
 			}
@@ -92,7 +96,11 @@ public class PolregView extends Composite {
 		txtPolregAddress.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtPolregAddress.getText().length() > 0) {
+					txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				PolregAddressFilter.getInstance().setSearchText(txtPolregAddress.getText());
 				polregTableViewer.refresh();
 			}
@@ -105,7 +113,11 @@ public class PolregView extends Composite {
 		txtPolregBirthDate.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtPolregBirthDate.getText().length() > 0) {
+					txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				PolregBirthdateFilter.getInstance().setSearchText(txtPolregBirthDate.getText());
 				polregTableViewer.refresh();
 			}

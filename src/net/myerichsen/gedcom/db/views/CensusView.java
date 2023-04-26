@@ -53,7 +53,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 25. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -92,6 +92,18 @@ public class CensusView extends Composite {
 		aLabel.setText("Filtre: \u00C5r");
 
 		txtCensusYear = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusYear.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (txtCensusYear.getText().length() > 0) {
+					txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
+				CensusYearFilter.getInstance().setSearchText(txtCensusYear.getText());
+				censusTableViewer.refresh();
+			}
+		});
 
 		final Label lblAmt = new Label(censusFilterComposite, SWT.NONE);
 		lblAmt.setText("Amt");
@@ -101,7 +113,11 @@ public class CensusView extends Composite {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusCounty.getText().length() > 0) {
+					txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusCountyFilter.getInstance().setSearchText(txtCensusCounty.getText());
 				censusTableViewer.refresh();
 			}
@@ -114,7 +130,11 @@ public class CensusView extends Composite {
 		txtCensusParish.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusParish.getText().length() > 0) {
+					txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusParishFilter.getInstance().setSearchText(txtCensusParish.getText());
 				censusTableViewer.refresh();
 			}
@@ -127,7 +147,11 @@ public class CensusView extends Composite {
 		txtCensusName.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusName.getText().length() > 0) {
+					txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusNameFilter.getInstance().setSearchText(txtCensusName.getText());
 				censusTableViewer.refresh();
 			}
@@ -140,7 +164,11 @@ public class CensusView extends Composite {
 		txtCensusSex.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusSex.getText().length() > 0) {
+					txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusSexFilter.getInstance().setSearchText(txtCensusSex.getText());
 				censusTableViewer.refresh();
 			}
@@ -153,7 +181,11 @@ public class CensusView extends Composite {
 		txtCensusAge.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusAge.getText().length() > 0) {
+					txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusAgeFilter.getInstance().setSearchText(txtCensusAge.getText());
 				censusTableViewer.refresh();
 			}
@@ -166,7 +198,11 @@ public class CensusView extends Composite {
 		txtCensusBirthPlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusBirthPlace.getText().length() > 0) {
+					txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusBirthPlaceFilter.getInstance().setSearchText(txtCensusBirthPlace.getText());
 				censusTableViewer.refresh();
 			}
@@ -179,7 +215,11 @@ public class CensusView extends Composite {
 		txtCensusBirthDate.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtCensusBirthDate.getText().length() > 0) {
+					txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				CensusBirthDateFilter.getInstance().setSearchText(txtCensusBirthDate.getText());
 				censusTableViewer.refresh();
 			}
@@ -511,15 +551,6 @@ public class CensusView extends Composite {
 			public String getText(Object element) {
 				final CensusModel cr = (CensusModel) element;
 				return cr.getKildedetaljer();
-			}
-		});
-
-		txtCensusYear.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
-				CensusYearFilter.getInstance().setSearchText(txtCensusYear.getText());
-				censusTableViewer.refresh();
 			}
 		});
 

@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -81,7 +81,11 @@ public class BurregView extends Composite {
 		txtBurregGiven.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtBurregGiven.getText().length() > 0) {
+					txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtBurregGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				BurregGivenFilter.getInstance().setSearchText(txtBurregGiven.getText());
 				burregTableViewer.refresh();
 			}
@@ -94,7 +98,11 @@ public class BurregView extends Composite {
 		txtBurregSurname.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtBurregSurname.getText().length() > 0) {
+					txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtBurregSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				BurregSurnameFilter.getInstance().setSearchText(txtBurregSurname.getText());
 				burregTableViewer.refresh();
 			}
@@ -107,7 +115,11 @@ public class BurregView extends Composite {
 		txtBurregBirthYear.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtBurregBirthYear.getText().length() > 0) {
+					txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtBurregBirthYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				BurregBirthDateFilter.getInstance().setSearchText(txtBurregBirthYear.getText());
 				burregTableViewer.refresh();
 			}

@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -78,7 +78,11 @@ public class SiblingsView extends Composite {
 		txtSiblingsPlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtSiblingsPlace.getText().length() > 0) {
+					txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				SiblingsPlaceFilter.getInstance().setSearchText(txtSiblingsPlace.getText());
 				siblingsTableViewer.refresh();
 			}
@@ -91,7 +95,11 @@ public class SiblingsView extends Composite {
 		txtSiblingsParents.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (txtSiblingsParents.getText().length() > 0) {
+					txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				} else {
+					txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				}
 				SiblingsParentsFilter.getInstance().setSearchText(txtSiblingsParents.getText());
 				siblingsTableViewer.refresh();
 			}
