@@ -7,12 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class ProbateModel extends ASModel {
@@ -20,12 +22,20 @@ public class ProbateModel extends ASModel {
 	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String SELECT_PROBATE = "SELECT * FROM EVENT "
-			+ "JOIN INDIVIDUAL ON EVENT.ID = INDIVIDUAL.EVENT_ID "
+	private static final String SELECT = "SELECT * FROM EVENT " + "JOIN INDIVIDUAL ON EVENT.ID = INDIVIDUAL.EVENT_ID "
 			+ "WHERE INDIVIDUAL.FONKOD = ? AND EVENT.FROMDATE >= ? AND TODATE <= ?";
 
-	public static ProbateModel[] load(String schema, String dbPath, String phonName, String birthDate, String deathDate,
-			String probateSource) throws SQLException {
+	/**
+	 * @param schema
+	 * @param dbPath
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @return
+	 * @throws SQLException
+	 */
+	public static ProbateModel[] load(String schema, String dbPath, String phonName, String birthDate, String deathDate)
+			throws SQLException {
 		ProbateModel probateRecord;
 		final List<ProbateModel> lp = new ArrayList<>();
 
@@ -33,7 +43,20 @@ public class ProbateModel extends ASModel {
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
-		statement = conn.prepareStatement(SELECT_PROBATE);
+
+		// Add five years to death date as limit for probate date
+		Pattern p = Pattern.compile("\\d{4}");
+		Matcher m = p.matcher(deathDate);
+
+		if (m.find()) {
+			String group = m.group(0);
+			int year = Integer.parseInt(group);
+			year = year += 5;
+			String newYear = Integer.toString(year);
+			deathDate = deathDate.replace(group, newYear);
+		}
+
+		statement = conn.prepareStatement(SELECT);
 		statement.setString(1, phonName);
 		statement.setString(2, birthDate);
 		statement.setString(3, deathDate);
@@ -51,7 +74,7 @@ public class ProbateModel extends ASModel {
 			source = rs.getString("SOURCE");
 			probateRecord.setSource(source);
 
-			if (source.contains(probateSource) && data.contains(name)) {
+			if (data.contains(name)) {
 				probateRecord.setFromDate(rs.getString("FROMDATE").trim());
 				probateRecord.setToDate(rs.getString("TODATE").trim());
 				probateRecord.setPlace(rs.getString("PLACE").trim());

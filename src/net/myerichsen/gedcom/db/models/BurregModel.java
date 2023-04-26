@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class BurregModel extends ASModel {
@@ -22,7 +22,7 @@ public class BurregModel extends ASModel {
 	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String SELECT_BURIAL_PERSON = "SELECT * FROM BURIAL_PERSON_COMPLETE "
+	private static final String SELECT = "SELECT * FROM BURIAL_PERSON_COMPLETE "
 			+ "WHERE CPH.BURIAL_PERSON_COMPLETE.PHONNAME = ?";
 
 	/**
@@ -42,7 +42,7 @@ public class BurregModel extends ASModel {
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
-		statement = conn.prepareStatement(SELECT_BURIAL_PERSON);
+		statement = conn.prepareStatement(SELECT);
 		statement.setString(1, phonName);
 		final ResultSet rs = statement.executeQuery();
 

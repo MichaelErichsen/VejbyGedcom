@@ -13,7 +13,7 @@ import java.util.Properties;
  * Class representing a census household
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
@@ -23,7 +23,6 @@ public class CensusHousehold extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "
 			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
-	private final static String SELECT_SCHEMA = SET_SCHEMA;
 	private final static String SELECT_HOUSEHOLD_HEAD_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
 	private final static String SELECT_HOUSEHOLD_HEAD_2 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
 			+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
@@ -39,7 +38,7 @@ public class CensusHousehold extends ASModel {
 
 		final Connection conn1 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("censusPath"));
 		final Connection conn2 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-		PreparedStatement statement1 = conn1.prepareStatement(SELECT_SCHEMA);
+		PreparedStatement statement1 = conn1.prepareStatement(SET_SCHEMA);
 		statement1.setString(1, props.getProperty("censusSchema"));
 		statement1.execute();
 
@@ -76,7 +75,7 @@ public class CensusHousehold extends ASModel {
 				ftDate = year + "-02-01";
 			}
 
-			statement2 = conn2.prepareStatement(SELECT_SCHEMA);
+			statement2 = conn2.prepareStatement(SET_SCHEMA);
 			statement2.setString(1, props.getProperty("vejbySchema"));
 			statement2.execute();
 			statement2 = conn2.prepareStatement(SELECT_HOUSEHOLD_HEAD_2);

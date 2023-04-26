@@ -16,7 +16,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class CensusModel extends ASModel {
@@ -34,8 +34,7 @@ public class CensusModel extends ASModel {
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "
 			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
 			+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String SELECT_CENSUS = "SELECT * FROM CENSUS WHERE FONNAVN = ? "
-			+ "AND FTAAR >= ? AND FTAAR <= ?";
+	private static final String SELECT = "SELECT * FROM CENSUS WHERE FONNAVN = ? " + "AND FTAAR >= ? AND FTAAR <= ?";
 
 	/**
 	 * Get a list of census records from the Derby table
@@ -53,7 +52,7 @@ public class CensusModel extends ASModel {
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
-		statement = conn.prepareStatement(SELECT_CENSUS);
+		statement = conn.prepareStatement(SELECT);
 		statement.setString(1, phonName);
 		statement.setString(2, birthYear);
 		statement.setString(3, deathYear);

@@ -8,7 +8,7 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 25. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class SettingsModel {
@@ -31,7 +31,6 @@ public class SettingsModel {
 	private String probatePath;
 	private String probateSchema;
 	private String probateSearch;
-	private String probateSource;
 	private String relocationSearch;
 	private String siblingSearch;
 	private String vejbyPath;
@@ -63,7 +62,6 @@ public class SettingsModel {
 		probatePath = props.getProperty("probatePath");
 		probateSchema = props.getProperty("probateSchema");
 		probateSearch = props.getProperty("probateSearch");
-		probateSource = props.getProperty("probateSource");
 		relocationSearch = props.getProperty("relocationSearch");
 		siblingSearch = props.getProperty("siblingSearch");
 		vejbyPath = props.getProperty("vejbyPath");
@@ -216,13 +214,6 @@ public class SettingsModel {
 	 */
 	public String getProbateSearch() {
 		return probateSearch;
-	}
-
-	/**
-	 * @return the probateSource
-	 */
-	public String getProbateSource() {
-		return probateSource;
 	}
 
 	/**
@@ -402,13 +393,6 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @param probateSource the probateSource to set
-	 */
-	public void setProbateSource(String probateSource) {
-		this.probateSource = probateSource;
-	}
-
-	/**
 	 * @param relocationSearch the relocationSearch to set
 	 */
 	public void setRelocationSearch(String relocationSearch) {
@@ -459,7 +443,6 @@ public class SettingsModel {
 		props.setProperty("probatePath", probatePath);
 		props.setProperty("probateSchema", probateSchema);
 		props.setProperty("probateSearch", probateSearch);
-		props.setProperty("probateSource", probateSource);
 		props.setProperty("relocationSearch", relocationSearch);
 		props.setProperty("siblingSearch", siblingSearch);
 		props.setProperty("vejbyPath", vejbyPath);

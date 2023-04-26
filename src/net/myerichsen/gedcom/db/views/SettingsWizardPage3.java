@@ -19,13 +19,12 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
  * Wizard page to handle census imports
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class SettingsWizardPage3 extends WizardPage {
 	private Text txtProbatePath;
 	private Text txtProbateSchema;
-	private Text txtProbateSource;
 
 	private SettingsModel settings;
 
@@ -51,8 +50,7 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtProbatePath.addModifyListener(e -> {
 			settings.setProbatePath(txtProbatePath.getText());
 
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getProbateSource().equals("")) {
+			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -86,8 +84,7 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtProbateSchema.addModifyListener(e -> {
 			settings.setProbateSchema(txtProbateSchema.getText());
 
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getProbateSource().equals("")) {
+			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -96,24 +93,6 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtProbateSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtProbateSchema.setText(settings.getProbateSchema());
 		new Label(container, SWT.NONE);
-
-		final Label lblSkiftekilde = new Label(container, SWT.NONE);
-		lblSkiftekilde.setText("Skiftekilde");
-
-		txtProbateSource = new Text(container, SWT.BORDER);
-		txtProbateSource.addModifyListener(e -> {
-			settings.setProbateSource(txtProbateSource.getText());
-
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getProbateSource().equals("")) {
-				setPageComplete(false);
-			} else {
-				setPageComplete(true);
-			}
-		});
-		txtProbateSource.setText(settings.getProbateSource());
-		txtProbateSource.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
 		new Label(container, SWT.NONE);
@@ -121,9 +100,6 @@ public class SettingsWizardPage3 extends WizardPage {
 		final Label lblDatabaseOgSchema = new Label(container, SWT.NONE);
 		lblDatabaseOgSchema.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
 		lblDatabaseOgSchema.setText("Database og schema beh\u00F8ver ikke at v\u00E6re forskellige");
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
-		new Label(container, SWT.NONE);
 
 		setControl(container);
 

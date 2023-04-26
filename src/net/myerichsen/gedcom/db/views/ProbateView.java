@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.filters.ProbatePlaceFilter;
+import net.myerichsen.gedcom.db.filters.ProbateSourceFilter;
 import net.myerichsen.gedcom.db.models.ProbateModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.ProbatePopulator;
@@ -41,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 26. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -51,6 +52,7 @@ public class ProbateView extends Composite {
 	private Properties props;
 	private Text txtProbatePlace;
 	private Thread thread;
+	private Text txtProbateSource;
 
 	/**
 	 * Create the composite.
@@ -81,6 +83,19 @@ public class ProbateView extends Composite {
 			}
 		});
 
+		Label lblKilde = new Label(ProbateFilterComposite, SWT.NONE);
+		lblKilde.setText("Kilde");
+
+		txtProbateSource = new Text(ProbateFilterComposite, SWT.BORDER);
+		txtProbateSource.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				ProbateSourceFilter.getInstance().setSearchText(txtProbateSource.getText());
+				probateTableViewer.refresh();
+			}
+		});
+
 		final Button btnRydFelterneProbate = new Button(ProbateFilterComposite, SWT.NONE);
 		btnRydFelterneProbate.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -104,8 +119,9 @@ public class ProbateView extends Composite {
 
 		probateTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		final ViewerFilter[] filters = new ViewerFilter[1];
+		final ViewerFilter[] filters = new ViewerFilter[2];
 		filters[0] = ProbatePlaceFilter.getInstance();
+		filters[1] = ProbateSourceFilter.getInstance();
 		probateTableViewer.setFilters(filters);
 
 		final TableViewerColumn Column_9 = new TableViewerColumn(probateTableViewer, SWT.NONE);
@@ -209,12 +225,15 @@ public class ProbateView extends Composite {
 	}
 
 	/**
-	 *
+	 * Clear filters
 	 */
 	private void clearFilters() {
 		ProbatePlaceFilter.getInstance().setSearchText("");
+		ProbateSourceFilter.getInstance().setSearchText("");
 		txtProbatePlace.setText("");
+		txtProbateSource.setText("");
 		txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		probateTableViewer.refresh();
 	}
 
@@ -231,8 +250,7 @@ public class ProbateView extends Composite {
 			if (probateListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
-							props.getProperty("probatePath"), phonName, birthDate, deathDate,
-							props.getProperty("probateSource") };
+							props.getProperty("probatePath"), phonName, birthDate, deathDate };
 					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
