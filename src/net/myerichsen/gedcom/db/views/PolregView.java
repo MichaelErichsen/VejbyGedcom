@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class PolregView extends Composite {
@@ -138,7 +138,8 @@ public class PolregView extends Composite {
 		polregScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		polregScroller.setSize(0, 0);
 
-		polregTableViewer = new TableViewer(polregScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		polregTableViewer = new TableViewer(polregScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		polregTableViewer.setUseHashlookup(true);
 		polregTable = polregTableViewer.getTable();
 		polregTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		final ViewerFilter[] filters = new ViewerFilter[2];

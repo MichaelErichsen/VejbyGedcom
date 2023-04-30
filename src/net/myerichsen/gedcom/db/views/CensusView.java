@@ -239,7 +239,8 @@ public class CensusView extends Composite {
 		censusScroller.setExpandHorizontal(true);
 		censusScroller.setExpandVertical(true);
 
-		censusTableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		censusTableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		censusTableViewer.setUseHashlookup(true);
 		censusTableViewer.addDoubleClickListener(event -> {
 			try {
 				censusPopup();

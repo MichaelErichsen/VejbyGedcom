@@ -28,7 +28,7 @@ import net.myerichsen.gedcom.db.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class DescendantCounterView extends Composite {
@@ -57,7 +57,8 @@ public class DescendantCounterView extends Composite {
 		descendantScroller.setExpandHorizontal(true);
 		descendantScroller.setExpandVertical(true);
 
-		descendantTableViewer = new TableViewer(descendantScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		descendantTableViewer = new TableViewer(descendantScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		descendantTableViewer.setUseHashlookup(true);
 		descendantTableViewer.setComparator(new DescendantComparator());
 		descendantTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 

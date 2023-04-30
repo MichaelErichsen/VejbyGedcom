@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -119,7 +119,8 @@ public class ProbateView extends Composite {
 		probateScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		probateScroller.setSize(0, 0);
 
-		probateTableViewer = new TableViewer(probateScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		probateTableViewer = new TableViewer(probateScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		probateTableViewer.setUseHashlookup(true);
 		probateTableViewer.addDoubleClickListener(event -> probatePopup(getDisplay()));
 		probateTable = probateTableViewer.getTable();
 		probateTable.setLinesVisible(true);

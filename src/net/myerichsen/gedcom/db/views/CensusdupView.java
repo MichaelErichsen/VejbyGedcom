@@ -35,7 +35,7 @@ import net.myerichsen.gedcom.db.populators.CensusdupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class CensusdupView extends Composite {
@@ -66,7 +66,8 @@ public class CensusdupView extends Composite {
 		censusdupScroller.setExpandHorizontal(true);
 		censusdupScroller.setExpandVertical(true);
 
-		censusdupTableViewer = new TableViewer(censusdupScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		censusdupTableViewer = new TableViewer(censusdupScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		censusdupTableViewer.setUseHashlookup(true);
 		censusdupTableViewer.addDoubleClickListener(event -> censusdupPopup(getDisplay()));
 		censusdupTable = censusdupTableViewer.getTable();
 		censusdupTableViewer.setContentProvider(ArrayContentProvider.getInstance());

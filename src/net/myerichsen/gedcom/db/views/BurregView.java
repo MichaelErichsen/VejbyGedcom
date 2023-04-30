@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class BurregView extends Composite {
@@ -140,7 +140,8 @@ public class BurregView extends Composite {
 		burregScroller.setExpandHorizontal(true);
 		burregScroller.setExpandVertical(true);
 
-		burregTableViewer = new TableViewer(burregScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		burregTableViewer = new TableViewer(burregScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		burregTableViewer.setUseHashlookup(true);
 		burregTableViewer.addDoubleClickListener(event -> burregPopup(getDisplay()));
 		burregTable = burregTableViewer.getTable();
 		burregTableViewer.setContentProvider(ArrayContentProvider.getInstance());

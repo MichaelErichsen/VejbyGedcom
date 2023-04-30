@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -122,7 +122,8 @@ public class RelocationView extends Composite {
 		relocationScroller.setExpandHorizontal(true);
 		relocationScroller.setExpandVertical(true);
 
-		relocationTableViewer = new TableViewer(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		relocationTableViewer = new TableViewer(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		relocationTableViewer.setUseHashlookup(true);
 		relocationTableViewer.addDoubleClickListener(event -> relocationPopup());
 
 		final ViewerFilter[] filters = new ViewerFilter[2];

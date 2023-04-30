@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 29. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -143,7 +143,9 @@ public class HouseholdHeadView extends Composite {
 		HouseholdHeadScroller.setExpandHorizontal(true);
 		HouseholdHeadScroller.setExpandVertical(true);
 
-		householdHeadTableViewer = new TableViewer(HouseholdHeadScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		householdHeadTableViewer = new TableViewer(HouseholdHeadScroller,
+				SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		householdHeadTableViewer.setUseHashlookup(true);
 		householdHeadTableViewer.addDoubleClickListener(event -> HouseholdHeadPopup(getDisplay()));
 
 		final ViewerFilter[] filters = new ViewerFilter[3];

@@ -43,7 +43,7 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -121,7 +121,8 @@ public class SiblingsView extends Composite {
 		siblingsScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		siblingsScroller.setSize(0, 0);
 
-		siblingsTableViewer = new TableViewer(siblingsScroller, SWT.BORDER | SWT.FULL_SELECTION);
+		siblingsTableViewer = new TableViewer(siblingsScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		siblingsTableViewer.setUseHashlookup(true);
 		siblingsTableViewer.addDoubleClickListener(event -> siblingsPopup(getDisplay()));
 		siblingsTable = siblingsTableViewer.getTable();
 
