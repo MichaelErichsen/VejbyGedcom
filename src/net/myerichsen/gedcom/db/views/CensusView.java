@@ -53,7 +53,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 30. apr. 2023
  *
  */
 public class CensusView extends Composite {
@@ -208,7 +208,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		Label lblFdedato = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblFdedato = new Label(censusFilterComposite, SWT.NONE);
 		lblFdedato.setText("F\u00F8dedato");
 
 		txtCensusBirthDate = new Text(censusFilterComposite, SWT.BORDER);
@@ -577,9 +577,10 @@ public class CensusView extends Composite {
 		sb.append("\n");
 
 		try {
-			sb.append(getCensusHousehold(ti.getText(21), ti.getText(5)));
+			sb.append(getCensusHousehold(ti.getText(21), ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19)));
 		} catch (final SQLException e) {
-			e.printStackTrace();
+			ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
+			as.setErrorMessage(e.getMessage());
 		}
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketælling", null, sb.toString(),
@@ -589,7 +590,7 @@ public class CensusView extends Composite {
 		if (open == 1) {
 			try {
 				final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
-						ti.getText(5), props.getProperty("censusSchema"));
+						ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19), props.getProperty("censusSchema"));
 				final StringBuilder sb2 = new StringBuilder();
 
 				for (final CensusModel element : lcr) {
@@ -602,11 +603,12 @@ public class CensusView extends Composite {
 				clipboard.dispose();
 
 			} catch (final SQLException e) {
-				e.printStackTrace();
+				ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
+				as.setErrorMessage(e.getMessage());
 			}
 		} else if (open == 2) {
 			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
-					ti.getText(5), props.getProperty("censusSchema"));
+					ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19), props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);
 			final String headOfHousehold = CensusHousehold.getHeadOfHousehold(props, censusModel);
 
@@ -674,22 +676,26 @@ public class CensusView extends Composite {
 
 	/**
 	 * Get the census household
-	 * 
-	 * @param property
-	 * @param text
-	 * @param text2
+	 *
+	 * @param kipNr
+	 * @param kildested
+	 * @param nr
+	 * @param matr
 	 * @return
 	 * @throws SQLException
 	 */
-	protected String getCensusHousehold(String kipNr, String nr) throws SQLException {
+	protected String getCensusHousehold(String kipNr, String kildested, String nr, String matr, String kildeHenvisning)
+			throws SQLException {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, nr, props.getProperty("censusSchema"));
+		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr, kildeHenvisning,
+				props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {
 			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
-					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + "\n");
+					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + ", " + hhr.getKildefoedested()
+					+ "\n");
 		}
 		string = sb.toString();
 

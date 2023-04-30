@@ -96,6 +96,19 @@ public abstract class LoadCphArch {
 	}
 
 	/**
+	 * Generate phonetic name
+	 *
+	 * @param givenName
+	 * @param lastname
+	 * @return
+	 * @throws Exception
+	 */
+	protected String generatePhonName(String[] column) throws Exception {
+		final String s = column[2] + " " + column[3];
+		return fk.generateKey(s.replace("\"", ""));
+	}
+
+	/**
 	 * Get column types from database catalog
 	 *
 	 * @param conn
@@ -184,7 +197,6 @@ public abstract class LoadCphArch {
 				}
 			}
 
-			// TODO Append phonetic name
 			if (columnTypes.size() > columns.length) {
 				sb.append(", '" + generatePhonName(columns) + "'");
 			}
@@ -206,19 +218,6 @@ public abstract class LoadCphArch {
 
 		br.close();
 
-	}
-
-	/**
-	 * Generate phonetic name
-	 * 
-	 * @param givenName
-	 * @param lastname
-	 * @return
-	 * @throws Exception
-	 */
-	protected String generatePhonName(String[] column) throws Exception {
-		String s = column[2] + " " + column[3];
-		return fk.generateKey(s.replace("\"", ""));
 	}
 
 }

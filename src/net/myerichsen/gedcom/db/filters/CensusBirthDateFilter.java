@@ -7,7 +7,7 @@ import net.myerichsen.gedcom.db.models.CensusModel;
 
 /**
  * Filter for birth Date column in census table (Singleton)
- * 
+ *
  * @author Michael Erichsen
  * @version 25. apr. 2023
  *

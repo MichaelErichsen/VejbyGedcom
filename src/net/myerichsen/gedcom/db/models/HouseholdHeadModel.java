@@ -32,11 +32,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	private static final String SELECT_1 = "SELECT * FROM EVENT WHERE INDIVIDUAL = ? AND TYPE = 'Census'";
 	private static final String SELECT_2 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
 	private static final String SELECT_3 = "SELECT MIN(LOEBENR) AS MINLNR FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
-			+ "AND HUSSTANDS_FAMILIENR = ?";
-	private static final String SELECT_4 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ?"
-			+ "AND HUSSTANDS_FAMILIENR = ? AND LOEBENR != ?";
-//	private static final String Select_5 = "SELECT INDIVIDUAL, SOURCEDETAIL FROM EVENT WHERE TYPE = 'Census' "
-//			+ "AND DATE = ? AND PLACE = ?";
+			+ "AND HUSSTANDS_FAMILIENR = ? AND MATR_NR_ADRESSE = ?";
 	private static final String SELECT_6 = "SELECT GIVENNAME, SURNAME FROM INDIVIDUAL WHERE ID = ?";
 
 	/**
@@ -78,36 +74,37 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 * @param vejbyDbPath
 	 * @param censusSchema
 	 * @param censusDbPath
-	 * @param headId
+	 * @param relocatorId
 	 * @return
 	 * @throws Exception
 	 */
 	private static List<HouseholdHeadModel> getCensusEvents(String vejbySchema, String vejbyDbPath, String censusSchema,
-			String censusDbPath, String headId) throws Exception {
+			String censusDbPath, String relocatorId) throws Exception {
 
-		Connection connV = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
+		final Connection connV = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
 		PreparedStatement statementV = connV.prepareStatement(SET_SCHEMA);
 		statementV.setString(1, vejbySchema);
 		statementV.execute();
 
-		Connection connC = DriverManager.getConnection("jdbc:derby:" + censusDbPath);
+		final Connection connC = DriverManager.getConnection("jdbc:derby:" + censusDbPath);
 		PreparedStatement statementC = connC.prepareStatement(SET_SCHEMA);
 		statementC.setString(1, censusSchema);
 		statementC.execute();
 
 		// Get a list of census events for this individual
 		statementV = connV.prepareStatement(SELECT_1);
-		statementV.setString(1, headId);
+		statementV.setString(1, relocatorId);
 		ResultSet rs = statementV.executeQuery();
 
-		HouseholdHeadModel hhm0, hhm1, hhm2;
+		HouseholdHeadModel hhm0;
+		HouseholdHeadModel hhm2;
 		final List<HouseholdHeadModel> lhhm0 = new ArrayList<>();
 		final List<HouseholdHeadModel> lhhm1 = new ArrayList<>();
 		String sd;
 
 		while (rs.next()) {
 			hhm0 = new HouseholdHeadModel();
-			hhm0.setHeadId(headId);
+			hhm0.setRelocatorId(relocatorId);
 			hhm0.setEventDate(rs.getDate("DATE"));
 			hhm0.setPlace(rs.getString("PLACE"));
 
@@ -125,11 +122,11 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 		statementV = connV.prepareStatement(SELECT_6);
 
 		for (final HouseholdHeadModel hhm : lhhm0) {
-			statementV.setString(1, headId);
+			statementV.setString(1, relocatorId);
 			rs = statementV.executeQuery();
 
 			if (rs.next()) {
-				hhm.setHeadName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
+				hhm.setRelocatorName(rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME").trim());
 			}
 		}
 
@@ -178,35 +175,24 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 				rs = statementC.executeQuery();
 
 				if (rs.next()) {
+					hhm.setHeadName(rs.getString("KILDENAVN"));
 					hhm.setKildestednavn(rs.getString("KILDESTEDNAVN"));
 					hhm.setHusstandsFamilieNr(rs.getString("HUSSTANDS_FAMILIENR"));
+					hhm.setMatrNrAdresse(rs.getString("MATR_NR_ADRESSE"));
 				}
 
 				statementC = connC.prepareStatement(SELECT_3);
 				statementC.setString(1, hhm.getKipNr());
 				statementC.setString(2, hhm.getKildestednavn());
 				statementC.setString(3, hhm.getHusstandsFamilieNr());
+				statementC.setString(4, hhm.getMatrNrAdresse());
 				rs = statementC.executeQuery();
 
 				if (!rs.next() || rs.getInt("MINLNR") != hhm.getLoebeNr()) {
 					continue ltrLoop;
 				}
 
-				statementC = connC.prepareStatement(SELECT_4);
-				statementC.setString(1, hhm.getKipNr());
-				statementC.setString(2, hhm.getKildestednavn());
-				statementC.setString(3, hhm.getHusstandsFamilieNr());
-				statementC.setInt(4, hhm.getLoebeNr());
-				rs = statementC.executeQuery();
-
-				while (rs.next()) {
-					hhm1 = (HouseholdHeadModel) hhm.clone();
-					hhm1.setLoebeNr(rs.getInt("LOEBENR"));
-					hhm1.setRelocatorName(rs.getString("KILDENAVN"));
-					hhm1.setSourceDetail(hhm.getSourceDetail());
-
-					lhhm1.add(hhm1);
-				}
+				lhhm1.add(hhm);
 			}
 		}
 		return lhhm1;
@@ -303,58 +289,6 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 		return hhma;
 	}
 
-	/**
-	 * Find individual ID's in the household
-	 *
-	 * @param vejbyDbPath
-	 * @param vejbySchema
-	 * @param id
-	 * @param date
-	 * @return
-	 * @throws SQLException
-	 */
-//	public static List<String> populatePopup(String vejbyDbPath, String vejbySchema, String date, String place,
-//			String detail) throws SQLException {
-//		final List<String> ls = new ArrayList<>();
-//		final List<String[]> lsa = new ArrayList<>();
-//		String[] sa;
-//
-//		final Connection conn = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
-//		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-//		statement.setString(1, vejbySchema);
-//		statement.execute();
-//
-//		statement = conn.prepareStatement(Select_5);
-//		statement.setString(1, date);
-//		statement.setString(2, place);
-//		final ResultSet rs = statement.executeQuery();
-//
-//		while (rs.next()) {
-//			sa = new String[2];
-//			sa[0] = rs.getString("INDIVIDUAL").trim();
-//			sa[1] = rs.getString("SOURCEDETAIL").toLowerCase();
-//			lsa.add(sa);
-//		}
-//
-//		statement.close();
-//		conn.close();
-//
-//		try {
-//			final String[] detailparts = detail.toLowerCase().split("; ");
-//
-//			for (final String[] sa1 : lsa) {
-//				if (sa1[1].contains(detailparts[1] + ",") && sa1[1].contains(detailparts[3] + ",")) {
-//					System.out.println(sa1[0] + ";" + sa1[1]);
-//					ls.add(sa1[0]);
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//		return ls;
-//	}
-
 	private String headId = "";
 	private String headName = "";
 	private Date eventDate = null;
@@ -368,6 +302,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	private String husstandsFamilieNr = "";
 	private String kipNr = "";
 	private int loebeNr = 0;
+	private String matrNrAdresse = "";
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
@@ -428,6 +363,13 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 */
 	public int getLoebeNr() {
 		return loebeNr;
+	}
+
+	/**
+	 * @return the matrNrAdresse
+	 */
+	public String getMatrNrAdresse() {
+		return matrNrAdresse;
 	}
 
 	/**
@@ -519,6 +461,13 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 */
 	public void setLoebeNr(int loebeNr) {
 		this.loebeNr = loebeNr;
+	}
+
+	/**
+	 * @param matrNrAdresse the matrNrAdresse to set
+	 */
+	public void setMatrNrAdresse(String matrNrAdresse) {
+		this.matrNrAdresse = matrNrAdresse;
 	}
 
 	/**

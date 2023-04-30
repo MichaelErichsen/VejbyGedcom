@@ -81,8 +81,6 @@ public class RelocationModel extends ASModel {
 
 		for (int j = 0; j < lr.size(); j++) {
 			for (final String id : ls) {
-				// FIXME java.lang.IndexOutOfBoundsException: Index 20 out of bounds for length
-				// 20
 				if (lr.get(j).getId().equals(id)) {
 					lr.remove(j);
 				}

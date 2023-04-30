@@ -2,6 +2,7 @@ package net.myerichsen.gedcom.db.views;
 
 import java.util.Properties;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -9,6 +10,9 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -24,6 +28,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -37,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 29. apr. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -49,8 +54,6 @@ public class HouseholdHeadView extends Composite {
 	private Combo txtHouseholdEventType;
 	private Properties props;
 	private Thread thread;
-
-	// FIXME Place filter not perfect (e.g. Rågeleje)
 
 	/**
 	 * Create the composite.
@@ -141,7 +144,7 @@ public class HouseholdHeadView extends Composite {
 		HouseholdHeadScroller.setExpandVertical(true);
 
 		householdHeadTableViewer = new TableViewer(HouseholdHeadScroller, SWT.BORDER | SWT.FULL_SELECTION);
-//		householdHeadTableViewer.addDoubleClickListener(event -> HouseholdHeadPopup());
+		householdHeadTableViewer.addDoubleClickListener(event -> HouseholdHeadPopup(getDisplay()));
 
 		final ViewerFilter[] filters = new ViewerFilter[3];
 		filters[0] = HouseholdHeadPlaceFilter.getInstance();
@@ -314,47 +317,37 @@ public class HouseholdHeadView extends Composite {
 	}
 
 	/**
-	 * Display individual ID's in the household
+	 * @param display
 	 */
-//	private void HouseholdHeadPopup() {
-//		final TableItem[] tia = householdHeadTable.getSelection();
-//		final TableItem ti = tia[0];
-//
-//		final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
-//
-//		if (ti.getText(8) == null || !ti.getText(8).equals("Folketælling")) {
-//			as.setMessage("Vælg venligst en folketælling");
-//			return;
-//		}
-//
-//		if (ti.getText(2) == null || ti.getText(2).length() == 0 || ti.getText(4) == null
-//				|| ti.getText(4).length() == 0) {
-//			as.setMessage("Dato eller sted mangler");
-//			return;
-//		}
-//
-//		List<String> ls;
-//
-//		try {
-//			ls = HouseholdHeadModel.populatePopup(props.getProperty("vejbyPath"), props.getProperty("vejbySchema"),
-//					ti.getText(2), ti.getText(4), ti.getText(7));
-//		} catch (final SQLException e) {
-//			as.setMessage(e.getMessage());
-//			return;
-//		}
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		for (final String id : ls) {
-//			sb.append(id + ", ");
-//		}
-//
-//		final MessageBox messageBox = new MessageBox(getShell(), SWT.ICON_WARNING | SWT.OK);
-//		messageBox.setText("Info");
-//		messageBox.setMessage("Id'er i denne husholdning:\n" + sb.toString());
-//		messageBox.open();
-//
-//	}
+	private void HouseholdHeadPopup(Display display) {
+		final TableItem[] tia = householdHeadTable.getSelection();
+		final TableItem ti = tia[0];
+
+		final StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < 8; i++) {
+			if (ti.getText(i).length() > 0) {
+				if (ti.getText(i).length() > 0) {
+					sb.append(ti.getText(i).trim() + ", ");
+				}
+			}
+		}
+
+		sb.append("\n");
+
+		final String string = sb.toString();
+
+		final MessageDialog dialog = new MessageDialog(getShell(), "Begravelser", null, string,
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+		final int open = dialog.open();
+
+		if (open == 1) {
+			final Clipboard clipboard = new Clipboard(display);
+			final TextTransfer textTransfer = TextTransfer.getInstance();
+			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
+			clipboard.dispose();
+		}
+	}
 
 	/**
 	 * @param phonName

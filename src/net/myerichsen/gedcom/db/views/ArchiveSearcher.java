@@ -18,6 +18,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -51,19 +52,10 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 25. apr. 2023
+ * @version 28. apr. 2023
  *
  */
 public class ArchiveSearcher extends Shell {
-	// FIXME Relocation, from, can display "NULL"
-
-	// TODO Polreg sometimes displays national characters as Jens Andersen,
-	// 1849-05-14, Høker, Baggesensgade, 32, 1, 1, 1, Baggesensgade 32, kælderen,
-	// String asciiEncodedString = new String(germanBytes,
-	// StandardCharsets.US_ASCII);
-	// public static boolean isAsciiPrintable(char ch) {
-	// return ch>=32&&ch<127;
-
 	private static Display display;
 
 	/**
@@ -278,9 +270,9 @@ public class ArchiveSearcher extends Shell {
 		mntmIndstillinger.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MenuItem mi = (MenuItem) e.getSource();
-				Menu m = mi.getParent();
-				ArchiveSearcher as = (ArchiveSearcher) m.getParent();
+				final MenuItem mi = (MenuItem) e.getSource();
+				final Menu m = mi.getParent();
+				final ArchiveSearcher as = (ArchiveSearcher) m.getParent();
 				final SettingsWizard settingsWizard = new SettingsWizard(props, as);
 				final WizardDialog wizardDialog = new WizardDialog(shell, settingsWizard);
 				wizardDialog.setBlockOnOpen(true);
@@ -694,7 +686,7 @@ public class ArchiveSearcher extends Shell {
 			final IndividualModel individual = new IndividualModel(conn, id, props.getProperty("vejbySchema"));
 
 			if (individual.getName().equals("")) {
-				setMessage("ID " + id + " findes ikke i databasen");
+				setErrorMessage("ID " + id + " findes ikke i databasen");
 				searchId.setFocus();
 				return;
 			}
@@ -857,10 +849,21 @@ public class ArchiveSearcher extends Shell {
 				siblingsTable.forceFocus();
 			}
 		} catch (final Exception e2) {
-			setMessage(e2.getMessage());
+			setErrorMessage(e2.getMessage());
 			e2.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * Set the message in the message combo box
+	 *
+	 * @param string
+	 *
+	 */
+	public void setErrorMessage(String string) {
+		setMessage(string);
+		messageComboBox.setBackground(new Color(255, 0, 0, 255));
 	}
 
 	/**
@@ -875,6 +878,7 @@ public class ArchiveSearcher extends Shell {
 		final LocalTime localTime = LocalTime.now();
 		messageComboBox.add(dtf.format(localTime) + " " + string, 0);
 		messageComboBox.select(0);
+		messageComboBox.setBackground(new Color(255, 255, 255, 255));
 		final int lastItem = Integer.parseInt(props.getProperty("msgLogLen"));
 
 		if (messageComboBox.getItemCount() > lastItem) {

@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Read and analyze a GEDCOM and load data into a Derby database
  *
  * @author Michael Erichsen
- * @version 25. apr. 2023
+ * @version 29. apr. 2023
  */
 public class GedcomLoader {
 	/**
@@ -150,22 +150,22 @@ public class GedcomLoader {
 		prepareStatements(conn);
 
 		readGedcom(args[0]);
-		Display.getDefault().asyncExec(() -> as.setMessage("GEDCOM fil indlæst"));
+		Display.getDefault().asyncExec(() -> as.setMessage("GEDCOM fil analyseres"));
 
 		clearTables(conn);
-		Display.getDefault().asyncExec(() -> as.setMessage("Tabellerne ryddet"));
+		Display.getDefault().asyncExec(() -> as.setMessage("Tabellerne er ryddet"));
 
 		parseAllFamilies();
-		Display.getDefault().asyncExec(() -> as.setMessage("Familier analyseret"));
+		Display.getDefault().asyncExec(() -> as.setMessage("Familier er analyseret"));
 
 		parseAllIndividuals();
-		Display.getDefault().asyncExec(() -> as.setMessage("Personer analyseret"));
+		Display.getDefault().asyncExec(() -> as.setMessage("Personer er analyseret"));
 
 		updateBirthDeathData(conn, args[2]);
-		Display.getDefault().asyncExec(() -> as.setMessage("Fødsels- og dødsdata opdateret"));
+		Display.getDefault().asyncExec(() -> as.setMessage("Fødsels- og dødsdata er opdateret"));
 
 		parseParents();
-		Display.getDefault().asyncExec(() -> as.setMessage("Forældre analyseret"));
+		Display.getDefault().asyncExec(() -> as.setMessage("Forældre er analyseret"));
 
 		conn.close();
 
@@ -305,6 +305,7 @@ public class GedcomLoader {
 	 */
 	private void insertFamilyEvents(Family family, final FamilyEvent familyEvent) throws SQLException {
 		psINSERT_FAMILY_EVENT.setString(1, familyEvent.getType().toString());
+		String sbString;
 
 		final StringWithCustomFacts subtype = familyEvent.getSubType();
 		if (subtype == null) {
@@ -361,15 +362,15 @@ public class GedcomLoader {
 						psINSERT_FAMILY_EVENT.setString(7, "");
 					}
 				} else {
-					final StringBuilder sb2 = new StringBuilder();
+					final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
 
 					for (final CustomFact customFact : customFacts) {
 						sb2.append(customFact.getDescription().getValue());
 					}
 
-					psINSERT_FAMILY_EVENT.setString(7,
-							(sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
-									: sb2.toString().replace("'", "¤")) + "', '");
+					sbString = sb2.toString().replace("'", "¤");
+					sbString = sbString.length() > 256 ? sbString.substring(0, 255) : sbString;
+					psINSERT_FAMILY_EVENT.setString(7, sbString);
 				}
 			}
 		}
@@ -424,6 +425,7 @@ public class GedcomLoader {
 	 */
 	private void insertIndividualEvent(Individual individual, final IndividualEvent individualEvent)
 			throws SQLException {
+		String string;
 
 		psINSERT_INDIVIDUAL_EVENT.setString(1, individualEvent.getType().toString());
 
@@ -470,8 +472,8 @@ public class GedcomLoader {
 				final List<String> lines = noteStructures.get(0).getLines();
 				final StringBuilder lineBuffer = new StringBuilder();
 
-				for (final String string : lines) {
-					lineBuffer.append(string + " ");
+				for (final String string2 : lines) {
+					lineBuffer.append(string2 + " ");
 				}
 				psINSERT_INDIVIDUAL_EVENT.setString(7, lineBuffer.toString().replace("'", "¤"));
 			}
@@ -496,15 +498,16 @@ public class GedcomLoader {
 						psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 					}
 				} else {
-					final StringBuilder sb2 = new StringBuilder();
+					final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
 
 					for (final CustomFact customFact : customFacts) {
 						sb2.append(customFact.getDescription().getValue());
 					}
 
-					psINSERT_INDIVIDUAL_EVENT.setString(8,
-							(sb2.length() > 256 ? sb2.toString().substring(0, 255).replace("'", "¤")
-									: sb2.toString().replace("'", "¤")) + "', '");
+					string = sb2.toString().replace("'", "¤");
+					string = string.length() > 256 ? string.substring(0, 255) : string;
+					string = string + "', '";
+					psINSERT_INDIVIDUAL_EVENT.setString(8, string);
 				}
 			}
 		}

@@ -13,7 +13,7 @@ import java.util.Properties;
  * Class representing a census household
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 29. apr. 2023
  *
  */
 public class CensusHousehold extends ASModel {
@@ -22,7 +22,8 @@ public class CensusHousehold extends ASModel {
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_CENSUS_HOUSEHOLD = "SELECT * FROM CENSUS "
-			+ "WHERE KIPNR = ? AND HUSSTANDS_FAMILIENR = ? ";
+			+ "WHERE KIPNR = ? AND KILDESTEDNAVN = ? AND HUSSTANDS_FAMILIENR = ? AND MATR_NR_ADRESSE = ? "
+			+ "AND KILDEHENVISNING = ?";
 	private final static String SELECT_HOUSEHOLD_HEAD_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND LOEBENR = ?";
 	private final static String SELECT_HOUSEHOLD_HEAD_2 = "SELECT INDIVIDUAL FROM EVENT WHERE TYPE = 'Census' "
 			+ "AND DATE = ? AND SOURCEDETAIL LIKE ?";
@@ -104,11 +105,18 @@ public class CensusHousehold extends ASModel {
 	/**
 	 * Get a list of household census records from the Derby table
 	 *
-	 * @param rs
+	 * @param dbPath
+	 * @param kipNr
+	 * @param kildested
+	 * @param nr
+	 * @param matr
+	 * @param kildeHenvisning
+	 * @param schema
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusModel> load(String dbPath, String kipNr, String nr, String schema) throws SQLException {
+	public static List<CensusModel> load(String dbPath, String kipNr, String kildested, String nr, String matr,
+			String kildeHenvisning, String schema) throws SQLException {
 		CensusModel ci;
 		final List<CensusModel> cil = new ArrayList<>();
 
@@ -118,7 +126,10 @@ public class CensusHousehold extends ASModel {
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
 		statement.setString(1, kipNr);
-		statement.setString(2, nr);
+		statement.setString(2, kildested);
+		statement.setString(3, nr);
+		statement.setString(4, matr);
+		statement.setString(5, kildeHenvisning);
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {

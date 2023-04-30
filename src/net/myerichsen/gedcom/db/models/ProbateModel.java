@@ -45,16 +45,16 @@ public class ProbateModel extends ASModel {
 		statement.execute();
 
 		// Add five years to death date as limit for probate date
-		Pattern p = Pattern.compile("\\d{4}");
-		Matcher m = p.matcher(deathDate);
+		final Pattern p = Pattern.compile("\\d{4}");
+		final Matcher m = p.matcher(deathDate);
 
 		if (m.find()) {
-			String group = m.group(0);
+			final String group = m.group(0);
 			int year = Integer.parseInt(group);
 
 			if (year < 9000) {
 				year = year += 5;
-				String newYear = Integer.toString(year);
+				final String newYear = Integer.toString(year);
 				deathDate = deathDate.replace(group, newYear);
 			}
 		}

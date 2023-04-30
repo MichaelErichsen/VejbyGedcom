@@ -16,7 +16,7 @@ import net.myerichsen.gedcom.db.models.SettingsModel;
 public class SettingsWizard extends Wizard {
 	private final Properties props;
 	private SettingsModel settings;
-	private ArchiveSearcher as;
+	private final ArchiveSearcher as;
 
 	public SettingsWizard(Properties props, ArchiveSearcher as) {
 		setWindowTitle("Indstillinger");
@@ -42,7 +42,7 @@ public class SettingsWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		String string = settings.storeProperties(props);
+		final String string = settings.storeProperties(props);
 		as.setMessage(string);
 		return true;
 	}

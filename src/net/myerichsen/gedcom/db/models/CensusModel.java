@@ -16,9 +16,10 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 29. apr. 2023
  *
  */
+
 public class CensusModel extends ASModel {
 	/**
 	 * Constants

@@ -87,7 +87,7 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		Label lblKilde = new Label(ProbateFilterComposite, SWT.NONE);
+		final Label lblKilde = new Label(ProbateFilterComposite, SWT.NONE);
 		lblKilde.setText("Kilde");
 
 		txtProbateSource = new Text(ProbateFilterComposite, SWT.BORDER);

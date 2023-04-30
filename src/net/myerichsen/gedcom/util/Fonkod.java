@@ -273,7 +273,7 @@ public class Fonkod {
 		p = Pattern.compile("(\\w+)\\s+\\1");
 		m = p.matcher(out);
 		while (m.find()) {
-			// TODO Fejl nedenfor?
+			// Fejl nedenfor?
 			out = out.replaceAll("(\\w+\\s+)\\1", "$1");
 			// System.out.println(out + "\teliminateDoubleOutput");
 		}
