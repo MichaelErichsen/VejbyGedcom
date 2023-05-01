@@ -120,7 +120,8 @@ public class ProbatePerson {
 		}
 		if (month.equals("OCT")) {
 			return "10";
-		} else if (month.equals("NOV")) {
+		}
+		if (month.equals("NOV")) {
 			return "11";
 		} else if (month.equals("DEC")) {
 			return "12";

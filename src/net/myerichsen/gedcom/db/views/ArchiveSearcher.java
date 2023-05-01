@@ -52,9 +52,10 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 01. maj. 2023
  *
  */
+
 public class ArchiveSearcher extends Shell {
 	private static Display display;
 

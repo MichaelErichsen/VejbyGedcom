@@ -580,7 +580,7 @@ public class CensusView extends Composite {
 		try {
 			sb.append(getCensusHousehold(ti.getText(21), ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19)));
 		} catch (final SQLException e) {
-			ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
+			final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 			as.setErrorMessage(e.getMessage());
 		}
 
@@ -604,7 +604,7 @@ public class CensusView extends Composite {
 				clipboard.dispose();
 
 			} catch (final SQLException e) {
-				ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
+				final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 				as.setErrorMessage(e.getMessage());
 			}
 		} else if (open == 2) {
