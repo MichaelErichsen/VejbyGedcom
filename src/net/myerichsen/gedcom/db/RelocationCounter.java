@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Counter for relocations in and out of location
+ * Counter for relocations in and out of a location between 1822 and 1875.
+ * Depends on subtype "Flytning" having from-location in NOTE and to-location in
+ * PLACE
  *
  * @author Michael Erichsen
  * @version 1. maj 2023
@@ -23,7 +25,7 @@ import java.util.logging.Logger;
 public class RelocationCounter {
 
 	/**
-	 * Class representing a year and relocation counts between 1822 and 1875
+	 * Inner class representing a year and relocation counts
 	 *
 	 * @author Michael Erichsen
 	 * @version 1. maj 2023
@@ -96,6 +98,7 @@ public class RelocationCounter {
 		final RelocationCounter rc = new RelocationCounter();
 		try {
 			rc.execute(args);
+			logger.info("Output saved to " + args[3] + "\\flyt_antal.csv");
 		} catch (SQLException | IOException e) {
 			logger.severe(e.getMessage());
 			e.printStackTrace();

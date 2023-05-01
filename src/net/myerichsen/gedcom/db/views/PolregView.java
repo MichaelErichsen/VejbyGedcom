@@ -35,6 +35,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import net.myerichsen.gedcom.db.comparators.PolregComparator;
 import net.myerichsen.gedcom.db.filters.PolregAddressFilter;
 import net.myerichsen.gedcom.db.filters.PolregBirthdateFilter;
+import net.myerichsen.gedcom.db.filters.PolregNameFilter;
 import net.myerichsen.gedcom.db.models.PolregModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.PolregPopulator;
@@ -43,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 1. maj 2023
  *
  */
 public class PolregView extends Composite {
@@ -84,7 +85,7 @@ public class PolregView extends Composite {
 				} else {
 					txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
-				PolregAddressFilter.getInstance().setSearchText(txtPolregName.getText());
+				PolregNameFilter.getInstance().setSearchText(txtPolregName.getText());
 				polregTableViewer.refresh();
 			}
 		});
@@ -142,9 +143,10 @@ public class PolregView extends Composite {
 		polregTableViewer.setUseHashlookup(true);
 		polregTable = polregTableViewer.getTable();
 		polregTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		final ViewerFilter[] filters = new ViewerFilter[2];
-		filters[0] = PolregAddressFilter.getInstance();
-		filters[1] = PolregBirthdateFilter.getInstance();
+		final ViewerFilter[] filters = new ViewerFilter[3];
+		filters[0] = PolregNameFilter.getInstance();
+		filters[1] = PolregAddressFilter.getInstance();
+		filters[2] = PolregBirthdateFilter.getInstance();
 		polregTableViewer.setFilters(filters);
 		polregTableViewer.setComparator(new PolregComparator());
 		polregTableViewer.addDoubleClickListener(event -> {
