@@ -47,12 +47,13 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.tablecreators.CensusTableCreator;
 import net.myerichsen.gedcom.db.tablecreators.CphTableCreator;
 import net.myerichsen.gedcom.db.tablecreators.GedcomTableCreator;
+import net.myerichsen.gedcom.db.tablecreators.MilRollCreator;
 import net.myerichsen.gedcom.db.tablecreators.ProbateTableCreator;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 03. maj. 2023
+ * @version 3. maj 2023
  *
  */
 
@@ -336,6 +337,15 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmDanTabbellerTil.setText("Dan tabeller til K\u00F8benhavnske registre");
 
+		final MenuItem mntmDanTabelTil = new MenuItem(menu_2, SWT.NONE);
+		mntmDanTabelTil.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setMessage(MilRollCreator.createTables(props));
+			}
+		});
+		mntmDanTabelTil.setText("Dan tabel til l\u00E6gdsruller");
+
 		new MenuItem(menu_2, SWT.SEPARATOR);
 
 		final MenuItem mntmL = new MenuItem(menu_2, SWT.NONE);
@@ -375,12 +385,11 @@ public class ArchiveSearcher extends Shell {
 		});
 		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s Begravelsesregisteret");
 
-		MenuItem mntmIndtastLgdsruller = new MenuItem(menu_2, SWT.NONE);
+		final MenuItem mntmIndtastLgdsruller = new MenuItem(menu_2, SWT.NONE);
 		mntmIndtastLgdsruller.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MilRollView mrv = new MilRollView();
-				mrv.main(null);
+				MilRollView.main(props);
 			}
 		});
 		mntmIndtastLgdsruller.setText("Indtast l\u00E6gdsruller");
@@ -577,6 +586,14 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("vejbyPath", Constants.VEJBYDB_PATH);
 			props.setProperty("vejbySchema", Constants.VEJBYDB_SCHEMA);
 			props.setProperty("msgLogLen", "20");
+			props.setProperty("amt", Constants.AMT);
+			props.setProperty("aar", Constants.AAR);
+			props.setProperty("rulletype", Constants.HOVEDRULLE);
+			props.setProperty("laegdnr", Constants.LAEGDNR);
+			props.setProperty("sogn", Constants.SOGN);
+			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
+			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
+			props.setProperty("uri", Constants.MILROLL_URI);
 
 			storeProperties();
 			System.out.println("Egenskaber gemt i " + Constants.PROPERTIES_PATH);

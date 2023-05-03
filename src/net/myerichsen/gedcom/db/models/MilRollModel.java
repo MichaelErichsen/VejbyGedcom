@@ -24,38 +24,14 @@ public class MilRollModel extends ASModel {
 	private String dbSchema = "";
 	private String dbPath = "";
 
-	/**
-	 * @return the dbSchema
-	 */
-	public String getDbSchema() {
-		return dbSchema;
-	}
-
-	/**
-	 * @param dbSchema the dbSchema to set
-	 */
-	public void setDbSchema(String dbSchema) {
-		this.dbSchema = dbSchema;
-	}
-
-	/**
-	 * @return the dbPath
-	 */
-	public String getDbPath() {
-		return dbPath;
-	}
-
-	/**
-	 * @param dbPath the dbPath to set
-	 */
-	public void setDbPath(String dbPath) {
-		this.dbPath = dbPath;
-	}
-
 	private String amt = "";
+
 	private String aar = "";
+
 	private String rulleType = "";
+
 	private int laegdNr = 0;
+
 	private String sogn = "";
 	private String litra = "";
 	private int glLoebeNr = 0;
@@ -99,6 +75,20 @@ public class MilRollModel extends ASModel {
 	 */
 	public String getAnmaerkninger() {
 		return anmaerkninger;
+	}
+
+	/**
+	 * @return the dbPath
+	 */
+	public String getDbPath() {
+		return dbPath;
+	}
+
+	/**
+	 * @return the dbSchema
+	 */
+	public String getDbSchema() {
+		return dbSchema;
 	}
 
 	/**
@@ -214,6 +204,43 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * Save entry to Derby database
+	 *
+	 * @throws SQLException
+	 *
+	 */
+	public String saveToDb() throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, dbSchema);
+		statement.execute();
+
+		statement = conn.prepareStatement(INSERT);
+		statement.setString(1, amt);
+		statement.setString(2, aar);
+		statement.setString(3, rulleType);
+		statement.setInt(4, laegdNr);
+		statement.setString(5, sogn);
+		statement.setString(6, litra);
+		statement.setInt(7, glLoebeNr);
+		statement.setInt(8, nyLoebeNr);
+		statement.setString(9, fader);
+		statement.setString(10, soen);
+		statement.setString(11, foedeSted);
+		statement.setInt(12, alder);
+		statement.setBigDecimal(13, stoerrelseITommer);
+		statement.setString(14, ophold);
+		statement.setString(15, anmaerkninger);
+		statement.setDate(16, foedt);
+		statement.setString(17, gedcomId);
+		statement.setString(18, navn);
+		statement.setString(19, faderFon);
+		statement.setString(20, soenFon);
+		statement.execute();
+		return "Indtastning " + nyLoebeNr + " er gemt";
+	}
+
+	/**
 	 * @param aar the aar to set
 	 */
 	public void setAar(String aar) {
@@ -239,6 +266,20 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setAnmaerkninger(String anmaerkninger) {
 		this.anmaerkninger = anmaerkninger;
+	}
+
+	/**
+	 * @param dbPath the dbPath to set
+	 */
+	public void setDbPath(String dbPath) {
+		this.dbPath = dbPath;
+	}
+
+	/**
+	 * @param dbSchema the dbSchema to set
+	 */
+	public void setDbSchema(String dbSchema) {
+		this.dbSchema = dbSchema;
 	}
 
 	/**
@@ -351,42 +392,5 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setStoerrelseITommer(BigDecimal stoerrelseITommer) {
 		this.stoerrelseITommer = stoerrelseITommer;
-	}
-
-	/**
-	 * Save entry to Derby database
-	 * 
-	 * @throws SQLException
-	 * 
-	 */
-	public String saveToDb() throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, dbSchema);
-		statement.execute();
-
-		statement = conn.prepareStatement(INSERT);
-		statement.setString(1, amt);
-		statement.setString(2, aar);
-		statement.setString(3, rulleType);
-		statement.setInt(4, laegdNr);
-		statement.setString(5, sogn);
-		statement.setString(6, litra);
-		statement.setInt(7, glLoebeNr);
-		statement.setInt(8, nyLoebeNr);
-		statement.setString(9, fader);
-		statement.setString(10, soen);
-		statement.setString(11, foedeSted);
-		statement.setInt(12, alder);
-		statement.setBigDecimal(13, stoerrelseITommer);
-		statement.setString(14, ophold);
-		statement.setString(15, anmaerkninger);
-		statement.setDate(16, foedt);
-		statement.setString(17, gedcomId);
-		statement.setString(18, navn);
-		statement.setString(19, faderFon);
-		statement.setString(20, soenFon);
-		statement.execute();
-		return "Indtastning " + nyLoebeNr + " er gemt";
 	}
 }

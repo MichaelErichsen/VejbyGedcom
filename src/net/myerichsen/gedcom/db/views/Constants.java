@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db.views;
 
 /**
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 3. maj 2023
  *
  */
 public class Constants {
@@ -26,4 +26,13 @@ public class Constants {
 	public static final String PROPERTIES_PATH = System.getProperty("user.home") + "/ArchiveSearcher.properties";
 	public static final String VEJBYDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
 	public static final String VEJBYDB_SCHEMA = "VEJBY";
+	public static final String AMT = "Kronborg";
+	public static final String AAR = "1792";
+	public static final String HOVEDRULLE = "Hovedrulle";
+	public static final String LAEGDNR = "6";
+	public static final String SOGN = "Vejby";
+	public static final String MILROLLDB_PATH = System.getProperty("user.home") + "/laegd";
+	public static final String MILROLLDB_SCHEMA = "LAEGD";
+	public static final String MILROLL_URI = "https://www.sa.dk/ao-soegesider/da/billedviser?epid=16481031#17028,656192";
+
 }

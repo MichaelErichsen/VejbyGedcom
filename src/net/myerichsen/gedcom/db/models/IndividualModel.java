@@ -2,6 +2,7 @@ package net.myerichsen.gedcom.db.models;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +15,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 3. maj 2023
  *
  */
 public class IndividualModel extends ASModel {
@@ -31,6 +32,7 @@ public class IndividualModel extends ASModel {
 	private static final String SELECT_PARENTS = "SELECT * FROM FAMILY WHERE ID = ?";
 	private static final String SELECT_INDIVIDUAL_FROM_ID = "SELECT * FROM INDIVIDUAL WHERE ID = ?";
 	private static final String SELECT_PARENTS_FROM_CHRISTENING = "SELECT * FROM EVENT WHERE TYPE = 'Christening' AND INDIVIDUAL = ?";
+	private static final String SELECT_INDIVIDUAL_FROM_PHONNAME = "SELECT * FROM INDIVIDUAL WHERE PHONNAME = ? AND BIRTHDATE > ? AND BIRTHDATE < ?";
 
 	/**
 	 * Find parent names from christening event
@@ -59,6 +61,49 @@ public class IndividualModel extends ASModel {
 		}
 
 		return "";
+	}
+
+	/**
+	 * Find individual data from its phonetic name and birth date
+	 *
+	 * @param conn
+	 * @param id
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<String> getDataFromPhonName(String dbPath, String schema, String phonName, Date birthDate)
+			throws SQLException {
+		final List<String> ls = new ArrayList<>();
+		String string;
+
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+
+		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_PHONNAME);
+		statement.setString(1, phonName);
+
+		// TODO Copy logic to census display
+
+		final String a = birthDate.toString();
+		final String a1 = a.substring(0, 4);
+		final int b = Integer.parseInt(a1);
+		final String e = a.replace(a1, Integer.toString(b - 2));
+		final String f = a.replace(a1, Integer.toString(b + 2));
+
+		statement.setDate(2, Date.valueOf(e));
+		statement.setDate(3, Date.valueOf(f));
+		final ResultSet rs = statement.executeQuery();
+
+		while (rs.next()) {
+			string = rs.getString("ID") + ", " + rs.getString("GIVENNAME") + " " + rs.getString("SURNAME") + ", "
+					+ rs.getDate("BIRTHDATE") + ", " + rs.getString("PARENTS");
+			string = string.replaceAll("\\s+", " ");
+			ls.add(string);
+		}
+
+		return ls;
 	}
 
 	/**

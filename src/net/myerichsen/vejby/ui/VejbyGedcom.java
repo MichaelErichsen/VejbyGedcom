@@ -13,8 +13,8 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 /**
- * MilRollView user interface for the Vejby Gedcom application. Implements tabbed
- * panels to do the work.
+ * MilRollView user interface for the Vejby Gedcom application. Implements
+ * tabbed panels to do the work.
  *
  * @author Michael Erichsen
  * @version 11-09-2020

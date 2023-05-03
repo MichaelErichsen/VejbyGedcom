@@ -8,7 +8,7 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 3. maj. 2023
  *
  */
 public class SettingsModel {
@@ -36,6 +36,8 @@ public class SettingsModel {
 	private String vejbyPath;
 	private String vejbySchema;
 	private String msgLogLen;
+	private String milrollPath;
+	private String milrollSchema;
 
 	/**
 	 * Constructor
@@ -67,6 +69,8 @@ public class SettingsModel {
 		vejbyPath = props.getProperty("vejbyPath");
 		vejbySchema = props.getProperty("vejbySchema");
 		msgLogLen = props.getProperty("msgLogLen");
+		milrollPath = props.getProperty("milrollPath");
+		milrollSchema = props.getProperty("milrollSchema");
 	}
 
 	/**
@@ -158,6 +162,20 @@ public class SettingsModel {
 	 */
 	public String getKipTextFilename() {
 		return kipTextFilename;
+	}
+
+	/**
+	 * @return the milrollPath
+	 */
+	public String getMilrollPath() {
+		return milrollPath;
+	}
+
+	/**
+	 * @return the milrollSchema
+	 */
+	public String getMilrollSchema() {
+		return milrollSchema;
 	}
 
 	/**
@@ -337,6 +355,20 @@ public class SettingsModel {
 	}
 
 	/**
+	 * @param milrollPath the milrollPath to set
+	 */
+	public void setMilrollPath(String milrollPath) {
+		this.milrollPath = milrollPath;
+	}
+
+	/**
+	 * @param milrollSchema the milrollSchema to set
+	 */
+	public void setMilrollSchema(String milrollSchema) {
+		this.milrollSchema = milrollSchema;
+	}
+
+	/**
 	 * @param msgLogLen the msgLogLen to set
 	 */
 	public void setMsgLogLen(String msgLogLen) {
@@ -448,6 +480,8 @@ public class SettingsModel {
 		props.setProperty("vejbyPath", vejbyPath);
 		props.setProperty("vejbySchema", vejbySchema);
 		props.setProperty("msgLogLen", msgLogLen);
+		props.setProperty("milrollPath", milrollPath);
+		props.setProperty("milrollSchema", milrollSchema);
 
 		final String path = System.getProperty("user.home") + "/ArchiveSearcher.properties";
 
