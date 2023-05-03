@@ -144,7 +144,7 @@ public class Household {
 		if (mappingKeys[6] != 0) {
 			String bd = row.get(mappingKeys[6]);
 
-			// Test for 18540304 format
+			// MilRollView for 18540304 format
 			if (bd.matches("[0-9]{8}")) {
 				final SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMdd");
 				final SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMM yyyy");

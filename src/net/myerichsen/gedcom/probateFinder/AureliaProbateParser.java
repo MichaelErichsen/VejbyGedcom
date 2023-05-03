@@ -30,7 +30,7 @@ import org.gedcom4j.exception.GedcomParserException;
  */
 public class AureliaProbateParser {
 	/**
-	 * Test method
+	 * MilRollView method
 	 *
 	 * @param args
 	 */

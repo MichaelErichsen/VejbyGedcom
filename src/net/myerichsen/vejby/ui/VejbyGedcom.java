@@ -13,7 +13,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 /**
- * Test user interface for the Vejby Gedcom application. Implements tabbed
+ * MilRollView user interface for the Vejby Gedcom application. Implements tabbed
  * panels to do the work.
  *
  * @author Michael Erichsen

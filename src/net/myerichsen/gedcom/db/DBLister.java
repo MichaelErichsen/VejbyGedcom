@@ -23,7 +23,7 @@ public class DBLister {
 	private static Logger logger;
 
 	/**
-	 * Test method
+	 * MilRollView method
 	 *
 	 * @param args
 	 */

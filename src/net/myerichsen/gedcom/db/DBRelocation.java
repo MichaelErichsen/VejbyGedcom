@@ -39,7 +39,7 @@ public class DBRelocation {
 	private static Logger logger;
 
 	/**
-	 * Test method
+	 * MilRollView method
 	 *
 	 * @param args
 	 */

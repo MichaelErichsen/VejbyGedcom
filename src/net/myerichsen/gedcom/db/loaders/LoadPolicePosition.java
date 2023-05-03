@@ -18,7 +18,7 @@ public class LoadPolicePosition extends LoadCphArch {
 	static int counter = 0;
 
 	/**
-	 * Test method
+	 * MilRollView method
 	 *
 	 * @param args
 	 */

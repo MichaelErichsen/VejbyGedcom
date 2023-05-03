@@ -183,7 +183,7 @@ public class MarriagePanel extends FsPanel {
 
 			family = new Family(0, i);
 
-			// Test for principal's sex
+			// MilRollView for principal's sex
 			if (line[1].equals("male")) {
 				groom = new Individual(individualId);
 				individualId++;
