@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 4. maj 2023
  *
  */
 public class RelocationModel extends ASModel {
@@ -24,7 +24,8 @@ public class RelocationModel extends ASModel {
 	private static final String SELECT_RELOCATION = "SELECT INDIVIDUAL.ID, INDIVIDUAL.GIVENNAME, "
 			+ "INDIVIDUAL.SURNAME, EVENT.DATE, EVENT.PLACE, EVENT.NOTE, EVENT.SOURCEDETAIL, "
 			+ "INDIVIDUAL.PARENTS FROM INDIVIDUAL, EVENT WHERE EVENT.SUBTYPE = 'Flytning' "
-			+ "AND INDIVIDUAL.ID = EVENT.INDIVIDUAL AND INDIVIDUAL.PHONNAME = ?";
+			+ "AND INDIVIDUAL.ID = EVENT.INDIVIDUAL AND INDIVIDUAL.PHONNAME = ? "
+			+ "AND INDIVIDUAL.BIRTHDATE > ? AND INDIVIDUAL.BIRTHDATE < ?";
 	private static final String SELECT_BIRTHDATE = "SELECT DATE FROM EVENT WHERE INDIVIDUAL = ? "
 			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 
@@ -36,8 +37,8 @@ public class RelocationModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static RelocationModel[] load(String schema, String dbPath, String phonName, String birthDate,
-			String deathDate) throws SQLException {
+	public static RelocationModel[] load(String schema, String dbPath, String phonName, String birthDate)
+			throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		RelocationModel relocationRecord;
 		final List<RelocationModel> lr = new ArrayList<>();
@@ -47,6 +48,16 @@ public class RelocationModel extends ASModel {
 		statement.execute();
 		statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
+
+		final String a = birthDate.toString();
+		final String a1 = a.substring(0, 4);
+		final int b = Integer.parseInt(a1);
+		final String e = a.replace(a1, Integer.toString(b - 2));
+		final String f = a.replace(a1, Integer.toString(b + 2));
+
+		statement.setDate(2, Date.valueOf(e));
+		statement.setDate(3, Date.valueOf(f));
+
 		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
@@ -62,30 +73,6 @@ public class RelocationModel extends ASModel {
 		}
 
 		statement.close();
-
-		// Find relocation dates outside the life span of the individual to
-		// eliminate
-
-		final Date bd = birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate);
-		final Date dd = deathDate.equals("") ? Date.valueOf("9999-12-31") : Date.valueOf(deathDate);
-
-		final List<String> ls = new ArrayList<>();
-
-		for (final RelocationModel relocation2 : lr) {
-			if (relocation2.getRelocationDate().before(bd) || relocation2.getRelocationDate().after(dd)) {
-				ls.add(relocation2.getId());
-			}
-		}
-
-		// Eliminate individuals with relocation dates outside their life span
-
-		for (int j = 0; j < lr.size(); j++) {
-			for (final String id : ls) {
-				if (lr.get(j).getId().equals(id)) {
-					lr.remove(j);
-				}
-			}
-		}
 
 		// Add birth date to each record
 

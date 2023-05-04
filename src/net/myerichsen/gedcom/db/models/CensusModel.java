@@ -16,7 +16,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 29. apr. 2023
+ * @version 4. maj 2023
  *
  */
 
@@ -59,7 +59,52 @@ public class CensusModel extends ASModel {
 		statement.setString(3, deathYear);
 		final ResultSet rs = statement.executeQuery();
 
+		int alder = 0;
+		int ftYear = 0;
+		final int by = Integer.parseInt(birthYear);
+		String fkd = "";
+		final Pattern pattern8 = Pattern.compile(EIGHT_DIGITS);
+		final Pattern patternD = Pattern.compile(DASH_DATE);
+		Matcher matcher;
+		int now = 0;
+		int len = 0;
+
 		while (rs.next()) {
+			alder = rs.getInt("Alder");
+
+			if (alder > 0) {
+				ftYear = rs.getInt("FTaar");
+
+				if (Math.abs(ftYear - alder - by) > 2) {
+					continue;
+				}
+			}
+
+			fkd = rs.getString("Foedt_kildedato");
+
+			if (fkd.length() > 0) {
+				matcher = pattern8.matcher(fkd);
+
+				if (matcher.find()) {
+					now = Integer.parseInt(fkd.substring(0, 4));
+
+					if (Math.abs(now - by) > 2) {
+						continue;
+					}
+				}
+
+				matcher = patternD.matcher(fkd);
+
+				if (matcher.find()) {
+					len = fkd.length();
+					now = Integer.parseInt(fkd.substring(len - 4, len));
+
+					if (Math.abs(now - by) > 2) {
+						continue;
+					}
+				}
+			}
+
 			ci = new CensusModel();
 			ci.setKIPnr(rs.getString("kipNr"));
 			ci.setLoebenr(rs.getInt("Loebenr"));
@@ -71,7 +116,7 @@ public class CensusModel extends ASModel {
 			ci.setMatr_nr_Adresse(rs.getString("Matr_nr_Adresse"));
 			ci.setKildenavn(rs.getString("Kildenavn"));
 			ci.setKoen(rs.getString("Koen"));
-			ci.setAlder(rs.getInt("Alder"));
+			ci.setAlder(alder);
 			ci.setCivilstand(rs.getString("Civilstand"));
 			ci.setKildeerhverv(rs.getString("Kildeerhverv"));
 			ci.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
@@ -81,7 +126,7 @@ public class CensusModel extends ASModel {
 			ci.setAdresse(rs.getString("Adresse"));
 			ci.setMatrikel(rs.getString("Matrikel"));
 			ci.setGade_nr(rs.getString("Gade_nr"));
-			ci.setFTaar(rs.getInt("FTaar"));
+			ci.setFTaar(ftYear);
 			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
 			cil.add(ci);

@@ -126,9 +126,8 @@ public class ProbatePerson {
 		}
 		if (month.equals("DEC")) {
 			return "12";
-		} else {
-			return "01";
 		}
+		return "01";
 	}
 
 	/**

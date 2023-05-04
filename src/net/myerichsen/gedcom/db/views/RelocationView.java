@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 4. maj 2023
  *
  */
 public class RelocationView extends Composite {
@@ -284,14 +284,13 @@ public class RelocationView extends Composite {
 	/**
 	 * @param phonName
 	 * @param birthDate
-	 * @param deathDate
 	 */
-	public void populate(String phonName, String birthDate, String deathDate) {
+	public void populate(String phonName, String birthDate) {
 		thread = new Thread(() -> {
 			if (relocationListener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath"), phonName, birthDate, deathDate };
+							props.getProperty("vejbyPath"), phonName, birthDate };
 					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> relocationTableViewer.setInput(relocationRecords));

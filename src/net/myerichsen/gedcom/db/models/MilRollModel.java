@@ -6,12 +6,13 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 3. maj 2023
+ * @version 4. maj 2023
  *
  */
 public class MilRollModel extends ASModel {
@@ -21,17 +22,10 @@ public class MilRollModel extends ASModel {
 			+ "STOERRELSEITOMMER, OPHOLD, ANMAERKNINGER, FOEDT, GEDCOMID, NAVN, FADERFON, "
 			+ "SOENFON) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private String dbSchema = "";
-	private String dbPath = "";
-
 	private String amt = "";
-
 	private String aar = "";
-
 	private String rulleType = "";
-
 	private int laegdNr = 0;
-
 	private String sogn = "";
 	private String litra = "";
 	private int glLoebeNr = 0;
@@ -43,7 +37,7 @@ public class MilRollModel extends ASModel {
 	private BigDecimal stoerrelseITommer = new BigDecimal(0);
 	private String ophold = "";
 	private String anmaerkninger = "";
-	private Date foedt;
+	private Date foedt = null;
 	private String gedcomId = "";
 	private String navn = "";
 	private String faderFon = "";
@@ -75,20 +69,6 @@ public class MilRollModel extends ASModel {
 	 */
 	public String getAnmaerkninger() {
 		return anmaerkninger;
-	}
-
-	/**
-	 * @return the dbPath
-	 */
-	public String getDbPath() {
-		return dbPath;
-	}
-
-	/**
-	 * @return the dbSchema
-	 */
-	public String getDbSchema() {
-		return dbSchema;
 	}
 
 	/**
@@ -206,13 +186,15 @@ public class MilRollModel extends ASModel {
 	/**
 	 * Save entry to Derby database
 	 *
+	 * @param props
+	 *
 	 * @throws SQLException
 	 *
 	 */
-	public String saveToDb() throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+	public String saveToDb(Properties props) throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, dbSchema);
+		statement.setString(1, props.getProperty("milrollSchema"));
 		statement.execute();
 
 		statement = conn.prepareStatement(INSERT);
@@ -266,20 +248,6 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setAnmaerkninger(String anmaerkninger) {
 		this.anmaerkninger = anmaerkninger;
-	}
-
-	/**
-	 * @param dbPath the dbPath to set
-	 */
-	public void setDbPath(String dbPath) {
-		this.dbPath = dbPath;
-	}
-
-	/**
-	 * @param dbSchema the dbSchema to set
-	 */
-	public void setDbSchema(String dbSchema) {
-		this.dbSchema = dbSchema;
 	}
 
 	/**

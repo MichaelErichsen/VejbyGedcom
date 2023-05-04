@@ -84,8 +84,6 @@ public class IndividualModel extends ASModel {
 		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_PHONNAME);
 		statement.setString(1, phonName);
 
-		// TODO Copy logic to census display
-
 		final String a = birthDate.toString();
 		final String a1 = a.substring(0, 4);
 		final int b = Integer.parseInt(a1);

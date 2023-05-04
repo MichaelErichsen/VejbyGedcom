@@ -42,12 +42,14 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Input application for military rolls
  *
  * @author Michael Erichsen
- * @version 3. maj 2023
+ * @version 4. maj 2023
  *
  */
+
 // TODO Create military roll search view
 // TODO Merge military roll relocations into relocation view
 // TODO Find a way to merge entries from following years
+
 public class MilRollView {
 	private static final String DASH_DATE = "\\d*-\\d*-\\d{4}";
 	private static final String EIGHT_DIGITS = "\\d{8}";
@@ -71,7 +73,6 @@ public class MilRollView {
 	}
 
 	protected Shell shlLgdsrulleindtastning;
-
 	private Text textAmt;
 	private Text textAar;
 	private Combo comboRulletype;
@@ -416,7 +417,6 @@ public class MilRollView {
 	 *
 	 * @throws Exception
 	 */
-	@SuppressWarnings("deprecation")
 	protected void saveToDb() throws SQLException {
 		final MilRollModel lm = new MilRollModel();
 
@@ -454,10 +454,12 @@ public class MilRollView {
 		try {
 			lm.setFoedt(string2Date(textFoedt.getText()));
 		} catch (final ParseException e1) {
-			lm.setFoedt(new Date(1, 1, 1001));
 		}
 		lm.setGedcomId(textGedcomid.getText());
-		lm.setGlLoebeNr(Integer.parseInt(textGlLoebenr.getText()));
+		try {
+			lm.setGlLoebeNr(Integer.parseInt(textGlLoebenr.getText()));
+		} catch (final NumberFormatException e2) {
+		}
 		try {
 			lm.setLaegdNr(Integer.parseInt(textLaegdNr.getText()));
 		} catch (final Exception e) {
@@ -497,7 +499,7 @@ public class MilRollView {
 			lm.setSoenFon("");
 		}
 
-		final String result = lm.saveToDb();
+		final String result = lm.saveToDb(props);
 		setMessage(result);
 
 	}

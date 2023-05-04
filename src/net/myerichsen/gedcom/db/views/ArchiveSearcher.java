@@ -47,13 +47,13 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.tablecreators.CensusTableCreator;
 import net.myerichsen.gedcom.db.tablecreators.CphTableCreator;
 import net.myerichsen.gedcom.db.tablecreators.GedcomTableCreator;
-import net.myerichsen.gedcom.db.tablecreators.MilRollCreator;
+import net.myerichsen.gedcom.db.tablecreators.MilRollTableCreator;
 import net.myerichsen.gedcom.db.tablecreators.ProbateTableCreator;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 3. maj 2023
+ * @version 4. maj 2023
  *
  */
 
@@ -341,7 +341,7 @@ public class ArchiveSearcher extends Shell {
 		mntmDanTabelTil.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setMessage(MilRollCreator.createTables(props));
+				setMessage(MilRollTableCreator.createTables(props));
 			}
 		});
 		mntmDanTabelTil.setText("Dan tabel til l\u00E6gdsruller");
@@ -744,7 +744,7 @@ public class ArchiveSearcher extends Shell {
 			individualView.populate(individual);
 
 			if (props.getProperty("relocationSearch").equals("true")) {
-				relocationView.populate(phonName, birthDate, deathDate);
+				relocationView.populate(phonName, birthDate);
 			}
 
 			if (props.getProperty("censusSearch").equals("true")) {
@@ -821,7 +821,7 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			if (props.getProperty("relocationSearch").equals("true")) {
-				relocationView.populate(phonName, birthDate, deathDate);
+				relocationView.populate(phonName, birthDate);
 			}
 
 			if (props.getProperty("censusSearch").equals("true")) {

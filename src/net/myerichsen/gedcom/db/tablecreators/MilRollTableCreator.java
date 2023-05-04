@@ -11,7 +11,7 @@ import java.util.Properties;
  * @version 3. maj 2023
  *
  */
-public class MilRollCreator {
+public class MilRollTableCreator {
 	private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String CREATE_TABLE = "CREATE TABLE RULLER ( AMT CHAR(32), AAR CHAR(32), "
