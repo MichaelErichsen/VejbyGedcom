@@ -297,6 +297,7 @@ public class RelocationView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Flytninger er hentet"));
 				} catch (final Exception e) {
+					e.printStackTrace();
 					Display.getDefault().asyncExec(
 							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}

@@ -582,6 +582,7 @@ public class CensusView extends Composite {
 		} catch (final SQLException e) {
 			final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 			as.setErrorMessage(e.getMessage());
+			e.printStackTrace();
 		}
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketælling", null, sb.toString(),
@@ -606,6 +607,7 @@ public class CensusView extends Composite {
 			} catch (final SQLException e) {
 				final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 				as.setErrorMessage(e.getMessage());
+				e.printStackTrace();
 			}
 		} else if (open == 2) {
 			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
@@ -729,6 +731,7 @@ public class CensusView extends Composite {
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Folketællinger er hentet"));
 				} catch (final Exception e) {
+					e.printStackTrace();
 					Display.getDefault().asyncExec(
 							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}

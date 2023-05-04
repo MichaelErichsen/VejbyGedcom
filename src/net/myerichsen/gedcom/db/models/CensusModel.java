@@ -25,7 +25,7 @@ public class CensusModel extends ASModel {
 	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String DASH_DATE = "\\d*-\\d{2}-\\d*";
+	private static final String DASH_DATE = "\\d*-\\d*-\\d{4}";
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
 	private static final String DIGITS_ONLY = "\\d+";
@@ -59,9 +59,9 @@ public class CensusModel extends ASModel {
 		statement.setString(3, deathYear);
 		final ResultSet rs = statement.executeQuery();
 
+		final int by = Integer.parseInt(birthYear);
 		int alder = 0;
 		int ftYear = 0;
-		final int by = Integer.parseInt(birthYear);
 		String fkd = "";
 		final Pattern pattern8 = Pattern.compile(EIGHT_DIGITS);
 		final Pattern patternD = Pattern.compile(DASH_DATE);
@@ -71,36 +71,36 @@ public class CensusModel extends ASModel {
 
 		while (rs.next()) {
 			alder = rs.getInt("Alder");
-
-			if (alder > 0) {
-				ftYear = rs.getInt("FTaar");
-
-				if (Math.abs(ftYear - alder - by) > 2) {
-					continue;
-				}
-			}
-
+			ftYear = rs.getInt("FTaar");
 			fkd = rs.getString("Foedt_kildedato");
 
-			if (fkd.length() > 0) {
-				matcher = pattern8.matcher(fkd);
-
-				if (matcher.find()) {
-					now = Integer.parseInt(fkd.substring(0, 4));
-
-					if (Math.abs(now - by) > 2) {
+			if (by > 1) {
+				if (alder > 0) {
+					if (Math.abs(ftYear - alder - by) > 2) {
 						continue;
 					}
 				}
 
-				matcher = patternD.matcher(fkd);
+				if (fkd.length() > 7) {
+					matcher = pattern8.matcher(fkd);
 
-				if (matcher.find()) {
-					len = fkd.length();
-					now = Integer.parseInt(fkd.substring(len - 4, len));
+					if (matcher.find()) {
+						now = Integer.parseInt(fkd.substring(0, 4));
 
-					if (Math.abs(now - by) > 2) {
-						continue;
+						if (Math.abs(now - by) > 2) {
+							continue;
+						}
+					}
+
+					matcher = patternD.matcher(fkd);
+
+					if (matcher.find()) {
+						len = fkd.length();
+						now = Integer.parseInt(fkd.substring(len - 4, len));
+
+						if (Math.abs(now - by) > 2) {
+							continue;
+						}
 					}
 				}
 			}
@@ -121,7 +121,7 @@ public class CensusModel extends ASModel {
 			ci.setKildeerhverv(rs.getString("Kildeerhverv"));
 			ci.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
 			ci.setKildefoedested(rs.getString("Kildefoedested"));
-			ci.setFoedt_kildedato(rs.getString("Foedt_kildedato"));
+			ci.setFoedt_kildedato(fkd);
 			ci.setFoedeaar(rs.getInt("Foedeaar"));
 			ci.setAdresse(rs.getString("Adresse"));
 			ci.setMatrikel(rs.getString("Matrikel"));

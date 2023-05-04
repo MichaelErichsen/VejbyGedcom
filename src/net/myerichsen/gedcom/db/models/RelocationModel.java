@@ -49,10 +49,19 @@ public class RelocationModel extends ASModel {
 		statement = conn.prepareStatement(SELECT_RELOCATION);
 		statement.setString(1, phonName);
 
-		final String a = birthDate.toString();
+		String a = birthDate.toString();
 		final String a1 = a.substring(0, 4);
 		final int b = Integer.parseInt(a1);
-		final String e = a.replace(a1, Integer.toString(b - 2));
+
+		String e = "";
+		if (!a.equals("0001-01-01")) {
+			e = a.replace(a1, Integer.toString(b - 2));
+		} else
+			e = a;
+		if (a.equals("0001-01-01")) {
+			a = "9999-12-31";
+		}
+
 		final String f = a.replace(a1, Integer.toString(b + 2));
 
 		statement.setDate(2, Date.valueOf(e));
