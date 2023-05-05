@@ -56,8 +56,9 @@ public class RelocationModel extends ASModel {
 		String e = "";
 		if (!a.equals("0001-01-01")) {
 			e = a.replace(a1, Integer.toString(b - 2));
-		} else
+		} else {
 			e = a;
+		}
 		if (a.equals("0001-01-01")) {
 			a = "9999-12-31";
 		}

@@ -53,7 +53,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 4. maj 2023
+ * @version 5. maj 2023
  *
  */
 
@@ -384,6 +384,19 @@ public class ArchiveSearcher extends Shell {
 			}
 		});
 		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s Begravelsesregisteret");
+
+		new MenuItem(menu_2, SWT.SEPARATOR);
+
+		final MenuItem mntmLgdsrulleliste = new MenuItem(menu_2, SWT.NONE);
+		mntmLgdsrulleliste.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final MilRollListView m = new MilRollListView(getShell());
+				m.setProperties(props);
+				m.open();
+			}
+		});
+		mntmLgdsrulleliste.setText("L\u00E6gdsrulleliste");
 
 		final MenuItem mntmIndtastLgdsruller = new MenuItem(menu_2, SWT.NONE);
 		mntmIndtastLgdsruller.addSelectionListener(new SelectionAdapter() {

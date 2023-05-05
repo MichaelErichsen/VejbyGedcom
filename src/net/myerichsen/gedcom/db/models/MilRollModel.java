@@ -21,6 +21,14 @@ public class MilRollModel extends ASModel {
 			+ "LAEGDNR, SOGN, LITRA, GLLOEBENR, NYLOEBENR, FADER, SOEN, FOEDESTED, ALDER, "
 			+ "STOERRELSEITOMMER, OPHOLD, ANMAERKNINGER, FOEDT, GEDCOMID, NAVN, FADERFON, "
 			+ "SOENFON) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String UPDATE = "INSERT INTO RULLER ( AMT, AAR, RULLETYPE, "
+			+ "LAEGDNR, SOGN, LITRA, GLLOEBENR, NYLOEBENR, FADER, SOEN, FOEDESTED, ALDER, "
+			+ "STOERRELSEITOMMER, OPHOLD, ANMAERKNINGER, FOEDT, GEDCOMID, NAVN, FADERFON, "
+			+ "SOENFON) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String DELETE = "INSERT INTO RULLER ( AMT, AAR, RULLETYPE, "
+			+ "LAEGDNR, SOGN, LITRA, GLLOEBENR, NYLOEBENR, FADER, SOEN, FOEDESTED, ALDER, "
+			+ "STOERRELSEITOMMER, OPHOLD, ANMAERKNINGER, FOEDT, GEDCOMID, NAVN, FADERFON, "
+			+ "SOENFON) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private String amt = "";
 	private String aar = "";
