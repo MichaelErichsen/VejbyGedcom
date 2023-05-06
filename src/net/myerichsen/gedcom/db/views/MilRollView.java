@@ -36,13 +36,14 @@ import org.eclipse.swt.widgets.Text;
 
 import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.models.MilRollModel;
+import net.myerichsen.gedcom.db.models.MilrollListModel;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**
- * Input application for military rolls
+ * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 4. maj 2023
+ * @version 6. maj 2023
  *
  */
 
@@ -75,11 +76,12 @@ public class MilRollView {
 	protected Shell shlLgdsrulleindtastning;
 	private Text textAmt;
 	private Text textAar;
-	private Combo comboRulletype;
+	private Text textLitra;
+	private Text textRulletype;
 	private Text textLaegdNr;
 	private Text textSogn;
+	private Text textLaegdId;
 	private Composite compositeData;
-	private Text textLitra;
 	private Text textGlLoebenr;
 	private Text textNyLoebenr;
 	private Text textFader;
@@ -93,8 +95,8 @@ public class MilRollView {
 	private Text textGedcomid;
 	private Composite compositeRulleButtons;
 	private Button btnGem;
-	private Button btnRyd;
-	private Button btnHent;
+	private Button btnTilbage;
+	private Button btnFrem;
 	private Properties props;
 	private Composite compositeButtons;
 	private Button btnGemIndtastning;
@@ -104,17 +106,6 @@ public class MilRollView {
 	private Combo messageComboBox;
 	private Button btnSgEfterGedcom;
 	private Button btnGemUri;
-
-	/**
-	 * Clear roll fields
-	 */
-	protected void clearRollFields() {
-		textAmt.setText("");
-		textAar.setText("");
-		comboRulletype.setText("Hovedrulle");
-		textLaegdNr.setText("");
-		textSogn.setText("");
-	}
 
 	/**
 	 * Construct a patronymicon name for the son
@@ -139,7 +130,7 @@ public class MilRollView {
 
 		final Composite compositeRulle = new Composite(shlLgdsrulleindtastning, SWT.BORDER);
 		compositeRulle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		compositeRulle.setLayout(new GridLayout(6, false));
+		compositeRulle.setLayout(new GridLayout(16, false));
 
 		final Label lblAmt = new Label(compositeRulle, SWT.NONE);
 		lblAmt.setText("Amt");
@@ -148,41 +139,82 @@ public class MilRollView {
 		textAmt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		textAmt.setText(props.getProperty("amt"));
 
-		final Label lblr = new Label(compositeRulle, SWT.NONE);
-		lblr.setText("\u00C5r");
+		final Label lblAar = new Label(compositeRulle, SWT.NONE);
+		lblAar.setText("År");
 
 		textAar = new Text(compositeRulle, SWT.BORDER);
-		textAar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textAar.setEditable(false);
+		textAar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		textAar.setText(props.getProperty("aar"));
 
-		final Label lblRulletype = new Label(compositeRulle, SWT.NONE);
-		lblRulletype.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblRulletype.setText("Rulletype");
+		final Label lblLitra = new Label(compositeRulle, SWT.NONE);
+		lblLitra.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblLitra.setText("Litra");
 
-		comboRulletype = new Combo(compositeRulle, SWT.NONE);
-		comboRulletype.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		final String[] rulleTyper = { "Hovedrulle", "Tilgangsrulle" };
-		comboRulletype.setItems(rulleTyper);
-		comboRulletype.setText(props.getProperty("rulletype"));
+		textLitra = new Text(compositeRulle, SWT.BORDER);
+		textLitra.setEditable(false);
+		textLitra.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		textLitra.setText(props.getProperty("litra"));
 
-		final Label lblLgdNr = new Label(compositeRulle, SWT.NONE);
-		lblLgdNr.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblLgdNr.setText("L\u00E6gd nr");
+		textRulletype = new Text(compositeRulle, SWT.NONE);
+		textRulletype.setEditable(false);
+		textRulletype.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textRulletype.setText(props.getProperty("rulletype"));
+
+		final Label lblLgd = new Label(compositeRulle, SWT.NONE);
+		lblLgd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblLgd.setText("L\u00E6gd");
 
 		textLaegdNr = new Text(compositeRulle, SWT.BORDER);
-		textLaegdNr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textLaegdNr.setEditable(false);
+		textLaegdNr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		textLaegdNr.setText(props.getProperty("laegdnr"));
 
-		final Label lblSogn = new Label(compositeRulle, SWT.NONE);
-		lblSogn.setText("Sogn");
-
 		textSogn = new Text(compositeRulle, SWT.BORDER);
+		textSogn.setEnabled(false);
 		textSogn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		textSogn.setText(props.getProperty("sogn"));
+
+		final Label lblId = new Label(compositeRulle, SWT.NONE);
+		lblId.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblId.setText("ID");
+
+		textLaegdId = new Text(compositeRulle, SWT.BORDER);
+		textLaegdId.setEditable(false);
+		textLaegdId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		textLaegdId.setText(props.getProperty("laegdid"));
 
 		compositeRulleButtons = new Composite(compositeRulle, SWT.NONE);
 		compositeRulleButtons.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		compositeRulleButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		btnFrem = new Button(compositeRulleButtons, SWT.NONE);
+		btnFrem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					getNextMilRoll(Integer.parseInt(textLaegdId.getText()));
+				} catch (final NumberFormatException | SQLException e1) {
+					setMessage(e1.getMessage());
+//					e1.printStackTrace();
+				}
+			}
+		});
+		btnFrem.setText("Frem");
+
+		btnTilbage = new Button(compositeRulleButtons, SWT.NONE);
+		btnTilbage.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					getPrevMilRoll(Integer.parseInt(textLaegdId.getText()));
+				} catch (final NumberFormatException | SQLException e1) {
+					setMessage(e1.getMessage());
+//					e1.printStackTrace();
+				}
+			}
+		});
+		btnTilbage.setText("Tilbage");
 
 		btnGem = new Button(compositeRulleButtons, SWT.NONE);
 		btnGem.addSelectionListener(new SelectionAdapter() {
@@ -192,29 +224,8 @@ public class MilRollView {
 			}
 		});
 		btnGem.setText("Gem");
-
-		btnHent = new Button(compositeRulleButtons, SWT.NONE);
-		btnHent.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				getProperties();
-				textAmt.setText(props.getProperty("amt"));
-				textAar.setText(props.getProperty("aar"));
-				comboRulletype.setText(props.getProperty("rulletype"));
-				textLaegdNr.setText(props.getProperty("laegdnr"));
-				textSogn.setText(props.getProperty("sogn"));
-			}
-		});
-		btnHent.setText("Hent");
-
-		btnRyd = new Button(compositeRulleButtons, SWT.NONE);
-		btnRyd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				clearRollFields();
-			}
-		});
-		btnRyd.setText("Ryd");
+		new Label(compositeRulle, SWT.NONE);
+		new Label(compositeRulle, SWT.NONE);
 
 		compositeBrowser = new Composite(shlLgdsrulleindtastning, SWT.BORDER);
 		compositeBrowser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -251,19 +262,10 @@ public class MilRollView {
 		});
 		browser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 		browser.setUrl(textUri.getText());
-		new Label(compositeBrowser, SWT.NONE);
-		new Label(compositeBrowser, SWT.NONE);
-		new Label(compositeBrowser, SWT.NONE);
 
 		compositeData = new Composite(shlLgdsrulleindtastning, SWT.BORDER);
 		compositeData.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		compositeData.setLayout(new GridLayout(6, false));
-
-		final Label lblLitra = new Label(compositeData, SWT.NONE);
-		lblLitra.setText("Litra");
-
-		textLitra = new Text(compositeData, SWT.BORDER);
-		textLitra.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblGlLbenr = new Label(compositeData, SWT.NONE);
 		lblGlLbenr.setBounds(0, 0, 55, 15);
@@ -287,7 +289,8 @@ public class MilRollView {
 				try {
 					searchForGedcomID();
 				} catch (final Exception e1) {
-					e1.printStackTrace();
+					setErrorMessage(e1.getMessage());
+//					e1.printStackTrace();
 				}
 			}
 		});
@@ -362,9 +365,54 @@ public class MilRollView {
 
 		textGedcomid = new Text(compositeData, SWT.BORDER);
 		textGedcomid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		new Label(compositeData, SWT.NONE);
+		new Label(compositeData, SWT.NONE);
 
 		messageComboBox = new Combo(shlLgdsrulleindtastning, SWT.READ_ONLY);
 		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+	}
+
+	/**
+	 * @param laegdId
+	 * @throws SQLException
+	 *
+	 */
+	protected void getNextMilRoll(int laegdId) throws SQLException {
+		final MilrollListModel m = MilrollListModel.selectNext(props.getProperty("milrollPath"),
+				props.getProperty("milrollSchema"), laegdId);
+
+		if (m.getLaegdId() > 0) {
+			textAmt.setText(m.getAmt());
+			textAar.setText(Integer.toString(m.getAar()));
+			textLitra.setText(m.getLitra());
+			textRulletype.setText(m.getRulleType());
+			textLaegdNr.setText(Integer.toString(m.getLaegdNr()));
+			textSogn.setText(m.getSogn());
+			textLaegdId.setText(Integer.toString(m.getLaegdId()));
+		} else
+			setMessage("Ingen højere i dette amt");
+	}
+
+	/**
+	 * @param laegdId
+	 * @throws SQLException
+	 *
+	 */
+	protected void getPrevMilRoll(int laegdId) throws SQLException {
+		final MilrollListModel m = MilrollListModel.selectPrev(props.getProperty("milrollPath"),
+				props.getProperty("milrollSchema"), laegdId);
+
+		if (m.getLaegdId() > 0) {
+			textAmt.setText(m.getAmt());
+			textAar.setText(Integer.toString(m.getAar()));
+			textLitra.setText(m.getLitra());
+			textRulletype.setText(m.getRulleType());
+			textLaegdNr.setText(Integer.toString(m.getLaegdNr()));
+			textSogn.setText(m.getSogn());
+			textLaegdId.setText(Integer.toString(m.getLaegdId()));
+		} else
+			setMessage("Ingen lavere i dette amt");
 
 	}
 
@@ -381,11 +429,13 @@ public class MilRollView {
 
 			props.setProperty("amt", Constants.AMT);
 			props.setProperty("aar", Constants.AAR);
+			props.setProperty("litra", Constants.LITRA);
 			props.setProperty("rulletype", Constants.HOVEDRULLE);
 			props.setProperty("laegdnr", Constants.LAEGDNR);
 			props.setProperty("sogn", Constants.SOGN);
-			props.setProperty("milrolldbpath", Constants.MILROLLDB_PATH);
-			props.setProperty("milrolldbschema", Constants.MILROLLDB_SCHEMA);
+			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
+			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
+			props.setProperty("laegdid", Constants.LAEGDID);
 			props.setProperty("uri", Constants.MILROLL_URI);
 
 			storeProperties();
@@ -421,22 +471,11 @@ public class MilRollView {
 		final MilRollModel lm = new MilRollModel();
 
 		try {
-			lm.setAar(textAar.getText());
-		} catch (final Exception e2) {
-			setErrorMessage("Indtast venligst år");
-			textAar.setFocus();
-		}
-		try {
 			lm.setAlder(Integer.parseInt(textAlder.getText()));
 		} catch (final Exception e) {
 			lm.setAlder(0);
 		}
-		try {
-			lm.setAmt(textAmt.getText());
-		} catch (final Exception e2) {
-			setErrorMessage("Indtast venligst amt");
-			textAmt.setFocus();
-		}
+
 		lm.setAnmaerkninger(textAnmaerkninger.getText());
 
 		try {
@@ -445,47 +484,48 @@ public class MilRollView {
 			setErrorMessage("Indtast venligst fader");
 			textFader.setFocus();
 		}
+
 		try {
 			lm.setFaderFon(fk.generateKey(lm.getFader()));
 		} catch (final Exception e1) {
 			lm.setFaderFon("");
 		}
+
 		lm.setFoedeSted(textFoedested.getText());
+
 		try {
 			lm.setFoedt(string2Date(textFoedt.getText()));
 		} catch (final ParseException e1) {
 		}
 		lm.setGedcomId(textGedcomid.getText());
+
 		try {
 			lm.setGlLoebeNr(Integer.parseInt(textGlLoebenr.getText()));
 		} catch (final NumberFormatException e2) {
 		}
+
 		try {
-			lm.setLaegdNr(Integer.parseInt(textLaegdNr.getText()));
+			lm.setLaegdId(Integer.parseInt(textLaegdId.getText()));
 		} catch (final Exception e) {
-			lm.setLaegdNr(0);
+			lm.setLaegdId(0);
 		}
-		lm.setLitra(textLitra.getText());
+
 		try {
-			lm.setNyLoebeNr(Integer.parseInt(textNyLoebenr.getText()));
+			lm.setLoebeNr(Integer.parseInt(textNyLoebenr.getText()));
 		} catch (final Exception e) {
 			setErrorMessage("Indtast venligst løbenr.");
 			textNyLoebenr.setFocus();
 		}
+
 		lm.setOphold(textOphold.getText());
-		lm.setRulleType(comboRulletype.getText());
+
 		try {
 			lm.setSoen(textSoen.getText());
 		} catch (final Exception e1) {
 			setErrorMessage("Indtast venligst søn");
 			textSoen.setFocus();
 		}
-		try {
-			lm.setSogn(textSogn.getText());
-		} catch (final Exception e1) {
-			setErrorMessage("Indtast venligst sogn");
-			textSogn.setFocus();
-		}
+
 		try {
 			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText()));
 		} catch (final Exception e) {
@@ -493,6 +533,7 @@ public class MilRollView {
 		}
 
 		lm.setNavn(constructName(lm.getFader(), lm.getSoen()));
+
 		try {
 			lm.setSoenFon(fk.generateKey(lm.getNavn()));
 		} catch (final Exception e) {
@@ -578,6 +619,15 @@ public class MilRollView {
 	protected void storeProperties() {
 		try {
 			final OutputStream output = new FileOutputStream(Constants.PROPERTIES_PATH);
+
+			props.setProperty("amt", textAmt.getText());
+			props.setProperty("aar", textAar.getText());
+			props.setProperty("rulletype", textRulletype.getText());
+			props.setProperty("laegdnr", textLaegdNr.getText());
+			props.setProperty("sogn", textSoen.getText());
+			props.setProperty("laegdid", textLaegdId.getText());
+			props.setProperty("uri", textUri.getText());
+
 			props.store(output, "Archive searcher properties");
 		} catch (final Exception e2) {
 			setErrorMessage("Kan ikke gemme egenskaber i " + Constants.PROPERTIES_PATH);

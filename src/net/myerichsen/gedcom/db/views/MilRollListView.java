@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -36,19 +37,26 @@ import net.myerichsen.gedcom.util.MillrollListSognEditingSupport;
 import net.myerichsen.gedcom.util.MilrollListRulletypeEditingSupport;
 
 /**
- * Military roll book data view
+ * Military rolls view
  *
  * @author Michael Erichsen
- * @version 5. maj 2023
+ * @version 6. maj 2023
  *
  */
 public class MilRollListView extends Dialog {
+	private static final int NYTOMLINIE = IDialogConstants.CLIENT_ID + 6;
+	private static final int KOPIERLINIE = IDialogConstants.CLIENT_ID + 5;
+	private static final int SLETLINIE = IDialogConstants.CLIENT_ID + 4;
+	private static final int RETLINIE = IDialogConstants.CLIENT_ID + 3;
+	private static final int OPRETLINIE = IDialogConstants.CLIENT_ID + 2;
 
 	private Table table;
 	private Properties props;
 	private Thread thread;
 	private TableViewer tableViewer;
 	private ASPopulator milrolllistListener;
+
+	// TODO Add message combo
 
 	/**
 	 * Create the dialog.
@@ -72,7 +80,7 @@ public class MilRollListView extends Dialog {
 	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		final Button button_1 = createButton(parent, 2, "opret", true);
+		final Button button_1 = createButton(parent, OPRETLINIE, "opret", true);
 		button_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -85,7 +93,7 @@ public class MilRollListView extends Dialog {
 		});
 		button_1.setText("Opret");
 
-		final Button button_2 = createButton(parent, 3, "ret", false);
+		final Button button_2 = createButton(parent, RETLINIE, "ret", false);
 		button_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -98,7 +106,7 @@ public class MilRollListView extends Dialog {
 		});
 		button_2.setText("Ret");
 
-		final Button button_3 = createButton(parent, 4, "slet", false);
+		final Button button_3 = createButton(parent, SLETLINIE, "slet", false);
 		button_3.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -110,18 +118,55 @@ public class MilRollListView extends Dialog {
 			}
 		});
 		button_3.setText("Slet");
+		Button button = createButton(parent, KOPIERLINIE, "kopierlinie", false);
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				kopier();
+			}
+		});
+		button.setText("Kopi\u00E9r linie");
 
-		final Button button_4 = createButton(parent, 5, "nylinie", false);
-		button_4.addSelectionListener(new SelectionAdapter() {
+		final Button btnNyTomLinie = createButton(parent, NYTOMLINIE, "nytomlinie", false);
+		btnNyTomLinie.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				tableViewer.add(new MilrollListModel());
 			}
 		});
-		button_4.setText("Ny linie");
+		btnNyTomLinie.setText("Ny tom linie");
 
-		final Button button_5 = createButton(parent, 0, "OK", false);
+		final Button button_5 = createButton(parent, IDialogConstants.OK_ID, "OK", false);
 		button_5.setText("OK");
+	}
+
+	/**
+	 * New empty item with backwards references copied into
+	 * 
+	 */
+	protected void kopier() {
+		final TableItem[] tia = table.getSelection();
+
+		if (tia.length == 0) {
+			System.out.println("Intet valgt");
+			return;
+		}
+
+		final TableItem ti = tia[0];
+
+		final MilrollListModel m = new MilrollListModel();
+		m.setAmt(ti.getText(0));
+//		m.setAar(Integer.parseInt(ti.getText(1)));
+//		m.setLitra(ti.getText(2));
+		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
+		m.setGlAar(Integer.parseInt(ti.getText(1)));
+		m.setGlLitra(ti.getText(2));
+		m.setRulleType(ti.getText(6));
+		m.setSogn(ti.getText(7));
+
+		tableViewer.add(m);
+
+		return;
 	}
 
 	/**

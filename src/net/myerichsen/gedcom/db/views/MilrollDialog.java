@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * @author Michael Erichsen
- * @version 3. maj 2023
+ * @version 5. maj 2023
  *
  */
 public class MilrollDialog extends Dialog {

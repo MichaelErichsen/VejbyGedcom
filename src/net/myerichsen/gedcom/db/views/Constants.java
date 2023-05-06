@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db.views;
 
 /**
  * @author Michael Erichsen
- * @version 3. maj 2023
+ * @version 5. maj 2023
  *
  */
 public class Constants {
@@ -34,5 +34,7 @@ public class Constants {
 	public static final String MILROLLDB_PATH = System.getProperty("user.home") + "/laegd";
 	public static final String MILROLLDB_SCHEMA = "LAEGD";
 	public static final String MILROLL_URI = "https://www.sa.dk/ao-soegesider/da/billedviser?epid=16481031#17028,656192";
+	public static final String LITRA = " ";
+	public static final String LAEGDID = "1";
 
 }

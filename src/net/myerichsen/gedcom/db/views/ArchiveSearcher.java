@@ -601,11 +601,13 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("msgLogLen", "20");
 			props.setProperty("amt", Constants.AMT);
 			props.setProperty("aar", Constants.AAR);
+			props.setProperty("litra", Constants.LITRA);
 			props.setProperty("rulletype", Constants.HOVEDRULLE);
 			props.setProperty("laegdnr", Constants.LAEGDNR);
 			props.setProperty("sogn", Constants.SOGN);
 			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
 			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
+			props.setProperty("laegdid", Constants.LAEGDID);
 			props.setProperty("uri", Constants.MILROLL_URI);
 
 			storeProperties();

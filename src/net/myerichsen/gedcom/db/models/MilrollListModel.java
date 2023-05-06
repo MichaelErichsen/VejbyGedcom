@@ -19,6 +19,10 @@ import java.util.List;
 public class MilrollListModel extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT = "SELECT * FROM LAEGD ORDER BY AMT ASC, AAR ASC, LITRA ASC, LAEGDNR ASC";
+	private static final String SELECT_NEXT = "SELECT * FROM LAEGD.LAEGD WHERE LAEGDID > ? ORDER BY AMT ASC, "
+			+ "AAR ASC, LITRA ASC, LAEGDNR ASC FETCH FIRST ROW ONLY";
+	private static final String SELECT_PREV = "SELECT * FROM LAEGD.LAEGD WHERE LAEGDID < ? ORDER BY AMT DESC, "
+			+ "AAR DESC, LITRA DESC, LAEGDNR DESC FETCH FIRST ROW ONLY";
 	private static final String INSERT = "INSERT INTO LAEGD ( AMT, AAR, LITRA, LAEGDNR, GLAAR, "
 			+ "GLLITRA, RULLETYPE, SOGN ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String UPDATE = "UPDATE LAEGD SET AMT = ?, AAR = ?, LITRA = ?, "
@@ -65,6 +69,74 @@ public class MilrollListModel extends ASModel {
 		}
 		return mrlma;
 
+	}
+
+	/**
+	 * @param dbPath
+	 * @param schema
+	 * @param laegdId
+	 * @return
+	 * @throws SQLException
+	 */
+	public static MilrollListModel selectNext(String dbPath, String schema, int laegdId) throws SQLException {
+		final MilrollListModel m = new MilrollListModel();
+
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+
+		statement = conn.prepareStatement(SELECT_NEXT);
+		statement.setInt(1, laegdId);
+		final ResultSet rs = statement.executeQuery();
+
+		if (rs.next()) {
+			m.setAmt(rs.getString("AMT").trim());
+			m.setAar(rs.getInt("AAR"));
+			m.setLitra(rs.getString("LITRA"));
+			m.setLaegdNr(rs.getInt("LAEGDNR"));
+			m.setGlAar(rs.getInt("GLAAR"));
+			m.setGlLitra(rs.getString("GLLITRA"));
+			m.setRulleType(rs.getString("RULLETYPE").trim());
+			m.setSogn(rs.getString("SOGN").trim());
+			m.setLaegdId(rs.getInt("LAEGDID"));
+		}
+
+		return m;
+	}
+
+	/**
+	 * @param dbPath
+	 * @param schema
+	 * @param laegdId
+	 * @return
+	 * @throws SQLException
+	 */
+	public static MilrollListModel selectPrev(String dbPath, String schema, int laegdId) throws SQLException {
+		final MilrollListModel m = new MilrollListModel();
+
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+
+		statement = conn.prepareStatement(SELECT_PREV);
+		statement.setInt(1, laegdId);
+		final ResultSet rs = statement.executeQuery();
+
+		if (rs.next()) {
+			m.setAmt(rs.getString("AMT").trim());
+			m.setAar(rs.getInt("AAR"));
+			m.setLitra(rs.getString("LITRA"));
+			m.setLaegdNr(rs.getInt("LAEGDNR"));
+			m.setGlAar(rs.getInt("GLAAR"));
+			m.setGlLitra(rs.getString("GLLITRA"));
+			m.setRulleType(rs.getString("RULLETYPE").trim());
+			m.setSogn(rs.getString("SOGN").trim());
+			m.setLaegdId(rs.getInt("LAEGDID"));
+		}
+
+		return m;
 	}
 
 	private String amt = "";
