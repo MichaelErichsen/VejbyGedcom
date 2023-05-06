@@ -44,13 +44,13 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 1. maj 2023
+ * @version 6. maj 2023
  *
  */
 public class PolregView extends Composite {
-	private TableViewer polregTableViewer;
-	private Table polregTable;
-	private ASPopulator polregListener;
+	private TableViewer tableViewer;
+	private Table table;
+	private ASPopulator listener;
 	private Properties props;
 	private Text txtPolregAddress;
 	private Text txtPolregBirthDate;
@@ -58,7 +58,7 @@ public class PolregView extends Composite {
 	private Thread thread;
 
 	/**
-	 * Create the composite.
+	 * Create the view
 	 *
 	 * @param parent
 	 * @param style
@@ -67,16 +67,16 @@ public class PolregView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		polregListener = new PolregPopulator();
+		listener = new PolregPopulator();
 
-		final Composite PolregFilterComposite = new Composite(this, SWT.BORDER);
-		PolregFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		PolregFilterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+		final Composite filterComposite = new Composite(this, SWT.BORDER);
+		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		final Label aLabel = new Label(PolregFilterComposite, SWT.NONE);
+		final Label aLabel = new Label(filterComposite, SWT.NONE);
 		aLabel.setText("Filtre: Navn");
 
-		txtPolregName = new Text(PolregFilterComposite, SWT.BORDER);
+		txtPolregName = new Text(filterComposite, SWT.BORDER);
 		txtPolregName.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -86,14 +86,14 @@ public class PolregView extends Composite {
 					txtPolregName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				PolregNameFilter.getInstance().setSearchText(txtPolregName.getText());
-				polregTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
-		final Label lblAdresse = new Label(PolregFilterComposite, SWT.NONE);
+		final Label lblAdresse = new Label(filterComposite, SWT.NONE);
 		lblAdresse.setText("Adresse");
 
-		txtPolregAddress = new Text(PolregFilterComposite, SWT.BORDER);
+		txtPolregAddress = new Text(filterComposite, SWT.BORDER);
 		txtPolregAddress.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -103,14 +103,14 @@ public class PolregView extends Composite {
 					txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				PolregAddressFilter.getInstance().setSearchText(txtPolregAddress.getText());
-				polregTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
-		final Label lblprdb = new Label(PolregFilterComposite, SWT.NONE);
+		final Label lblprdb = new Label(filterComposite, SWT.NONE);
 		lblprdb.setText("Fødselsdato");
 
-		txtPolregBirthDate = new Text(PolregFilterComposite, SWT.BORDER);
+		txtPolregBirthDate = new Text(filterComposite, SWT.BORDER);
 		txtPolregBirthDate.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -120,11 +120,11 @@ public class PolregView extends Composite {
 					txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				PolregBirthdateFilter.getInstance().setSearchText(txtPolregBirthDate.getText());
-				polregTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
-		final Button btnRydFelternePolreg = new Button(PolregFilterComposite, SWT.NONE);
+		final Button btnRydFelternePolreg = new Button(filterComposite, SWT.NONE);
 		btnRydFelternePolreg.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -133,30 +133,32 @@ public class PolregView extends Composite {
 		});
 		btnRydFelternePolreg.setText("Ryd felterne");
 
-		final ScrolledComposite polregScroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		polregScroller.setExpandHorizontal(true);
-		polregScroller.setExpandVertical(true);
-		polregScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		polregScroller.setSize(0, 0);
+		final ScrolledComposite scrolledComposite = new ScrolledComposite(this,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
+		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		scrolledComposite.setSize(0, 0);
 
-		polregTableViewer = new TableViewer(polregScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		polregTableViewer.setUseHashlookup(true);
-		polregTable = polregTableViewer.getTable();
-		polregTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer = new TableViewer(scrolledComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+
 		final ViewerFilter[] filters = new ViewerFilter[3];
 		filters[0] = PolregNameFilter.getInstance();
 		filters[1] = PolregAddressFilter.getInstance();
 		filters[2] = PolregBirthdateFilter.getInstance();
-		polregTableViewer.setFilters(filters);
-		polregTableViewer.setComparator(new PolregComparator());
-		polregTableViewer.addDoubleClickListener(event -> {
+		tableViewer.setFilters(filters);
+		tableViewer.setComparator(new PolregComparator());
+		tableViewer.addDoubleClickListener(event -> {
 			polregPopup();
 		});
 
-		polregTable.setHeaderVisible(true);
-		polregTable.setLinesVisible(true);
+		table = tableViewer.getTable();
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
 
-		final TableViewerColumn tableViewerColumn = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnNavn_1 = tableViewerColumn.getColumn();
 		tblclmnNavn_1.setWidth(100);
 		tblclmnNavn_1.setText("Navn");
@@ -169,7 +171,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFdedag = tableViewerColumn_1.getColumn();
 		tblclmnFdedag.setWidth(100);
 		tblclmnFdedag.setText("F\u00F8dselsdato");
@@ -182,7 +184,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnErhverv_1 = tableViewerColumn_2.getColumn();
 		tblclmnErhverv_1.setWidth(100);
 		tblclmnErhverv_1.setText("Erhverv");
@@ -195,7 +197,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnGade = tableViewerColumn_3.getColumn();
 		tblclmnGade.setWidth(100);
 		tblclmnGade.setText("Gade");
@@ -208,7 +210,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnNr = tableViewerColumn_4.getColumn();
 		tblclmnNr.setWidth(40);
 		tblclmnNr.setText("Nr.");
@@ -221,7 +223,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnBogstav = tableViewerColumn_5.getColumn();
 		tblclmnBogstav.setWidth(40);
 		tblclmnBogstav.setText("Bogstav");
@@ -234,7 +236,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnEtage = tableViewerColumn_6.getColumn();
 		tblclmnEtage.setWidth(50);
 		tblclmnEtage.setText("Etage");
@@ -247,7 +249,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnSted_1 = tableViewerColumn_7.getColumn();
 		tblclmnSted_1.setWidth(100);
 		tblclmnSted_1.setText("Sted");
@@ -260,7 +262,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnVrt = tableViewerColumn_8.getColumn();
 		tblclmnVrt.setWidth(100);
 		tblclmnVrt.setText("V\u00E6rt");
@@ -273,7 +275,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_9 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnDag = tableViewerColumn_9.getColumn();
 		tblclmnDag.setWidth(50);
 		tblclmnDag.setText("Dag");
@@ -286,7 +288,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_10 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_10 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnMned = tableViewerColumn_10.getColumn();
 		tblclmnMned.setWidth(49);
 		tblclmnMned.setText("M\u00E5ned");
@@ -299,7 +301,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_11 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_11 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnr_1 = tableViewerColumn_11.getColumn();
 		tblclmnr_1.setWidth(50);
 		tblclmnr_1.setText("\u00C5r");
@@ -312,7 +314,7 @@ public class PolregView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_12 = new TableViewerColumn(polregTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_12 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnAdresse_1 = tableViewerColumn_12.getColumn();
 		tblclmnAdresse_1.setWidth(300);
 		tblclmnAdresse_1.setText("Adresse");
@@ -325,8 +327,8 @@ public class PolregView extends Composite {
 			}
 		});
 
-		polregScroller.setContent(polregTable);
-		polregScroller.setMinSize(polregTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scrolledComposite.setContent(table);
+		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -343,12 +345,12 @@ public class PolregView extends Composite {
 			thread.interrupt();
 		}
 		final PolregModel[] input = new PolregModel[0];
-		polregTableViewer.setInput(input);
+		tableViewer.setInput(input);
 		clearFilters();
 	}
 
 	/**
-	 *
+	 * Clear filters
 	 */
 	private void clearFilters() {
 		PolregBirthdateFilter.getInstance().setSearchText("");
@@ -357,14 +359,14 @@ public class PolregView extends Composite {
 		txtPolregAddress.setText("");
 		txtPolregAddress.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtPolregBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		polregTableViewer.refresh();
+		tableViewer.refresh();
 	}
 
 	/**
 	 *
 	 */
 	private void polregPopup() {
-		final TableItem[] tia = polregTable.getSelection();
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
@@ -397,13 +399,13 @@ public class PolregView extends Composite {
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
 		thread = new Thread(() -> {
-			if (polregListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
 							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
-					final PolregModel[] PolregRecords = (PolregModel[]) polregListener.load(loadArgs);
+					final PolregModel[] PolregRecords = (PolregModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> polregTableViewer.setInput(PolregRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(PolregRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Politiets Registerblade er hentet"));
 				} catch (final Exception e) {

@@ -5,8 +5,10 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing an entry in a military roll
@@ -15,16 +17,19 @@ import java.util.Properties;
  * @version 6. maj 2023
  *
  */
-public class MilRollModel extends ASModel {
-	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String INSERT = "INSERT INTO RULLE ( LAEGDID, GLLAEGDID, GLLOEBENR, LOEBENR, FADER, SOEN, FOEDESTED, ALDER, "
-			+ "STOERRELSEITOMMER, OPHOLD, ANMAERKNINGER, FOEDT, GEDCOMID, NAVN, FADERFON, "
-			+ "SOENFON) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String UPDATE = "UPDATE RULLE SET GLLAEGDID = ?, GLLOEBENR = ?, FADER = ?, SOEN = ?, FOEDESTED = ?, ALDER = ?, "
-			+ "STOERRELSEITOMMER = ?, OPHOLD = ?, ANMAERKNINGER = ?, FOEDT = ?, GEDCOMID = ?, NAVN = ?, FADERFON = ?, SOENFON = ? "
-			+ "WHERE LAEGDID = ? AND LOEBENR = ?";
-	private static final String DELETE = "DELETE FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
 
+public class MilRollEntryModel extends ASModel {
+	private static final String SET_SCHEMA = "SET SCHEMA = ?";
+	private static final String SELECT = "SELECT * FROM LAEGD.LAEGD, LAEGD.RULLE WHERE LAEGD.LAEGD.LAEGDID = LAEGD.RULLE.LAEGDID";
+
+	private String amt = "";
+	private int aar = 0;
+	private String litra = " ";
+	private int laegdnr = 0;
+	private int glaar = 0;
+	private String gllitra = " ";
+	private String rulletype = "Hovedrulle";
+	private String sogn = "";
 	private int laegdId = 0;
 	private int glLaegdId = 0;
 	private int glLoebeNr = 0;
@@ -43,10 +48,24 @@ public class MilRollModel extends ASModel {
 	private String soenFon = "";
 
 	/**
+	 * @return the aar
+	 */
+	public int getAar() {
+		return aar;
+	}
+
+	/**
 	 * @return the alder
 	 */
 	public int getAlder() {
 		return alder;
+	}
+
+	/**
+	 * @return the amt
+	 */
+	public String getAmt() {
+		return amt;
 	}
 
 	/**
@@ -92,10 +111,24 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * @return the glaar
+	 */
+	public int getGlaar() {
+		return glaar;
+	}
+
+	/**
 	 * @return the glLaegdId
 	 */
 	public int getGlLaegdId() {
 		return glLaegdId;
+	}
+
+	/**
+	 * @return the gllitra
+	 */
+	public String getGllitra() {
+		return gllitra;
 	}
 
 	/**
@@ -110,6 +143,20 @@ public class MilRollModel extends ASModel {
 	 */
 	public int getLaegdId() {
 		return laegdId;
+	}
+
+	/**
+	 * @return the laegdnr
+	 */
+	public int getLaegdnr() {
+		return laegdnr;
+	}
+
+	/**
+	 * @return the litra
+	 */
+	public String getLitra() {
+		return litra;
 	}
 
 	/**
@@ -134,6 +181,13 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * @return the rulletype
+	 */
+	public String getRulletype() {
+		return rulletype;
+	}
+
+	/**
 	 * @return the soen
 	 */
 	public String getSoen() {
@@ -148,6 +202,13 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * @return the sogn
+	 */
+	public String getSogn() {
+		return sogn;
+	}
+
+	/**
 	 * @return the stoerrelseITommer
 	 */
 	public BigDecimal getStoerrelseITommer() {
@@ -155,92 +216,70 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * Load list of entries from data base
+	 *
 	 * @param props
-	 * @return
+	 *
 	 * @throws SQLException
+	 *
 	 */
-	public String delete(Properties props) throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
+	public static MilRollEntryModel[] load(String path, String schema) throws SQLException {
+		MilRollEntryModel m;
+		final List<MilRollEntryModel> lm = new ArrayList<MilRollEntryModel>();
+
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + path);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, props.getProperty("milrollSchema"));
+		statement.setString(1, schema);
 		statement.execute();
 
-		statement = conn.prepareStatement(DELETE);
-		statement.setInt(1, laegdId);
-		statement.setInt(2, loebeNr);
-		statement.execute();
+		statement = conn.prepareStatement(SELECT);
+		ResultSet rs = statement.executeQuery();
 
-		return "Indtastning " + loebeNr + " er slettet";
+		while (rs.next()) {
+			m = new MilRollEntryModel();
+			m.setAmt(rs.getString("AMT").trim());
+			m.setAar(rs.getInt("AAR"));
+			m.setLitra(rs.getString("LITRA"));
+			m.setLaegdnr(rs.getInt("LAEGDNR"));
+			m.setGlaar(rs.getInt("GLAAR"));
+			m.setGllitra(rs.getString("GLLITRA"));
+			m.setRulletype(rs.getString("RULLETYPE").trim());
+			m.setSogn(rs.getString("SOGN").trim());
+			m.setLaegdId(rs.getInt("LAEGDID"));
+			m.setGlLaegdId(rs.getInt("GLLAEGDID"));
+			m.setGlaar(rs.getInt("GLLOEBENR"));
+			m.setLoebeNr(rs.getInt("LOEBENR"));
+			m.setFader(rs.getString("FADER"));
+			m.setSoen(rs.getString("SOEN"));
+			m.setFoedeSted(rs.getString("FOEDESTED"));
+			m.setAlder(rs.getInt("ALDER"));
+			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			m.setOphold(rs.getString("OPHOLD"));
+			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			m.setFoedt(rs.getDate("FOEDT"));
+			m.setGedcomId(rs.getString("GEDCOMID"));
+			m.setNavn(rs.getString("NAVN"));
+			m.setFaderFon(rs.getString("FADERFON"));
+			m.setSoenFon(rs.getString("SOENFON"));
+
+			lm.add(m);
+		}
+
+		final MilRollEntryModel[] ma = new MilRollEntryModel[lm.size()];
+
+		for (int i = 0; i < lm.size(); i++) {
+			ma[i] = lm.get(i);
+
+		}
+
+		return ma;
 	}
 
 	/**
-	 * Save entry to Derby database
-	 *
-	 * @param props
-	 *
-	 * @throws SQLException
-	 *
+	 * @param aar the aar to set
 	 */
-	public String insert(Properties props) throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, props.getProperty("milrollSchema"));
-		statement.execute();
-
-		statement = conn.prepareStatement(INSERT);
-		statement.setInt(1, laegdId);
-		statement.setInt(2, glLaegdId);
-		statement.setInt(3, glLoebeNr);
-		statement.setInt(4, loebeNr);
-		statement.setString(5, fader);
-		statement.setString(6, soen);
-		statement.setString(7, foedeSted);
-		statement.setInt(8, alder);
-		statement.setBigDecimal(9, stoerrelseITommer);
-		statement.setString(10, ophold);
-		statement.setString(11, anmaerkninger);
-		statement.setDate(12, foedt);
-		statement.setString(13, gedcomId);
-		statement.setString(14, navn);
-		statement.setString(15, faderFon);
-		statement.setString(16, soenFon);
-		statement.execute();
-
-		return "Indtastning " + loebeNr + " er oprettet";
-	}
-
-	/**
-	 * @param props
-	 * @return
-	 * @throws SQLException
-	 */
-	public String update(Properties props) throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, props.getProperty("milrollSchema"));
-		statement.execute();
-
-		statement = conn.prepareStatement(UPDATE);
-
-		statement.setInt(1, glLaegdId);
-		statement.setInt(2, glLoebeNr);
-		statement.setString(3, fader);
-		statement.setString(4, soen);
-		statement.setString(5, foedeSted);
-		statement.setInt(6, alder);
-		statement.setBigDecimal(7, stoerrelseITommer);
-		statement.setString(8, ophold);
-		statement.setString(9, anmaerkninger);
-		statement.setDate(10, foedt);
-		statement.setString(11, gedcomId);
-		statement.setString(12, navn);
-		statement.setString(13, faderFon);
-		statement.setString(14, soenFon);
-		statement.setInt(15, laegdId);
-		statement.setInt(16, loebeNr);
-		statement.execute();
-
-		return "Indtastning " + loebeNr + " er rettet";
+	public void setAar(int aar) {
+		this.aar = aar;
 	}
 
 	/**
@@ -248,6 +287,13 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setAlder(int alder) {
 		this.alder = alder;
+	}
+
+	/**
+	 * @param amt the amt to set
+	 */
+	public void setAmt(String amt) {
+		this.amt = amt;
 	}
 
 	/**
@@ -293,10 +339,24 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * @param glaar the glaar to set
+	 */
+	public void setGlaar(int glaar) {
+		this.glaar = glaar;
+	}
+
+	/**
 	 * @param glLaegdId the glLaegdId to set
 	 */
 	public void setGlLaegdId(int glLaegdId) {
 		this.glLaegdId = glLaegdId;
+	}
+
+	/**
+	 * @param gllitra the gllitra to set
+	 */
+	public void setGllitra(String gllitra) {
+		this.gllitra = gllitra;
 	}
 
 	/**
@@ -311,6 +371,20 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setLaegdId(int laegdId) {
 		this.laegdId = laegdId;
+	}
+
+	/**
+	 * @param laegdnr the laegdnr to set
+	 */
+	public void setLaegdnr(int laegdnr) {
+		this.laegdnr = laegdnr;
+	}
+
+	/**
+	 * @param litra the litra to set
+	 */
+	public void setLitra(String litra) {
+		this.litra = litra;
 	}
 
 	/**
@@ -335,6 +409,13 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * @param rulletype the rulletype to set
+	 */
+	public void setRulletype(String rulletype) {
+		this.rulletype = rulletype;
+	}
+
+	/**
 	 * @param soen the soen to set
 	 */
 	public void setSoen(String soen) {
@@ -349,9 +430,17 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
+	 * @param sogn the sogn to set
+	 */
+	public void setSogn(String sogn) {
+		this.sogn = sogn;
+	}
+
+	/**
 	 * @param stoerrelseITommer the stoerrelseITommer to set
 	 */
 	public void setStoerrelseITommer(BigDecimal stoerrelseITommer) {
 		this.stoerrelseITommer = stoerrelseITommer;
 	}
+
 }

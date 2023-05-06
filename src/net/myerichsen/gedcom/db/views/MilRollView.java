@@ -47,7 +47,6 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 
-// TODO Create military roll search view
 // TODO Merge military roll relocations into relocation view
 // TODO Find a way to merge entries from following years
 
@@ -471,43 +470,8 @@ public class MilRollView {
 		final MilRollModel lm = new MilRollModel();
 
 		try {
-			lm.setAlder(Integer.parseInt(textAlder.getText()));
-		} catch (final Exception e) {
-			lm.setAlder(0);
-		}
-
-		lm.setAnmaerkninger(textAnmaerkninger.getText());
-
-		try {
-			lm.setFader(textFader.getText());
-		} catch (final Exception e2) {
-			setErrorMessage("Indtast venligst fader");
-			textFader.setFocus();
-		}
-
-		try {
-			lm.setFaderFon(fk.generateKey(lm.getFader()));
-		} catch (final Exception e1) {
-			lm.setFaderFon("");
-		}
-
-		lm.setFoedeSted(textFoedested.getText());
-
-		try {
-			lm.setFoedt(string2Date(textFoedt.getText()));
-		} catch (final ParseException e1) {
-		}
-		lm.setGedcomId(textGedcomid.getText());
-
-		try {
 			lm.setGlLoebeNr(Integer.parseInt(textGlLoebenr.getText()));
 		} catch (final NumberFormatException e2) {
-		}
-
-		try {
-			lm.setLaegdId(Integer.parseInt(textLaegdId.getText()));
-		} catch (final Exception e) {
-			lm.setLaegdId(0);
 		}
 
 		try {
@@ -517,7 +481,12 @@ public class MilRollView {
 			textNyLoebenr.setFocus();
 		}
 
-		lm.setOphold(textOphold.getText());
+		try {
+			lm.setFader(textFader.getText());
+		} catch (final Exception e2) {
+			setErrorMessage("Indtast venligst fader");
+			textFader.setFocus();
+		}
 
 		try {
 			lm.setSoen(textSoen.getText());
@@ -526,10 +495,40 @@ public class MilRollView {
 			textSoen.setFocus();
 		}
 
+		lm.setFoedeSted(textFoedested.getText());
+
+		try {
+			lm.setAlder(Integer.parseInt(textAlder.getText()));
+		} catch (final Exception e) {
+			lm.setAlder(0);
+		}
+
 		try {
 			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText()));
 		} catch (final Exception e) {
 			lm.setStoerrelseITommer(new BigDecimal(0));
+		}
+
+		lm.setOphold(textOphold.getText());
+		lm.setAnmaerkninger(textAnmaerkninger.getText());
+
+		try {
+			lm.setFoedt(string2Date(textFoedt.getText()));
+		} catch (final ParseException e1) {
+		}
+
+		lm.setGedcomId(textGedcomid.getText());
+
+		try {
+			lm.setFaderFon(fk.generateKey(lm.getFader()));
+		} catch (final Exception e1) {
+			lm.setFaderFon("");
+		}
+
+		try {
+			lm.setLaegdId(Integer.parseInt(textLaegdId.getText()));
+		} catch (final Exception e) {
+			lm.setLaegdId(0);
 		}
 
 		lm.setNavn(constructName(lm.getFader(), lm.getSoen()));
@@ -540,7 +539,7 @@ public class MilRollView {
 			lm.setSoenFon("");
 		}
 
-		final String result = lm.saveToDb(props);
+		final String result = lm.insert(props);
 		setMessage(result);
 
 	}

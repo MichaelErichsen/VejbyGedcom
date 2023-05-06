@@ -300,7 +300,6 @@ public class MilRollListView extends Dialog {
 		});
 		tableViewerColumn_7.setEditingSupport(new MillrollListSognEditingSupport(tableViewer));
 
-		// TODO Generate id
 		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnLgdId = tableViewerColumn_8.getColumn();
 		tblclmnLgdId.setWidth(100);
@@ -370,7 +369,7 @@ public class MilRollListView extends Dialog {
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(milrolllistRecords));
 				} catch (final Exception e) {
 					e.printStackTrace();
-//	TODO				Display.getDefault().asyncExec(
+//					Display.getDefault().asyncExec(
 //							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 				}
 			}

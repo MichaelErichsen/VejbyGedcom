@@ -37,7 +37,6 @@ public class BurregModel extends ASModel {
 	 */
 	public static BurregModel[] load(String schema, String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
-
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);

@@ -104,6 +104,7 @@ public class ArchiveSearcher extends Shell {
 	private final DescendantCounterView descendantCounterView;
 	private final HouseholdHeadView householdHeadView;
 	private final CensusdupView censusdupView;
+	private MilRollEntryView milrollEntryView;
 
 	/**
 	 * Create the shell.
@@ -181,6 +182,12 @@ public class ArchiveSearcher extends Shell {
 		censusdupView.setProperties(props);
 		tbtmFtDubletter.setControl(censusdupView);
 
+		TabItem tbtmLgdsruller = new TabItem(tabFolder, SWT.NONE);
+		tbtmLgdsruller.setText("L\u00E6gdsruller");
+		milrollEntryView = new MilRollEntryView(tabFolder, SWT.NONE);
+		milrollEntryView.setProperties(props);
+		tbtmLgdsruller.setControl(milrollEntryView);
+
 		messageComboBox = new Combo(this, SWT.READ_ONLY);
 		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
@@ -255,6 +262,11 @@ public class ArchiveSearcher extends Shell {
 	protected void createContents() {
 		setText("Arkivsøgning");
 		setSize(1037, 625);
+		try {
+			milrollEntryView.populate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -786,6 +798,8 @@ public class ArchiveSearcher extends Shell {
 			if (props.getProperty("headSearch").equals("true")) {
 				householdHeadView.populate(individual.getId());
 			}
+
+//			milrollEntryView.populate();
 		} catch (final SQLException e1) {
 			messageComboBox.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -858,6 +872,8 @@ public class ArchiveSearcher extends Shell {
 			if (searchFather.getText().length() > 0 || searchMother.getText().length() > 0) {
 				siblingsView.populate(searchFather.getText(), searchMother.getText());
 			}
+
+//			milrollEntryView.populate();
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
