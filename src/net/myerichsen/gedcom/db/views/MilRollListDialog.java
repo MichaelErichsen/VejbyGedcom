@@ -40,10 +40,10 @@ import net.myerichsen.gedcom.util.MilrollListRulletypeEditingSupport;
  * Military rolls view
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 7. maj 2023
  *
  */
-public class MilRollListView extends Dialog {
+public class MilRollListDialog extends Dialog {
 	private static final int NYTOMLINIE = IDialogConstants.CLIENT_ID + 6;
 	private static final int KOPIERLINIE = IDialogConstants.CLIENT_ID + 5;
 	private static final int SLETLINIE = IDialogConstants.CLIENT_ID + 4;
@@ -55,16 +55,16 @@ public class MilRollListView extends Dialog {
 	private Thread thread;
 	private TableViewer tableViewer;
 	private ASPopulator milrolllistListener;
-
-	// TODO Add message combo
+	private final ArchiveSearcher as;
 
 	/**
 	 * Create the dialog.
 	 *
 	 * @param parentShell
 	 */
-	public MilRollListView(Shell parentShell) {
+	public MilRollListDialog(Shell parentShell) {
 		super(parentShell);
+		as = (ArchiveSearcher) parentShell;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class MilRollListView extends Dialog {
 				try {
 					opret();
 				} catch (final SQLException e1) {
-					e1.printStackTrace();
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage()));
 				}
 			}
 		});
@@ -100,7 +100,7 @@ public class MilRollListView extends Dialog {
 				try {
 					ret();
 				} catch (final SQLException e1) {
-					e1.printStackTrace();
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage()));
 				}
 			}
 		});
@@ -113,12 +113,12 @@ public class MilRollListView extends Dialog {
 				try {
 					slet();
 				} catch (final SQLException e1) {
-					e1.printStackTrace();
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage()));
 				}
 			}
 		});
 		button_3.setText("Slet");
-		Button button = createButton(parent, KOPIERLINIE, "kopierlinie", false);
+		final Button button = createButton(parent, KOPIERLINIE, "kopierlinie", false);
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -138,35 +138,6 @@ public class MilRollListView extends Dialog {
 
 		final Button button_5 = createButton(parent, IDialogConstants.OK_ID, "OK", false);
 		button_5.setText("OK");
-	}
-
-	/**
-	 * New empty item with backwards references copied into
-	 * 
-	 */
-	protected void kopier() {
-		final TableItem[] tia = table.getSelection();
-
-		if (tia.length == 0) {
-			System.out.println("Intet valgt");
-			return;
-		}
-
-		final TableItem ti = tia[0];
-
-		final MilrollListModel m = new MilrollListModel();
-		m.setAmt(ti.getText(0));
-//		m.setAar(Integer.parseInt(ti.getText(1)));
-//		m.setLitra(ti.getText(2));
-		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
-		m.setGlAar(Integer.parseInt(ti.getText(1)));
-		m.setGlLitra(ti.getText(2));
-		m.setRulleType(ti.getText(6));
-		m.setSogn(ti.getText(7));
-
-		tableViewer.add(m);
-
-		return;
 	}
 
 	/**
@@ -327,6 +298,33 @@ public class MilRollListView extends Dialog {
 	}
 
 	/**
+	 * New empty item with backwards references copied into
+	 *
+	 */
+	protected void kopier() {
+		final TableItem[] tia = table.getSelection();
+
+		if (tia.length == 0) {
+			Display.getDefault().asyncExec(() -> as.setMessage("Ingen rulle valgt"));
+			return;
+		}
+
+		final TableItem ti = tia[0];
+
+		final MilrollListModel m = new MilrollListModel();
+		m.setAmt(ti.getText(0));
+		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
+		m.setGlAar(Integer.parseInt(ti.getText(1)));
+		m.setGlLitra(ti.getText(2));
+		m.setRulleType(ti.getText(6));
+		m.setSogn(ti.getText(7));
+
+		tableViewer.add(m);
+
+		return;
+	}
+
+	/**
 	 * @throws SQLException
 	 *
 	 */
@@ -368,9 +366,7 @@ public class MilRollListView extends Dialog {
 
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(milrolllistRecords));
 				} catch (final Exception e) {
-					e.printStackTrace();
-//					Display.getDefault().asyncExec(
-//							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage()));
 				}
 			}
 		});

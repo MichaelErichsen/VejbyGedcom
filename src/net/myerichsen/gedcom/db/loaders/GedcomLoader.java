@@ -89,7 +89,7 @@ public class GedcomLoader {
 	private static Gedcom gedcom;
 
 	/**
-	 * MilRollView called method
+	 * MilRollEntryDialog called method
 	 *
 	 * @param args
 	 * @param shells

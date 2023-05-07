@@ -19,7 +19,7 @@ public class LoadPolicePerson extends LoadCphArch {
 	static int counter = 0;
 
 	/**
-	 * MilRollView method
+	 * MilRollEntryDialog method
 	 *
 	 * @param args
 	 */

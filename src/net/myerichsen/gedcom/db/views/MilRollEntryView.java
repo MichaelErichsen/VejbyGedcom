@@ -45,7 +45,7 @@ import net.myerichsen.gedcom.db.populators.MilrollPopulator;
  * Milroll entry view
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 7. maj 2023
  *
  */
 
@@ -420,6 +420,43 @@ public class MilRollEntryView extends Composite {
 		scrolledCompotise.setContent(table);
 		scrolledCompotise.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
+		final Composite buttonComposite = new Composite(this, SWT.BORDER);
+		buttonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+		final Label lblDanListeOver = new Label(buttonComposite, SWT.NONE);
+		lblDanListeOver.setText("Hent liste over l\u00E6gdsruller");
+
+		final Button btnFind = new Button(buttonComposite, SWT.NONE);
+		btnFind.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					populate();
+				} catch (final SQLException e1) {
+					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+				}
+			}
+		});
+		btnFind.setText("Hent");
+
+		final Button btnLgdsrulleliste = new Button(buttonComposite, SWT.NONE);
+		btnLgdsrulleliste.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				((ArchiveSearcher) ((TabFolder) getParent()).getParent()).laegdsRulleListe();
+			}
+		});
+		btnLgdsrulleliste.setText("L\u00E6gdsrulleliste");
+
+		final Button btnIndtastLgdsruller = new Button(buttonComposite, SWT.NONE);
+		btnIndtastLgdsruller.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MilRollEntryDialog.main(props);
+			}
+
+		});
+		btnIndtastLgdsruller.setText("Indtast l\u00E6gdsruller");
 	}
 
 	@Override
@@ -505,7 +542,7 @@ public class MilRollEntryView extends Composite {
 		}
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Lægdsruller", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Hop til" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -513,6 +550,15 @@ public class MilRollEntryView extends Composite {
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
 			clipboard.dispose();
+		} else if (open == 2) {
+			final String id = ti.getText(17);
+			if (id.length() > 0) {
+				if (id.startsWith("@I")) {
+					final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+					grandParent.getSearchId().setText(id);
+					grandParent.searchById(null);
+				}
+			}
 		}
 	}
 

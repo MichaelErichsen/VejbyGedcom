@@ -36,7 +36,7 @@ import org.gedcom4j.parser.GedcomParser;
 public class ProbateFinder {
 
 	/**
-	 * MilRollView method
+	 * MilRollEntryDialog method
 	 *
 	 * @param args
 	 */

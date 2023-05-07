@@ -103,8 +103,8 @@ public class ArchiveSearcher extends Shell {
 	private final SiblingsView siblingsView;
 	private final DescendantCounterView descendantCounterView;
 	private final HouseholdHeadView householdHeadView;
-	private final CensusdupView censusdupView;
-	private MilRollEntryView milrollEntryView;
+	private final CensusDupView censusDupView;
+	private final MilRollEntryView milrollEntryView;
 
 	/**
 	 * Create the shell.
@@ -178,11 +178,11 @@ public class ArchiveSearcher extends Shell {
 
 		final TabItem tbtmFtDubletter = new TabItem(tabFolder, SWT.NONE);
 		tbtmFtDubletter.setText("Ft. &dubletter");
-		censusdupView = new CensusdupView(tabFolder, SWT.NONE);
-		censusdupView.setProperties(props);
-		tbtmFtDubletter.setControl(censusdupView);
+		censusDupView = new CensusDupView(tabFolder, SWT.NONE);
+		censusDupView.setProperties(props);
+		tbtmFtDubletter.setControl(censusDupView);
 
-		TabItem tbtmLgdsruller = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmLgdsruller = new TabItem(tabFolder, SWT.NONE);
 		tbtmLgdsruller.setText("L\u00E6gdsruller");
 		milrollEntryView = new MilRollEntryView(tabFolder, SWT.NONE);
 		milrollEntryView.setProperties(props);
@@ -251,7 +251,7 @@ public class ArchiveSearcher extends Shell {
 		siblingsView.clear();
 		descendantCounterView.clear();
 		householdHeadView.clear();
-		censusdupView.clear();
+		censusDupView.clear();
 		searchId.setFocus();
 		setMessage("Felter er ryddet");
 	}
@@ -262,11 +262,6 @@ public class ArchiveSearcher extends Shell {
 	protected void createContents() {
 		setText("Arkivsøgning");
 		setSize(1037, 625);
-		try {
-			milrollEntryView.populate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -403,9 +398,7 @@ public class ArchiveSearcher extends Shell {
 		mntmLgdsrulleliste.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				final MilRollListView m = new MilRollListView(getShell());
-				m.setProperties(props);
-				m.open();
+				laegdsRulleListe();
 			}
 		});
 		mntmLgdsrulleliste.setText("L\u00E6gdsrulleliste");
@@ -414,7 +407,7 @@ public class ArchiveSearcher extends Shell {
 		mntmIndtastLgdsruller.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MilRollView.main(props);
+				MilRollEntryDialog.main(props);
 			}
 		});
 		mntmIndtastLgdsruller.setText("Indtast l\u00E6gdsruller");
@@ -672,6 +665,15 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 *
+	 */
+	public void laegdsRulleListe() {
+		final MilRollListDialog m = new MilRollListDialog(getShell());
+		m.setProperties(props);
+		m.open();
+	}
+
+	/**
 	 * @param e
 	 */
 	protected void polregLoader(SelectionEvent e) {
@@ -722,7 +724,7 @@ public class ArchiveSearcher extends Shell {
 		searchName.setText("");
 		individualView.clear();
 		descendantCounterView.clear();
-		censusdupView.clear();
+		censusDupView.clear();
 
 		if (searchId.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();

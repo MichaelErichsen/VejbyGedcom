@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -12,7 +13,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 7. maj 2023
  *
  */
 public class MilRollModel extends ASModel {
@@ -24,6 +25,7 @@ public class MilRollModel extends ASModel {
 			+ "STOERRELSEITOMMER = ?, OPHOLD = ?, ANMAERKNINGER = ?, FOEDT = ?, GEDCOMID = ?, NAVN = ?, FADERFON = ?, SOENFON = ? "
 			+ "WHERE LAEGDID = ? AND LOEBENR = ?";
 	private static final String DELETE = "DELETE FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
+	private static final String SELECT = "SELECT * FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
 
 	private int laegdId = 0;
 	private int glLaegdId = 0;
@@ -41,6 +43,28 @@ public class MilRollModel extends ASModel {
 	private String navn = "";
 	private String faderFon = "";
 	private String soenFon = "";
+
+	/**
+	 * @param props
+	 * @return
+	 * @throws SQLException
+	 */
+	public String delete(Properties props, int laegdId, int loebeNr) throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, props.getProperty("milrollSchema"));
+		statement.execute();
+
+		statement = conn.prepareStatement(DELETE);
+		statement.setInt(1, laegdId);
+		statement.setInt(2, loebeNr);
+		statement.execute();
+
+		statement.close();
+		conn.close();
+
+		return "Indtastning " + loebeNr + " er slettet";
+	}
 
 	/**
 	 * @return the alder
@@ -155,25 +179,6 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
-	 * @param props
-	 * @return
-	 * @throws SQLException
-	 */
-	public String delete(Properties props) throws SQLException {
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, props.getProperty("milrollSchema"));
-		statement.execute();
-
-		statement = conn.prepareStatement(DELETE);
-		statement.setInt(1, laegdId);
-		statement.setInt(2, loebeNr);
-		statement.execute();
-
-		return "Indtastning " + loebeNr + " er slettet";
-	}
-
-	/**
 	 * Save entry to Derby database
 	 *
 	 * @param props
@@ -206,41 +211,52 @@ public class MilRollModel extends ASModel {
 		statement.setString(16, soenFon);
 		statement.execute();
 
+		statement.close();
+		conn.close();
+
 		return "Indtastning " + loebeNr + " er oprettet";
 	}
 
 	/**
+	 * Select entry from Derby database
+	 *
 	 * @param props
-	 * @return
-	 * @throws SQLException
+	 * @throws Exception
+	 *
 	 */
-	public String update(Properties props) throws SQLException {
+	public void select(Properties props, int laegdId, int loebeNr) throws Exception {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, props.getProperty("milrollSchema"));
 		statement.execute();
 
-		statement = conn.prepareStatement(UPDATE);
+		statement = conn.prepareStatement(SELECT);
+		statement.setInt(1, laegdId);
+		statement.setInt(2, loebeNr);
+		final ResultSet rs = statement.executeQuery();
 
-		statement.setInt(1, glLaegdId);
-		statement.setInt(2, glLoebeNr);
-		statement.setString(3, fader);
-		statement.setString(4, soen);
-		statement.setString(5, foedeSted);
-		statement.setInt(6, alder);
-		statement.setBigDecimal(7, stoerrelseITommer);
-		statement.setString(8, ophold);
-		statement.setString(9, anmaerkninger);
-		statement.setDate(10, foedt);
-		statement.setString(11, gedcomId);
-		statement.setString(12, navn);
-		statement.setString(13, faderFon);
-		statement.setString(14, soenFon);
-		statement.setInt(15, laegdId);
-		statement.setInt(16, loebeNr);
-		statement.execute();
+		if (!rs.next()) {
+			throw new Exception("Løbenr. ikke fundet");
+		}
+		this.laegdId = rs.getInt(1);
+		glLaegdId = rs.getInt(2);
+		glLoebeNr = rs.getInt(3);
+		this.loebeNr = rs.getInt(4);
+		fader = rs.getString(5);
+		soen = rs.getString(6);
+		foedeSted = rs.getString(7);
+		alder = rs.getInt(8);
+		stoerrelseITommer = rs.getBigDecimal(9);
+		ophold = rs.getString(10);
+		anmaerkninger = rs.getString(11);
+		foedt = rs.getDate(12);
+		gedcomId = rs.getString(13);
+		navn = rs.getString(14);
+		faderFon = rs.getString(15);
+		soenFon = rs.getString(16);
 
-		return "Indtastning " + loebeNr + " er rettet";
+		statement.close();
+		conn.close();
 	}
 
 	/**
@@ -353,5 +369,41 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setStoerrelseITommer(BigDecimal stoerrelseITommer) {
 		this.stoerrelseITommer = stoerrelseITommer;
+	}
+
+	/**
+	 * @param props
+	 * @return
+	 * @throws SQLException
+	 */
+	public String update(Properties props, int laegdId, int loebeNr) throws SQLException {
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, props.getProperty("milrollSchema"));
+		statement.execute();
+
+		statement = conn.prepareStatement(UPDATE);
+
+		statement.setInt(1, glLaegdId);
+		statement.setInt(2, glLoebeNr);
+		statement.setString(3, fader);
+		statement.setString(4, soen);
+		statement.setString(5, foedeSted);
+		statement.setInt(6, alder);
+		statement.setBigDecimal(7, stoerrelseITommer);
+		statement.setString(8, ophold);
+		statement.setString(9, anmaerkninger);
+		statement.setDate(10, foedt);
+		statement.setString(11, gedcomId);
+		statement.setString(12, navn);
+		statement.setString(13, faderFon);
+		statement.setString(14, soenFon);
+		statement.setInt(15, laegdId);
+		statement.setInt(16, loebeNr);
+		statement.executeUpdate();
+		statement.close();
+		conn.close();
+
+		return "Indtastning " + loebeNr + " er rettet";
 	}
 }

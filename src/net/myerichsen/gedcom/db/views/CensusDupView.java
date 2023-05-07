@@ -35,13 +35,13 @@ import net.myerichsen.gedcom.db.populators.CensusdupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 6. maj 2023
  *
  */
-public class CensusdupView extends Composite {
-	private TableViewer censusdupTableViewer;
-	private Table censusdupTable;
-	private ASPopulator censusdupListener;
+public class CensusDupView extends Composite {
+	private TableViewer tableViewer;
+	private Table table;
+	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 
@@ -51,31 +51,31 @@ public class CensusdupView extends Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public CensusdupView(Composite parent, int style) {
+	public CensusDupView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		censusdupListener = new CensusdupPopulator();
+		listener = new CensusdupPopulator();
 
-		final ScrolledComposite censusdupScroller = new ScrolledComposite(this,
+		final ScrolledComposite scrolledComposite = new ScrolledComposite(this,
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		final GridData gd_censusdupScroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_censusdupScroller.widthHint = 617;
-		censusdupScroller.setLayoutData(gd_censusdupScroller);
-		censusdupScroller.setSize(0, 0);
-		censusdupScroller.setExpandHorizontal(true);
-		censusdupScroller.setExpandVertical(true);
+		scrolledComposite.setLayoutData(gd_censusdupScroller);
+		scrolledComposite.setSize(0, 0);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
 
-		censusdupTableViewer = new TableViewer(censusdupScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		censusdupTableViewer.setUseHashlookup(true);
-		censusdupTableViewer.addDoubleClickListener(event -> censusdupPopup(getDisplay()));
-		censusdupTable = censusdupTableViewer.getTable();
-		censusdupTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer = new TableViewer(scrolledComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.addDoubleClickListener(event -> popup(getDisplay()));
+		table = tableViewer.getTable();
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		censusdupTable.setHeaderVisible(true);
-		censusdupTable.setLinesVisible(true);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
 
-		final TableViewerColumn tableViewerColumn = new TableViewerColumn(censusdupTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFornavne = tableViewerColumn.getColumn();
 		tblclmnFornavne.setWidth(70);
 		tblclmnFornavne.setText("ID");
@@ -88,7 +88,7 @@ public class CensusdupView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(censusdupTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnEfternavn_1 = tableViewerColumn_1.getColumn();
 		tblclmnEfternavn_1.setWidth(100);
 		tblclmnEfternavn_1.setText("Dato");
@@ -101,7 +101,7 @@ public class CensusdupView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(censusdupTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnDdsdato = tableViewerColumn_2.getColumn();
 		tblclmnDdsdato.setWidth(300);
 		tblclmnDdsdato.setText("Sted");
@@ -114,7 +114,7 @@ public class CensusdupView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(censusdupTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFder_1 = tableViewerColumn_3.getColumn();
 		tblclmnFder_1.setWidth(600);
 		tblclmnFder_1.setText("Detaljer");
@@ -127,8 +127,8 @@ public class CensusdupView extends Composite {
 			}
 		});
 
-		censusdupScroller.setContent(censusdupTable);
-		censusdupScroller.setMinSize(censusdupTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scrolledComposite.setContent(table);
+		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		final Composite buttonComposite = new Composite(this, SWT.BORDER);
 		buttonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -152,11 +152,53 @@ public class CensusdupView extends Composite {
 
 	}
 
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
+		final CensusdupModel[] input = new CensusdupModel[0];
+		tableViewer.setInput(input);
+		tableViewer.refresh();
+	}
+
+	/**
+	 * Populate the census duplicate tab from the database
+	 *
+	 * @throws SQLException
+	 */
+	public void populate() throws SQLException {
+		thread = new Thread(() -> {
+			if (listener != null) {
+				try {
+					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+							props.getProperty("vejbyPath") };
+					final CensusdupModel[] censusdupRecords = (CensusdupModel[]) listener.load(loadArgs);
+
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+							.setMessage("Folketællingsdubletter er hentet"));
+				} catch (final Exception e) {
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				}
+			}
+		});
+		thread.start();
+	}
+
 	/**
 	 * @param display
 	 */
-	private void censusdupPopup(Display display) {
-		final TableItem[] tia = censusdupTable.getSelection();
+	private void popup(Display display) {
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
@@ -183,48 +225,6 @@ public class CensusdupView extends Composite {
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		}
-	}
-
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
-
-	/**
-	 * Clear the table
-	 */
-	public void clear() {
-		if (thread != null) {
-			thread.interrupt();
-		}
-		final CensusdupModel[] input = new CensusdupModel[0];
-		censusdupTableViewer.setInput(input);
-		censusdupTableViewer.refresh();
-	}
-
-	/**
-	 * Populate the census duplicate tab from the database
-	 *
-	 * @throws SQLException
-	 */
-	public void populate() throws SQLException {
-		thread = new Thread(() -> {
-			if (censusdupListener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath") };
-					final CensusdupModel[] censusdupRecords = (CensusdupModel[]) censusdupListener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> censusdupTableViewer.setInput(censusdupRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Folketællingsdubletter er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
-		thread.start();
 	}
 
 	/**

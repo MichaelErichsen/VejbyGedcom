@@ -22,6 +22,66 @@ public class MilRollEntryModel extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT = "SELECT * FROM LAEGD.LAEGD, LAEGD.RULLE WHERE LAEGD.LAEGD.LAEGDID = LAEGD.RULLE.LAEGDID";
 
+	/**
+	 * Load list of entries from data base
+	 *
+	 * @param props
+	 *
+	 * @throws SQLException
+	 *
+	 */
+	public static MilRollEntryModel[] load(String path, String schema) throws SQLException {
+		MilRollEntryModel m;
+		final List<MilRollEntryModel> lm = new ArrayList<>();
+
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + path);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+
+		statement = conn.prepareStatement(SELECT);
+		final ResultSet rs = statement.executeQuery();
+
+		while (rs.next()) {
+			m = new MilRollEntryModel();
+			m.setAmt(rs.getString("AMT").trim());
+			m.setAar(rs.getInt("AAR"));
+			m.setLitra(rs.getString("LITRA"));
+			m.setLaegdnr(rs.getInt("LAEGDNR"));
+			m.setGlaar(rs.getInt("GLAAR"));
+			m.setGllitra(rs.getString("GLLITRA"));
+			m.setRulletype(rs.getString("RULLETYPE").trim());
+			m.setSogn(rs.getString("SOGN").trim());
+			m.setLaegdId(rs.getInt("LAEGDID"));
+			m.setGlLaegdId(rs.getInt("GLLAEGDID"));
+			m.setGlaar(rs.getInt("GLLOEBENR"));
+			m.setLoebeNr(rs.getInt("LOEBENR"));
+			m.setFader(rs.getString("FADER"));
+			m.setSoen(rs.getString("SOEN"));
+			m.setFoedeSted(rs.getString("FOEDESTED"));
+			m.setAlder(rs.getInt("ALDER"));
+			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			m.setOphold(rs.getString("OPHOLD"));
+			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			m.setFoedt(rs.getDate("FOEDT"));
+			m.setGedcomId(rs.getString("GEDCOMID"));
+			m.setNavn(rs.getString("NAVN"));
+			m.setFaderFon(rs.getString("FADERFON"));
+			m.setSoenFon(rs.getString("SOENFON"));
+
+			lm.add(m);
+		}
+
+		final MilRollEntryModel[] ma = new MilRollEntryModel[lm.size()];
+
+		for (int i = 0; i < lm.size(); i++) {
+			ma[i] = lm.get(i);
+
+		}
+
+		return ma;
+	}
+
 	private String amt = "";
 	private int aar = 0;
 	private String litra = " ";
@@ -45,6 +105,7 @@ public class MilRollEntryModel extends ASModel {
 	private String gedcomId = "";
 	private String navn = "";
 	private String faderFon = "";
+
 	private String soenFon = "";
 
 	/**
@@ -213,66 +274,6 @@ public class MilRollEntryModel extends ASModel {
 	 */
 	public BigDecimal getStoerrelseITommer() {
 		return stoerrelseITommer;
-	}
-
-	/**
-	 * Load list of entries from data base
-	 *
-	 * @param props
-	 *
-	 * @throws SQLException
-	 *
-	 */
-	public static MilRollEntryModel[] load(String path, String schema) throws SQLException {
-		MilRollEntryModel m;
-		final List<MilRollEntryModel> lm = new ArrayList<MilRollEntryModel>();
-
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + path);
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, schema);
-		statement.execute();
-
-		statement = conn.prepareStatement(SELECT);
-		ResultSet rs = statement.executeQuery();
-
-		while (rs.next()) {
-			m = new MilRollEntryModel();
-			m.setAmt(rs.getString("AMT").trim());
-			m.setAar(rs.getInt("AAR"));
-			m.setLitra(rs.getString("LITRA"));
-			m.setLaegdnr(rs.getInt("LAEGDNR"));
-			m.setGlaar(rs.getInt("GLAAR"));
-			m.setGllitra(rs.getString("GLLITRA"));
-			m.setRulletype(rs.getString("RULLETYPE").trim());
-			m.setSogn(rs.getString("SOGN").trim());
-			m.setLaegdId(rs.getInt("LAEGDID"));
-			m.setGlLaegdId(rs.getInt("GLLAEGDID"));
-			m.setGlaar(rs.getInt("GLLOEBENR"));
-			m.setLoebeNr(rs.getInt("LOEBENR"));
-			m.setFader(rs.getString("FADER"));
-			m.setSoen(rs.getString("SOEN"));
-			m.setFoedeSted(rs.getString("FOEDESTED"));
-			m.setAlder(rs.getInt("ALDER"));
-			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
-			m.setOphold(rs.getString("OPHOLD"));
-			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
-			m.setFoedt(rs.getDate("FOEDT"));
-			m.setGedcomId(rs.getString("GEDCOMID"));
-			m.setNavn(rs.getString("NAVN"));
-			m.setFaderFon(rs.getString("FADERFON"));
-			m.setSoenFon(rs.getString("SOENFON"));
-
-			lm.add(m);
-		}
-
-		final MilRollEntryModel[] ma = new MilRollEntryModel[lm.size()];
-
-		for (int i = 0; i < lm.size(); i++) {
-			ma[i] = lm.get(i);
-
-		}
-
-		return ma;
 	}
 
 	/**

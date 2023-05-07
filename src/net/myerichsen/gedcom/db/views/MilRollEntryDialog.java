@@ -16,6 +16,9 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -37,20 +40,23 @@ import org.eclipse.swt.widgets.Text;
 import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.models.MilRollModel;
 import net.myerichsen.gedcom.db.models.MilrollListModel;
+import net.myerichsen.gedcom.util.FaderProvider;
+import net.myerichsen.gedcom.util.FoedestedProvider;
 import net.myerichsen.gedcom.util.Fonkod;
+import net.myerichsen.gedcom.util.OpholdProvider;
 
 /**
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 7. maj 2023
  *
  */
 
 // TODO Merge military roll relocations into relocation view
 // TODO Find a way to merge entries from following years
 
-public class MilRollView {
+public class MilRollEntryDialog {
 	private static final String DASH_DATE = "\\d*-\\d*-\\d{4}";
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
@@ -64,7 +70,7 @@ public class MilRollView {
 	 */
 	public static void main(Properties props) {
 		try {
-			final MilRollView window = new MilRollView();
+			final MilRollEntryDialog window = new MilRollEntryDialog();
 			window.open();
 			window.setProperties(props);
 		} catch (final Exception e) {
@@ -105,6 +111,31 @@ public class MilRollView {
 	private Combo messageComboBox;
 	private Button btnSgEfterGedcom;
 	private Button btnGemUri;
+	private Button btNaeste;
+	private Button btnHentForLbenr;
+	private Button btnRet;
+	private Button btnSlet;
+
+	/**
+	 * Clear fields. Increment loebenr
+	 */
+	protected void clearForNext() {
+		textGlLoebenr.setText("");
+		try {
+			final int l = Integer.parseInt(textNyLoebenr.getText());
+			textNyLoebenr.setText(Integer.toString(l + 1));
+		} catch (final Exception e) {
+		}
+		textFader.setText("");
+		textSoen.setText("");
+		textFoedested.setText("");
+		textAlder.setText("");
+		textStoerrelseitommer.setText("");
+		textOphold.setText("");
+		textAnmaerkninger.setText("");
+		textFoedt.setText("");
+		textGedcomid.setText("");
+	}
 
 	/**
 	 * Construct a patronymicon name for the son
@@ -195,7 +226,6 @@ public class MilRollView {
 					getNextMilRoll(Integer.parseInt(textLaegdId.getText()));
 				} catch (final NumberFormatException | SQLException e1) {
 					setMessage(e1.getMessage());
-//					e1.printStackTrace();
 				}
 			}
 		});
@@ -209,7 +239,6 @@ public class MilRollView {
 					getPrevMilRoll(Integer.parseInt(textLaegdId.getText()));
 				} catch (final NumberFormatException | SQLException e1) {
 					setMessage(e1.getMessage());
-//					e1.printStackTrace();
 				}
 			}
 		});
@@ -289,7 +318,6 @@ public class MilRollView {
 					searchForGedcomID();
 				} catch (final Exception e1) {
 					setErrorMessage(e1.getMessage());
-//					e1.printStackTrace();
 				}
 			}
 		});
@@ -300,7 +328,7 @@ public class MilRollView {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					saveToDb();
+					insert();
 				} catch (final Exception e1) {
 					setErrorMessage(e1.getMessage());
 				}
@@ -308,11 +336,48 @@ public class MilRollView {
 		});
 		btnGemIndtastning.setText("Gem indtastning");
 
+		btnHentForLbenr = new Button(compositeButtons, SWT.NONE);
+		btnHentForLbenr.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				select();
+			}
+		});
+		btnHentForLbenr.setText("Hent for l\u00F8benr");
+
+		btnRet = new Button(compositeButtons, SWT.NONE);
+		btnRet.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				update();
+
+			}
+		});
+		btnRet.setText("Ret");
+
+		btnSlet = new Button(compositeButtons, SWT.NONE);
+		btnSlet.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				delete();
+			}
+		});
+		btnSlet.setText("Slet");
+
+		btNaeste = new Button(compositeButtons, SWT.NONE);
+		btNaeste.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				clearForNext();
+			}
+		});
+		btNaeste.setText("N\u00E6ste");
+
 		textNyLoebenr = new Text(compositeData, SWT.BORDER);
 		textNyLoebenr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblFader = new Label(compositeData, SWT.NONE);
-		lblFader.setText("Fader");
+		lblFader.setText("Fader (Ctl+Space)");
 
 		textFader = new Text(compositeData, SWT.BORDER);
 		textFader.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -324,7 +389,7 @@ public class MilRollView {
 		textSoen.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblFdested = new Label(compositeData, SWT.NONE);
-		lblFdested.setText("F\u00F8dested");
+		lblFdested.setText("F\u00F8dested  (Ctl+Space)");
 
 		textFoedested = new Text(compositeData, SWT.BORDER);
 		textFoedested.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -342,7 +407,7 @@ public class MilRollView {
 		textStoerrelseitommer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblOphold = new Label(compositeData, SWT.NONE);
-		lblOphold.setText("Ophold");
+		lblOphold.setText("Ophold  (Ctl+Space)");
 
 		textOphold = new Text(compositeData, SWT.BORDER);
 		textOphold.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -360,15 +425,41 @@ public class MilRollView {
 		textFoedt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblGedcomId = new Label(compositeData, SWT.NONE);
-		lblGedcomId.setText("GEDCOM ID");
+		lblGedcomId.setText("GEDCOM ID (@ and I beh\u00F8ves ikke)");
 
 		textGedcomid = new Text(compositeData, SWT.BORDER);
 		textGedcomid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		new Label(compositeData, SWT.NONE);
 		new Label(compositeData, SWT.NONE);
 
+		try {
+			final KeyStroke keyStroke = KeyStroke.getInstance("Ctrl+Space");
+			new ContentProposalAdapter(textFader, new TextContentAdapter(), new FaderProvider(props), keyStroke, null);
+			new ContentProposalAdapter(textFoedested, new TextContentAdapter(), new FoedestedProvider(props), keyStroke,
+					null);
+			new ContentProposalAdapter(textOphold, new TextContentAdapter(), new OpholdProvider(props), keyStroke,
+					null);
+		} catch (final org.eclipse.jface.bindings.keys.ParseException e1) {
+			e1.printStackTrace();
+		}
+
 		messageComboBox = new Combo(shlLgdsrulleindtastning, SWT.READ_ONLY);
 		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+	}
+
+	/**
+	 *
+	 */
+	protected void delete() {
+		final MilRollModel m = new MilRollModel();
+		try {
+			final String result = m.delete(props, Integer.parseInt(textLaegdId.getText()),
+					Integer.parseInt(textNyLoebenr.getText()));
+			setMessage(result);
+		} catch (NumberFormatException | SQLException e) {
+			setErrorMessage(e.getMessage());
+		}
 
 	}
 
@@ -389,8 +480,9 @@ public class MilRollView {
 			textLaegdNr.setText(Integer.toString(m.getLaegdNr()));
 			textSogn.setText(m.getSogn());
 			textLaegdId.setText(Integer.toString(m.getLaegdId()));
-		} else
+		} else {
 			setMessage("Ingen højere i dette amt");
+		}
 	}
 
 	/**
@@ -410,8 +502,9 @@ public class MilRollView {
 			textLaegdNr.setText(Integer.toString(m.getLaegdNr()));
 			textSogn.setText(m.getSogn());
 			textLaegdId.setText(Integer.toString(m.getLaegdId()));
-		} else
+		} else {
 			setMessage("Ingen lavere i dette amt");
+		}
 
 	}
 
@@ -443,30 +536,13 @@ public class MilRollView {
 	}
 
 	/**
-	 * Open the window.
-	 */
-	public void open() {
-		final Display display = Display.getDefault();
-		fk = new Fonkod();
-		getProperties();
-		createContents();
-		shlLgdsrulleindtastning.open();
-		shlLgdsrulleindtastning.layout();
-		while (!shlLgdsrulleindtastning.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
-
-	/**
 	 * Save to Derby database
 	 *
 	 * @throws SQLException
 	 *
 	 * @throws Exception
 	 */
-	protected void saveToDb() throws SQLException {
+	protected void insert() throws SQLException {
 		final MilRollModel lm = new MilRollModel();
 
 		try {
@@ -517,7 +593,24 @@ public class MilRollView {
 		} catch (final ParseException e1) {
 		}
 
-		lm.setGedcomId(textGedcomid.getText());
+		final String id = textGedcomid.getText();
+
+		Pattern p = Pattern.compile("@I\\d+@");
+		Matcher m = p.matcher(id);
+
+		if (m.find()) {
+			lm.setGedcomId(id);
+		} else {
+			p = Pattern.compile("\\d+");
+			try {
+				m = p.matcher(id);
+
+				if (m.matches()) {
+					lm.setGedcomId("@I" + id + "@");
+				}
+			} catch (final Exception e) {
+			}
+		}
 
 		try {
 			lm.setFaderFon(fk.generateKey(lm.getFader()));
@@ -539,9 +632,30 @@ public class MilRollView {
 			lm.setSoenFon("");
 		}
 
+		props.setProperty("milrollFader", lm.getFader());
+		props.setProperty("milrollFoedested", lm.getFoedeSted());
+		props.setProperty("milrollOphold", lm.getOphold());
+
 		final String result = lm.insert(props);
 		setMessage(result);
 
+	}
+
+	/**
+	 * Open the window.
+	 */
+	public void open() {
+		final Display display = Display.getDefault();
+		fk = new Fonkod();
+		getProperties();
+		createContents();
+		shlLgdsrulleindtastning.open();
+		shlLgdsrulleindtastning.layout();
+		while (!shlLgdsrulleindtastning.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
 	}
 
 	/**
@@ -571,7 +685,35 @@ public class MilRollView {
 		mrd.setInput(sa);
 		mrd.open();
 
-		textGedcomid.setText(mrd.getSelectedIndividual());
+		if (mrd.getSelectedIndividual() != null) {
+			textGedcomid.setText(mrd.getSelectedIndividual());
+		}
+	}
+
+	/**
+	 * Get entry from Derby
+	 */
+	private void select() {
+		final MilRollModel m = new MilRollModel();
+
+		try {
+			m.select(props, Integer.parseInt(textLaegdId.getText()), Integer.parseInt(textNyLoebenr.getText()));
+			textGlLoebenr.setText(Integer.toString(m.getGlLoebeNr()));
+			textFader.setText(m.getFader());
+			textSoen.setText(m.getSoen());
+			textFoedested.setText(m.getFoedeSted());
+			textAlder.setText(Integer.toString(m.getAlder()));
+			textStoerrelseitommer.setText(m.getStoerrelseITommer().toString());
+			textOphold.setText(m.getOphold());
+			textAnmaerkninger.setText(m.getAnmaerkninger());
+			try {
+				textFoedt.setText(m.getFoedt().toString());
+			} catch (final Exception e) {
+			}
+			textGedcomid.setText(m.getGedcomId());
+		} catch (final Exception e1) {
+			setErrorMessage(e1.getMessage());
+		}
 	}
 
 	/**
@@ -634,6 +776,11 @@ public class MilRollView {
 		}
 	}
 
+	/**
+	 * @param string
+	 * @return
+	 * @throws ParseException
+	 */
 	private Date string2Date(String string) throws ParseException {
 		SimpleDateFormat sdf;
 		java.util.Date utilDate;
@@ -675,5 +822,113 @@ public class MilRollView {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 *
+	 */
+	protected void update() {
+		final MilRollModel lm = new MilRollModel();
+
+		try {
+			lm.setGlLoebeNr(Integer.parseInt(textGlLoebenr.getText()));
+		} catch (final NumberFormatException e2) {
+		}
+
+		try {
+			lm.setLoebeNr(Integer.parseInt(textNyLoebenr.getText()));
+		} catch (final Exception e) {
+			setErrorMessage("Indtast venligst løbenr.");
+			textNyLoebenr.setFocus();
+		}
+
+		try {
+			lm.setFader(textFader.getText());
+		} catch (final Exception e2) {
+			setErrorMessage("Indtast venligst fader");
+			textFader.setFocus();
+		}
+
+		try {
+			lm.setSoen(textSoen.getText());
+		} catch (final Exception e1) {
+			setErrorMessage("Indtast venligst søn");
+			textSoen.setFocus();
+		}
+
+		lm.setFoedeSted(textFoedested.getText());
+
+		try {
+			lm.setAlder(Integer.parseInt(textAlder.getText()));
+		} catch (final Exception e) {
+			lm.setAlder(0);
+		}
+
+		try {
+			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText()));
+		} catch (final Exception e) {
+			lm.setStoerrelseITommer(new BigDecimal(0));
+		}
+
+		lm.setOphold(textOphold.getText());
+		lm.setAnmaerkninger(textAnmaerkninger.getText());
+
+		try {
+			lm.setFoedt(string2Date(textFoedt.getText()));
+		} catch (final ParseException e1) {
+		}
+
+		final String id = textGedcomid.getText();
+
+		Pattern p = Pattern.compile("@I\\d+@");
+		Matcher m = p.matcher(id);
+
+		if (m.find()) {
+			lm.setGedcomId(id);
+		} else {
+			p = Pattern.compile("\\d+");
+			try {
+				m = p.matcher(id);
+
+				if (m.matches()) {
+					lm.setGedcomId("@I" + id + "@");
+				}
+			} catch (final Exception e) {
+			}
+		}
+
+		try {
+			lm.setFaderFon(fk.generateKey(lm.getFader()));
+		} catch (final Exception e1) {
+			lm.setFaderFon("");
+		}
+
+		try {
+			lm.setLaegdId(Integer.parseInt(textLaegdId.getText()));
+		} catch (final Exception e) {
+			lm.setLaegdId(0);
+		}
+
+		lm.setNavn(constructName(lm.getFader(), lm.getSoen()));
+
+		try {
+			lm.setSoenFon(fk.generateKey(lm.getNavn()));
+		} catch (final Exception e) {
+			lm.setSoenFon("");
+		}
+
+		props.setProperty("milrollFader", lm.getFader());
+		props.setProperty("milrollFoedested", lm.getFoedeSted());
+		props.setProperty("milrollOphold", lm.getOphold());
+
+		String result;
+		try {
+			result = lm.update(props, Integer.parseInt(textLaegdId.getText()),
+					Integer.parseInt(textNyLoebenr.getText()));
+			setMessage(result);
+		} catch (NumberFormatException | SQLException e) {
+			setErrorMessage(e.getMessage());
+		}
+
 	}
 }

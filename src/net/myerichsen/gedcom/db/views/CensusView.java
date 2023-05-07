@@ -53,9 +53,10 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 6. maj 2023
  *
  */
+
 public class CensusView extends Composite {
 	private Text txtCensusYear;
 	private Text txtCensusCounty;
@@ -65,9 +66,9 @@ public class CensusView extends Composite {
 	private Text txtCensusAge;
 	private Text txtCensusBirthPlace;
 	private Text txtCensusBirthDate;
-	private TableViewer censusTableViewer;
-	private Table censusTable;
-	private ASPopulator censusListener;
+	private TableViewer tableViewer;
+	private Table table;
+	private ASPopulator listener;
 	private List<CensusModel> household;
 	private Properties props;
 	private Thread thread;
@@ -82,7 +83,7 @@ public class CensusView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		censusListener = new CensusPopulator();
+		listener = new CensusPopulator();
 
 		final Composite censusFilterComposite = new Composite(this, SWT.BORDER);
 		censusFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -101,7 +102,7 @@ public class CensusView extends Composite {
 					txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusYearFilter.getInstance().setSearchText(txtCensusYear.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -119,7 +120,7 @@ public class CensusView extends Composite {
 					txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusCountyFilter.getInstance().setSearchText(txtCensusCounty.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -136,7 +137,7 @@ public class CensusView extends Composite {
 					txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusParishFilter.getInstance().setSearchText(txtCensusParish.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -153,7 +154,7 @@ public class CensusView extends Composite {
 					txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusNameFilter.getInstance().setSearchText(txtCensusName.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -170,7 +171,7 @@ public class CensusView extends Composite {
 					txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusSexFilter.getInstance().setSearchText(txtCensusSex.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -187,7 +188,7 @@ public class CensusView extends Composite {
 					txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusAgeFilter.getInstance().setSearchText(txtCensusAge.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -204,7 +205,7 @@ public class CensusView extends Composite {
 					txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusBirthPlaceFilter.getInstance().setSearchText(txtCensusBirthPlace.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -221,7 +222,7 @@ public class CensusView extends Composite {
 					txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				CensusBirthDateFilter.getInstance().setSearchText(txtCensusBirthDate.getText());
-				censusTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 		final Button btnRydFelterneCensus = new Button(censusFilterComposite, SWT.NONE);
@@ -239,11 +240,11 @@ public class CensusView extends Composite {
 		censusScroller.setExpandHorizontal(true);
 		censusScroller.setExpandVertical(true);
 
-		censusTableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		censusTableViewer.setUseHashlookup(true);
-		censusTableViewer.addDoubleClickListener(event -> {
+		tableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.addDoubleClickListener(event -> {
 			try {
-				censusPopup();
+				popup();
 			} catch (final SQLException e1) {
 				e1.printStackTrace();
 			}
@@ -258,15 +259,15 @@ public class CensusView extends Composite {
 		filters[5] = CensusYearFilter.getInstance();
 		filters[6] = CensusAgeFilter.getInstance();
 		filters[7] = CensusBirthDateFilter.getInstance();
-		censusTableViewer.setFilters(filters);
-		censusTableViewer.setComparator(new CensusComparator());
-		censusTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer.setFilters(filters);
+		tableViewer.setComparator(new CensusComparator());
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		censusTable = censusTableViewer.getTable();
-		censusTable.setLinesVisible(true);
-		censusTable.setHeaderVisible(true);
+		table = tableViewer.getTable();
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
 
-		final TableViewerColumn censusTableVieverColumn = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnr = censusTableVieverColumn.getColumn();
 		tblclmnr.setWidth(50);
 		tblclmnr.setText("\u00C5r");
@@ -279,7 +280,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_1 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnAmt = censusTableVieverColumn_1.getColumn();
 		tblclmnAmt.setWidth(75);
 		tblclmnAmt.setText("Amt");
@@ -291,7 +292,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_2 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnHerred = censusTableVieverColumn_2.getColumn();
 		tblclmnHerred.setWidth(75);
 		tblclmnHerred.setText("Herred");
@@ -303,7 +304,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_3 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnSogn = censusTableVieverColumn_3.getColumn();
 		tblclmnSogn.setWidth(75);
 		tblclmnSogn.setText("Sogn");
@@ -315,7 +316,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_4 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnKildestednavn = censusTableVieverColumn_4.getColumn();
 		tblclmnKildestednavn.setWidth(75);
 		tblclmnKildestednavn.setText("Kildestednavn");
@@ -327,7 +328,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_5 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnHusstfamnr = censusTableVieverColumn_5.getColumn();
 		tblclmnHusstfamnr.setWidth(40);
 		tblclmnHusstfamnr.setText("Husst./fam.nr.");
@@ -339,7 +340,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_6 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnMatrnraddr = censusTableVieverColumn_6.getColumn();
 		tblclmnMatrnraddr.setWidth(75);
 		tblclmnMatrnraddr.setText("Matr.nr.addr.");
@@ -351,7 +352,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_7 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnKildenavn = censusTableVieverColumn_7.getColumn();
 		tblclmnKildenavn.setWidth(75);
 		tblclmnKildenavn.setText("Kildenavn");
@@ -363,7 +364,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_8 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnKn = censusTableVieverColumn_8.getColumn();
 		tblclmnKn.setWidth(40);
 		tblclmnKn.setText("K\u00F8n");
@@ -375,7 +376,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_9 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnAlder = censusTableVieverColumn_9.getColumn();
 		tblclmnAlder.setWidth(40);
 		tblclmnAlder.setText("Alder");
@@ -387,7 +388,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_10 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_10 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnCivilstand = censusTableVieverColumn_10.getColumn();
 		tblclmnCivilstand.setWidth(75);
 		tblclmnCivilstand.setText("Civilstand");
@@ -399,7 +400,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_11 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_11 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnErhverv = censusTableVieverColumn_11.getColumn();
 		tblclmnErhverv.setWidth(75);
 		tblclmnErhverv.setText("Erhverv");
@@ -411,7 +412,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_12 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_12 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnStillHusst = censusTableVieverColumn_12.getColumn();
 		tblclmnStillHusst.setWidth(75);
 		tblclmnStillHusst.setText("Still. husst.");
@@ -423,7 +424,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_13 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_13 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFdested = censusTableVieverColumn_13.getColumn();
 		tblclmnFdested.setWidth(75);
 		tblclmnFdested.setText("F\u00F8dested");
@@ -435,7 +436,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_14 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_14 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFdedato = censusTableVieverColumn_14.getColumn();
 		tblclmnFdedato.setWidth(75);
 		tblclmnFdedato.setText("F\u00F8dedato");
@@ -447,7 +448,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_15 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_15 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFder = censusTableVieverColumn_15.getColumn();
 		tblclmnFder.setWidth(75);
 		tblclmnFder.setText("F\u00F8de\u00E5r");
@@ -459,7 +460,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_16 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_16 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnAdresse = censusTableVieverColumn_16.getColumn();
 		tblclmnAdresse.setWidth(75);
 		tblclmnAdresse.setText("Adresse");
@@ -471,7 +472,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_17 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_17 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnMatrikel = censusTableVieverColumn_17.getColumn();
 		tblclmnMatrikel.setWidth(75);
 		tblclmnMatrikel.setText("Matrikel");
@@ -483,7 +484,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_18 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_18 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnGadenr = censusTableVieverColumn_18.getColumn();
 		tblclmnGadenr.setWidth(40);
 		tblclmnGadenr.setText("Gadenr.");
@@ -495,7 +496,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_19 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_19 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnHenvisning = censusTableVieverColumn_19.getColumn();
 		tblclmnHenvisning.setWidth(75);
 		tblclmnHenvisning.setText("Henvisning");
@@ -507,7 +508,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_20 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_20 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnKommentar = censusTableVieverColumn_20.getColumn();
 		tblclmnKommentar.setWidth(75);
 		tblclmnKommentar.setText("Kommentar");
@@ -519,7 +520,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_21 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_21 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnKipNr = censusTableVieverColumn_21.getColumn();
 		tblclmnKipNr.setWidth(50);
 		tblclmnKipNr.setText("KIP nr.");
@@ -531,7 +532,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_22 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_22 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnLbenr = censusTableVieverColumn_22.getColumn();
 		tblclmnLbenr.setWidth(40);
 		tblclmnLbenr.setText("L\u00F8benr.");
@@ -543,7 +544,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_23 = new TableViewerColumn(censusTableViewer, SWT.NONE);
+		final TableViewerColumn censusTableVieverColumn_23 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnDetaljer_1 = censusTableVieverColumn_23.getColumn();
 		tblclmnDetaljer_1.setWidth(100);
 		tblclmnDetaljer_1.setText("Detaljer");
@@ -555,9 +556,120 @@ public class CensusView extends Composite {
 			}
 		});
 
-		censusScroller.setContent(censusTable);
-		censusScroller.setMinSize(censusTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		censusScroller.setContent(table);
+		censusScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
+	}
+
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
+	}
+
+	/**
+	 * Clear the table
+	 */
+	public void clear() {
+		if (thread != null) {
+			thread.interrupt();
+		}
+		final CensusModel[] input = new CensusModel[0];
+		tableViewer.setInput(input);
+		clearFilters();
+	}
+
+	/**
+	 * Clear filters
+	 */
+	private void clearFilters() {
+		CensusBirthPlaceFilter.getInstance().setSearchText("");
+		CensusBirthDateFilter.getInstance().setSearchText("");
+		CensusCountyFilter.getInstance().setSearchText("");
+		CensusNameFilter.getInstance().setSearchText("");
+		CensusParishFilter.getInstance().setSearchText("");
+		CensusSexFilter.getInstance().setSearchText("");
+		CensusAgeFilter.getInstance().setSearchText("");
+		CensusYearFilter.getInstance().setSearchText("");
+		txtCensusBirthPlace.setText("");
+		txtCensusBirthDate.setText("");
+		txtCensusCounty.setText("");
+		txtCensusName.setText("");
+		txtCensusParish.setText("");
+		txtCensusSex.setText("");
+		txtCensusAge.setText("");
+		txtCensusYear.setText("");
+		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		tableViewer.refresh();
+	}
+
+	/**
+	 * Get the census household
+	 *
+	 * @param kipNr
+	 * @param kildested
+	 * @param nr
+	 * @param matr
+	 * @return
+	 * @throws SQLException
+	 */
+	protected String getCensusHousehold(String kipNr, String kildested, String nr, String matr, String kildeHenvisning)
+			throws SQLException {
+		final StringBuilder sb = new StringBuilder();
+		String string;
+
+		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr, kildeHenvisning,
+				props.getProperty("censusSchema"));
+
+		for (final CensusModel hhr : household) {
+			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
+					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + ", " + hhr.getKildefoedested()
+					+ "\n");
+		}
+		string = sb.toString();
+
+		if (string.length() > 4096) {
+			string = string.substring(0, 4095);
+		}
+
+		return string;
+	}
+
+	/**
+	 * Populate census table
+	 *
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 * @throws SQLException
+	 */
+	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
+		thread = new Thread(() -> {
+			if (listener != null) {
+				try {
+					final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
+							props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
+							deathDate.substring(0, 4) };
+					final CensusModel[] CensusRecords = (CensusModel[]) listener.load(loadArgs);
+
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(CensusRecords));
+
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+							.setMessage("Folketællinger er hentet"));
+				} catch (final Exception e) {
+					e.printStackTrace();
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				}
+			}
+		});
+		thread.start();
 	}
 
 	/**
@@ -565,8 +677,8 @@ public class CensusView extends Composite {
 	 *
 	 * @throws SQLException
 	 */
-	private void censusPopup() throws SQLException {
-		final TableItem[] tia = censusTable.getSelection();
+	private void popup() throws SQLException {
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
@@ -621,123 +733,13 @@ public class CensusView extends Composite {
 			messageBox.setMessage("Husstandens overhovede var " + headOfHousehold);
 			final int buttonID = messageBox.open();
 
-			if (buttonID == SWT.OK && headOfHousehold != null && headOfHousehold.length() > 0) {
+			if (buttonID == SWT.OK && headOfHousehold != null && headOfHousehold.length() > 0
+					&& !headOfHousehold.equals("ikke fundet")) {
 				final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 				grandParent.getSearchId().setText(headOfHousehold);
 				grandParent.searchById(null);
 			}
 		}
-	}
-
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
-
-	/**
-	 * Clear the table
-	 */
-	public void clear() {
-		if (thread != null) {
-			thread.interrupt();
-		}
-		final CensusModel[] input = new CensusModel[0];
-		censusTableViewer.setInput(input);
-		clearFilters();
-	}
-
-	/**
-	 * Clear filters
-	 */
-	private void clearFilters() {
-		CensusBirthPlaceFilter.getInstance().setSearchText("");
-		CensusBirthDateFilter.getInstance().setSearchText("");
-		CensusCountyFilter.getInstance().setSearchText("");
-		CensusNameFilter.getInstance().setSearchText("");
-		CensusParishFilter.getInstance().setSearchText("");
-		CensusSexFilter.getInstance().setSearchText("");
-		CensusAgeFilter.getInstance().setSearchText("");
-		CensusYearFilter.getInstance().setSearchText("");
-		txtCensusBirthPlace.setText("");
-		txtCensusBirthDate.setText("");
-		txtCensusCounty.setText("");
-		txtCensusName.setText("");
-		txtCensusParish.setText("");
-		txtCensusSex.setText("");
-		txtCensusAge.setText("");
-		txtCensusYear.setText("");
-		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		censusTableViewer.refresh();
-	}
-
-	/**
-	 * Get the census household
-	 *
-	 * @param kipNr
-	 * @param kildested
-	 * @param nr
-	 * @param matr
-	 * @return
-	 * @throws SQLException
-	 */
-	protected String getCensusHousehold(String kipNr, String kildested, String nr, String matr, String kildeHenvisning)
-			throws SQLException {
-		final StringBuilder sb = new StringBuilder();
-		String string;
-
-		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr, kildeHenvisning,
-				props.getProperty("censusSchema"));
-
-		for (final CensusModel hhr : household) {
-			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
-					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + ", " + hhr.getKildefoedested()
-					+ "\n");
-		}
-		string = sb.toString();
-
-		if (string.length() > 4096) {
-			string = string.substring(0, 4095);
-		}
-
-		return string;
-	}
-
-	/**
-	 * Populate census table
-	 *
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @throws SQLException
-	 */
-	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		thread = new Thread(() -> {
-			if (censusListener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
-							props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
-							deathDate.substring(0, 4) };
-					final CensusModel[] CensusRecords = (CensusModel[]) censusListener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> censusTableViewer.setInput(CensusRecords));
-
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Folketællinger er hentet"));
-				} catch (final Exception e) {
-					e.printStackTrace();
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
-		thread.start();
 	}
 
 	/**
