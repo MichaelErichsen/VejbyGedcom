@@ -53,7 +53,7 @@ import net.myerichsen.gedcom.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 5. maj 2023
+ * @version 8. maj 2023
  *
  */
 
@@ -147,7 +147,7 @@ public class ArchiveSearcher extends Shell {
 		tbtmProbate.setControl(probateView);
 
 		final TabItem tbtmPolreg = new TabItem(tabFolder, SWT.NONE);
-		tbtmPolreg.setText("Pol&itiets Registerblade");
+		tbtmPolreg.setText("Poli&tiets Registerblade");
 		polregView = new PolregView(tabFolder, SWT.NONE);
 		polregView.setProperties(props);
 		tbtmPolreg.setControl(polregView);
@@ -183,7 +183,7 @@ public class ArchiveSearcher extends Shell {
 		tbtmFtDubletter.setControl(censusDupView);
 
 		final TabItem tbtmLgdsruller = new TabItem(tabFolder, SWT.NONE);
-		tbtmLgdsruller.setText("L\u00E6gdsruller");
+		tbtmLgdsruller.setText("&L\u00E6gdsruller");
 		milrollEntryView = new MilRollEntryView(tabFolder, SWT.NONE);
 		milrollEntryView.setProperties(props);
 		tbtmLgdsruller.setControl(milrollEntryView);
@@ -417,6 +417,16 @@ public class ArchiveSearcher extends Shell {
 
 		final Menu menu_3 = new Menu(mntmNewSubmenu);
 		mntmNewSubmenu.setMenu(menu_3);
+
+		MenuItem mntmHjlpetaster = new MenuItem(menu_3, SWT.NONE);
+		mntmHjlpetaster.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				KeystrokeDialog kd = new KeystrokeDialog(shell);
+				kd.open();
+			}
+		});
+		mntmHjlpetaster.setText("Hj\u00E6lpetaster");
 
 		final MenuItem mntmOm = new MenuItem(menu_3, SWT.NONE);
 		mntmOm.addSelectionListener(new SelectionAdapter() {

@@ -45,7 +45,7 @@ import net.myerichsen.gedcom.db.populators.MilrollPopulator;
  * Milroll entry view
  *
  * @author Michael Erichsen
- * @version 7. maj 2023
+ * @version 8. maj 2023
  *
  */
 

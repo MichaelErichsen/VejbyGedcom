@@ -49,7 +49,7 @@ import net.myerichsen.gedcom.util.OpholdProvider;
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 7. maj 2023
+ * @version 8. maj 2023
  *
  */
 
@@ -321,7 +321,7 @@ public class MilRollEntryDialog {
 				}
 			}
 		});
-		btnSgEfterGedcom.setText("S\u00F8g efter GEDCOM ID");
+		btnSgEfterGedcom.setText("S\u00F8g efter GED&COM ID");
 
 		btnGemIndtastning = new Button(compositeButtons, SWT.NONE);
 		btnGemIndtastning.addSelectionListener(new SelectionAdapter() {
@@ -334,7 +334,16 @@ public class MilRollEntryDialog {
 				}
 			}
 		});
-		btnGemIndtastning.setText("Gem indtastning");
+		btnGemIndtastning.setText("Ge&m indtastning");
+
+		btNaeste = new Button(compositeButtons, SWT.NONE);
+		btNaeste.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				clearForNext();
+			}
+		});
+		btNaeste.setText("N\u00E6ste (Alt+&A)");
 
 		btnHentForLbenr = new Button(compositeButtons, SWT.NONE);
 		btnHentForLbenr.addSelectionListener(new SelectionAdapter() {
@@ -343,7 +352,7 @@ public class MilRollEntryDialog {
 				select();
 			}
 		});
-		btnHentForLbenr.setText("Hent for l\u00F8benr");
+		btnHentForLbenr.setText("Hent for l\u00F8benr.");
 
 		btnRet = new Button(compositeButtons, SWT.NONE);
 		btnRet.addSelectionListener(new SelectionAdapter() {
@@ -363,15 +372,6 @@ public class MilRollEntryDialog {
 			}
 		});
 		btnSlet.setText("Slet");
-
-		btNaeste = new Button(compositeButtons, SWT.NONE);
-		btNaeste.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				clearForNext();
-			}
-		});
-		btNaeste.setText("N\u00E6ste");
 
 		textNyLoebenr = new Text(compositeData, SWT.BORDER);
 		textNyLoebenr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
