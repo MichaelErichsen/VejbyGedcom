@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.MilrollComparator;
+import net.myerichsen.gedcom.db.dialogs.MilRollEntryDialog;
 import net.myerichsen.gedcom.db.filters.MilrollCountyFilter;
 import net.myerichsen.gedcom.db.filters.MilrollIDFilter;
 import net.myerichsen.gedcom.db.filters.MilrollNameFilter;
@@ -423,9 +424,6 @@ public class MilRollEntryView extends Composite {
 		final Composite buttonComposite = new Composite(this, SWT.BORDER);
 		buttonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		final Label lblDanListeOver = new Label(buttonComposite, SWT.NONE);
-		lblDanListeOver.setText("Hent liste over l\u00E6gdsruller");
-
 		final Button btnFind = new Button(buttonComposite, SWT.NONE);
 		btnFind.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -437,7 +435,7 @@ public class MilRollEntryView extends Composite {
 				}
 			}
 		});
-		btnFind.setText("Hent");
+		btnFind.setText("Hent indtastninger");
 
 		final Button btnLgdsrulleliste = new Button(buttonComposite, SWT.NONE);
 		btnLgdsrulleliste.addSelectionListener(new SelectionAdapter() {

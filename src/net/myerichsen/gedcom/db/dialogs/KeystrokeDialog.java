@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.views;
+package net.myerichsen.gedcom.db.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -22,7 +22,7 @@ public class KeystrokeDialog extends Dialog {
 	 *
 	 * @param parentShell
 	 */
-	protected KeystrokeDialog(Shell parentShell) {
+	public KeystrokeDialog(Shell parentShell) {
 		super(parentShell);
 	}
 

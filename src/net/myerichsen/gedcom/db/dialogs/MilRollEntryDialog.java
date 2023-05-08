@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.views;
+package net.myerichsen.gedcom.db.dialogs;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.models.MilRollModel;
 import net.myerichsen.gedcom.db.models.MilrollListModel;
+import net.myerichsen.gedcom.db.views.Constants;
 import net.myerichsen.gedcom.util.FaderProvider;
 import net.myerichsen.gedcom.util.FoedestedProvider;
 import net.myerichsen.gedcom.util.Fonkod;
@@ -115,17 +116,32 @@ public class MilRollEntryDialog {
 	private Button btnHentForLbenr;
 	private Button btnRet;
 	private Button btnSlet;
+	private Button btnHentGlLbenr;
+	private Label lblGlLgdid;
+	private Text textGlLaegdId;
 
 	/**
-	 * Clear fields. Increment loebenr
+	 * Clear fields. Increment loebenr or glloebenr. Move cursor
 	 */
 	protected void clearForNext() {
-		textGlLoebenr.setText("");
-		try {
-			final int l = Integer.parseInt(textNyLoebenr.getText());
-			textNyLoebenr.setText(Integer.toString(l + 1));
-		} catch (final Exception e) {
+		if (textGlLoebenr.getText().length() > 0) {
+			try {
+				final int l = Integer.parseInt(textGlLoebenr.getText());
+				textGlLoebenr.setText(Integer.toString(l + 1));
+				textNyLoebenr.setFocus();
+			} catch (final Exception e) {
+			}
+			textNyLoebenr.setText("");
+		} else {
+			textGlLoebenr.setText("");
+			try {
+				final int l = Integer.parseInt(textNyLoebenr.getText());
+				textNyLoebenr.setText(Integer.toString(l + 1));
+				textFader.setFocus();
+			} catch (final Exception e) {
+			}
 		}
+
 		textFader.setText("");
 		textSoen.setText("");
 		textFoedested.setText("");
@@ -146,7 +162,11 @@ public class MilRollEntryDialog {
 	 */
 	private String constructName(String fader, String soen) {
 		final String[] nameParts = fader.split(" ");
-		return soen + " " + nameParts[0] + "sen";
+		String string = nameParts[0];
+		if (string.endsWith("s")) {
+			return soen.trim() + " " + string + "en";
+		}
+		return soen.trim() + " " + string + "sen";
 	}
 
 	/**
@@ -200,6 +220,16 @@ public class MilRollEntryDialog {
 		textLaegdNr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		textLaegdNr.setText(props.getProperty("laegdnr"));
 
+		lblGlLgdid = new Label(compositeRulle, SWT.NONE);
+		lblGlLgdid.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblGlLgdid.setText("Gl. l\u00E6gdId");
+
+		textGlLaegdId = new Text(compositeRulle, SWT.BORDER);
+		textGlLaegdId.setText("0");
+		textGlLaegdId.setEditable(false);
+		textGlLaegdId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		textLaegdNr.setText(props.getProperty("gllaegdid"));
+
 		textSogn = new Text(compositeRulle, SWT.BORDER);
 		textSogn.setEnabled(false);
 		textSogn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -223,6 +253,8 @@ public class MilRollEntryDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					textGlLaegdId.setText(textLaegdId.getText());
+					props.setProperty("gllaegdid", textGlLaegdId.getText());
 					getNextMilRoll(Integer.parseInt(textLaegdId.getText()));
 				} catch (final NumberFormatException | SQLException e1) {
 					setMessage(e1.getMessage());
@@ -236,6 +268,8 @@ public class MilRollEntryDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					textGlLaegdId.setText(textLaegdId.getText());
+					props.setProperty("gllaegdid", textGlLaegdId.getText());
 					getPrevMilRoll(Integer.parseInt(textLaegdId.getText()));
 				} catch (final NumberFormatException | SQLException e1) {
 					setMessage(e1.getMessage());
@@ -252,8 +286,6 @@ public class MilRollEntryDialog {
 			}
 		});
 		btnGem.setText("Gem");
-		new Label(compositeRulle, SWT.NONE);
-		new Label(compositeRulle, SWT.NONE);
 
 		compositeBrowser = new Composite(shlLgdsrulleindtastning, SWT.BORDER);
 		compositeBrowser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -345,6 +377,15 @@ public class MilRollEntryDialog {
 		});
 		btNaeste.setText("N\u00E6ste (Alt+&A)");
 
+		btnHentGlLbenr = new Button(compositeButtons, SWT.NONE);
+		btnHentGlLbenr.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				selectOld();
+			}
+		});
+		btnHentGlLbenr.setText("Hent gl. l\u00F8benr.");
+
 		btnHentForLbenr = new Button(compositeButtons, SWT.NONE);
 		btnHentForLbenr.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -352,7 +393,7 @@ public class MilRollEntryDialog {
 				select();
 			}
 		});
-		btnHentForLbenr.setText("Hent for l\u00F8benr.");
+		btnHentForLbenr.setText("Hent nyt l\u00F8benr.");
 
 		btnRet = new Button(compositeButtons, SWT.NONE);
 		btnRet.addSelectionListener(new SelectionAdapter() {
@@ -528,6 +569,7 @@ public class MilRollEntryDialog {
 			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
 			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
 			props.setProperty("laegdid", Constants.LAEGDID);
+			props.setProperty("gllaegdid", Constants.GLLAEGDID);
 			props.setProperty("uri", Constants.MILROLL_URI);
 
 			storeProperties();
@@ -624,6 +666,12 @@ public class MilRollEntryDialog {
 			lm.setLaegdId(0);
 		}
 
+		try {
+			lm.setGlLaegdId(Integer.parseInt(textGlLaegdId.getText()));
+		} catch (final Exception e) {
+			lm.setGlLaegdId(0);
+		}
+
 		lm.setNavn(constructName(lm.getFader(), lm.getSoen()));
 
 		try {
@@ -717,6 +765,37 @@ public class MilRollEntryDialog {
 	}
 
 	/**
+	 * Get entry from Derby
+	 */
+	private void selectOld() {
+
+		// pag 62
+
+		final MilRollModel m = new MilRollModel();
+
+		try {
+			m.select(props, Integer.parseInt(textGlLaegdId.getText()), Integer.parseInt(textGlLoebenr.getText()));
+			textNyLoebenr.setText("");
+			textFader.setText(m.getFader());
+			textSoen.setText(m.getSoen());
+			textFoedested.setText(m.getFoedeSted());
+			textAlder.setText("");
+			textStoerrelseitommer.setText("");
+			textOphold.setText(m.getOphold());
+			textAnmaerkninger.setText("");
+			try {
+				textFoedt.setText(m.getFoedt().toString());
+			} catch (final Exception e) {
+			}
+			textGedcomid.setText(m.getGedcomId());
+			textNyLoebenr.setFocus();
+		} catch (final Exception e1) {
+			setErrorMessage(e1.getMessage());
+//			e1.printStackTrace();
+		}
+	}
+
+	/**
 	 * Set the message in the message combo box
 	 *
 	 * @param string
@@ -765,8 +844,9 @@ public class MilRollEntryDialog {
 			props.setProperty("aar", textAar.getText());
 			props.setProperty("rulletype", textRulletype.getText());
 			props.setProperty("laegdnr", textLaegdNr.getText());
-			props.setProperty("sogn", textSoen.getText());
+			props.setProperty("sogn", textSogn.getText());
 			props.setProperty("laegdid", textLaegdId.getText());
+			props.setProperty("gllaegdid", textGlLaegdId.getText());
 			props.setProperty("uri", textUri.getText());
 
 			props.store(output, "Archive searcher properties");

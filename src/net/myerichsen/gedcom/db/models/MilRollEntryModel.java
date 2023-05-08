@@ -54,7 +54,7 @@ public class MilRollEntryModel extends ASModel {
 			m.setSogn(rs.getString("SOGN").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
 			m.setGlLaegdId(rs.getInt("GLLAEGDID"));
-			m.setGlaar(rs.getInt("GLLOEBENR"));
+			m.setGlLoebeNr(rs.getInt("GLLOEBENR"));
 			m.setLoebeNr(rs.getInt("LOEBENR"));
 			m.setFader(rs.getString("FADER"));
 			m.setSoen(rs.getString("SOEN"));

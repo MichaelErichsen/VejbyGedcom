@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.views;
+package net.myerichsen.gedcom.db.dialogs;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;

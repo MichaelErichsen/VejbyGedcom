@@ -13,7 +13,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 7. maj 2023
+ * @version 8. maj 2023
  *
  */
 public class MilRollModel extends ASModel {
@@ -26,6 +26,7 @@ public class MilRollModel extends ASModel {
 			+ "WHERE LAEGDID = ? AND LOEBENR = ?";
 	private static final String DELETE = "DELETE FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
 	private static final String SELECT = "SELECT * FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
+//	private static final String SELECT_OLD = "SELECT * FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
 
 	private int laegdId = 0;
 	private int glLaegdId = 0;
@@ -258,6 +259,48 @@ public class MilRollModel extends ASModel {
 		statement.close();
 		conn.close();
 	}
+
+//	/**
+//	 * Select entry from Derby database
+//	 *
+//	 * @param props
+//	 * @throws Exception
+//	 *
+//	 */
+//	public void selectOld(Properties props, int glLaegdId, int glLoebeNr) throws Exception {
+//		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
+//		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+//		statement.setString(1, props.getProperty("milrollSchema"));
+//		statement.execute();
+//
+//		statement = conn.prepareStatement(SELECT_OLD);
+//		statement.setInt(1, glLaegdId);
+//		statement.setInt(2, glLoebeNr);
+//		final ResultSet rs = statement.executeQuery();
+//
+//		if (!rs.next()) {
+//			throw new Exception("Løbenr. ikke fundet");
+//		}
+//		laegdId = rs.getInt(1);
+//		this.glLaegdId = rs.getInt(2);
+//		this.glLoebeNr = rs.getInt(3);
+//		loebeNr = rs.getInt(4);
+//		fader = rs.getString(5);
+//		soen = rs.getString(6);
+//		foedeSted = rs.getString(7);
+//		alder = rs.getInt(8);
+//		stoerrelseITommer = rs.getBigDecimal(9);
+//		ophold = rs.getString(10);
+//		anmaerkninger = rs.getString(11);
+//		foedt = rs.getDate(12);
+//		gedcomId = rs.getString(13);
+//		navn = rs.getString(14);
+//		faderFon = rs.getString(15);
+//		soenFon = rs.getString(16);
+//
+//		statement.close();
+//		conn.close();
+//	}
 
 	/**
 	 * @param alder the alder to set

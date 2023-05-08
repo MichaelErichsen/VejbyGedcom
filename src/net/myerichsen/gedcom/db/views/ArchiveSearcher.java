@@ -37,6 +37,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import net.myerichsen.gedcom.db.dialogs.HelpDialog;
+import net.myerichsen.gedcom.db.dialogs.KeystrokeDialog;
+import net.myerichsen.gedcom.db.dialogs.MilRollEntryDialog;
+import net.myerichsen.gedcom.db.dialogs.MilRollListDialog;
+import net.myerichsen.gedcom.db.dialogs.SettingsWizard;
 import net.myerichsen.gedcom.db.loaders.CensusDbLoader;
 import net.myerichsen.gedcom.db.loaders.GedcomLoader;
 import net.myerichsen.gedcom.db.loaders.LoadBurialPersonComplete;

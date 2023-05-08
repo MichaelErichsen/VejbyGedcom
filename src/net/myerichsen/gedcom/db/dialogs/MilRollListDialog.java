@@ -1,4 +1,4 @@
-package net.myerichsen.gedcom.db.views;
+package net.myerichsen.gedcom.db.dialogs;
 
 import java.sql.SQLException;
 import java.util.Properties;
@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.TableItem;
 import net.myerichsen.gedcom.db.models.MilrollListModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.MilrollListPopulator;
+import net.myerichsen.gedcom.db.views.ArchiveSearcher;
 import net.myerichsen.gedcom.util.MillrollListAarEditingSupport;
 import net.myerichsen.gedcom.util.MillrollListAmtEditingSupport;
 import net.myerichsen.gedcom.util.MillrollListGlAarEditingSupport;

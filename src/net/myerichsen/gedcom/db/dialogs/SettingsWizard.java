@@ -1,10 +1,11 @@
-package net.myerichsen.gedcom.db.views;
+package net.myerichsen.gedcom.db.dialogs;
 
 import java.util.Properties;
 
 import org.eclipse.jface.wizard.Wizard;
 
 import net.myerichsen.gedcom.db.models.SettingsModel;
+import net.myerichsen.gedcom.db.views.ArchiveSearcher;
 
 /**
  * Settings wizard
