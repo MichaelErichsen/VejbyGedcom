@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * Find possible ID's for a phonetic name
- * 
+ *
  * @author Michael Erichsen
  * @version 8. maj 2023
  *

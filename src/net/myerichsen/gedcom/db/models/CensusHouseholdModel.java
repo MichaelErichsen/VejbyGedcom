@@ -16,7 +16,7 @@ import java.util.Properties;
  * @version 29. apr. 2023
  *
  */
-public class CensusHousehold extends ASModel {
+public class CensusHouseholdModel extends ASModel {
 	/**
 	 * Constants
 	 */

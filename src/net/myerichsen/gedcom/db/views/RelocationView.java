@@ -42,15 +42,15 @@ import net.myerichsen.gedcom.db.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 4. maj 2023
+ * @version 9. maj 2023
  *
  */
 public class RelocationView extends Composite {
-	private TableViewer relocationTableViewer;
+	private TableViewer tableViewer;
 	private Text txtRelocationGiven;
 	private Text txtRelocationSurname;
-	private Table relocationTable;
-	private ASPopulator relocationListener;
+	private Table table;
+	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 
@@ -64,7 +64,7 @@ public class RelocationView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		relocationListener = new RelocationPopulator();
+		listener = new RelocationPopulator();
 
 		final Composite relocationFilterComposite = new Composite(this, SWT.BORDER);
 		relocationFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -84,7 +84,7 @@ public class RelocationView extends Composite {
 					txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				RelocationGivenFilter.getInstance().setSearchText(txtRelocationGiven.getText());
-				relocationTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -102,7 +102,7 @@ public class RelocationView extends Composite {
 					txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				RelocationSurnameFilter.getInstance().setSearchText(txtRelocationSurname.getText());
-				relocationTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -122,22 +122,22 @@ public class RelocationView extends Composite {
 		relocationScroller.setExpandHorizontal(true);
 		relocationScroller.setExpandVertical(true);
 
-		relocationTableViewer = new TableViewer(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		relocationTableViewer.setUseHashlookup(true);
-		relocationTableViewer.addDoubleClickListener(event -> relocationPopup());
+		tableViewer = new TableViewer(relocationScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.addDoubleClickListener(event -> popup());
 
 		final ViewerFilter[] filters = new ViewerFilter[2];
 		filters[0] = RelocationGivenFilter.getInstance();
 		filters[1] = RelocationSurnameFilter.getInstance();
-		relocationTableViewer.setFilters(filters);
-		relocationTableViewer.setComparator(new RelocationComparator());
-		relocationTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer.setFilters(filters);
+		tableViewer.setComparator(new RelocationComparator());
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		relocationTable = relocationTableViewer.getTable();
-		relocationTable.setLinesVisible(true);
-		relocationTable.setHeaderVisible(true);
+		table = tableViewer.getTable();
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
 
-		final TableViewerColumn relocationTableViewerColumn = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		relocationTableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
@@ -150,7 +150,7 @@ public class RelocationView extends Composite {
 		tblclmnId.setWidth(40);
 		tblclmnId.setText("ID");
 
-		final TableViewerColumn relocationTableViewerColumn_1 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFornavn = relocationTableViewerColumn_1.getColumn();
 		tblclmnFornavn.setWidth(100);
 		tblclmnFornavn.setText("Fornavn");
@@ -162,7 +162,7 @@ public class RelocationView extends Composite {
 				return rr.getGivenName();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_2 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnEfternavn = relocationTableViewerColumn_2.getColumn();
 		tblclmnEfternavn.setWidth(100);
 		tblclmnEfternavn.setText("Efternavn");
@@ -174,7 +174,7 @@ public class RelocationView extends Composite {
 				return rr.getSurName();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_3 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFlyttedato = relocationTableViewerColumn_3.getColumn();
 		tblclmnFlyttedato.setWidth(100);
 		tblclmnFlyttedato.setText("Flyttedato");
@@ -186,7 +186,7 @@ public class RelocationView extends Composite {
 				return rr.getDate().toString();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_4 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnTil = relocationTableViewerColumn_4.getColumn();
 		tblclmnTil.setWidth(200);
 		tblclmnTil.setText("Til");
@@ -198,7 +198,7 @@ public class RelocationView extends Composite {
 				return rr.getPlace();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_5 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFra = relocationTableViewerColumn_5.getColumn();
 		tblclmnFra.setWidth(100);
 		tblclmnFra.setText("Fra");
@@ -210,7 +210,7 @@ public class RelocationView extends Composite {
 				return rr.getNote();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_6 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnDetaljer = relocationTableViewerColumn_6.getColumn();
 		tblclmnDetaljer.setWidth(100);
 		tblclmnDetaljer.setText("Detaljer");
@@ -221,7 +221,7 @@ public class RelocationView extends Composite {
 				return rr.getSourceDetail();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_7 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFdselsdato = relocationTableViewerColumn_7.getColumn();
 		tblclmnFdselsdato.setWidth(100);
 		tblclmnFdselsdato.setText("F\u00F8dselsdato");
@@ -233,7 +233,7 @@ public class RelocationView extends Composite {
 				return rr.getBirthDate().toString();
 			}
 		});
-		final TableViewerColumn relocationTableViewerColumn_8 = new TableViewerColumn(relocationTableViewer, SWT.NONE);
+		final TableViewerColumn relocationTableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnForldre = relocationTableViewerColumn_8.getColumn();
 		tblclmnForldre.setWidth(177);
 		tblclmnForldre.setText("For\u00E6ldre");
@@ -246,8 +246,8 @@ public class RelocationView extends Composite {
 			}
 		});
 
-		relocationScroller.setContent(relocationTable);
-		relocationScroller.setMinSize(relocationTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		relocationScroller.setContent(table);
+		relocationScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -264,7 +264,7 @@ public class RelocationView extends Composite {
 			thread.interrupt();
 		}
 		final RelocationModel[] input = new RelocationModel[0];
-		relocationTableViewer.setInput(input);
+		tableViewer.setInput(input);
 		clearFilters();
 	}
 
@@ -278,7 +278,7 @@ public class RelocationView extends Composite {
 		txtRelocationSurname.setText("");
 		txtRelocationGiven.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtRelocationSurname.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		relocationTableViewer.refresh();
+		tableViewer.refresh();
 	}
 
 	/**
@@ -287,13 +287,13 @@ public class RelocationView extends Composite {
 	 */
 	public void populate(String phonName, String birthDate) {
 		thread = new Thread(() -> {
-			if (relocationListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), phonName, birthDate };
-					final RelocationModel[] relocationRecords = (RelocationModel[]) relocationListener.load(loadArgs);
+					final RelocationModel[] relocationRecords = (RelocationModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> relocationTableViewer.setInput(relocationRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(relocationRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Flytninger er hentet"));
 				} catch (final Exception e) {
@@ -309,8 +309,8 @@ public class RelocationView extends Composite {
 	/**
 	 *
 	 */
-	private void relocationPopup() {
-		final TableItem[] tia = relocationTable.getSelection();
+	private void popup() {
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();

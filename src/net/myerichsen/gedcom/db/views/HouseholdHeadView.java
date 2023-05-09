@@ -46,9 +46,9 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
  *
  */
 public class HouseholdHeadView extends Composite {
-	private TableViewer householdHeadTableViewer;
-	private Table householdHeadTable;
-	private ASPopulator householdHeadListener;
+	private TableViewer tableViever;
+	private Table table;
+	private ASPopulator listener;
 	private Text txtHouseholdPlace;
 	private Text txtHouseholdRelocatorName;
 	private Combo txtHouseholdEventType;
@@ -65,7 +65,7 @@ public class HouseholdHeadView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		householdHeadListener = new HouseholdHeadPopulator();
+		listener = new HouseholdHeadPopulator();
 
 		final Composite HouseholdHeadFilterComposite = new Composite(this, SWT.BORDER);
 		HouseholdHeadFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -85,7 +85,7 @@ public class HouseholdHeadView extends Composite {
 					txtHouseholdPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				HouseholdHeadPlaceFilter.getInstance().setSearchText(txtHouseholdPlace.getText());
-				householdHeadTableViewer.refresh();
+				tableViever.refresh();
 			}
 		});
 
@@ -103,7 +103,7 @@ public class HouseholdHeadView extends Composite {
 					txtHouseholdRelocatorName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				HouseholdHeadNameFilter.getInstance().setSearchText(txtHouseholdRelocatorName.getText());
-				householdHeadTableViewer.refresh();
+				tableViever.refresh();
 			}
 		});
 
@@ -120,10 +120,11 @@ public class HouseholdHeadView extends Composite {
 					txtHouseholdEventType.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				HouseholdHeadTypeFilter.getInstance().setSearchText(txtHouseholdEventType.getText());
-				householdHeadTableViewer.refresh();
+				tableViever.refresh();
 
 			}
 		});
+
 		final String[] eventTypes = { "", "Flytning", "Folketælling" };
 		txtHouseholdEventType.setItems(eventTypes);
 
@@ -143,40 +144,37 @@ public class HouseholdHeadView extends Composite {
 		HouseholdHeadScroller.setExpandHorizontal(true);
 		HouseholdHeadScroller.setExpandVertical(true);
 
-		householdHeadTableViewer = new TableViewer(HouseholdHeadScroller,
-				SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		householdHeadTableViewer.setUseHashlookup(true);
-		householdHeadTableViewer.addDoubleClickListener(event -> HouseholdHeadPopup(getDisplay()));
+		tableViever = new TableViewer(HouseholdHeadScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViever.setUseHashlookup(true);
+		tableViever.addDoubleClickListener(event -> popup(getDisplay()));
 
 		final ViewerFilter[] filters = new ViewerFilter[3];
 		filters[0] = HouseholdHeadPlaceFilter.getInstance();
 		filters[1] = HouseholdHeadNameFilter.getInstance();
 		filters[2] = HouseholdHeadTypeFilter.getInstance();
-		householdHeadTableViewer.setFilters(filters);
+		tableViever.setFilters(filters);
 
-		householdHeadTableViewer.setComparator(new HouseholdHeadComparator());
-		householdHeadTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViever.setComparator(new HouseholdHeadComparator());
+		tableViever.setContentProvider(ArrayContentProvider.getInstance());
 
-		householdHeadTable = householdHeadTableViewer.getTable();
-		householdHeadTable.setLinesVisible(true);
-		householdHeadTable.setHeaderVisible(true);
+		table = tableViever.getTable();
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
 
-		final TableViewerColumn HouseholdHeadTableViewerColumn = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn = new TableViewerColumn(tableViever, SWT.NONE);
 		HouseholdHeadTableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getHeadId();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getHeadId();
 			}
 		});
 		final TableColumn tblclmnId = HouseholdHeadTableViewerColumn.getColumn();
 		tblclmnId.setWidth(80);
 		tblclmnId.setText("Husbonds ID");
 
-		final TableViewerColumn HouseholdHeadTableViewerColumn_1 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_1 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnFornavn = HouseholdHeadTableViewerColumn_1.getColumn();
 		tblclmnFornavn.setWidth(100);
 		tblclmnFornavn.setText("Husbond");
@@ -184,12 +182,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getHeadName();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getHeadName();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_2 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_2 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnEfternavn = HouseholdHeadTableViewerColumn_2.getColumn();
 		tblclmnEfternavn.setWidth(73);
 		tblclmnEfternavn.setText("Dato");
@@ -197,24 +194,22 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getEventDate().toString();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getEventDate().toString();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_6 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_6 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnDetaljer = HouseholdHeadTableViewerColumn_6.getColumn();
 		tblclmnDetaljer.setWidth(100);
 		tblclmnDetaljer.setText("Fra");
 		HouseholdHeadTableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getNote();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getNote();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_3 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_3 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnFlyttedato = HouseholdHeadTableViewerColumn_3.getColumn();
 		tblclmnFlyttedato.setWidth(123);
 		tblclmnFlyttedato.setText("Til");
@@ -222,12 +217,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getPlace();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getPlace();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_5 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_5 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnFra = HouseholdHeadTableViewerColumn_5.getColumn();
 		tblclmnFra.setWidth(87);
 		tblclmnFra.setText("Tjenende ID");
@@ -235,12 +229,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getRelocatorId();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getRelocatorId();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_8 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_8 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnRId = HouseholdHeadTableViewerColumn_8.getColumn();
 		tblclmnRId.setWidth(148);
 		tblclmnRId.setText("Tjenende navn");
@@ -248,12 +241,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getRelocatorName();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getRelocatorName();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_4 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_4 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnTil = HouseholdHeadTableViewerColumn_4.getColumn();
 		tblclmnTil.setWidth(270);
 		tblclmnTil.setText("Detaljer");
@@ -261,12 +253,11 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getSourceDetail();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getSourceDetail();
 			}
 		});
-		final TableViewerColumn HouseholdHeadTableViewerColumn_9 = new TableViewerColumn(householdHeadTableViewer,
-				SWT.NONE);
+		final TableViewerColumn HouseholdHeadTableViewerColumn_9 = new TableViewerColumn(tableViever, SWT.NONE);
 		final TableColumn tblclmnType = HouseholdHeadTableViewerColumn_9.getColumn();
 		tblclmnType.setWidth(70);
 		tblclmnType.setText("Type");
@@ -274,13 +265,13 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel rr = (HouseholdHeadModel) element;
-				return rr.getEventType();
+				final HouseholdHeadModel model = (HouseholdHeadModel) element;
+				return model.getEventType();
 			}
 		});
 
-		HouseholdHeadScroller.setContent(householdHeadTable);
-		HouseholdHeadScroller.setMinSize(householdHeadTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		HouseholdHeadScroller.setContent(table);
+		HouseholdHeadScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -298,7 +289,7 @@ public class HouseholdHeadView extends Composite {
 		}
 
 		final HouseholdHeadModel[] input = new HouseholdHeadModel[0];
-		householdHeadTableViewer.setInput(input);
+		tableViever.setInput(input);
 		clearFilters();
 	}
 
@@ -315,14 +306,41 @@ public class HouseholdHeadView extends Composite {
 		txtHouseholdEventType.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtHouseholdPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtHouseholdRelocatorName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		householdHeadTableViewer.refresh();
+		tableViever.refresh();
+	}
+
+	/**
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 */
+	public void populate(String headId) {
+		thread = new Thread(() -> {
+			if (listener != null) {
+				try {
+					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"),
+							props.getProperty("vejbySchema"), props.getProperty("censusPath"),
+							props.getProperty("censusSchema"), props.getProperty("milrollPath"),
+							props.getProperty("milrollSchema"), headId };
+					final HouseholdHeadModel[] HouseholdHeadRecords = (HouseholdHeadModel[]) listener.load(loadArgs);
+
+					Display.getDefault().asyncExec(() -> tableViever.setInput(HouseholdHeadRecords));
+					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+							.setMessage("Husbond er hentet"));
+				} catch (final Exception e) {
+					Display.getDefault().asyncExec(
+							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				}
+			}
+		});
+		thread.start();
 	}
 
 	/**
 	 * @param display
 	 */
-	private void HouseholdHeadPopup(Display display) {
-		final TableItem[] tia = householdHeadTable.getSelection();
+	private void popup(Display display) {
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
@@ -349,33 +367,6 @@ public class HouseholdHeadView extends Composite {
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		}
-	}
-
-	/**
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 */
-	public void populate(String headId) {
-		thread = new Thread(() -> {
-			if (householdHeadListener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath"), props.getProperty("censusSchema"),
-							props.getProperty("censusPath"), headId };
-					final HouseholdHeadModel[] HouseholdHeadRecords = (HouseholdHeadModel[]) householdHeadListener
-							.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> householdHeadTableViewer.setInput(HouseholdHeadRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Husbond er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
-		thread.start();
 	}
 
 	/**

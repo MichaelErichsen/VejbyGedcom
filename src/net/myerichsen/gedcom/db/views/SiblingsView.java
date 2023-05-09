@@ -43,13 +43,13 @@ import net.myerichsen.gedcom.db.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 9. maj 2023
  *
  */
 public class SiblingsView extends Composite {
-	private TableViewer siblingsTableViewer;
-	private Table siblingsTable;
-	private ASPopulator siblingsListener;
+	private TableViewer tableViewer;
+	private Table table;
+	private ASPopulator listener;
 	private Properties props;
 	private Text txtSiblingsPlace;
 	private Text txtSiblingsParents;
@@ -65,7 +65,7 @@ public class SiblingsView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		siblingsListener = new SiblingsPopulator();
+		listener = new SiblingsPopulator();
 
 		final Composite SiblingsFilterComposite = new Composite(this, SWT.BORDER);
 		SiblingsFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -84,7 +84,7 @@ public class SiblingsView extends Composite {
 					txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				SiblingsPlaceFilter.getInstance().setSearchText(txtSiblingsPlace.getText());
-				siblingsTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -101,7 +101,7 @@ public class SiblingsView extends Composite {
 					txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				SiblingsParentsFilter.getInstance().setSearchText(txtSiblingsParents.getText());
-				siblingsTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -121,22 +121,22 @@ public class SiblingsView extends Composite {
 		siblingsScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		siblingsScroller.setSize(0, 0);
 
-		siblingsTableViewer = new TableViewer(siblingsScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		siblingsTableViewer.setUseHashlookup(true);
-		siblingsTableViewer.addDoubleClickListener(event -> siblingsPopup(getDisplay()));
-		siblingsTable = siblingsTableViewer.getTable();
+		tableViewer = new TableViewer(siblingsScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.addDoubleClickListener(event -> popup(getDisplay()));
+		table = tableViewer.getTable();
 
-		siblingsTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		final ViewerFilter[] filters = new ViewerFilter[2];
 		filters[0] = SiblingsParentsFilter.getInstance();
 		filters[1] = SiblingsPlaceFilter.getInstance();
-		siblingsTableViewer.setFilters(filters);
-		siblingsTableViewer.setComparator(new SiblingComparator());
+		tableViewer.setFilters(filters);
+		tableViewer.setComparator(new SiblingComparator());
 
-		siblingsTable.setHeaderVisible(true);
-		siblingsTable.setLinesVisible(true);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
 
-		final TableViewerColumn tableViewerColumn = new TableViewerColumn(siblingsTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnId_1 = tableViewerColumn.getColumn();
 		tblclmnId_1.setWidth(91);
 		tblclmnId_1.setText("ID");
@@ -149,7 +149,7 @@ public class SiblingsView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(siblingsTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFdselsdato = tableViewerColumn_1.getColumn();
 		tblclmnFdselsdato.setWidth(100);
 		tblclmnFdselsdato.setText("F\u00F8dselsdato");
@@ -162,7 +162,7 @@ public class SiblingsView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(siblingsTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnNavn_2 = tableViewerColumn_2.getColumn();
 		tblclmnNavn_2.setWidth(146);
 		tblclmnNavn_2.setText("Navn");
@@ -175,7 +175,7 @@ public class SiblingsView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(siblingsTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnForldre_1 = tableViewerColumn_3.getColumn();
 		tblclmnForldre_1.setWidth(237);
 		tblclmnForldre_1.setText("For\u00E6ldre");
@@ -188,7 +188,7 @@ public class SiblingsView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(siblingsTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnSted_2 = tableViewerColumn_4.getColumn();
 		tblclmnSted_2.setWidth(484);
 		tblclmnSted_2.setText("Sted");
@@ -201,8 +201,8 @@ public class SiblingsView extends Composite {
 			}
 		});
 
-		siblingsScroller.setContent(siblingsTable);
-		siblingsScroller.setMinSize(siblingsTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		siblingsScroller.setContent(table);
+		siblingsScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -219,7 +219,7 @@ public class SiblingsView extends Composite {
 			thread.interrupt();
 		}
 		final SiblingsModel[] input = new SiblingsModel[0];
-		siblingsTableViewer.setInput(input);
+		tableViewer.setInput(input);
 		clearFilters();
 	}
 
@@ -233,7 +233,7 @@ public class SiblingsView extends Composite {
 		txtSiblingsParents.setText("");
 		txtSiblingsParents.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtSiblingsPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		siblingsTableViewer.refresh();
+		tableViewer.refresh();
 	}
 
 	/**
@@ -244,13 +244,13 @@ public class SiblingsView extends Composite {
 	 */
 	public void populate(String parents) throws SQLException {
 		new Thread(() -> {
-			if (siblingsListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), parents };
-					final SiblingsModel[] siblingRecords = (SiblingsModel[]) siblingsListener.load(loadArgs);
+					final SiblingsModel[] siblingRecords = (SiblingsModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(siblingRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
 				} catch (final Exception e) {
 					e.printStackTrace();
 				}
@@ -269,13 +269,13 @@ public class SiblingsView extends Composite {
 	 */
 	public void populate(String fathersName, String mothersName) throws SQLException {
 		thread = new Thread(() -> {
-			if (siblingsListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
 							props.getProperty("vejbyPath"), fathersName, mothersName };
-					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) siblingsListener.load(loadArgs);
+					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> siblingsTableViewer.setInput(SiblingRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Søskende er hentet"));
 
@@ -289,19 +289,11 @@ public class SiblingsView extends Composite {
 	}
 
 	/**
-	 * @param props
-	 */
-	public void setProperties(Properties props) {
-		this.props = props;
-
-	}
-
-	/**
 	 * @param display
 	 * @param event
 	 */
-	private void siblingsPopup(Display display) {
-		final TableItem[] tia = siblingsTable.getSelection();
+	private void popup(Display display) {
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
@@ -333,5 +325,13 @@ public class SiblingsView extends Composite {
 			grandParent.getSearchId().setText(siblingsId);
 			grandParent.searchById(null);
 		}
+	}
+
+	/**
+	 * @param props
+	 */
+	public void setProperties(Properties props) {
+		this.props = props;
+
 	}
 }

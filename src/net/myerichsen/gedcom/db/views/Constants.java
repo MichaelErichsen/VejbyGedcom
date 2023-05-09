@@ -2,7 +2,7 @@ package net.myerichsen.gedcom.db.views;
 
 /**
  * Constants used for initialization of Archive Searcher
- * 
+ *
  * @author Michael Erichsen
  * @version 8. maj 2023
  *

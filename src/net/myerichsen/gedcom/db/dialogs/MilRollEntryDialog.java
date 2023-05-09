@@ -54,7 +54,6 @@ import net.myerichsen.gedcom.util.Fonkod;
  *
  */
 
-// TODO Merge military roll relocations into relocation view
 // TODO Find a way to merge entries from following years
 
 public class MilRollEntryDialog {
@@ -121,12 +120,16 @@ public class MilRollEntryDialog {
 
 	/**
 	 * Populate content assist popup with latest location
-	 * 
+	 *
 	 * @param existing
 	 * @param current
 	 */
 	private String addContentAssistProperty(String existing, String current) {
-		String s = current.trim() + ";" + existing;
+		if (current.length() == 0 || current.isBlank()) {
+			return existing;
+		}
+
+		final String s = current.trim() + ";" + existing;
 		String sa[] = s.split(";");
 
 		// Remove duplicates
@@ -136,10 +139,10 @@ public class MilRollEntryDialog {
 			sa = Arrays.copyOf(sa, sa.length - 1);
 		}
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < sa.length; i++) {
-			sb.append(sa[i]).append(";");
+		for (final String element : sa) {
+			sb.append(element).append(";");
 		}
 
 		return sb.toString();
@@ -491,7 +494,7 @@ public class MilRollEntryDialog {
 		textFoedt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblGedcomId = new Label(compositeData, SWT.NONE);
-		lblGedcomId.setText("GEDCOM ID (@ and I beh\u00F8ves ikke)");
+		lblGedcomId.setText("GEDCOM ID (@ og I beh\u00F8ves ikke)");
 
 		textGedcomid = new Text(compositeData, SWT.BORDER);
 		textGedcomid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

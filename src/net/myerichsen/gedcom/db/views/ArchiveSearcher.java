@@ -423,11 +423,11 @@ public class ArchiveSearcher extends Shell {
 		final Menu menu_3 = new Menu(mntmNewSubmenu);
 		mntmNewSubmenu.setMenu(menu_3);
 
-		MenuItem mntmHjlpetaster = new MenuItem(menu_3, SWT.NONE);
+		final MenuItem mntmHjlpetaster = new MenuItem(menu_3, SWT.NONE);
 		mntmHjlpetaster.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				KeystrokeDialog kd = new KeystrokeDialog(shell);
+				final KeystrokeDialog kd = new KeystrokeDialog(shell);
 				kd.open();
 			}
 		});

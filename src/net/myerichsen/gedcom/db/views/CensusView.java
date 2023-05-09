@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.filters.CensusNameFilter;
 import net.myerichsen.gedcom.db.filters.CensusParishFilter;
 import net.myerichsen.gedcom.db.filters.CensusSexFilter;
 import net.myerichsen.gedcom.db.filters.CensusYearFilter;
-import net.myerichsen.gedcom.db.models.CensusHousehold;
+import net.myerichsen.gedcom.db.models.CensusHouseholdModel;
 import net.myerichsen.gedcom.db.models.CensusModel;
 import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.CensusPopulator;
@@ -624,7 +624,7 @@ public class CensusView extends Composite {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHousehold.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr, kildeHenvisning,
+		household = CensusHouseholdModel.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr, kildeHenvisning,
 				props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {
@@ -703,7 +703,7 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
+				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), ti.getText(21),
 						ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19), props.getProperty("censusSchema"));
 				final StringBuilder sb2 = new StringBuilder();
 
@@ -722,10 +722,10 @@ public class CensusView extends Composite {
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
-			final List<CensusModel> lcr = CensusHousehold.load(props.getProperty("vejbyPath"), ti.getText(21),
+			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), ti.getText(21),
 					ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19), props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);
-			final String headOfHousehold = CensusHousehold.getHeadOfHousehold(props, censusModel);
+			final String headOfHousehold = CensusHouseholdModel.getHeadOfHousehold(props, censusModel);
 
 			final Shell[] shells = getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);

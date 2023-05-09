@@ -151,7 +151,7 @@ public class PolregView extends Composite {
 		tableViewer.setFilters(filters);
 		tableViewer.setComparator(new PolregComparator());
 		tableViewer.addDoubleClickListener(event -> {
-			polregPopup();
+			popup();
 		});
 
 		table = tableViewer.getTable();
@@ -363,33 +363,6 @@ public class PolregView extends Composite {
 	}
 
 	/**
-	 *
-	 */
-	private void polregPopup() {
-		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
-
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 13; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-		sb.append("\n");
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Politiets Registerblade", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
-		final int open = dialog.open();
-
-		if (open == 1) {
-			final Clipboard clipboard = new Clipboard(getDisplay());
-			final TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
-			clipboard.dispose();
-		}
-	}
-
-	/**
 	 * Populate police registry table
 	 *
 	 * @param phonName
@@ -415,6 +388,33 @@ public class PolregView extends Composite {
 			}
 		});
 		thread.start();
+	}
+
+	/**
+	 *
+	 */
+	private void popup() {
+		final TableItem[] tia = table.getSelection();
+		final TableItem ti = tia[0];
+
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 13; i++) {
+			if (ti.getText(i).length() > 0) {
+				sb.append(ti.getText(i) + ", ");
+			}
+		}
+		sb.append("\n");
+
+		final MessageDialog dialog = new MessageDialog(getShell(), "Politiets Registerblade", null, sb.toString(),
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+		final int open = dialog.open();
+
+		if (open == 1) {
+			final Clipboard clipboard = new Clipboard(getDisplay());
+			final TextTransfer textTransfer = TextTransfer.getInstance();
+			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
+			clipboard.dispose();
+		}
 	}
 
 	/**

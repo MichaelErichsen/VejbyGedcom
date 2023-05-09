@@ -12,10 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class representing a HouseholdHead relocation event
+ * Class representing a HouseholdHead relocation or census event or military
+ * roll record
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 9. maj 2023
  */
 
 /*
@@ -34,6 +35,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	private static final String SELECT_3 = "SELECT MIN(LOEBENR) AS MINLNR FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
 			+ "AND HUSSTANDS_FAMILIENR = ? AND MATR_NR_ADRESSE = ?";
 	private static final String SELECT_6 = "SELECT GIVENNAME, SURNAME FROM INDIVIDUAL WHERE ID = ?";
+	private static final String SELECT_M = "SELECT * FROM LAEGD.LAEGD, LAEGD.RULLE WHERE GEDCOMID = ? AND LAEGD.LAEGD.LAEGDID = LAEGD.RULLE.LAEGDID";
 
 	/**
 	 * @param p
@@ -199,6 +201,49 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	}
 
 	/**
+	 * @param vejbyDbPath
+	 * @param milRollSchema
+	 * @param relocatorId
+	 * @return
+	 * @throws Exception
+	 */
+	private static List<HouseholdHeadModel> getMilRollEvents(String milrollPath, String milrollSchema,
+			String relocatorId) throws Exception {
+		final Connection connM = DriverManager.getConnection("jdbc:derby:" + milrollPath);
+		PreparedStatement statementM = connM.prepareStatement(SET_SCHEMA);
+		statementM.setString(1, milrollSchema);
+		statementM.execute();
+
+		// Get a list of military roll records for this individual
+		statementM = connM.prepareStatement(SELECT_M);
+		statementM.setString(1, relocatorId);
+		final ResultSet rs = statementM.executeQuery();
+
+		HouseholdHeadModel hhm;
+		final List<HouseholdHeadModel> lhhm = new ArrayList<>();
+		String s = "";
+
+		while (rs.next()) {
+			hhm = new HouseholdHeadModel();
+			hhm.setHeadId("");
+			hhm.setHeadName(rs.getString("FADER"));
+			hhm.setEventDate(Date.valueOf(rs.getString("AAR") + "-01-01"));
+			hhm.setPlace(rs.getString("OPHOLD"));
+			hhm.setNote("");
+			s = rs.getString("ANMAERKNINGER").trim();
+			s = s.length() > 0 ? ", " + s : "";
+			hhm.setSourceDetail(
+					"Alder " + rs.getString("ALDER") + ", fødested " + rs.getString("FOEDESTED").trim() + s);
+			hhm.setRelocatorId(relocatorId);
+			hhm.setRelocatorName(rs.getString("SOEN"));
+			hhm.setEventType("Lægdsrulle");
+			lhhm.add(hhm);
+		}
+
+		return lhhm;
+	}
+
+	/**
 	 * Get a list of relocation data
 	 *
 	 * @param schema
@@ -273,11 +318,14 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 * @return
 	 * @throws Exception
 	 */
-	public static HouseholdHeadModel[] load(String vejbySchema, String vejbyDbPath, String censusSchema,
-			String censusDbPath, String headId) throws Exception {
+	public static HouseholdHeadModel[] load(String vejbyDbPath, String vejbySchema, String censusDbPath,
+			String censusSchema, String milrollPath, String milrollSchema, String headId) throws Exception {
 		final List<HouseholdHeadModel> lhhm = getRelocationEvents(vejbySchema, vejbyDbPath, headId);
-		final List<HouseholdHeadModel> lhhm2 = getCensusEvents(vejbySchema, vejbyDbPath, censusSchema, censusDbPath,
+		final List<HouseholdHeadModel> lhhm1 = getCensusEvents(vejbySchema, vejbyDbPath, censusSchema, censusDbPath,
 				headId);
+		final List<HouseholdHeadModel> lhhm2 = getMilRollEvents(milrollPath, milrollSchema, headId);
+
+		lhhm.addAll(lhhm1);
 		lhhm.addAll(lhhm2);
 
 		final HouseholdHeadModel[] hhma = new HouseholdHeadModel[lhhm.size()];

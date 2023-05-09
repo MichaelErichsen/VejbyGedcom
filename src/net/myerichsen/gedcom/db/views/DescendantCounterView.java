@@ -28,13 +28,13 @@ import net.myerichsen.gedcom.db.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 9. maj 2023
  *
  */
 public class DescendantCounterView extends Composite {
-	private Table descendantTable;
-	private ASPopulator descendantListener;
-	private TableViewer descendantTableViewer;
+	private Table table;
+	private ASPopulator listener;
+	private TableViewer tableViewer;
 	private Properties props;
 	private Thread thread;
 
@@ -48,7 +48,7 @@ public class DescendantCounterView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		descendantListener = new DescendantPopulator();
+		listener = new DescendantPopulator();
 
 		final ScrolledComposite descendantScroller = new ScrolledComposite(this,
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -57,16 +57,16 @@ public class DescendantCounterView extends Composite {
 		descendantScroller.setExpandHorizontal(true);
 		descendantScroller.setExpandVertical(true);
 
-		descendantTableViewer = new TableViewer(descendantScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		descendantTableViewer.setUseHashlookup(true);
-		descendantTableViewer.setComparator(new DescendantComparator());
-		descendantTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer = new TableViewer(descendantScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.setComparator(new DescendantComparator());
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		descendantTable = descendantTableViewer.getTable();
-		descendantTable.setLinesVisible(true);
-		descendantTable.setHeaderVisible(true);
+		table = tableViewer.getTable();
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
 
-		final TableViewerColumn tableViewerColumn = new TableViewerColumn(descendantTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnAntalEfterkommere = tableViewerColumn.getColumn();
 		tblclmnAntalEfterkommere.setWidth(143);
 		tblclmnAntalEfterkommere.setText("Antal efterkommere");
@@ -78,7 +78,7 @@ public class DescendantCounterView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(descendantTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnId = tableViewerColumn_1.getColumn();
 		tblclmnId.setWidth(58);
 		tblclmnId.setText("ID");
@@ -90,7 +90,7 @@ public class DescendantCounterView extends Composite {
 			}
 		});
 
-		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(descendantTableViewer, SWT.NONE);
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnNavn = tableViewerColumn_2.getColumn();
 		tblclmnNavn.setWidth(300);
 		tblclmnNavn.setText("Navn");
@@ -118,8 +118,8 @@ public class DescendantCounterView extends Composite {
 		});
 		btnFind.setText("Find");
 
-		descendantScroller.setContent(descendantTable);
-		descendantScroller.setMinSize(descendantTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		descendantScroller.setContent(table);
+		descendantScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -136,8 +136,8 @@ public class DescendantCounterView extends Composite {
 			thread.interrupt();
 		}
 		final DescendantModel[] input = new DescendantModel[0];
-		descendantTableViewer.setInput(input);
-		descendantTableViewer.refresh();
+		tableViewer.setInput(input);
+		tableViewer.refresh();
 	}
 
 	/**
@@ -145,12 +145,12 @@ public class DescendantCounterView extends Composite {
 	 */
 	public void populate() {
 		thread = new Thread(() -> {
-			if (descendantListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("gedcomFilePath") };
-					final DescendantModel[] descendantRecords = (DescendantModel[]) descendantListener.load(loadArgs);
+					final DescendantModel[] descendantRecords = (DescendantModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> descendantTableViewer.setInput(descendantRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(descendantRecords));
 
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Efterkommere er hentet"));

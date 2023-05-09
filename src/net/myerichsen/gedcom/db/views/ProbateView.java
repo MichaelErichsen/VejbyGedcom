@@ -42,17 +42,17 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 9. maj 2023
  *
  */
 public class ProbateView extends Composite {
-	private TableViewer probateTableViewer;
-	private Table probateTable;
-	private ASPopulator probateListener;
+	private TableViewer tableViewer;
+	private Table table;
+	private ASPopulator listener;
 	private Properties props;
-	private Text txtProbatePlace;
 	private Thread thread;
 	private Text txtProbateSource;
+	private Text txtProbatePlace;
 
 	/**
 	 * Create the composite.
@@ -64,7 +64,7 @@ public class ProbateView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		probateListener = new ProbatePopulator();
+		listener = new ProbatePopulator();
 
 		final Composite ProbateFilterComposite = new Composite(this, SWT.BORDER);
 		ProbateFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -83,7 +83,7 @@ public class ProbateView extends Composite {
 					txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				ProbatePlaceFilter.getInstance().setSearchText(txtProbatePlace.getText());
-				probateTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -100,7 +100,7 @@ public class ProbateView extends Composite {
 					txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
 				ProbateSourceFilter.getInstance().setSearchText(txtProbateSource.getText());
-				probateTableViewer.refresh();
+				tableViewer.refresh();
 			}
 		});
 
@@ -119,21 +119,21 @@ public class ProbateView extends Composite {
 		probateScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		probateScroller.setSize(0, 0);
 
-		probateTableViewer = new TableViewer(probateScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
-		probateTableViewer.setUseHashlookup(true);
-		probateTableViewer.addDoubleClickListener(event -> probatePopup(getDisplay()));
-		probateTable = probateTableViewer.getTable();
-		probateTable.setLinesVisible(true);
-		probateTable.setHeaderVisible(true);
+		tableViewer = new TableViewer(probateScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer.setUseHashlookup(true);
+		tableViewer.addDoubleClickListener(event -> popup(getDisplay()));
+		table = tableViewer.getTable();
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
 
-		probateTableViewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
 		final ViewerFilter[] filters = new ViewerFilter[2];
 		filters[0] = ProbatePlaceFilter.getInstance();
 		filters[1] = ProbateSourceFilter.getInstance();
-		probateTableViewer.setFilters(filters);
+		tableViewer.setFilters(filters);
 
-		final TableViewerColumn Column_9 = new TableViewerColumn(probateTableViewer, SWT.NONE);
+		final TableViewerColumn Column_9 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnNavn = Column_9.getColumn();
 		tblclmnNavn.setWidth(100);
 		tblclmnNavn.setText("Navn");
@@ -146,7 +146,7 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		final TableViewerColumn Column_10 = new TableViewerColumn(probateTableViewer, SWT.NONE);
+		final TableViewerColumn Column_10 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnFra_1 = Column_10.getColumn();
 		tblclmnFra_1.setWidth(100);
 		tblclmnFra_1.setText("Fra");
@@ -159,7 +159,7 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		final TableViewerColumn Column_11 = new TableViewerColumn(probateTableViewer, SWT.NONE);
+		final TableViewerColumn Column_11 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnTil_1 = Column_11.getColumn();
 		tblclmnTil_1.setWidth(100);
 		tblclmnTil_1.setText("Til");
@@ -172,7 +172,7 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		final TableViewerColumn Column_12 = new TableViewerColumn(probateTableViewer, SWT.NONE);
+		final TableViewerColumn Column_12 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnSted = Column_12.getColumn();
 		tblclmnSted.setWidth(100);
 		tblclmnSted.setText("Sted");
@@ -185,7 +185,7 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		final TableViewerColumn Column_13 = new TableViewerColumn(probateTableViewer, SWT.NONE);
+		final TableViewerColumn Column_13 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnData = Column_13.getColumn();
 		tblclmnData.setWidth(300);
 		tblclmnData.setText("Data");
@@ -198,7 +198,7 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		final TableViewerColumn Column_14 = new TableViewerColumn(probateTableViewer, SWT.NONE);
+		final TableViewerColumn Column_14 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnKilde = Column_14.getColumn();
 		tblclmnKilde.setWidth(300);
 		tblclmnKilde.setText("Kilde");
@@ -211,8 +211,8 @@ public class ProbateView extends Composite {
 			}
 		});
 
-		probateScroller.setContent(probateTable);
-		probateScroller.setMinSize(probateTable.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		probateScroller.setContent(table);
+		probateScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -229,7 +229,7 @@ public class ProbateView extends Composite {
 			thread.interrupt();
 		}
 		final ProbateModel[] input = new ProbateModel[0];
-		probateTableViewer.setInput(input);
+		tableViewer.setInput(input);
 		clearFilters();
 	}
 
@@ -243,7 +243,7 @@ public class ProbateView extends Composite {
 		txtProbateSource.setText("");
 		txtProbatePlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtProbateSource.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		probateTableViewer.refresh();
+		tableViewer.refresh();
 	}
 
 	/**
@@ -256,13 +256,13 @@ public class ProbateView extends Composite {
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
 		thread = new Thread(() -> {
-			if (probateListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
 							props.getProperty("probatePath"), phonName, birthDate, deathDate };
-					final ProbateModel[] probateRecords = (ProbateModel[]) probateListener.load(loadArgs);
+					final ProbateModel[] probateRecords = (ProbateModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> probateTableViewer.setInput(probateRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(probateRecords));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Skifter er hentet"));
 				} catch (final Exception e) {
@@ -277,8 +277,8 @@ public class ProbateView extends Composite {
 	/**
 	 * @param display
 	 */
-	private void probatePopup(Display display) {
-		final TableItem[] tia = probateTable.getSelection();
+	private void popup(Display display) {
+		final TableItem[] tia = table.getSelection();
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
