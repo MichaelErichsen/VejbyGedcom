@@ -17,11 +17,13 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
+ * Find possible ID's for a phonetic name
+ * 
  * @author Michael Erichsen
- * @version 5. maj 2023
+ * @version 8. maj 2023
  *
  */
-public class MilrollDialog extends Dialog {
+public class MilRollIdDialog extends Dialog {
 	private Table soenTable;
 	private String[] mrma;
 	private String selectedIndividual;
@@ -31,7 +33,7 @@ public class MilrollDialog extends Dialog {
 	 *
 	 * @param parentShell
 	 */
-	public MilrollDialog(Shell parentShell) {
+	public MilRollIdDialog(Shell parentShell) {
 		super(parentShell);
 	}
 

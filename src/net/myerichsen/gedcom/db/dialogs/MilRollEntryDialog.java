@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -41,16 +42,15 @@ import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.models.MilRollModel;
 import net.myerichsen.gedcom.db.models.MilrollListModel;
 import net.myerichsen.gedcom.db.views.Constants;
-import net.myerichsen.gedcom.util.FaderProvider;
-import net.myerichsen.gedcom.util.FoedestedProvider;
+import net.myerichsen.gedcom.providers.FoedestedProvider;
+import net.myerichsen.gedcom.providers.OpholdProvider;
 import net.myerichsen.gedcom.util.Fonkod;
-import net.myerichsen.gedcom.util.OpholdProvider;
 
 /**
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 8. maj 2023
+ * @version 9. maj 2023
  *
  */
 
@@ -87,6 +87,7 @@ public class MilRollEntryDialog {
 	private Text textLaegdNr;
 	private Text textSogn;
 	private Text textLaegdId;
+	private Text textGlLaegdId;
 	private Composite compositeData;
 	private Text textGlLoebenr;
 	private Text textNyLoebenr;
@@ -117,14 +118,38 @@ public class MilRollEntryDialog {
 	private Button btnRet;
 	private Button btnSlet;
 	private Button btnHentGlLbenr;
-	private Label lblGlLgdid;
-	private Text textGlLaegdId;
+
+	/**
+	 * Populate content assist popup with latest location
+	 * 
+	 * @param existing
+	 * @param current
+	 */
+	private String addContentAssistProperty(String existing, String current) {
+		String s = current.trim() + ";" + existing;
+		String sa[] = s.split(";");
+
+		// Remove duplicates
+		sa = Arrays.stream(sa).distinct().toArray(String[]::new);
+
+		if (sa.length > 10) {
+			sa = Arrays.copyOf(sa, sa.length - 1);
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < sa.length; i++) {
+			sb.append(sa[i]).append(";");
+		}
+
+		return sb.toString();
+	}
 
 	/**
 	 * Clear fields. Increment loebenr or glloebenr. Move cursor
 	 */
 	protected void clearForNext() {
-		if (textGlLoebenr.getText().length() > 0) {
+		if (textGlLoebenr.getText().length() > 0 && Integer.parseInt(textGlLoebenr.getText()) > 0) {
 			try {
 				final int l = Integer.parseInt(textGlLoebenr.getText());
 				textGlLoebenr.setText(Integer.toString(l + 1));
@@ -162,7 +187,7 @@ public class MilRollEntryDialog {
 	 */
 	private String constructName(String fader, String soen) {
 		final String[] nameParts = fader.split(" ");
-		String string = nameParts[0];
+		final String string = nameParts[0];
 		if (string.endsWith("s")) {
 			return soen.trim() + " " + string + "en";
 		}
@@ -220,7 +245,7 @@ public class MilRollEntryDialog {
 		textLaegdNr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		textLaegdNr.setText(props.getProperty("laegdnr"));
 
-		lblGlLgdid = new Label(compositeRulle, SWT.NONE);
+		final Label lblGlLgdid = new Label(compositeRulle, SWT.NONE);
 		lblGlLgdid.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblGlLgdid.setText("Gl. l\u00E6gdId");
 
@@ -418,7 +443,7 @@ public class MilRollEntryDialog {
 		textNyLoebenr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblFader = new Label(compositeData, SWT.NONE);
-		lblFader.setText("Fader (Ctl+Space)");
+		lblFader.setText("Fader");
 
 		textFader = new Text(compositeData, SWT.BORDER);
 		textFader.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -475,7 +500,6 @@ public class MilRollEntryDialog {
 
 		try {
 			final KeyStroke keyStroke = KeyStroke.getInstance("Ctrl+Space");
-			new ContentProposalAdapter(textFader, new TextContentAdapter(), new FaderProvider(props), keyStroke, null);
 			new ContentProposalAdapter(textFoedested, new TextContentAdapter(), new FoedestedProvider(props), keyStroke,
 					null);
 			new ContentProposalAdapter(textOphold, new TextContentAdapter(), new OpholdProvider(props), keyStroke,
@@ -680,9 +704,11 @@ public class MilRollEntryDialog {
 			lm.setSoenFon("");
 		}
 
-		props.setProperty("milrollFader", lm.getFader());
-		props.setProperty("milrollFoedested", lm.getFoedeSted());
-		props.setProperty("milrollOphold", lm.getOphold());
+		props.setProperty("milrollFoedested",
+				addContentAssistProperty(props.getProperty("milrollFoedested"), lm.getFoedeSted()));
+		props.setProperty("milrollOphold",
+				addContentAssistProperty(props.getProperty("milrollOphold"), lm.getOphold()));
+		storeProperties();
 
 		final String result = lm.insert(props);
 		setMessage(result);
@@ -729,7 +755,7 @@ public class MilRollEntryDialog {
 			sa[i] = ls.get(i);
 		}
 
-		final MilrollDialog mrd = new MilrollDialog(shlLgdsrulleindtastning);
+		final MilRollIdDialog mrd = new MilRollIdDialog(shlLgdsrulleindtastning);
 		mrd.setInput(sa);
 		mrd.open();
 
@@ -759,6 +785,7 @@ public class MilRollEntryDialog {
 			} catch (final Exception e) {
 			}
 			textGedcomid.setText(m.getGedcomId());
+			setMessage("Løbenr. " + m.getLoebeNr() + " er hentet");
 		} catch (final Exception e1) {
 			setErrorMessage(e1.getMessage());
 		}
@@ -768,9 +795,6 @@ public class MilRollEntryDialog {
 	 * Get entry from Derby
 	 */
 	private void selectOld() {
-
-		// pag 62
-
 		final MilRollModel m = new MilRollModel();
 
 		try {
@@ -789,9 +813,9 @@ public class MilRollEntryDialog {
 			}
 			textGedcomid.setText(m.getGedcomId());
 			textNyLoebenr.setFocus();
+			setMessage("Løbenr. " + m.getGlLoebeNr() + " er hentet fra foregående lægdsrulle");
 		} catch (final Exception e1) {
 			setErrorMessage(e1.getMessage());
-//			e1.printStackTrace();
 		}
 	}
 
@@ -997,9 +1021,11 @@ public class MilRollEntryDialog {
 			lm.setSoenFon("");
 		}
 
-		props.setProperty("milrollFader", lm.getFader());
-		props.setProperty("milrollFoedested", lm.getFoedeSted());
-		props.setProperty("milrollOphold", lm.getOphold());
+		props.setProperty("milrollFoedested",
+				addContentAssistProperty(props.getProperty("milrollFoedested"), lm.getFoedeSted()));
+		props.setProperty("milrollOphold",
+				addContentAssistProperty(props.getProperty("milrollOphold"), lm.getOphold()));
+		storeProperties();
 
 		String result;
 		try {

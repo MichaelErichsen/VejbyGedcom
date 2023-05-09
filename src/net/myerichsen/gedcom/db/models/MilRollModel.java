@@ -13,7 +13,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 8. maj 2023
+ * @version 9. maj 2023
  *
  */
 public class MilRollModel extends ASModel {
@@ -225,82 +225,41 @@ public class MilRollModel extends ASModel {
 	 * @throws Exception
 	 *
 	 */
-	public void select(Properties props, int laegdId, int loebeNr) throws Exception {
+	public void select(Properties props, int p1, int p2) throws Exception {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, props.getProperty("milrollSchema"));
 		statement.execute();
 
 		statement = conn.prepareStatement(SELECT);
-		statement.setInt(1, laegdId);
-		statement.setInt(2, loebeNr);
+		statement.setInt(1, p1);
+		statement.setInt(2, p2);
 		final ResultSet rs = statement.executeQuery();
 
 		if (!rs.next()) {
 			throw new Exception("Løbenr. ikke fundet");
 		}
-		this.laegdId = rs.getInt(1);
-		glLaegdId = rs.getInt(2);
-		glLoebeNr = rs.getInt(3);
-		this.loebeNr = rs.getInt(4);
-		fader = rs.getString(5);
-		soen = rs.getString(6);
-		foedeSted = rs.getString(7);
-		alder = rs.getInt(8);
-		stoerrelseITommer = rs.getBigDecimal(9);
-		ophold = rs.getString(10);
-		anmaerkninger = rs.getString(11);
-		foedt = rs.getDate(12);
-		gedcomId = rs.getString(13);
-		navn = rs.getString(14);
-		faderFon = rs.getString(15);
-		soenFon = rs.getString(16);
+
+		laegdId = rs.getInt("LAEGDID");
+		loebeNr = rs.getInt("LOEBENR");
+		glLaegdId = rs.getInt("GLLAEGDID");
+		glLoebeNr = rs.getInt("GLLOEBENR");
+		fader = rs.getString("FADER");
+		soen = rs.getString("SOEN");
+		foedeSted = rs.getString("FOEDESTED");
+		alder = rs.getInt("ALDER");
+		stoerrelseITommer = rs.getBigDecimal("STOERRELSEITOMMER");
+		ophold = rs.getString("OPHOLD");
+		anmaerkninger = rs.getString("ANMAERKNINGER");
+		foedt = rs.getDate("FOEDT");
+		gedcomId = rs.getString("GEDCOMID");
+		navn = rs.getString("NAVN");
+		faderFon = rs.getString("FADERFON");
+		soenFon = rs.getString("SOENFON");
 
 		statement.close();
 		conn.close();
 	}
-
-//	/**
-//	 * Select entry from Derby database
-//	 *
-//	 * @param props
-//	 * @throws Exception
-//	 *
-//	 */
-//	public void selectOld(Properties props, int glLaegdId, int glLoebeNr) throws Exception {
-//		final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
-//		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-//		statement.setString(1, props.getProperty("milrollSchema"));
-//		statement.execute();
-//
-//		statement = conn.prepareStatement(SELECT_OLD);
-//		statement.setInt(1, glLaegdId);
-//		statement.setInt(2, glLoebeNr);
-//		final ResultSet rs = statement.executeQuery();
-//
-//		if (!rs.next()) {
-//			throw new Exception("Løbenr. ikke fundet");
-//		}
-//		laegdId = rs.getInt(1);
-//		this.glLaegdId = rs.getInt(2);
-//		this.glLoebeNr = rs.getInt(3);
-//		loebeNr = rs.getInt(4);
-//		fader = rs.getString(5);
-//		soen = rs.getString(6);
-//		foedeSted = rs.getString(7);
-//		alder = rs.getInt(8);
-//		stoerrelseITommer = rs.getBigDecimal(9);
-//		ophold = rs.getString(10);
-//		anmaerkninger = rs.getString(11);
-//		foedt = rs.getDate(12);
-//		gedcomId = rs.getString(13);
-//		navn = rs.getString(14);
-//		faderFon = rs.getString(15);
-//		soenFon = rs.getString(16);
-//
-//		statement.close();
-//		conn.close();
-//	}
 
 	/**
 	 * @param alder the alder to set

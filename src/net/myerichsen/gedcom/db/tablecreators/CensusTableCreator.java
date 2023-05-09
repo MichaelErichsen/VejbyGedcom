@@ -15,7 +15,7 @@ public class CensusTableCreator {
 	/**
 	 *
 	 */
-	private static final String CREATE_SCHEMA = "CREATE SCHEMA ";
+	private static final String CREATE_SCHEMA = "CREATE SCHEMA";
 	private static final String SET_SCHEMA = "SET SCHEMA =  ?";
 	private static final String TABLE_CENSUS = "CREATE TABLE CENSUS ( KIPNR CHAR(8) NOT NULL,"
 			+ " LOEBENR INTEGER NOT NULL, AMT VARCHAR(256), HERRED VARCHAR(256),"

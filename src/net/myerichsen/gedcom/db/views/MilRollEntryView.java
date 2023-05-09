@@ -46,7 +46,7 @@ import net.myerichsen.gedcom.db.populators.MilrollPopulator;
  * Milroll entry view
  *
  * @author Michael Erichsen
- * @version 8. maj 2023
+ * @version 9. maj 2023
  *
  */
 
@@ -544,9 +544,14 @@ public class MilRollEntryView extends Composite {
 		final int open = dialog.open();
 
 		if (open == 1) {
+			final String h = ti.getText(13).startsWith("0") ? "" : ", Højde i tommer " + ti.getText(13);
+			final String s = ti.getText(0) + " amt " + ti.getText(1) + ti.getText(2) + ", lægd " + ti.getText(3)
+					+ ", Løbenr. " + ti.getText(8) + ", Fader " + ti.getText(9).trim() + ", Fødested "
+					+ ti.getText(11).trim() + ", Alder " + ti.getText(12) + h + ", Opholdssted "
+					+ ti.getText(14).trim();
 			final Clipboard clipboard = new Clipboard(getDisplay());
 			final TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
+			clipboard.setContents(new String[] { s }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		} else if (open == 2) {
 			final String id = ti.getText(17);
