@@ -12,21 +12,18 @@ import java.util.List;
  * Class representing roll data for a military roll
  *
  * @author Michael Erichsen
- * @version 5. maj 2023
+ * @version 10. maj 2023
  *
  */
 
 public class MilrollListModel extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String SELECT = "SELECT * FROM LAEGD ORDER BY AMT ASC, AAR ASC, LITRA ASC, LAEGDNR ASC";
-	private static final String SELECT_NEXT = "SELECT * FROM LAEGD.LAEGD WHERE LAEGDID > ? ORDER BY AMT ASC, "
-			+ "AAR ASC, LITRA ASC, LAEGDNR ASC FETCH FIRST ROW ONLY";
-	private static final String SELECT_PREV = "SELECT * FROM LAEGD.LAEGD WHERE LAEGDID < ? ORDER BY AMT DESC, "
-			+ "AAR DESC, LITRA DESC, LAEGDNR DESC FETCH FIRST ROW ONLY";
-	private static final String INSERT = "INSERT INTO LAEGD ( AMT, AAR, LITRA, LAEGDNR, GLAAR, "
-			+ "GLLITRA, RULLETYPE, SOGN ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String UPDATE = "UPDATE LAEGD SET AMT = ?, AAR = ?, LITRA = ?, "
-			+ "LAEGDNR = ?, GLAAR = ?, GLLITRA = ?, RULLETYPE = ?, SOGN = ? WHERE LAEGDID = ?";
+	private static final String LOAD = "SELECT * FROM LAEGD ORDER BY AMT ASC, AAR ASC, LITRA ASC, LAEGDNR ASC";
+	private static final String SELECT = "SELECT * FROM LAEGD.LAEGD WHERE LAEGDID = ? ";
+	private static final String INSERT = "INSERT INTO LAEGD ( AMT, AAR, LITRA, RULLETYPE, LAEGDNR, SOGN, LAEGDID, "
+			+ "NEXTLAEGDID, PREVLAEGDID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String UPDATE = "UPDATE LAEGD SET AMT = ?, AAR = ?, LITRA = ?, RULLETYPE = ?, "
+			+ "LAEGDNR = ?, SOGN = ?, NEXTLAEGDID = ?, PREVLAEGDID =? WHERE LAEGDID = ?";
 	private static final String DELETE = "DELETE FROM LAEGD WHERE LAEGDID = ?";
 
 	/**
@@ -44,7 +41,7 @@ public class MilrollListModel extends ASModel {
 		statement.setString(1, schema);
 		statement.execute();
 
-		statement = conn.prepareStatement(SELECT);
+		statement = conn.prepareStatement(LOAD);
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
@@ -52,12 +49,13 @@ public class MilrollListModel extends ASModel {
 			m.setAmt(rs.getString("AMT").trim());
 			m.setAar(rs.getInt("AAR"));
 			m.setLitra(rs.getString("LITRA"));
-			m.setLaegdNr(rs.getInt("LAEGDNR"));
-			m.setGlAar(rs.getInt("GLAAR"));
-			m.setGlLitra(rs.getString("GLLITRA"));
 			m.setRulleType(rs.getString("RULLETYPE").trim());
+			m.setLaegdNr(rs.getInt("LAEGDNR"));
 			m.setSogn(rs.getString("SOGN").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
+			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+
 			lmrlm.add(m);
 		}
 
@@ -68,7 +66,6 @@ public class MilrollListModel extends ASModel {
 
 		}
 		return mrlma;
-
 	}
 
 	/**
@@ -79,27 +76,38 @@ public class MilrollListModel extends ASModel {
 	 * @throws SQLException
 	 */
 	public static MilrollListModel selectNext(String dbPath, String schema, int laegdId) throws SQLException {
-		final MilrollListModel m = new MilrollListModel();
+		MilrollListModel m = new MilrollListModel();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
 
-		statement = conn.prepareStatement(SELECT_NEXT);
+		statement = conn.prepareStatement(SELECT);
 		statement.setInt(1, laegdId);
-		final ResultSet rs = statement.executeQuery();
+		ResultSet rs = statement.executeQuery();
+
+		if (!rs.next()) {
+			return m;
+		}
+
+		laegdId = rs.getInt("NEXTLAEGDID");
+
+		statement = conn.prepareStatement(SELECT);
+		statement.setInt(1, laegdId);
+		rs = statement.executeQuery();
 
 		if (rs.next()) {
+			m = new MilrollListModel();
 			m.setAmt(rs.getString("AMT").trim());
 			m.setAar(rs.getInt("AAR"));
 			m.setLitra(rs.getString("LITRA"));
-			m.setLaegdNr(rs.getInt("LAEGDNR"));
-			m.setGlAar(rs.getInt("GLAAR"));
-			m.setGlLitra(rs.getString("GLLITRA"));
 			m.setRulleType(rs.getString("RULLETYPE").trim());
+			m.setLaegdNr(rs.getInt("LAEGDNR"));
 			m.setSogn(rs.getString("SOGN").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
+			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
 		}
 
 		return m;
@@ -113,27 +121,38 @@ public class MilrollListModel extends ASModel {
 	 * @throws SQLException
 	 */
 	public static MilrollListModel selectPrev(String dbPath, String schema, int laegdId) throws SQLException {
-		final MilrollListModel m = new MilrollListModel();
+		MilrollListModel m = new MilrollListModel();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
 
-		statement = conn.prepareStatement(SELECT_PREV);
+		statement = conn.prepareStatement(SELECT);
 		statement.setInt(1, laegdId);
-		final ResultSet rs = statement.executeQuery();
+		ResultSet rs = statement.executeQuery();
+
+		if (!rs.next()) {
+			return m;
+		}
+
+		laegdId = rs.getInt("PREVLAEGDID");
+
+		statement = conn.prepareStatement(SELECT);
+		statement.setInt(1, laegdId);
+		rs = statement.executeQuery();
 
 		if (rs.next()) {
+			m = new MilrollListModel();
 			m.setAmt(rs.getString("AMT").trim());
 			m.setAar(rs.getInt("AAR"));
 			m.setLitra(rs.getString("LITRA"));
-			m.setLaegdNr(rs.getInt("LAEGDNR"));
-			m.setGlAar(rs.getInt("GLAAR"));
-			m.setGlLitra(rs.getString("GLLITRA"));
 			m.setRulleType(rs.getString("RULLETYPE").trim());
+			m.setLaegdNr(rs.getInt("LAEGDNR"));
 			m.setSogn(rs.getString("SOGN").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
+			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
 		}
 
 		return m;
@@ -142,12 +161,12 @@ public class MilrollListModel extends ASModel {
 	private String amt = "";
 	private int aar = 0;
 	private String litra = " ";
-	private int laegdNr = 0;
-	private int glAar = 0;
-	private String glLitra = " ";
 	private String rulleType = "Hovedrulle";
+	private int laegdNr = 0;
 	private String sogn = "";
 	private int laegdId = 0;
+	private int nextLaegdId = 0;
+	private int prevLaegdId = 0;
 
 	/**
 	 * @param dbPath
@@ -182,20 +201,6 @@ public class MilrollListModel extends ASModel {
 	}
 
 	/**
-	 * @return the glAar
-	 */
-	public int getGlAar() {
-		return glAar;
-	}
-
-	/**
-	 * @return the glLitra
-	 */
-	public String getGlLitra() {
-		return glLitra;
-	}
-
-	/**
 	 * @return the laegdId
 	 */
 	public int getLaegdId() {
@@ -214,6 +219,20 @@ public class MilrollListModel extends ASModel {
 	 */
 	public String getLitra() {
 		return litra;
+	}
+
+	/**
+	 * @return the nextLaegdId
+	 */
+	public int getNextLaegdId() {
+		return nextLaegdId;
+	}
+
+	/**
+	 * @return the prevLaegdId
+	 */
+	public int getPrevLaegdId() {
+		return prevLaegdId;
 	}
 
 	/**
@@ -245,13 +264,16 @@ public class MilrollListModel extends ASModel {
 		statement.setString(1, amt);
 		statement.setInt(2, aar);
 		statement.setString(3, litra);
-		statement.setInt(4, laegdNr);
-		statement.setInt(5, glAar);
-		statement.setString(6, glLitra);
-		statement.setString(7, rulleType);
-		statement.setString(8, sogn);
+		statement.setString(4, rulleType);
+		statement.setInt(5, laegdNr);
+		statement.setString(6, sogn);
+		statement.setInt(7, laegdId);
+		statement.setInt(8, nextLaegdId);
+		statement.setInt(9, nextLaegdId);
+
 		final int executeUpdate = statement.executeUpdate();
 		return executeUpdate;
+
 	}
 
 	/**
@@ -266,20 +288,6 @@ public class MilrollListModel extends ASModel {
 	 */
 	public void setAmt(String amt) {
 		this.amt = amt;
-	}
-
-	/**
-	 * @param glAar the glAar to set
-	 */
-	public void setGlAar(int glAar) {
-		this.glAar = glAar;
-	}
-
-	/**
-	 * @param glLitra the glLitra to set
-	 */
-	public void setGlLitra(String glLitra) {
-		this.glLitra = glLitra;
 	}
 
 	/**
@@ -301,6 +309,20 @@ public class MilrollListModel extends ASModel {
 	 */
 	public void setLitra(String litra) {
 		this.litra = litra;
+	}
+
+	/**
+	 * @param nextLaegdId the nextLaegdId to set
+	 */
+	public void setNextLaegdId(int nextLaegdId) {
+		this.nextLaegdId = nextLaegdId;
+	}
+
+	/**
+	 * @param prevLaegdId the prevLaegdId to set
+	 */
+	public void setPrevLaegdId(int prevLaegdId) {
+		this.prevLaegdId = prevLaegdId;
 	}
 
 	/**
@@ -333,11 +355,11 @@ public class MilrollListModel extends ASModel {
 		statement.setString(1, amt);
 		statement.setInt(2, aar);
 		statement.setString(3, litra);
-		statement.setInt(4, laegdNr);
-		statement.setInt(5, glAar);
-		statement.setString(6, glLitra);
-		statement.setString(7, rulleType);
-		statement.setString(8, sogn);
+		statement.setString(4, rulleType);
+		statement.setInt(5, laegdNr);
+		statement.setString(6, sogn);
+		statement.setInt(7, nextLaegdId);
+		statement.setInt(8, nextLaegdId);
 		statement.setInt(9, laegdId);
 		final int executeUpdate = statement.executeUpdate();
 		return executeUpdate;

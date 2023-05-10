@@ -9,10 +9,10 @@ import net.myerichsen.gedcom.db.models.MilrollListModel;
 
 /**
  * @author Michael Erichsen
- * @version 5. maj 2023
+ * @version 10. maj 2023
  *
  */
-public class MillrollListGlLitraEditingSupport extends EditingSupport {
+public class MillrollListLaegdIdEditingSupport extends EditingSupport {
 	private final TableViewer viewer;
 	private final CellEditor editor;
 
@@ -22,7 +22,7 @@ public class MillrollListGlLitraEditingSupport extends EditingSupport {
 	 * @param viewer
 	 * @param viewer2
 	 */
-	public MillrollListGlLitraEditingSupport(TableViewer viewer) {
+	public MillrollListLaegdIdEditingSupport(TableViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
 		this.editor = new TextCellEditor(viewer.getTable());
@@ -40,12 +40,16 @@ public class MillrollListGlLitraEditingSupport extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		return ((MilrollListModel) element).getGlLitra();
+		return Integer.toString(((MilrollListModel) element).getLaegdId());
 	}
 
 	@Override
 	protected void setValue(Object element, Object userInputValue) {
-		((MilrollListModel) element).setGlLitra(String.valueOf(userInputValue));
+		if (userInputValue.equals("")) {
+			((MilrollListModel) element).setLaegdId(0);
+		} else {
+			((MilrollListModel) element).setLaegdId(Integer.parseInt(String.valueOf(userInputValue)));
+		}
 		viewer.update(element, null);
 	}
 

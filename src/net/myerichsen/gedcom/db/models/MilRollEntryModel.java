@@ -14,7 +14,7 @@ import java.util.List;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 10. maj 2023
  *
  */
 
@@ -47,14 +47,13 @@ public class MilRollEntryModel extends ASModel {
 			m.setAmt(rs.getString("AMT").trim());
 			m.setAar(rs.getInt("AAR"));
 			m.setLitra(rs.getString("LITRA"));
-			m.setLaegdnr(rs.getInt("LAEGDNR"));
-			m.setGlaar(rs.getInt("GLAAR"));
-			m.setGllitra(rs.getString("GLLITRA"));
 			m.setRulletype(rs.getString("RULLETYPE").trim());
+			m.setLaegdnr(rs.getInt("LAEGDNR"));
 			m.setSogn(rs.getString("SOGN").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
-			m.setGlLaegdId(rs.getInt("GLLAEGDID"));
-			m.setGlLoebeNr(rs.getInt("GLLOEBENR"));
+			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+			m.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
 			m.setLoebeNr(rs.getInt("LOEBENR"));
 			m.setFader(rs.getString("FADER"));
 			m.setSoen(rs.getString("SOEN"));
@@ -82,17 +81,36 @@ public class MilRollEntryModel extends ASModel {
 		return ma;
 	}
 
+	/**
+	 * @param prevLaegdId
+	 * @param prevLoebeNr
+	 */
+	public static MilRollEntryModel select(int prevLaegdId, int prevLoebeNr) {
+		return null;
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param prevLaegdId
+	 * @param prevLoebeNr
+	 */
+	public static MilRollEntryModel selectPrev(int prevLaegdId, int prevLoebeNr) {
+		return null;
+		// TODO Auto-generated method stub
+
+	}
+
 	private String amt = "";
 	private int aar = 0;
 	private String litra = " ";
-	private int laegdnr = 0;
-	private int glaar = 0;
-	private String gllitra = " ";
 	private String rulletype = "Hovedrulle";
+	private int laegdnr = 0;
 	private String sogn = "";
 	private int laegdId = 0;
-	private int glLaegdId = 0;
-	private int glLoebeNr = 0;
+	private int prevLaegdId = 0;
+	private int nextLaegdId = 0;
+	private int prevLoebeNr = 0;
 	private int loebeNr = 0;
 	private String fader = "";
 	private String soen = "";
@@ -105,7 +123,6 @@ public class MilRollEntryModel extends ASModel {
 	private String gedcomId = "";
 	private String navn = "";
 	private String faderFon = "";
-
 	private String soenFon = "";
 
 	/**
@@ -172,34 +189,6 @@ public class MilRollEntryModel extends ASModel {
 	}
 
 	/**
-	 * @return the glaar
-	 */
-	public int getGlaar() {
-		return glaar;
-	}
-
-	/**
-	 * @return the glLaegdId
-	 */
-	public int getGlLaegdId() {
-		return glLaegdId;
-	}
-
-	/**
-	 * @return the gllitra
-	 */
-	public String getGllitra() {
-		return gllitra;
-	}
-
-	/**
-	 * @return the glLoebeNr
-	 */
-	public int getGlLoebeNr() {
-		return glLoebeNr;
-	}
-
-	/**
 	 * @return the laegdId
 	 */
 	public int getLaegdId() {
@@ -235,10 +224,31 @@ public class MilRollEntryModel extends ASModel {
 	}
 
 	/**
+	 * @return the nextLaegdId
+	 */
+	public int getNextLaegdId() {
+		return nextLaegdId;
+	}
+
+	/**
 	 * @return the ophold
 	 */
 	public String getOphold() {
 		return ophold;
+	}
+
+	/**
+	 * @return the prevLaegdId
+	 */
+	public int getPrevLaegdId() {
+		return prevLaegdId;
+	}
+
+	/**
+	 * @return the prevLoebeNr
+	 */
+	public int getPrevLoebeNr() {
+		return prevLoebeNr;
 	}
 
 	/**
@@ -340,34 +350,6 @@ public class MilRollEntryModel extends ASModel {
 	}
 
 	/**
-	 * @param glaar the glaar to set
-	 */
-	public void setGlaar(int glaar) {
-		this.glaar = glaar;
-	}
-
-	/**
-	 * @param glLaegdId the glLaegdId to set
-	 */
-	public void setGlLaegdId(int glLaegdId) {
-		this.glLaegdId = glLaegdId;
-	}
-
-	/**
-	 * @param gllitra the gllitra to set
-	 */
-	public void setGllitra(String gllitra) {
-		this.gllitra = gllitra;
-	}
-
-	/**
-	 * @param glLoebeNr the glLoebeNr to set
-	 */
-	public void setGlLoebeNr(int glLoebeNr) {
-		this.glLoebeNr = glLoebeNr;
-	}
-
-	/**
 	 * @param laegdId the laegdId to set
 	 */
 	public void setLaegdId(int laegdId) {
@@ -403,10 +385,31 @@ public class MilRollEntryModel extends ASModel {
 	}
 
 	/**
+	 * @param nextLaegdId the nextLaegdId to set
+	 */
+	public void setNextLaegdId(int nextLaegdId) {
+		this.nextLaegdId = nextLaegdId;
+	}
+
+	/**
 	 * @param ophold the ophold to set
 	 */
 	public void setOphold(String ophold) {
 		this.ophold = ophold;
+	}
+
+	/**
+	 * @param prevLaegdId the prevLaegdId to set
+	 */
+	public void setPrevLaegdId(int prevLaegdId) {
+		this.prevLaegdId = prevLaegdId;
+	}
+
+	/**
+	 * @param prevLoebeNr the prevLoebeNr to set
+	 */
+	public void setPrevLoebeNr(int prevLoebeNr) {
+		this.prevLoebeNr = prevLoebeNr;
 	}
 
 	/**

@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * @version 8. maj 2023
  *
  */
-public class MilRollIdDialog extends Dialog {
+public class MilRollIDialog extends Dialog {
 	private Table soenTable;
 	private String[] mrma;
 	private String selectedIndividual;
@@ -33,7 +33,7 @@ public class MilRollIdDialog extends Dialog {
 	 *
 	 * @param parentShell
 	 */
-	public MilRollIdDialog(Shell parentShell) {
+	public MilRollIDialog(Shell parentShell) {
 		super(parentShell);
 	}
 

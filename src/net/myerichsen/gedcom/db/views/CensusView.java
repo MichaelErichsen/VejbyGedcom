@@ -624,8 +624,8 @@ public class CensusView extends Composite {
 		final StringBuilder sb = new StringBuilder();
 		String string;
 
-		household = CensusHouseholdModel.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr, kildeHenvisning,
-				props.getProperty("censusSchema"));
+		household = CensusHouseholdModel.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr,
+				kildeHenvisning, props.getProperty("censusSchema"));
 
 		for (final CensusModel hhr : household) {
 			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "

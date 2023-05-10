@@ -30,10 +30,11 @@ import net.myerichsen.gedcom.db.populators.MilrollListPopulator;
 import net.myerichsen.gedcom.db.views.ArchiveSearcher;
 import net.myerichsen.gedcom.util.MillrollListAarEditingSupport;
 import net.myerichsen.gedcom.util.MillrollListAmtEditingSupport;
-import net.myerichsen.gedcom.util.MillrollListGlAarEditingSupport;
-import net.myerichsen.gedcom.util.MillrollListGlLitraEditingSupport;
+import net.myerichsen.gedcom.util.MillrollListLaegdIdEditingSupport;
 import net.myerichsen.gedcom.util.MillrollListLaegdNrEditingSupport;
 import net.myerichsen.gedcom.util.MillrollListLitraEditingSupport;
+import net.myerichsen.gedcom.util.MillrollListNextLaegdIdEditingSupport;
+import net.myerichsen.gedcom.util.MillrollListPrevLaegdIdEditingSupport;
 import net.myerichsen.gedcom.util.MillrollListSognEditingSupport;
 import net.myerichsen.gedcom.util.MilrollListRulletypeEditingSupport;
 
@@ -41,9 +42,12 @@ import net.myerichsen.gedcom.util.MilrollListRulletypeEditingSupport;
  * Military rolls view
  *
  * @author Michael Erichsen
- * @version 7. maj 2023
+ * @version 10. maj 2023
  *
  */
+
+// TODO Change to tree and make selectable
+
 public class MilRollListDialog extends Dialog {
 	private static final int NYTOMLINIE = IDialogConstants.CLIENT_ID + 6;
 	private static final int KOPIERLINIE = IDialogConstants.CLIENT_ID + 5;
@@ -55,7 +59,7 @@ public class MilRollListDialog extends Dialog {
 	private Properties props;
 	private Thread thread;
 	private TableViewer tableViewer;
-	private ASPopulator milrolllistListener;
+	private ASPopulator listener;
 	private final ArchiveSearcher as;
 
 	/**
@@ -202,48 +206,6 @@ public class MilRollListDialog extends Dialog {
 		});
 		tableViewerColumn_2.setEditingSupport(new MillrollListLitraEditingSupport(tableViewer));
 
-		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnLgdNr = tableViewerColumn_3.getColumn();
-		tblclmnLgdNr.setWidth(70);
-		tblclmnLgdNr.setText("L\u00E6gd nr.");
-		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				final MilrollListModel mrlm = (MilrollListModel) element;
-				return Integer.toString(mrlm.getLaegdNr());
-			}
-		});
-		tableViewerColumn_3.setEditingSupport(new MillrollListLaegdNrEditingSupport(tableViewer));
-
-		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnrForud = tableViewerColumn_4.getColumn();
-		tblclmnrForud.setWidth(60);
-		tblclmnrForud.setText("\u00C5r forud");
-		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				final MilrollListModel mrlm = (MilrollListModel) element;
-				return Integer.toString(mrlm.getGlAar());
-			}
-		});
-		tableViewerColumn_4.setEditingSupport(new MillrollListGlAarEditingSupport(tableViewer));
-
-		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnLitraForud = tableViewerColumn_5.getColumn();
-		tblclmnLitraForud.setWidth(70);
-		tblclmnLitraForud.setText("Litra forud");
-		tableViewerColumn_5.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				final MilrollListModel mrlm = (MilrollListModel) element;
-				return mrlm.getGlLitra();
-			}
-		});
-		tableViewerColumn_5.setEditingSupport(new MillrollListGlLitraEditingSupport(tableViewer));
-
 		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnRulletype = tableViewerColumn_6.getColumn();
 		tblclmnRulletype.setWidth(100);
@@ -257,6 +219,20 @@ public class MilRollListDialog extends Dialog {
 			}
 		});
 		tableViewerColumn_6.setEditingSupport(new MilrollListRulletypeEditingSupport(tableViewer));
+
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnLgdNr = tableViewerColumn_3.getColumn();
+		tblclmnLgdNr.setWidth(70);
+		tblclmnLgdNr.setText("L\u00E6gd nr.");
+		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				final MilrollListModel mrlm = (MilrollListModel) element;
+				return Integer.toString(mrlm.getLaegdNr());
+			}
+		});
+		tableViewerColumn_3.setEditingSupport(new MillrollListLaegdNrEditingSupport(tableViewer));
 
 		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnSogn = tableViewerColumn_7.getColumn();
@@ -284,8 +260,37 @@ public class MilRollListDialog extends Dialog {
 				return Integer.toString(mrlm.getLaegdId());
 			}
 		});
+		tableViewerColumn_8.setEditingSupport(new MillrollListLaegdIdEditingSupport(tableViewer));
 
-		milrolllistListener = new MilrollListPopulator();
+		final TableViewerColumn tableViewerColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnNextLgdId = tableViewerColumn_9.getColumn();
+		tblclmnNextLgdId.setWidth(100);
+		tblclmnNextLgdId.setText("N\u00E6ste l\u00E6gd ID");
+		tableViewerColumn_9.setLabelProvider(new ColumnLabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				final MilrollListModel mrlm = (MilrollListModel) element;
+				return Integer.toString(mrlm.getNextLaegdId());
+			}
+		});
+		tableViewerColumn_9.setEditingSupport(new MillrollListNextLaegdIdEditingSupport(tableViewer));
+
+		final TableViewerColumn tableViewerColumn_10 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnPrevLgdId = tableViewerColumn_10.getColumn();
+		tblclmnPrevLgdId.setWidth(100);
+		tblclmnPrevLgdId.setText("Forrige l\u00E6gd ID");
+		tableViewerColumn_10.setLabelProvider(new ColumnLabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				final MilrollListModel mrlm = (MilrollListModel) element;
+				return Integer.toString(mrlm.getPrevLaegdId());
+			}
+		});
+		tableViewerColumn_10.setEditingSupport(new MillrollListPrevLaegdIdEditingSupport(tableViewer));
+
+		listener = new MilrollListPopulator();
 		populate();
 		return container;
 	}
@@ -295,7 +300,7 @@ public class MilRollListDialog extends Dialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(755, 561);
+		return new Point(817, 561);
 	}
 
 	/**
@@ -315,8 +320,6 @@ public class MilRollListDialog extends Dialog {
 		final MilrollListModel m = new MilrollListModel();
 		m.setAmt(ti.getText(0));
 		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
-		m.setGlAar(Integer.parseInt(ti.getText(1)));
-		m.setGlLitra(ti.getText(2));
 		m.setRulleType(ti.getText(6));
 		m.setSogn(ti.getText(7));
 
@@ -343,11 +346,11 @@ public class MilRollListDialog extends Dialog {
 		m.setAmt(ti.getText(0));
 		m.setAar(Integer.parseInt(ti.getText(1)));
 		m.setLitra(ti.getText(2));
-		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
-		m.setGlAar(Integer.parseInt(ti.getText(4)));
-		m.setGlLitra(ti.getText(5));
-		m.setRulleType(ti.getText(6));
-		m.setSogn(ti.getText(7));
+		m.setRulleType(ti.getText(3));
+		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
+		m.setSogn(ti.getText(5));
+		m.setLaegdId(Integer.parseInt(ti.getText(6)));
+		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
 		final int insert = m.insert(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();
 		return insert;
@@ -358,16 +361,16 @@ public class MilRollListDialog extends Dialog {
 	 */
 	public void populate() {
 		thread = new Thread(() -> {
-			if (milrolllistListener != null) {
+			if (listener != null) {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
 							props.getProperty("milrollSchema") };
-					final MilrollListModel[] milrolllistRecords = (MilrollListModel[]) milrolllistListener
-							.load(loadArgs);
+					final MilrollListModel[] milrolllistRecords = (MilrollListModel[]) listener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(milrolllistRecords));
 				} catch (final Exception e) {
 					Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage()));
+					e.printStackTrace();
 				}
 			}
 		});
@@ -392,12 +395,11 @@ public class MilRollListDialog extends Dialog {
 		m.setAmt(ti.getText(0));
 		m.setAar(Integer.parseInt(ti.getText(1)));
 		m.setLitra(ti.getText(2));
-		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
-		m.setGlAar(Integer.parseInt(ti.getText(4)));
-		m.setGlLitra(ti.getText(5));
-		m.setRulleType(ti.getText(6));
-		m.setSogn(ti.getText(7));
-		m.setLaegdId(Integer.parseInt(ti.getText(8)));
+		m.setRulleType(ti.getText(3));
+		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
+		m.setSogn(ti.getText(5));
+		m.setLaegdId(Integer.parseInt(ti.getText(6)));
+		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
 		final int update = m.update(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();
 		return update;

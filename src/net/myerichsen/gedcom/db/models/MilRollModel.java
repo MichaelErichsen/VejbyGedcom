@@ -13,25 +13,24 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 10. maj 2023
  *
  */
 public class MilRollModel extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String INSERT = "INSERT INTO RULLE ( LAEGDID, GLLAEGDID, GLLOEBENR, LOEBENR, FADER, SOEN, FOEDESTED, ALDER, "
+	private static final String INSERT = "INSERT INTO RULLE ( LAEGDID, PREVLAEGDID, PREVLOEBENR, LOEBENR, FADER, SOEN, FOEDESTED, ALDER, "
 			+ "STOERRELSEITOMMER, OPHOLD, ANMAERKNINGER, FOEDT, GEDCOMID, NAVN, FADERFON, "
 			+ "SOENFON) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String UPDATE = "UPDATE RULLE SET GLLAEGDID = ?, GLLOEBENR = ?, FADER = ?, SOEN = ?, FOEDESTED = ?, ALDER = ?, "
+	private static final String UPDATE = "UPDATE RULLE SET PREVLAEGDID = ?, PREVLOEBENR = ?, FADER = ?, SOEN = ?, FOEDESTED = ?, ALDER = ?, "
 			+ "STOERRELSEITOMMER = ?, OPHOLD = ?, ANMAERKNINGER = ?, FOEDT = ?, GEDCOMID = ?, NAVN = ?, FADERFON = ?, SOENFON = ? "
 			+ "WHERE LAEGDID = ? AND LOEBENR = ?";
 	private static final String DELETE = "DELETE FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
 	private static final String SELECT = "SELECT * FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
-//	private static final String SELECT_OLD = "SELECT * FROM RULLE WHERE LAEGDID = ? AND LOEBENR = ?";
 
 	private int laegdId = 0;
-	private int glLaegdId = 0;
-	private int glLoebeNr = 0;
 	private int loebeNr = 0;
+	private int prevLaegdId = 0;
+	private int prevLoebeNr = 0;
 	private String fader = "";
 	private String soen = "";
 	private String foedeSted = "";
@@ -117,17 +116,17 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
-	 * @return the glLaegdId
+	 * @return the prevLaegdId
 	 */
-	public int getGlLaegdId() {
-		return glLaegdId;
+	public int getPrevLaegdId() {
+		return prevLaegdId;
 	}
 
 	/**
-	 * @return the glLoebeNr
+	 * @return the prevLoebeNr
 	 */
-	public int getGlLoebeNr() {
-		return glLoebeNr;
+	public int getPrevLoebeNr() {
+		return prevLoebeNr;
 	}
 
 	/**
@@ -195,8 +194,8 @@ public class MilRollModel extends ASModel {
 
 		statement = conn.prepareStatement(INSERT);
 		statement.setInt(1, laegdId);
-		statement.setInt(2, glLaegdId);
-		statement.setInt(3, glLoebeNr);
+		statement.setInt(2, prevLaegdId);
+		statement.setInt(3, prevLoebeNr);
 		statement.setInt(4, loebeNr);
 		statement.setString(5, fader);
 		statement.setString(6, soen);
@@ -242,8 +241,8 @@ public class MilRollModel extends ASModel {
 
 		laegdId = rs.getInt("LAEGDID");
 		loebeNr = rs.getInt("LOEBENR");
-		glLaegdId = rs.getInt("GLLAEGDID");
-		glLoebeNr = rs.getInt("GLLOEBENR");
+		prevLaegdId = rs.getInt("PREVLAEGDID");
+		prevLoebeNr = rs.getInt("PREVLOEBENR");
 		fader = rs.getString("FADER");
 		soen = rs.getString("SOEN");
 		foedeSted = rs.getString("FOEDESTED");
@@ -311,17 +310,17 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
-	 * @param glLaegdId the glLaegdId to set
+	 * @param prevLaegdId the prevLaegdId to set
 	 */
-	public void setGlLaegdId(int glLaegdId) {
-		this.glLaegdId = glLaegdId;
+	public void setPrevLaegdId(int prevLaegdId) {
+		this.prevLaegdId = prevLaegdId;
 	}
 
 	/**
-	 * @param glLoebeNr the glLoebeNr to set
+	 * @param prevLoebeNr the prevLoebeNr to set
 	 */
-	public void setGlLoebeNr(int glLoebeNr) {
-		this.glLoebeNr = glLoebeNr;
+	public void setPrevLoebeNr(int prevLoebeNr) {
+		this.prevLoebeNr = prevLoebeNr;
 	}
 
 	/**
@@ -386,8 +385,8 @@ public class MilRollModel extends ASModel {
 
 		statement = conn.prepareStatement(UPDATE);
 
-		statement.setInt(1, glLaegdId);
-		statement.setInt(2, glLoebeNr);
+		statement.setInt(1, prevLaegdId);
+		statement.setInt(2, prevLoebeNr);
 		statement.setString(3, fader);
 		statement.setString(4, soen);
 		statement.setString(5, foedeSted);

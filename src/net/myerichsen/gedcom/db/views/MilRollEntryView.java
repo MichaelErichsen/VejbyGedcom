@@ -46,9 +46,11 @@ import net.myerichsen.gedcom.db.populators.MilrollPopulator;
  * Milroll entry view
  *
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 10. maj 2023
  *
  */
+
+// TODO https://www.sa.dk/ao-soegesider/da/billedviser?epid=16481031#17074,665339
 
 public class MilRollEntryView extends Composite {
 	private Text txtMilrollYear;
@@ -222,18 +224,6 @@ public class MilRollEntryView extends Composite {
 			}
 		});
 
-		final TableViewerColumn MilrollTableVieverColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnLaegdnr = MilrollTableVieverColumn_9.getColumn();
-		tblclmnLaegdnr.setWidth(40);
-		tblclmnLaegdnr.setText("L\u00E6gd nr.");
-		MilrollTableVieverColumn_9.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getLaegdnr());
-			}
-		});
-
 		final TableViewerColumn MilrollTableVieverColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnRulletype = MilrollTableVieverColumn_4.getColumn();
 		tblclmnRulletype.setWidth(75);
@@ -243,6 +233,18 @@ public class MilRollEntryView extends Composite {
 			public String getText(Object element) {
 				final MilRollEntryModel mrem = (MilRollEntryModel) element;
 				return mrem.getRulletype();
+			}
+		});
+
+		final TableViewerColumn MilrollTableVieverColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnLaegdnr = MilrollTableVieverColumn_9.getColumn();
+		tblclmnLaegdnr.setWidth(40);
+		tblclmnLaegdnr.setText("L\u00E6gd nr.");
+		MilrollTableVieverColumn_9.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				final MilRollEntryModel mrem = (MilRollEntryModel) element;
+				return Integer.toString(mrem.getLaegdnr());
 			}
 		});
 
@@ -261,24 +263,24 @@ public class MilRollEntryView extends Composite {
 		final TableViewerColumn MilrollTableVieverColumn_gllaegdId = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnlgllaegdId = MilrollTableVieverColumn_gllaegdId.getColumn();
 		tblclmnlgllaegdId.setWidth(40);
-		tblclmnlgllaegdId.setText("Gl. L\u00E6gd ID");
+		tblclmnlgllaegdId.setText("Forr. l\u00E6gd ID");
 		MilrollTableVieverColumn_gllaegdId.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getGlLaegdId());
+				return Integer.toString(mrem.getPrevLaegdId());
 			}
 		});
 
 		final TableViewerColumn MilrollTableVieverColumn_glloebenr = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnglloebenr = MilrollTableVieverColumn_glloebenr.getColumn();
-		tblclmnglloebenr.setWidth(40);
-		tblclmnglloebenr.setText("Gl. l\u00F8benr.\u00A8");
+		tblclmnglloebenr.setWidth(36);
+		tblclmnglloebenr.setText("Forr. l\u00F8benr.\u00A8");
 		MilrollTableVieverColumn_glloebenr.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getGlLoebeNr());
+				return Integer.toString(mrem.getPrevLoebeNr());
 			}
 		});
 
@@ -545,10 +547,11 @@ public class MilRollEntryView extends Composite {
 
 		if (open == 1) {
 			final String h = ti.getText(13).startsWith("0") ? "" : ", Højde i tommer " + ti.getText(13);
+			final String a = ti.getText(15).length() == 0 ? "" : ", " + ti.getText(15);
 			final String s = ti.getText(0) + " amt " + ti.getText(1) + ti.getText(2) + ", lægd " + ti.getText(3)
 					+ ", Løbenr. " + ti.getText(8) + ", Fader " + ti.getText(9).trim() + ", Fødested "
-					+ ti.getText(11).trim() + ", Alder " + ti.getText(12) + h + ", Opholdssted "
-					+ ti.getText(14).trim();
+					+ ti.getText(11).trim() + ", Alder " + ti.getText(12) + h + ", Opholdssted " + ti.getText(14).trim()
+					+ a;
 			final Clipboard clipboard = new Clipboard(getDisplay());
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { s }, new Transfer[] { textTransfer });

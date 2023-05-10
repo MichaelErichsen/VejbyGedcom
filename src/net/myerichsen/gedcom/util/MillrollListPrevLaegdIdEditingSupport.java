@@ -9,10 +9,10 @@ import net.myerichsen.gedcom.db.models.MilrollListModel;
 
 /**
  * @author Michael Erichsen
- * @version 5. maj 2023
+ * @version 10. maj 2023
  *
  */
-public class MillrollListGlAarEditingSupport extends EditingSupport {
+public class MillrollListPrevLaegdIdEditingSupport extends EditingSupport {
 	private final TableViewer viewer;
 	private final CellEditor editor;
 
@@ -22,7 +22,7 @@ public class MillrollListGlAarEditingSupport extends EditingSupport {
 	 * @param viewer
 	 * @param viewer2
 	 */
-	public MillrollListGlAarEditingSupport(TableViewer viewer) {
+	public MillrollListPrevLaegdIdEditingSupport(TableViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
 		this.editor = new TextCellEditor(viewer.getTable());
@@ -40,15 +40,15 @@ public class MillrollListGlAarEditingSupport extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		return Integer.toString(((MilrollListModel) element).getGlAar());
+		return Integer.toString(((MilrollListModel) element).getPrevLaegdId());
 	}
 
 	@Override
 	protected void setValue(Object element, Object userInputValue) {
 		if (userInputValue.equals("")) {
-			((MilrollListModel) element).setGlAar(0);
+			((MilrollListModel) element).setPrevLaegdId(0);
 		} else {
-			((MilrollListModel) element).setGlAar(Integer.parseInt(String.valueOf(userInputValue)));
+			((MilrollListModel) element).setPrevLaegdId(Integer.parseInt(String.valueOf(userInputValue)));
 		}
 		viewer.update(element, null);
 	}
