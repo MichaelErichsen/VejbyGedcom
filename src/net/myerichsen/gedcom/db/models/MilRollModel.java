@@ -13,7 +13,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 10. maj 2023
+ * @version 11. maj 2023
  *
  */
 public class MilRollModel extends ASModel {

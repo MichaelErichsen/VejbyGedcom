@@ -50,9 +50,11 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 10. maj 2023
+ * @version 11. maj 2023
  *
  */
+
+// TODO Litra not populated when opening
 
 public class MilRollEntryDialog {
 	private static final String DASH_DATE = "\\d*-\\d*-\\d{4}";
@@ -541,8 +543,8 @@ public class MilRollEntryDialog {
 	 *
 	 */
 	protected void getNextMilRoll(int laegdId) throws SQLException {
-		final MilrollListModel m = MilrollListModel.selectNext(props.getProperty("milrollPath"),
-				props.getProperty("milrollSchema"), laegdId);
+		final MilrollListModel m = MilrollListModel.select(props.getProperty("milrollPath"),
+				props.getProperty("milrollSchema"), laegdId + 1);
 
 		if (m.getLaegdId() > 0) {
 			textAmt.setText(m.getAmt());
@@ -554,7 +556,7 @@ public class MilRollEntryDialog {
 			textLaegdId.setText(Integer.toString(m.getLaegdId()));
 			textPrevLaegdId.setText(Integer.toString(m.getPrevLaegdId()));
 		} else {
-			setMessage("Ingen højere i dette amt");
+			setMessage("Ingen højere fundet");
 		}
 	}
 
@@ -566,10 +568,10 @@ public class MilRollEntryDialog {
 	 *
 	 */
 	protected void getPrevMilRoll(int laegdId) throws SQLException {
-		final MilrollListModel m = MilrollListModel.selectPrev(props.getProperty("milrollPath"),
-				props.getProperty("milrollSchema"), laegdId);
+		final MilrollListModel m = MilrollListModel.select(props.getProperty("milrollPath"),
+				props.getProperty("milrollSchema"), laegdId - 1);
 
-		if (m.getLaegdId() > 0) {
+		if (laegdId > 0 && m.getLaegdId() > 0) {
 			textAmt.setText(m.getAmt());
 			textAar.setText(Integer.toString(m.getAar()));
 			textLitra.setText(m.getLitra());
@@ -579,7 +581,7 @@ public class MilRollEntryDialog {
 			textLaegdId.setText(Integer.toString(m.getLaegdId()));
 			textPrevLaegdId.setText(Integer.toString(m.getPrevLaegdId()));
 		} else {
-			setMessage("Ingen lavere i dette amt");
+			setMessage("Ingen lavere fundet");
 		}
 
 	}
@@ -752,11 +754,17 @@ public class MilRollEntryDialog {
 	protected void searchForGedcomID() throws Exception {
 		final String constructName = constructName(textFader.getText(), textSoen.getText());
 		final String phonName = fk.generateKey(constructName);
+		Date birthDate = null;
 
-		final int alder = Integer.parseInt(textAlder.getText());
-		final int aar = Integer.parseInt(textAar.getText());
-		final int birthYearInt = aar - alder;
-		final Date birthDate = Date.valueOf(Integer.toString(birthYearInt) + "-01-01");
+		if (textAlder.getText() != null && textAlder.getText().isBlank() == false) {
+			final int alder = Integer.parseInt(textAlder.getText());
+			final int aar = Integer.parseInt(textAar.getText());
+			final int birthYearInt = aar - alder;
+			birthDate = Date.valueOf(Integer.toString(birthYearInt) + "-01-01");
+		} else if (textFoedt.getText() != null && textFoedt.getText().isBlank() == false) {
+			birthDate = string2Date(textFoedt.getText());
+		} else
+			return;
 
 		final List<String> ls = IndividualModel.getDataFromPhonName(props.getProperty("vejbyPath"),
 				props.getProperty("vejbySchema"), phonName, birthDate);
@@ -902,12 +910,13 @@ public class MilRollEntryDialog {
 	private Date string2Date(String string) throws ParseException {
 		SimpleDateFormat sdf;
 		java.util.Date utilDate;
+
 		if (string.length() > 0) {
 			Pattern pattern = Pattern.compile(EIGHT_DIGITS);
 			Matcher matcher = pattern.matcher(string);
 
 			if (matcher.find()) {
-				sdf = new SimpleDateFormat("yyyymmdd");
+				sdf = new SimpleDateFormat("yyyyMMdd");
 				utilDate = sdf.parse(string);
 				return new Date(utilDate.getTime());
 			}
@@ -916,7 +925,7 @@ public class MilRollEntryDialog {
 			matcher = pattern.matcher(string);
 
 			if (matcher.find()) {
-				sdf = new SimpleDateFormat("dd-mm-yyyy");
+				sdf = new SimpleDateFormat("dd-MM-yyyy");
 				utilDate = sdf.parse(string);
 				return new Date(utilDate.getTime());
 			}
@@ -925,7 +934,7 @@ public class MilRollEntryDialog {
 			matcher = pattern.matcher(string);
 
 			if (matcher.find()) {
-				sdf = new SimpleDateFormat("yyyy-mm-dd");
+				sdf = new SimpleDateFormat("yyyy-MM-dd");
 				utilDate = sdf.parse(string);
 				return new Date(utilDate.getTime());
 			}

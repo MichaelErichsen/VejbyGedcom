@@ -12,7 +12,7 @@ import java.util.List;
  * Class representing roll data for a military roll
  *
  * @author Michael Erichsen
- * @version 10. maj 2023
+ * @version 11. maj 2023
  *
  */
 
@@ -75,7 +75,7 @@ public class MilrollListModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MilrollListModel selectNext(String dbPath, String schema, int laegdId) throws SQLException {
+	public static MilrollListModel select(String dbPath, String schema, int laegdId) throws SQLException {
 		MilrollListModel m = new MilrollListModel();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
@@ -86,61 +86,6 @@ public class MilrollListModel extends ASModel {
 		statement = conn.prepareStatement(SELECT);
 		statement.setInt(1, laegdId);
 		ResultSet rs = statement.executeQuery();
-
-		if (!rs.next()) {
-			return m;
-		}
-
-		laegdId = rs.getInt("NEXTLAEGDID");
-
-		statement = conn.prepareStatement(SELECT);
-		statement.setInt(1, laegdId);
-		rs = statement.executeQuery();
-
-		if (rs.next()) {
-			m = new MilrollListModel();
-			m.setAmt(rs.getString("AMT").trim());
-			m.setAar(rs.getInt("AAR"));
-			m.setLitra(rs.getString("LITRA"));
-			m.setRulleType(rs.getString("RULLETYPE").trim());
-			m.setLaegdNr(rs.getInt("LAEGDNR"));
-			m.setSogn(rs.getString("SOGN").trim());
-			m.setLaegdId(rs.getInt("LAEGDID"));
-			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
-			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
-		}
-
-		return m;
-	}
-
-	/**
-	 * @param dbPath
-	 * @param schema
-	 * @param laegdId
-	 * @return
-	 * @throws SQLException
-	 */
-	public static MilrollListModel selectPrev(String dbPath, String schema, int laegdId) throws SQLException {
-		MilrollListModel m = new MilrollListModel();
-
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, schema);
-		statement.execute();
-
-		statement = conn.prepareStatement(SELECT);
-		statement.setInt(1, laegdId);
-		ResultSet rs = statement.executeQuery();
-
-		if (!rs.next()) {
-			return m;
-		}
-
-		laegdId = rs.getInt("PREVLAEGDID");
-
-		statement = conn.prepareStatement(SELECT);
-		statement.setInt(1, laegdId);
-		rs = statement.executeQuery();
 
 		if (rs.next()) {
 			m = new MilrollListModel();
