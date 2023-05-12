@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -50,11 +51,9 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 11. maj 2023
+ * @version 12. maj 2023
  *
  */
-
-// TODO Litra not populated when opening
 
 public class MilRollEntryDialog {
 	private static final String DASH_DATE = "\\d*-\\d*-\\d{4}";
@@ -117,6 +116,8 @@ public class MilRollEntryDialog {
 	private Button btnRet;
 	private Button btnSlet;
 	private Button btnHentPrevLbenr;
+	private ControlDecoration controlDecorationOphold;
+	private ControlDecoration controlDecorationFoedested;
 
 	/**
 	 * Populate content assist popup with latest location
@@ -252,7 +253,7 @@ public class MilRollEntryDialog {
 		textLaegdNr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		textLaegdNr.setText(props.getProperty("laegdnr"));
 		new Label(compositeRulle, SWT.NONE);
-		textLaegdNr.setText(props.getProperty("gllaegdid"));
+		textLaegdNr.setText(props.getProperty("prevlaegdid"));
 		new Label(compositeRulle, SWT.NONE);
 
 		textSogn = new Text(compositeRulle, SWT.BORDER);
@@ -274,7 +275,7 @@ public class MilRollEntryDialog {
 		lblPrevLgdid.setText("Forr. l\u00E6gdId");
 
 		textPrevLaegdId = new Text(compositeRulle, SWT.BORDER);
-		textPrevLaegdId.setText(props.getProperty("gllaegdid"));
+		textPrevLaegdId.setText(props.getProperty("prevlaegdid"));
 		textPrevLaegdId.setEditable(false);
 		textPrevLaegdId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
@@ -368,6 +369,72 @@ public class MilRollEntryDialog {
 		lblNyLbenr.setBounds(0, 0, 55, 15);
 		lblNyLbenr.setText("L\u00F8benr");
 
+		textNyLoebenr = new Text(compositeData, SWT.BORDER);
+		textNyLoebenr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFader = new Label(compositeData, SWT.NONE);
+		lblFader.setText("Fader");
+
+		textFader = new Text(compositeData, SWT.BORDER);
+		textFader.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblSn = new Label(compositeData, SWT.NONE);
+		lblSn.setText("S\u00F8n");
+
+		textSoen = new Text(compositeData, SWT.BORDER);
+		textSoen.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFdested = new Label(compositeData, SWT.NONE);
+		lblFdested.setText("F\u00F8dested");
+
+		textFoedested = new Text(compositeData, SWT.BORDER);
+		textFoedested.setToolTipText("Ctl-Mellemrum husker de seneste ti indtastninger");
+		textFoedested.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		controlDecorationFoedested = new ControlDecoration(textFoedested, SWT.LEFT | SWT.TOP, compositeData);
+		controlDecorationFoedested.setDescriptionText("Ctl-Mellemrum husker de seneste ti indtastninger");
+
+		final Label lblAlder = new Label(compositeData, SWT.NONE);
+		lblAlder.setText("Alder");
+
+		textAlder = new Text(compositeData, SWT.BORDER);
+		textAlder.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblStrITommer = new Label(compositeData, SWT.NONE);
+		lblStrITommer.setText("Str. i tommer");
+
+		textStoerrelseitommer = new Text(compositeData, SWT.BORDER);
+		textStoerrelseitommer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblOphold = new Label(compositeData, SWT.NONE);
+		lblOphold.setText("Ophold");
+
+		textOphold = new Text(compositeData, SWT.BORDER);
+		textOphold.setToolTipText("Ctl-Mellemrum husker de seneste ti indtastninger");
+		textOphold.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		controlDecorationOphold = new ControlDecoration(textOphold, SWT.LEFT | SWT.TOP, compositeData);
+		controlDecorationOphold.setDescriptionText("Ctl-Mellemrum husker de seneste ti indtastninger");
+
+		final Label lblAnmrkninger = new Label(compositeData, SWT.NONE);
+		lblAnmrkninger.setText("Anm\u00E6rkninger");
+
+		textAnmaerkninger = new Text(compositeData, SWT.BORDER);
+		textAnmaerkninger.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblFdt = new Label(compositeData, SWT.NONE);
+		lblFdt.setText("F\u00F8dt");
+
+		textFoedt = new Text(compositeData, SWT.BORDER);
+		textFoedt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		final Label lblGedcomId = new Label(compositeData, SWT.NONE);
+		lblGedcomId.setText("GEDCOM ID");
+
+		textGedcomid = new Text(compositeData, SWT.BORDER);
+		textGedcomid.setToolTipText("@I og @ beh\u00F8ves ikke ved indtastning");
+		textGedcomid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
 		compositeButtons = new Composite(shlLgdsrulleindtastning, SWT.NONE);
 		compositeButtons.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		compositeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -446,71 +513,15 @@ public class MilRollEntryDialog {
 		});
 		btnSlet.setText("Slet");
 
-		textNyLoebenr = new Text(compositeData, SWT.BORDER);
-		textNyLoebenr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblFader = new Label(compositeData, SWT.NONE);
-		lblFader.setText("Fader");
-
-		textFader = new Text(compositeData, SWT.BORDER);
-		textFader.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblSn = new Label(compositeData, SWT.NONE);
-		lblSn.setText("S\u00F8n");
-
-		textSoen = new Text(compositeData, SWT.BORDER);
-		textSoen.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblFdested = new Label(compositeData, SWT.NONE);
-		lblFdested.setText("F\u00F8dested  (Ctl+Space)");
-
-		textFoedested = new Text(compositeData, SWT.BORDER);
-		textFoedested.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblAlder = new Label(compositeData, SWT.NONE);
-		lblAlder.setText("Alder");
-
-		textAlder = new Text(compositeData, SWT.BORDER);
-		textAlder.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblStrITommer = new Label(compositeData, SWT.NONE);
-		lblStrITommer.setText("Str. i tommer");
-
-		textStoerrelseitommer = new Text(compositeData, SWT.BORDER);
-		textStoerrelseitommer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblOphold = new Label(compositeData, SWT.NONE);
-		lblOphold.setText("Ophold  (Ctl+Space)");
-
-		textOphold = new Text(compositeData, SWT.BORDER);
-		textOphold.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblAnmrkninger = new Label(compositeData, SWT.NONE);
-		lblAnmrkninger.setText("Anm\u00E6rkninger");
-
-		textAnmaerkninger = new Text(compositeData, SWT.BORDER);
-		textAnmaerkninger.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblFdt = new Label(compositeData, SWT.NONE);
-		lblFdt.setText("F\u00F8dt");
-
-		textFoedt = new Text(compositeData, SWT.BORDER);
-		textFoedt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		final Label lblGedcomId = new Label(compositeData, SWT.NONE);
-		lblGedcomId.setText("GEDCOM ID (@ og I beh\u00F8ves ikke)");
-
-		textGedcomid = new Text(compositeData, SWT.BORDER);
-		textGedcomid.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		new Label(compositeData, SWT.NONE);
-		new Label(compositeData, SWT.NONE);
-
 		try {
 			final KeyStroke keyStroke = KeyStroke.getInstance("Ctrl+Space");
 			new ContentProposalAdapter(textFoedested, new TextContentAdapter(), new FoedestedProvider(props), keyStroke,
 					null);
 			new ContentProposalAdapter(textOphold, new TextContentAdapter(), new OpholdProvider(props), keyStroke,
 					null);
+			new Label(compositeData, SWT.NONE);
+			new Label(compositeData, SWT.NONE);
+
 		} catch (final org.eclipse.jface.bindings.keys.ParseException e1) {
 			e1.printStackTrace();
 		}
@@ -521,7 +532,7 @@ public class MilRollEntryDialog {
 	}
 
 	/**
-	 *
+	 * Delete an entry
 	 */
 	protected void delete() {
 		final MilRollModel m = new MilRollModel();
@@ -537,7 +548,7 @@ public class MilRollEntryDialog {
 
 	/**
 	 * Get next roll
-	 * 
+	 *
 	 * @param laegdId
 	 * @throws SQLException
 	 *
@@ -562,7 +573,7 @@ public class MilRollEntryDialog {
 
 	/**
 	 * Get previous roll
-	 * 
+	 *
 	 * @param laegdId
 	 * @throws SQLException
 	 *
@@ -606,7 +617,7 @@ public class MilRollEntryDialog {
 			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
 			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
 			props.setProperty("laegdid", Constants.LAEGDID);
-			props.setProperty("gllaegdid", Constants.GLLAEGDID);
+			props.setProperty("prevlaegdid", Constants.prevlaegdid);
 			props.setProperty("uri", Constants.MILROLL_URI);
 
 			storeProperties();
@@ -618,8 +629,6 @@ public class MilRollEntryDialog {
 	 * Save to Derby database
 	 *
 	 * @throws SQLException
-	 *
-	 * @throws Exception
 	 */
 	protected void insert() throws SQLException {
 		final MilRollModel lm = new MilRollModel();
@@ -659,7 +668,7 @@ public class MilRollEntryDialog {
 		}
 
 		try {
-			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText()));
+			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText().replace(",", ".")));
 		} catch (final Exception e) {
 			lm.setStoerrelseITommer(new BigDecimal(0));
 		}
@@ -746,8 +755,8 @@ public class MilRollEntryDialog {
 	}
 
 	/**
-	 * Search for id for phonetic name of son and age or birth. Present result in a
-	 * popup with selection possibility
+	 * Search for GEDCOM id for phonetic name of son and age or birth. Present
+	 * result in a popup with selection possibility
 	 *
 	 * @throws Exception
 	 */
@@ -756,15 +765,16 @@ public class MilRollEntryDialog {
 		final String phonName = fk.generateKey(constructName);
 		Date birthDate = null;
 
-		if (textAlder.getText() != null && textAlder.getText().isBlank() == false) {
+		if (textAlder.getText() != null && !textAlder.getText().isBlank()) {
 			final int alder = Integer.parseInt(textAlder.getText());
 			final int aar = Integer.parseInt(textAar.getText());
 			final int birthYearInt = aar - alder;
 			birthDate = Date.valueOf(Integer.toString(birthYearInt) + "-01-01");
-		} else if (textFoedt.getText() != null && textFoedt.getText().isBlank() == false) {
+		} else if (textFoedt.getText() != null && !textFoedt.getText().isBlank()) {
 			birthDate = string2Date(textFoedt.getText());
-		} else
+		} else {
 			return;
+		}
 
 		final List<String> ls = IndividualModel.getDataFromPhonName(props.getProperty("vejbyPath"),
 				props.getProperty("vejbySchema"), phonName, birthDate);
@@ -812,13 +822,13 @@ public class MilRollEntryDialog {
 	}
 
 	/**
-	 * Get old entry from Derby
+	 * Get previous entry from Derby
 	 */
 	private void selectOld() {
 		final MilRollModel m = new MilRollModel();
 
 		try {
-			String prevloebenr = textPrevLoebenr.getText();
+			final String prevloebenr = textPrevLoebenr.getText();
 			m.select(props, Integer.parseInt(textPrevLaegdId.getText()), Integer.parseInt(prevloebenr));
 			textNyLoebenr.setText("");
 			textFader.setText(m.getFader());
@@ -842,7 +852,7 @@ public class MilRollEntryDialog {
 	}
 
 	/**
-	 * Set the message in the message combo box
+	 * Set the error message in the message combo box
 	 *
 	 * @param string
 	 *
@@ -873,6 +883,8 @@ public class MilRollEntryDialog {
 	}
 
 	/**
+	 * Set properties
+	 *
 	 * @param props
 	 */
 	public void setProperties(Properties props) {
@@ -888,11 +900,12 @@ public class MilRollEntryDialog {
 
 			props.setProperty("amt", textAmt.getText());
 			props.setProperty("aar", textAar.getText());
+			props.setProperty("litra", textLitra.getText());
 			props.setProperty("rulletype", textRulletype.getText());
 			props.setProperty("laegdnr", textLaegdNr.getText());
 			props.setProperty("sogn", textSogn.getText());
 			props.setProperty("laegdid", textLaegdId.getText());
-			props.setProperty("gllaegdid", textPrevLaegdId.getText());
+			props.setProperty("prevlaegdid", textPrevLaegdId.getText());
 			props.setProperty("uri", textUri.getText());
 
 			props.store(output, "Archive searcher properties");
@@ -952,7 +965,7 @@ public class MilRollEntryDialog {
 	}
 
 	/**
-	 *
+	 * Update the entry
 	 */
 	protected void update() {
 		final MilRollModel lm = new MilRollModel();
@@ -992,7 +1005,7 @@ public class MilRollEntryDialog {
 		}
 
 		try {
-			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText()));
+			lm.setStoerrelseITommer(new BigDecimal(textStoerrelseitommer.getText().replace(",", ".")));
 		} catch (final Exception e) {
 			lm.setStoerrelseITommer(new BigDecimal(0));
 		}

@@ -59,11 +59,11 @@ public class KeystrokeDialog extends Dialog {
 		gl_container.marginLeft = 5;
 		container.setLayout(gl_container);
 
-		Label lblHovedbillede = new Label(container, SWT.NONE);
+		final Label lblHovedbillede = new Label(container, SWT.NONE);
 		lblHovedbillede.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.BOLD));
 		lblHovedbillede.setText("Hovedbillede");
 
-		Label lblLgdsrulleindtastning = new Label(container, SWT.NONE);
+		final Label lblLgdsrulleindtastning = new Label(container, SWT.NONE);
 		lblLgdsrulleindtastning.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		lblLgdsrulleindtastning.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.BOLD));
 		lblLgdsrulleindtastning.setText("L\u00E6gdsrulleindtastning");
@@ -71,7 +71,7 @@ public class KeystrokeDialog extends Dialog {
 		lblB.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		lblB.setText("Alt+B Københavns begravelsesregister faneblad");
 
-		Label lblAlteRydIndtastningsfelter = new Label(container, SWT.NONE);
+		final Label lblAlteRydIndtastningsfelter = new Label(container, SWT.NONE);
 		lblAlteRydIndtastningsfelter.setText("Alt+E Ryd indtastningsfelter");
 		final Label lblD = new Label(container, SWT.NONE);
 		lblD.setText("Alt+D Folketællingsdubletter faneblad");

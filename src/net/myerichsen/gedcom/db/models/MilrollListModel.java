@@ -85,7 +85,7 @@ public class MilrollListModel extends ASModel {
 
 		statement = conn.prepareStatement(SELECT);
 		statement.setInt(1, laegdId);
-		ResultSet rs = statement.executeQuery();
+		final ResultSet rs = statement.executeQuery();
 
 		if (rs.next()) {
 			m = new MilrollListModel();

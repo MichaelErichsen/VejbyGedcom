@@ -38,6 +38,6 @@ public class Constants {
 	public static final String MILROLL_URI = "https://www.sa.dk/ao-soegesider/da/billedviser?epid=16481031#17028,656192";
 	public static final String LITRA = " ";
 	public static final String LAEGDID = "1";
-	public static final String GLLAEGDID = "0";
+	public static final String prevlaegdid = "0";
 
 }

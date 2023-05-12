@@ -15,37 +15,37 @@ public class ListTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ListTest lt = new ListTest();
+		final ListTest lt = new ListTest();
 		lt.execute();
 
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void execute() {
 
-		LinkedList<MilRollEntryModel> list = new LinkedList<MilRollEntryModel>();
+		final LinkedList<MilRollEntryModel> list = new LinkedList<>();
 
-		MilRollEntryModel model = new MilRollEntryModel();
+		final MilRollEntryModel model = new MilRollEntryModel();
 
 		list.add(model);
 
 		// Find all previous entries
-		int glLaegdId = model.getPrevLaegdId();
+		int prevlaegdid = model.getPrevLaegdId();
 		int glLoebeNr = model.getPrevLoebeNr();
 
-		while (glLaegdId != 0 && glLoebeNr != 0) {
-			MilRollEntryModel previous = MilRollEntryModel.select(glLaegdId, glLoebeNr);
+		while (prevlaegdid != 0 && glLoebeNr != 0) {
+			final MilRollEntryModel previous = MilRollEntryModel.select(prevlaegdid, glLoebeNr);
 			list.addFirst(model);
-			glLaegdId = previous.getPrevLaegdId();
+			prevlaegdid = previous.getPrevLaegdId();
 			glLoebeNr = previous.getPrevLoebeNr();
 		}
 
 		// Find all later entries
 		// SELECT * from laegd, rulle where gl == new and gl == new
 		// if rs.next contibue recursively
-		MilRollEntryModel selectOld = MilRollEntryModel.selectPrev(glLaegdId, glLoebeNr);
+		final MilRollEntryModel selectOld = MilRollEntryModel.selectPrev(prevlaegdid, glLoebeNr);
 		list.addLast(selectOld);
 
 	}

@@ -260,11 +260,11 @@ public class MilRollEntryView extends Composite {
 			}
 		});
 
-		final TableViewerColumn MilrollTableVieverColumn_gllaegdId = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnlgllaegdId = MilrollTableVieverColumn_gllaegdId.getColumn();
-		tblclmnlgllaegdId.setWidth(40);
-		tblclmnlgllaegdId.setText("Forr. l\u00E6gd ID");
-		MilrollTableVieverColumn_gllaegdId.setLabelProvider(new ColumnLabelProvider() {
+		final TableViewerColumn MilrollTableVieverColumn_prevlaegdid = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnlprevlaegdid = MilrollTableVieverColumn_prevlaegdid.getColumn();
+		tblclmnlprevlaegdid.setWidth(40);
+		tblclmnlprevlaegdid.setText("Forr. l\u00E6gd ID");
+		MilrollTableVieverColumn_prevlaegdid.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				final MilRollEntryModel mrem = (MilRollEntryModel) element;

@@ -116,20 +116,6 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
-	 * @return the prevLaegdId
-	 */
-	public int getPrevLaegdId() {
-		return prevLaegdId;
-	}
-
-	/**
-	 * @return the prevLoebeNr
-	 */
-	public int getPrevLoebeNr() {
-		return prevLoebeNr;
-	}
-
-	/**
 	 * @return the laegdId
 	 */
 	public int getLaegdId() {
@@ -155,6 +141,20 @@ public class MilRollModel extends ASModel {
 	 */
 	public String getOphold() {
 		return ophold;
+	}
+
+	/**
+	 * @return the prevLaegdId
+	 */
+	public int getPrevLaegdId() {
+		return prevLaegdId;
+	}
+
+	/**
+	 * @return the prevLoebeNr
+	 */
+	public int getPrevLoebeNr() {
+		return prevLoebeNr;
 	}
 
 	/**
@@ -310,20 +310,6 @@ public class MilRollModel extends ASModel {
 	}
 
 	/**
-	 * @param prevLaegdId the prevLaegdId to set
-	 */
-	public void setPrevLaegdId(int prevLaegdId) {
-		this.prevLaegdId = prevLaegdId;
-	}
-
-	/**
-	 * @param prevLoebeNr the prevLoebeNr to set
-	 */
-	public void setPrevLoebeNr(int prevLoebeNr) {
-		this.prevLoebeNr = prevLoebeNr;
-	}
-
-	/**
 	 * @param laegdId the laegdId to set
 	 */
 	public void setLaegdId(int laegdId) {
@@ -349,6 +335,20 @@ public class MilRollModel extends ASModel {
 	 */
 	public void setOphold(String ophold) {
 		this.ophold = ophold;
+	}
+
+	/**
+	 * @param prevLaegdId the prevLaegdId to set
+	 */
+	public void setPrevLaegdId(int prevLaegdId) {
+		this.prevLaegdId = prevLaegdId;
+	}
+
+	/**
+	 * @param prevLoebeNr the prevLoebeNr to set
+	 */
+	public void setPrevLoebeNr(int prevLoebeNr) {
+		this.prevLoebeNr = prevLoebeNr;
 	}
 
 	/**
