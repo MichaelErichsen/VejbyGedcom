@@ -42,9 +42,9 @@ import org.eclipse.swt.widgets.Text;
 import net.myerichsen.gedcom.db.models.IndividualModel;
 import net.myerichsen.gedcom.db.models.MilRollModel;
 import net.myerichsen.gedcom.db.models.MilrollListModel;
+import net.myerichsen.gedcom.db.providers.FoedestedProvider;
+import net.myerichsen.gedcom.db.providers.OpholdProvider;
 import net.myerichsen.gedcom.db.views.Constants;
-import net.myerichsen.gedcom.providers.FoedestedProvider;
-import net.myerichsen.gedcom.providers.OpholdProvider;
 import net.myerichsen.gedcom.util.Fonkod;
 
 /**

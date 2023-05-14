@@ -9,18 +9,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 10. maj 2023
+ * @version 14. maj 2023
  *
  */
 
 public class MilRollEntryModel extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String SELECT = "SELECT * FROM LAEGD.LAEGD, LAEGD.RULLE WHERE LAEGD.LAEGD.LAEGDID = LAEGD.RULLE.LAEGDID";
+
+	private static final String LOAD = "SELECT * FROM LAEGD, RULLE WHERE LAEGD.LAEGD.LAEGDID = LAEGD.RULLE.LAEGDID";
+	private static final String SELECT = "SELECT * FROM LAEGD, RULLE WHERE LAEGD.LAEGDID = ? AND RULLE.LOEBENR = ? "
+			+ "AND LAEGD.LAEGDID = RULLE.LAEGDID";
+	private static final String SELECT_PREV = "SELECT * FROM LAEGD, RULLE WHERE LAEGD.PREVLAEGDID = ? "
+			+ "AND RULLE.PREVLOEBENR = ? AND LAEGD.LAEGDID = RULLE.LAEGDID";
 
 	/**
 	 * Load list of entries from data base
@@ -39,7 +45,7 @@ public class MilRollEntryModel extends ASModel {
 		statement.setString(1, schema);
 		statement.execute();
 
-		statement = conn.prepareStatement(SELECT);
+		statement = conn.prepareStatement(LOAD);
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
@@ -67,7 +73,6 @@ public class MilRollEntryModel extends ASModel {
 			m.setNavn(rs.getString("NAVN"));
 			m.setFaderFon(rs.getString("FADERFON"));
 			m.setSoenFon(rs.getString("SOENFON"));
-
 			lm.add(m);
 		}
 
@@ -82,26 +87,123 @@ public class MilRollEntryModel extends ASModel {
 	}
 
 	/**
-	 * @param prevLaegdId
-	 * @param prevLoebeNr
+	 * @param props
+	 * @param laegdId
+	 * @param loebeNr
+	 * @return
 	 */
-	public static MilRollEntryModel select(int prevLaegdId, int prevLoebeNr) {
-		return null;
-		// TODO Auto-generated method stub
+	public static MilRollEntryModel select(Properties props, int laegdId, int loebeNr) {
+		MilRollEntryModel m = null;
+
+		try {
+			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
+			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+			statement.setString(1, props.getProperty("milrollSchema"));
+			statement.execute();
+
+			statement = conn.prepareStatement(SELECT);
+			statement.setInt(1, laegdId);
+			statement.setInt(2, loebeNr);
+			final ResultSet rs = statement.executeQuery();
+
+			if (!rs.next()) {
+				return null;
+			}
+
+			m = new MilRollEntryModel();
+			m.setAmt(rs.getString("AMT").trim());
+			m.setAar(rs.getInt("AAR"));
+			m.setLitra(rs.getString("LITRA"));
+			m.setRulletype(rs.getString("RULLETYPE").trim());
+			m.setLaegdnr(rs.getInt("LAEGDNR"));
+			m.setSogn(rs.getString("SOGN").trim());
+			m.setLaegdId(laegdId);
+			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+			m.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
+			m.setLoebeNr(loebeNr);
+			m.setFader(rs.getString("FADER"));
+			m.setSoen(rs.getString("SOEN"));
+			m.setFoedeSted(rs.getString("FOEDESTED"));
+			m.setAlder(rs.getInt("ALDER"));
+			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			m.setOphold(rs.getString("OPHOLD"));
+			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			m.setFoedt(rs.getDate("FOEDT"));
+			m.setGedcomId(rs.getString("GEDCOMID"));
+			m.setNavn(rs.getString("NAVN"));
+			m.setFaderFon(rs.getString("FADERFON"));
+			m.setSoenFon(rs.getString("SOENFON"));
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		return m;
 
 	}
 
 	/**
+	 * @param props
 	 * @param prevLaegdId
 	 * @param prevLoebeNr
+	 * @return
 	 */
-	public static MilRollEntryModel selectPrev(int prevLaegdId, int prevLoebeNr) {
-		return null;
-		// TODO Auto-generated method stub
+	public static MilRollEntryModel selectPrev(Properties props, int prevLaegdId, int prevLoebeNr) {
+		MilRollEntryModel m = null;
+
+		if (prevLaegdId == 0 && prevLoebeNr == 0) {
+			return m;
+		}
+
+		try {
+			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
+			PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+			statement.setString(1, props.getProperty("milrollSchema"));
+			statement.execute();
+
+			statement = conn.prepareStatement(SELECT_PREV);
+			statement.setInt(1, prevLaegdId);
+			statement.setInt(2, prevLoebeNr);
+			final ResultSet rs = statement.executeQuery();
+
+			if (!rs.next()) {
+				return null;
+			}
+
+			m = new MilRollEntryModel();
+			m.setAmt(rs.getString("AMT").trim());
+			m.setAar(rs.getInt("AAR"));
+			m.setLitra(rs.getString("LITRA"));
+			m.setRulletype(rs.getString("RULLETYPE").trim());
+			m.setLaegdnr(rs.getInt("LAEGDNR"));
+			m.setSogn(rs.getString("SOGN").trim());
+			m.setLaegdId(rs.getInt("LAEGDID"));
+			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+			m.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
+			m.setLoebeNr(rs.getInt("LOEBENR"));
+			m.setFader(rs.getString("FADER"));
+			m.setSoen(rs.getString("SOEN"));
+			m.setFoedeSted(rs.getString("FOEDESTED"));
+			m.setAlder(rs.getInt("ALDER"));
+			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			m.setOphold(rs.getString("OPHOLD"));
+			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			m.setFoedt(rs.getDate("FOEDT"));
+			m.setGedcomId(rs.getString("GEDCOMID"));
+			m.setNavn(rs.getString("NAVN"));
+			m.setFaderFon(rs.getString("FADERFON"));
+			m.setSoenFon(rs.getString("SOENFON"));
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		return m;
 
 	}
 
 	private String amt = "";
+
 	private int aar = 0;
 	private String litra = " ";
 	private String rulletype = "Hovedrulle";
@@ -445,6 +547,18 @@ public class MilRollEntryModel extends ASModel {
 	 */
 	public void setStoerrelseITommer(BigDecimal stoerrelseITommer) {
 		this.stoerrelseITommer = stoerrelseITommer;
+	}
+
+	@Override
+	public String toString() {
+		return (navn != null ? navn.trim() : "") + ", " + (amt != null ? amt.trim() + ", " : "") + aar + ", "
+				+ (litra != null ? litra + ", " : "") + laegdnr + ", " + (sogn != null ? sogn.trim() + ", " : "")
+				+ loebeNr + ", " + (fader != null ? fader.trim() + ", " : "")
+				+ (foedeSted != null ? foedeSted.trim() + ", " : "") + alder + ", "
+				+ (stoerrelseITommer != null ? stoerrelseITommer + ", " : "")
+				+ (ophold != null ? ophold.trim() + ", " : "")
+				+ (anmaerkninger != null ? anmaerkninger.trim() + ", " : "") + (foedt != null ? foedt + ", " : "")
+				+ (gedcomId != null ? gedcomId.trim() + ", " : "");
 	}
 
 }

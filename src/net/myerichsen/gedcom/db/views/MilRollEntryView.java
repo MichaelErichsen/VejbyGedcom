@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -34,6 +35,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import net.myerichsen.gedcom.db.comparators.MilrollComparator;
 import net.myerichsen.gedcom.db.dialogs.MilRollEntryDialog;
+import net.myerichsen.gedcom.db.dialogs.MilRollTreeDialog;
 import net.myerichsen.gedcom.db.filters.MilrollCountyFilter;
 import net.myerichsen.gedcom.db.filters.MilrollIDFilter;
 import net.myerichsen.gedcom.db.filters.MilrollNameFilter;
@@ -46,11 +48,9 @@ import net.myerichsen.gedcom.db.populators.MilrollPopulator;
  * Milroll entry view
  *
  * @author Michael Erichsen
- * @version 10. maj 2023
+ * @version 14. maj 2023
  *
  */
-
-// TODO https://www.sa.dk/ao-soegesider/da/billedviser?epid=16481031#17074,665339
 
 public class MilRollEntryView extends Composite {
 	private Text txtMilrollYear;
@@ -62,6 +62,7 @@ public class MilRollEntryView extends Composite {
 	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
+	private Shell shell;
 
 	/**
 	 * Create the view
@@ -71,6 +72,7 @@ public class MilRollEntryView extends Composite {
 	 */
 	public MilRollEntryView(Composite parent, int style) {
 		super(parent, style);
+		shell = getShell();
 		setLayout(new GridLayout(1, false));
 
 		listener = new MilrollPopulator();
@@ -284,6 +286,18 @@ public class MilRollEntryView extends Composite {
 			}
 		});
 
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnLgdId = tableViewerColumn.getColumn();
+		tblclmnLgdId.setWidth(46);
+		tblclmnLgdId.setText("L\u00E6gd ID");
+		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				final MilRollEntryModel mrem = (MilRollEntryModel) element;
+				return Integer.toString(mrem.getLaegdId());
+			}
+		});
+
 		final TableViewerColumn MilrollTableVieverColumn_loebenr = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnlloebenr = MilrollTableVieverColumn_loebenr.getColumn();
 		tblclmnlloebenr.setWidth(40);
@@ -457,6 +471,16 @@ public class MilRollEntryView extends Composite {
 
 		});
 		btnIndtastLgdsruller.setText("Indtast l\u00E6gdsruller");
+
+//		Button btnTree = new Button(buttonComposite, SWT.NONE);
+//		btnTree.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				MilRollTreeDialog tree = new MilRollTreeDialog(props, shell);
+//				tree.open();
+//			}
+//		});
+//		btnTree.setText("Tree");
 	}
 
 	@Override
@@ -535,28 +559,31 @@ public class MilRollEntryView extends Composite {
 		final TableItem ti = tia[0];
 
 		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 24; i++) {
+		for (int i = 0; i < 25; i++) {
 			if (ti.getText(i).length() > 0) {
 				sb.append(ti.getText(i).trim() + ", ");
 			}
 		}
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Lægdsruller", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Hop til" }, 0);
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Hop til", "Træ" }, 0);
 		final int open = dialog.open();
 
-		if (open == 1) {
-			final String h = ti.getText(13).startsWith("0") ? "" : ", Højde i tommer " + ti.getText(13);
-			final String a = ti.getText(15).length() == 0 ? "" : ", " + ti.getText(15);
+		switch (open) {
+		case 1: {
+			final String h = ti.getText(14).startsWith("0") ? "" : ", Højde i tommer " + ti.getText(14);
+			final String a = ti.getText(16).length() == 0 ? "" : ", " + ti.getText(16);
 			final String s = ti.getText(0) + " amt " + ti.getText(1) + ti.getText(2) + ", lægd " + ti.getText(3)
-					+ ", Løbenr. " + ti.getText(8) + ", Fader " + ti.getText(9).trim() + ", Fødested "
-					+ ti.getText(11).trim() + ", Alder " + ti.getText(12) + h + ", Opholdssted " + ti.getText(14).trim()
+					+ ", Løbenr. " + ti.getText(9) + ", Fader " + ti.getText(10).trim() + ", Fødested "
+					+ ti.getText(12).trim() + ", Alder " + ti.getText(13) + h + ", Opholdssted " + ti.getText(15).trim()
 					+ a;
 			final Clipboard clipboard = new Clipboard(getDisplay());
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { s }, new Transfer[] { textTransfer });
 			clipboard.dispose();
-		} else if (open == 2) {
+			break;
+		}
+		case 2: {
 			final String id = ti.getText(17);
 			if (id.length() > 0) {
 				if (id.startsWith("@I")) {
@@ -565,6 +592,15 @@ public class MilRollEntryView extends Composite {
 					grandParent.searchById(null);
 				}
 			}
+			break;
+		}
+		case 3: {
+			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell, ti.getText(8), ti.getText(9));
+			tree.open();
+			break;
+		}
+		default:
+			break;
 		}
 	}
 

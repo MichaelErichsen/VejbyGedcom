@@ -46,8 +46,6 @@ import net.myerichsen.gedcom.util.MilrollListRulletypeEditingSupport;
  *
  */
 
-// TODO Change to tree and make selectable
-
 public class MilRollListDialog extends Dialog {
 	private static final int NYTOMLINIE = IDialogConstants.CLIENT_ID + 6;
 	private static final int KOPIERLINIE = IDialogConstants.CLIENT_ID + 5;

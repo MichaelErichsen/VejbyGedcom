@@ -34,8 +34,8 @@ public class MilrollListRulletypeEditingSupport extends EditingSupport {
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		final String[] rulletype = new String[2];
-		rulletype[0] = "Hovedliste";
-		rulletype[1] = "Tilgangsliste";
+		rulletype[0] = "Hovedrulle";
+		rulletype[1] = "Tilgangsrulle";
 
 		return new ComboBoxCellEditor(viewer.getTable(), rulletype);
 	}
@@ -44,7 +44,7 @@ public class MilrollListRulletypeEditingSupport extends EditingSupport {
 	protected Object getValue(Object element) {
 		final MilrollListModel mrlm = (MilrollListModel) element;
 
-		if (mrlm.getRulleType().equals("Hovedliste")) {
+		if (mrlm.getRulleType().equals("Hovedrulle")) {
 			return 0;
 		}
 
@@ -56,9 +56,9 @@ public class MilrollListRulletypeEditingSupport extends EditingSupport {
 		final MilrollListModel mrlm = (MilrollListModel) element;
 
 		if ((Integer) value == 0) {
-			mrlm.setRulleType("Hovedliste");
+			mrlm.setRulleType("Hovedrulle");
 		} else {
-			mrlm.setRulleType("Tilgangsliste");
+			mrlm.setRulleType("Tilgangsrulle");
 		}
 
 		viewer.update(element, null);
