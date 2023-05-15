@@ -16,7 +16,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 4. maj 2023
+ * @version 15. maj 2023
  *
  */
 
@@ -95,8 +95,9 @@ public class CensusModel extends ASModel {
 					matcher = patternD.matcher(fkd);
 
 					if (matcher.find()) {
-						len = fkd.length();
-						now = Integer.parseInt(fkd.substring(len - 4, len));
+						String group = matcher.group();
+						len = group.length();
+						now = Integer.parseInt(group.substring(len - 4, len));
 
 						if (Math.abs(now - by) > 2) {
 							continue;

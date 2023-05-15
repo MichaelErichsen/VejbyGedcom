@@ -15,7 +15,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 14. maj 2023
+ * @version 15. maj 2023
  *
  */
 
@@ -94,6 +94,10 @@ public class MilRollEntryModel extends ASModel {
 	 */
 	public static MilRollEntryModel select(Properties props, int laegdId, int loebeNr) {
 		MilRollEntryModel m = null;
+
+		if (laegdId == 0 && loebeNr == 0) {
+			return m;
+		}
 
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("milrollPath"));
