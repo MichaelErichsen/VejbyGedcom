@@ -48,7 +48,7 @@ import net.myerichsen.gedcom.db.populators.MilrollPopulator;
  * Milroll entry view
  *
  * @author Michael Erichsen
- * @version 14. maj 2023
+ * @version 17. maj 2023
  *
  */
 
@@ -471,16 +471,6 @@ public class MilRollEntryView extends Composite {
 
 		});
 		btnIndtastLgdsruller.setText("Indtast l\u00E6gdsruller");
-
-//		Button btnTree = new Button(buttonComposite, SWT.NONE);
-//		btnTree.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				MilRollTreeDialog tree = new MilRollTreeDialog(props, shell);
-//				tree.open();
-//			}
-//		});
-//		btnTree.setText("Tree");
 	}
 
 	@Override
@@ -550,7 +540,7 @@ public class MilRollEntryView extends Composite {
 	}
 
 	/**
-	 * Create the census popup
+	 * Create the military roll popup
 	 *
 	 * @throws SQLException
 	 */
@@ -573,7 +563,7 @@ public class MilRollEntryView extends Composite {
 		case 1: {
 			final String h = ti.getText(14).startsWith("0") ? "" : ", Højde i tommer " + ti.getText(14);
 			final String a = ti.getText(16).length() == 0 ? "" : ", " + ti.getText(16);
-			final String s = ti.getText(0) + " amt " + ti.getText(1) + ti.getText(2) + ", lægd " + ti.getText(3)
+			final String s = ti.getText(0) + " amt " + ti.getText(1) + ti.getText(2) + ", lægd " + ti.getText(4)
 					+ ", Løbenr. " + ti.getText(9) + ", Fader " + ti.getText(10).trim() + ", Fødested "
 					+ ti.getText(12).trim() + ", Alder " + ti.getText(13) + h + ", Opholdssted " + ti.getText(15).trim()
 					+ a;
@@ -584,18 +574,16 @@ public class MilRollEntryView extends Composite {
 			break;
 		}
 		case 2: {
-			final String id = ti.getText(17);
-			if (id.length() > 0) {
-				if (id.startsWith("@I")) {
-					final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
-					grandParent.getSearchId().setText(id);
-					grandParent.searchById(null);
-				}
+			final String id = ti.getText(18);
+			if (id.length() > 0 && id.startsWith("@I")) {
+				final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+				grandParent.getSearchId().setText(id);
+				grandParent.searchById(null);
 			}
 			break;
 		}
 		case 3: {
-			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell, ti.getText(8), ti.getText(9));
+			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell, this, ti.getText(8), ti.getText(9));
 			tree.open();
 			break;
 		}

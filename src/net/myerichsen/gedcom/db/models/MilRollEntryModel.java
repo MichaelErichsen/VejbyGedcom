@@ -15,7 +15,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 15. maj 2023
+ * @version 17. maj 2023
  *
  */
 
@@ -557,12 +557,11 @@ public class MilRollEntryModel extends ASModel {
 	public String toString() {
 		return (navn != null ? navn.trim() : "") + ", " + (amt != null ? amt.trim() + ", " : "") + aar + ", "
 				+ (litra != null ? litra + ", " : "") + laegdnr + ", " + (sogn != null ? sogn.trim() + ", " : "")
-				+ loebeNr + ", " + (fader != null ? fader.trim() + ", " : "")
-				+ (foedeSted != null ? foedeSted.trim() + ", " : "") + alder + ", "
-				+ (stoerrelseITommer != null ? stoerrelseITommer + ", " : "")
+				+ (fader != null ? fader.trim() + ", " : "") + (foedeSted != null ? foedeSted.trim() + ", " : "")
+				+ alder + ", " + (stoerrelseITommer != null ? stoerrelseITommer + ", " : "")
 				+ (ophold != null ? ophold.trim() + ", " : "")
 				+ (anmaerkninger != null ? anmaerkninger.trim() + ", " : "") + (foedt != null ? foedt + ", " : "")
-				+ (gedcomId != null ? gedcomId.trim() + ", " : "");
+				+ (gedcomId != null ? gedcomId.trim() + ", " : "") + laegdId + ", " + loebeNr + ", ";
 	}
 
 }
