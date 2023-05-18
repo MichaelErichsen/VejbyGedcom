@@ -15,7 +15,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 3. maj 2023
+ * @version 18. maj 2023
  *
  */
 public class IndividualModel extends ASModel {
@@ -321,9 +321,7 @@ public class IndividualModel extends ASModel {
 		statement.setString(1, this.id);
 		rs = statement.executeQuery();
 
-		if (rs.next())
-
-		{
+		if (rs.next()) {
 			birthDate = rs.getDate("DATE");
 			birthPlace = rs.getString("PLACE") == null ? "" : rs.getString("PLACE");
 		}

@@ -294,24 +294,27 @@ public class SiblingsView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+//		final TableItem ti = tia[0];
+//
+//		final StringBuilder sb = new StringBuilder();
+//
+//		for (int i = 0; i < 25; i++) {
+//			if (ti.getText(i).length() > 0) {
+//				if (ti.getText(i).length() > 0) {
+//					sb.append(ti.getText(i).trim() + ", ");
+//				}
+//			}
+//		}
+//
+//		sb.append("\n");
+//
+//		final String string = sb.toString();
 
-		final StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < 25; i++) {
-			if (ti.getText(i).length() > 0) {
-				if (ti.getText(i).length() > 0) {
-					sb.append(ti.getText(i).trim() + ", ");
-				}
-			}
-		}
-
-		sb.append("\n");
-
-		final String string = sb.toString();
+		final SiblingsModel m = (SiblingsModel) tia[0].getData();
+		final String string = m.toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Søskende", null, string, MessageDialog.INFORMATION,
-				new String[] { "OK", "Kopier", "Hop til søskende" }, 0);
+				new String[] { "OK", "Kopier", "Søg efter" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -320,7 +323,7 @@ public class SiblingsView extends Composite {
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		} else if (open == 2) {
-			final String siblingsId = ti.getText(0);
+			final String siblingsId = m.getIndividualKey();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(siblingsId);
 			grandParent.searchById(null);

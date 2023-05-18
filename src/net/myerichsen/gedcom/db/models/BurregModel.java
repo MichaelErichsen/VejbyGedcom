@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 18, maj 2023
  *
  */
 public class BurregModel extends ASModel {
@@ -483,27 +483,26 @@ public class BurregModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return "BurregRecord [" + (firstNames != null ? "firstNames=" + firstNames + ", " : "")
-				+ (lastName != null ? "lastName=" + lastName + ", " : "")
-				+ (dateOfDeath != null ? "dateOfDeath=" + dateOfDeath + ", " : "")
-				+ (yearOfBirth != null ? "yearOfBirth=" + yearOfBirth + ", " : "")
-				+ (deathPlace != null ? "deathPlace=" + deathPlace + ", " : "")
-				+ (civilStatus != null ? "civilStatus=" + civilStatus + ", " : "")
-				+ (adressOutsideCph != null ? "adressOutsideCph=" + adressOutsideCph + ", " : "")
-				+ (sex != null ? "sex=" + sex + ", " : "") + (comment != null ? "comment=" + comment + ", " : "")
-				+ (cemetary != null ? "cemetary=" + cemetary + ", " : "")
-				+ (chapel != null ? "chapel=" + chapel + ", " : "") + (parish != null ? "parish=" + parish + ", " : "")
-				+ (street != null ? "street=" + street + ", " : "") + (hood != null ? "hood=" + hood + ", " : "")
-				+ (streetNumber != null ? "streetNumber=" + streetNumber + ", " : "")
-				+ (letter != null ? "letter=" + letter + ", " : "") + (floor != null ? "floor=" + floor + ", " : "")
-				+ (institution != null ? "institution=" + institution + ", " : "")
-				+ (institutionStreet != null ? "institutionStreet=" + institutionStreet + ", " : "")
-				+ (institutionHood != null ? "institutionHood=" + institutionHood + ", " : "")
-				+ (institutionStreetNumber != null ? "institutionStreetNumber=" + institutionStreetNumber + ", " : "")
-				+ (occuptations != null ? "occuptations=" + occuptations + ", " : "")
-				+ (occupationRelationTypes != null ? "occupationRelationTypes=" + occupationRelationTypes + ", " : "")
-				+ (deathCauses != null ? "deathCauses=" + deathCauses + ", " : "")
-				+ (deathCausesDanish != null ? "deathCausesDanish=" + deathCausesDanish : "") + "]";
+		return (firstNames != null ? firstNames.trim() + ", " : "") + (lastName != null ? lastName.trim() + ", " : "")
+				+ (dateOfDeath != null ? dateOfDeath.trim() + ", " : "")
+				+ (yearOfBirth != null ? yearOfBirth.trim() + ", " : "")
+				+ (deathPlace != null ? deathPlace.trim() + ", " : "")
+				+ (civilStatus != null ? civilStatus.trim() + ", " : "")
+				+ (adressOutsideCph != null ? adressOutsideCph.trim() + ", " : "")
+				+ (sex != null ? sex.trim() + ", " : "") + (comment != null ? comment.trim() + ", " : "")
+				+ (cemetary != null ? cemetary.trim() + ", " : "") + (chapel != null ? chapel.trim() + ", " : "")
+				+ (parish != null ? parish.trim() + ", " : "") + (street != null ? street.trim() + ", " : "")
+				+ (hood != null ? "hood=" + hood.trim() + ", " : "")
+				+ (streetNumber != null ? streetNumber.trim() + ", " : "")
+				+ (letter != null ? letter.trim() + ", " : "") + (floor != null ? floor.trim() + ", " : "")
+				+ (institution != null ? institution.trim() + ", " : "")
+				+ (institutionStreet != null ? institutionStreet.trim() + ", " : "")
+				+ (institutionHood != null ? institutionHood.trim() + ", " : "")
+				+ (institutionStreetNumber != null ? institutionStreetNumber.trim() + ", " : "")
+				+ (occuptations != null ? occuptations.trim() + ", " : "")
+				+ (occupationRelationTypes != null ? occupationRelationTypes.trim() + ", " : "")
+				+ (deathCauses != null ? deathCauses.trim() + ", " : "")
+				+ (deathCausesDanish != null ? deathCausesDanish : "");
 	}
 
 }

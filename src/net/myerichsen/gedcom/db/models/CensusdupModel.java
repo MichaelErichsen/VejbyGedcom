@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a census duplicate
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 18. maj 2023
  *
  */
 public class CensusdupModel extends ASModel {
@@ -144,8 +144,8 @@ public class CensusdupModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return "CensusData [individual=" + individual + ", date=" + date + ", place=" + place + ", sourceDetail="
-				+ sourceDetail + "]";
+		return (individual != null ? individual.trim() + ", " : "") + (date != null ? date + ", " : "")
+				+ (place != null ? place.trim() + ", " : "") + (sourceDetail != null ? sourceDetail.trim() : "");
 	}
 
 }

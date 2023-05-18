@@ -14,7 +14,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 18. maj 2023
  *
  */
 
@@ -252,11 +252,10 @@ public class SiblingsModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return "SiblingsModel [" + (individualKey != null ? "individualKey=" + individualKey + ", " : "") + birthYear
-				+ (name != null ? "name=" + name + ", " : "") + (parents != null ? "parents=" + parents + ", " : "")
-				+ (fatherPhonetic != null ? "fatherPhonetic=" + fatherPhonetic + ", " : "")
-				+ (motherPhonetic != null ? "motherPhonetic=" + motherPhonetic + ", " : "")
-				+ (place != null ? "place=" + place : "") + "]";
+		return (individualKey != null ? individualKey.trim() + ", " : "") + birthYear + ", "
+				+ (name != null ? name.trim() + ", " : "") + (parents != null ? parents.trim() + ", " : "")
+				+ (fatherPhonetic != null ? fatherPhonetic.trim() + ", " : "")
+				+ (motherPhonetic != null ? motherPhonetic.trim() + ", " : "") + (place != null ? place : "");
 	}
 
 }

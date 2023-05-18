@@ -16,7 +16,7 @@ import net.myerichsen.gedcom.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 15. maj 2023
+ * @version 18. maj 2023
  *
  */
 
@@ -95,7 +95,7 @@ public class CensusModel extends ASModel {
 					matcher = patternD.matcher(fkd);
 
 					if (matcher.find()) {
-						String group = matcher.group();
+						final String group = matcher.group();
 						len = group.length();
 						now = Integer.parseInt(group.substring(len - 4, len));
 
@@ -623,21 +623,24 @@ public class CensusModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return (KIPnr.length() > 0 ? KIPnr + ", " : "") + (Loebenr > 0 ? Loebenr + ", " : "")
-				+ (Amt.length() > 0 ? Amt + ", " : "") + (Herred.length() > 0 ? Herred + ", " : "")
-				+ (Sogn.length() > 0 ? Sogn + ", " : "") + (Kildestednavn.length() > 0 ? Kildestednavn + ", " : "")
-				+ (Husstands_familienr.length() > 0 ? Husstands_familienr + ", " : "")
-				+ (Matr_nr_Adresse.length() > 0 ? Matr_nr_Adresse + ", " : "")
-				+ (Kildenavn.length() > 0 ? Kildenavn + ", " : "") + (Koen.length() > 0 ? Koen + ", " : "")
-				+ (Alder > 0 ? Alder + ", " : "") + (Civilstand.length() > 0 ? Civilstand + ", " : "")
-				+ (Kildeerhverv.length() > 0 ? Kildeerhverv + ", " : "")
-				+ (Stilling_i_husstanden.length() > 0 ? Stilling_i_husstanden + ", " : "")
-				+ (Kildefoedested.length() > 0 ? Kildefoedested + ", " : "")
-				+ (Foedt_kildedato.length() > 0 ? Foedt_kildedato + ", " : "") + (Foedeaar > 0 ? Foedeaar + ", " : "")
-				+ (Adresse.length() > 0 ? Adresse + ", " : "") + (Matrikel.length() > 0 ? Matrikel + ", " : "")
-				+ (Gade_nr.length() > 0 ? Gade_nr + ", " : "") + (FTaar > 0 ? FTaar + ", " : "")
-				+ (Kildehenvisning.length() > 0 ? Kildehenvisning + ", " : "")
-				+ (Kildekommentar.length() > 0 ? Kildekommentar + ", " : "")
-				+ (Kildedetaljer.length() > 0 ? Kildedetaljer + ", " : "");
+		return (KIPnr.length() > 0 ? KIPnr.trim() + ", " : "") + (Loebenr > 0 ? Loebenr + ", " : "")
+				+ (Amt.length() > 0 ? Amt.trim() + ", " : "") + (Herred.length() > 0 ? Herred.trim() + ", " : "")
+				+ (Sogn.length() > 0 ? Sogn.trim() + ", " : "")
+				+ (Kildestednavn.length() > 0 ? Kildestednavn.trim() + ", " : "")
+				+ (Husstands_familienr.length() > 0 ? Husstands_familienr.trim() + ", " : "")
+				+ (Matr_nr_Adresse.length() > 0 ? Matr_nr_Adresse.trim() + ", " : "")
+				+ (Kildenavn.length() > 0 ? Kildenavn.trim() + ", " : "")
+				+ (Koen.length() > 0 ? Koen.trim() + ", " : "") + (Alder > 0 ? Alder + ", " : "")
+				+ (Civilstand.length() > 0 ? Civilstand.trim() + ", " : "")
+				+ (Kildeerhverv.length() > 0 ? Kildeerhverv.trim() + ", " : "")
+				+ (Stilling_i_husstanden.length() > 0 ? Stilling_i_husstanden.trim() + ", " : "")
+				+ (Kildefoedested.length() > 0 ? Kildefoedested.trim() + ", " : "")
+				+ (Foedt_kildedato.length() > 0 ? Foedt_kildedato.trim() + ", " : "")
+				+ (Foedeaar > 0 ? Foedeaar + ", " : "") + (Adresse.length() > 0 ? Adresse.trim() + ", " : "")
+				+ (Matrikel.length() > 0 ? Matrikel.trim() + ", " : "")
+				+ (Gade_nr.length() > 0 ? Gade_nr.trim() + ", " : "") + (FTaar > 0 ? FTaar + ", " : "")
+				+ (Kildehenvisning.length() > 0 ? Kildehenvisning.trim() + ", " : "")
+				+ (Kildekommentar.length() > 0 ? Kildekommentar.trim() + ", " : "")
+				+ (Kildedetaljer.length() > 0 ? Kildedetaljer.trim() + ", " : "");
 	}
 }

@@ -311,18 +311,20 @@ public class RelocationView extends Composite {
 	 */
 	private void popup() {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+//		final TableItem ti = tia[0];
+//
+//		final StringBuilder sb = new StringBuilder();
+//		for (int i = 0; i < 9; i++) {
+//			if (ti.getText(i).length() > 0) {
+//				sb.append(ti.getText(i) + ", ");
+//			}
+//		}
+//		sb.append("\n");
 
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 9; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-		sb.append("\n");
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Flytning", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+		final RelocationModel m = (RelocationModel) tia[0].getData();
+		final String string = m.toString() + "\n";
+		final MessageDialog dialog = new MessageDialog(getShell(), "Flytning", null, string, MessageDialog.INFORMATION,
+				new String[] { "OK", "Kopier" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {

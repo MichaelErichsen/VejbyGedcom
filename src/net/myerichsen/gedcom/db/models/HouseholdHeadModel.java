@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * roll record
  *
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 18. maj 2023
  */
 
 /*
@@ -555,11 +555,17 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "HouseholdHeadModel [headId=" + headId + ", headName=" + headName + ", eventDate=" + eventDate
-				+ ", place=" + place + ", note=" + note + ", sourceDetail=" + sourceDetail + ", relocatorId="
-				+ relocatorId + ", relocatorName=" + relocatorName + ", eventType=" + eventType + ", kildestednavn="
-				+ kildestednavn + ", husstandsFamilieNr=" + husstandsFamilieNr + ", kipNr=" + kipNr + ", loebeNr="
-				+ loebeNr + "]";
+		return (headId.length() > 0 ? headId.trim() + ", " : "") + (headName.length() > 0 ? headName.trim() + ", " : "")
+				+ (eventDate != null ? eventDate + ", " : "") + (place.length() > 0 ? place.trim() + ", " : "")
+				+ (note.length() > 0 ? note.trim() + ", " : "")
+				+ (relocatorId.length() > 0 ? relocatorId.trim() + ", " : "")
+				+ (relocatorName.length() > 0 ? relocatorName.trim() + ", " : "")
+				+ (eventType.length() > 0 ? eventType.trim() + ", " : "")
+				+ (kildestednavn.length() > 0 ? kildestednavn.trim() + ", " : "")
+				+ (husstandsFamilieNr.length() > 0 ? husstandsFamilieNr.trim() + ", " : "")
+				+ (kipNr.length() > 0 ? kipNr.trim() + ", " : "") + loebeNr + ", "
+				+ (matrNrAdresse.length() > 0 ? matrNrAdresse : "")
+				+ (sourceDetail.length() > 0 ? "\n\n" + sourceDetail.trim() : "");
 	}
 
 }

@@ -44,7 +44,7 @@ import net.myerichsen.gedcom.db.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 18. maj 2023
  *
  */
 public class PolregView extends Composite {
@@ -395,24 +395,26 @@ public class PolregView extends Composite {
 	 */
 	private void popup() {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+//		final TableItem ti = tia[0];
+//
+//		final StringBuilder sb = new StringBuilder();
+//		for (int i = 0; i < 13; i++) {
+//			if (ti.getText(i).length() > 0) {
+//				sb.append(ti.getText(i) + ", ");
+//			}
+//		}
+//		sb.append("\n");
 
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 13; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-		sb.append("\n");
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Politiets Registerblade", null, sb.toString(),
+		final PolregModel m = (PolregModel) tia[0].getData();
+		final String string = m.toString() + "\n";
+		final MessageDialog dialog = new MessageDialog(getShell(), "Politiets Registerblade", null, string,
 				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
 			final Clipboard clipboard = new Clipboard(getDisplay());
 			final TextTransfer textTransfer = TextTransfer.getInstance();
-			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
+			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		}
 	}

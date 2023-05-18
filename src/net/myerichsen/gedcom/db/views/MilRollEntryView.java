@@ -1,5 +1,6 @@
 package net.myerichsen.gedcom.db.views;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -45,10 +46,10 @@ import net.myerichsen.gedcom.db.populators.ASPopulator;
 import net.myerichsen.gedcom.db.populators.MilrollPopulator;
 
 /**
- * Milroll entry view
+ * Military roll entry view
  *
  * @author Michael Erichsen
- * @version 17. maj 2023
+ * @version 18. maj 2023
  *
  */
 
@@ -546,26 +547,21 @@ public class MilRollEntryView extends Composite {
 	 */
 	private void popup() throws SQLException {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+		final MilRollEntryModel m = (MilRollEntryModel) tia[0].getData();
+		final String string = m.toString();
 
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 25; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i).trim() + ", ");
-			}
-		}
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Lægdsruller", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Hop til", "Træ" }, 0);
+		final MessageDialog dialog = new MessageDialog(getShell(), "Lægdsruller", null, string,
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Søg efter", "Vis tidligere for denne" }, 0);
 		final int open = dialog.open();
 
 		switch (open) {
 		case 1: {
-			final String h = ti.getText(14).startsWith("0") ? "" : ", Højde i tommer " + ti.getText(14);
-			final String a = ti.getText(16).length() == 0 ? "" : ", " + ti.getText(16);
-			final String s = ti.getText(0) + " amt " + ti.getText(1) + ti.getText(2) + ", lægd " + ti.getText(4)
-					+ ", Løbenr. " + ti.getText(9) + ", Fader " + ti.getText(10).trim() + ", Fødested "
-					+ ti.getText(12).trim() + ", Alder " + ti.getText(13) + h + ", Opholdssted " + ti.getText(15).trim()
+			final String h = m.getStoerrelseITommer() == new BigDecimal(0) ? ""
+					: ", Højde i tommer " + m.getStoerrelseITommer();
+			final String a = m.getAnmaerkninger().length() == 0 ? "" : ", " + m.getAnmaerkninger().trim();
+			final String s = m.getAmt().trim() + " amt " + m.getAar() + m.getLitra() + ", lægd " + m.getLaegdnr()
+					+ ", Løbenr. " + m.getLoebeNr() + ", Fader " + m.getFader().trim() + ", Fødested "
+					+ m.getFoedeSted().trim() + ", Alder " + m.getAlder() + h + ", Opholdssted " + m.getOphold().trim()
 					+ a;
 			final Clipboard clipboard = new Clipboard(getDisplay());
 			final TextTransfer textTransfer = TextTransfer.getInstance();
@@ -574,7 +570,7 @@ public class MilRollEntryView extends Composite {
 			break;
 		}
 		case 2: {
-			final String id = ti.getText(18);
+			final String id = m.getGedcomId();
 			if (id.length() > 0 && id.startsWith("@I")) {
 				final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 				grandParent.getSearchId().setText(id);
@@ -583,7 +579,8 @@ public class MilRollEntryView extends Composite {
 			break;
 		}
 		case 3: {
-			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell, this, ti.getText(8), ti.getText(9));
+			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell, m.getLaegdId() + "",
+					m.getLoebeNr() + "");
 			tree.open();
 			break;
 		}

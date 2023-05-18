@@ -53,7 +53,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 18. maj 2023
  *
  */
 
@@ -679,18 +679,19 @@ public class CensusView extends Composite {
 	 */
 	private void popup() throws SQLException {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+		final CensusModel m = (CensusModel) tia[0].getData();
 
-		final StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 24; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-		sb.append("\n");
+		final StringBuilder sb = new StringBuilder(m.toString());
+//		for (int i = 0; i < 24; i++) {
+//			if (ti.getText(i).length() > 0) {
+//				sb.append(ti.getText(i) + ", ");
+//			}
+//		}
+		sb.append("\n\n");
 
 		try {
-			sb.append(getCensusHousehold(ti.getText(21), ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19)));
+			sb.append(getCensusHousehold(m.getKIPnr(), m.getKildestednavn(), m.getHusstands_familienr(),
+					m.getMatrikel(), m.getKildehenvisning()));
 		} catch (final SQLException e) {
 			final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 			as.setErrorMessage(e.getMessage());
@@ -703,8 +704,9 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), ti.getText(21),
-						ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19), props.getProperty("censusSchema"));
+				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), m.getKIPnr(),
+						m.getKildestednavn(), m.getGade_nr(), m.getMatrikel(), m.getKildehenvisning(),
+						props.getProperty("censusSchema"));
 				final StringBuilder sb2 = new StringBuilder();
 
 				for (final CensusModel element : lcr) {
@@ -722,8 +724,9 @@ public class CensusView extends Composite {
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
-			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), ti.getText(21),
-					ti.getText(4), ti.getText(5), ti.getText(6), ti.getText(19), props.getProperty("censusSchema"));
+			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), m.getKIPnr(),
+					m.getKildestednavn(), m.getHusstands_familienr(), m.getMatrikel(), m.getKildehenvisning(),
+					props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);
 			final String headOfHousehold = CensusHouseholdModel.getHeadOfHousehold(props, censusModel);
 

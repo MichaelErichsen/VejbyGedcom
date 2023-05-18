@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 18. maj 2023
  *
  */
 public class ProbateModel extends ASModel {
@@ -22,6 +22,7 @@ public class ProbateModel extends ASModel {
 	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
+
 	private static final String SELECT = "SELECT * FROM EVENT " + "JOIN INDIVIDUAL ON EVENT.ID = INDIVIDUAL.EVENT_ID "
 			+ "WHERE INDIVIDUAL.FONKOD = ? AND EVENT.FROMDATE >= ? AND TODATE <= ?";
 
@@ -97,6 +98,7 @@ public class ProbateModel extends ASModel {
 	}
 
 	private String name = "";
+
 	private String fromDate = "";
 	private String toDate = "";
 	private String place = "";
@@ -185,5 +187,12 @@ public class ProbateModel extends ASModel {
 	 */
 	public void setToDate(String toDate) {
 		this.toDate = toDate;
+	}
+
+	@Override
+	public String toString() {
+		return (name != null ? name.trim() + ", " : "") + (fromDate != null ? fromDate.trim() + ", " : "")
+				+ (toDate != null ? toDate.trim() + ", " : "") + (place != null ? place.trim() + ", " : "")
+				+ (data != null ? data.trim() + ", " : "") + (source != null ? source : "");
 	}
 }

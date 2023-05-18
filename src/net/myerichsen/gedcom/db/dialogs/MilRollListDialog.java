@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.util.MilrollListRulletypeEditingSupport;
  * Military rolls view
  *
  * @author Michael Erichsen
- * @version 10. maj 2023
+ * @version 18. maj 2023
  *
  */
 
@@ -313,13 +313,14 @@ public class MilRollListDialog extends Dialog {
 			return;
 		}
 
-		final TableItem ti = tia[0];
+		final MilrollListModel m = (MilrollListModel) tia[0].getData();
 
-		final MilrollListModel m = new MilrollListModel();
-		m.setAmt(ti.getText(0));
-		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
-		m.setRulleType(ti.getText(6));
-		m.setSogn(ti.getText(7));
+//		final TableItem ti = tia[0];
+//		final MilrollListModel m = new MilrollListModel();
+//		m.setAmt(ti.getText(0));
+//		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
+//		m.setRulleType(ti.getText(6));
+//		m.setSogn(ti.getText(7));
 
 		tableViewer.add(m);
 
@@ -338,17 +339,19 @@ public class MilRollListDialog extends Dialog {
 			return 0;
 		}
 
-		final TableItem ti = tia[0];
+		final MilrollListModel m = (MilrollListModel) tia[0].getData();
 
-		final MilrollListModel m = new MilrollListModel();
-		m.setAmt(ti.getText(0));
-		m.setAar(Integer.parseInt(ti.getText(1)));
-		m.setLitra(ti.getText(2));
-		m.setRulleType(ti.getText(3));
-		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
-		m.setSogn(ti.getText(5));
-		m.setLaegdId(Integer.parseInt(ti.getText(6)));
-		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
+//		final TableItem ti = tia[0];
+//		final MilrollListModel m = new MilrollListModel();
+//		m.setAmt(ti.getText(0));
+//		m.setAar(Integer.parseInt(ti.getText(1)));
+//		m.setLitra(ti.getText(2));
+//		m.setRulleType(ti.getText(3));
+//		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
+//		m.setSogn(ti.getText(5));
+//		m.setLaegdId(Integer.parseInt(ti.getText(6)));
+//		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
+
 		final int insert = m.insert(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();
 		return insert;
@@ -387,17 +390,19 @@ public class MilRollListDialog extends Dialog {
 			return 0;
 		}
 
-		final TableItem ti = tia[0];
+		final MilrollListModel m = (MilrollListModel) tia[0].getData();
 
-		final MilrollListModel m = new MilrollListModel();
-		m.setAmt(ti.getText(0));
-		m.setAar(Integer.parseInt(ti.getText(1)));
-		m.setLitra(ti.getText(2));
-		m.setRulleType(ti.getText(3));
-		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
-		m.setSogn(ti.getText(5));
-		m.setLaegdId(Integer.parseInt(ti.getText(6)));
-		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
+//		final TableItem ti = tia[0];
+//		final MilrollListModel m = new MilrollListModel();
+//		m.setAmt(ti.getText(0));
+//		m.setAar(Integer.parseInt(ti.getText(1)));
+//		m.setLitra(ti.getText(2));
+//		m.setRulleType(ti.getText(3));
+//		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
+//		m.setSogn(ti.getText(5));
+//		m.setLaegdId(Integer.parseInt(ti.getText(6)));
+//		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
+
 		final int update = m.update(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();
 		return update;
@@ -423,10 +428,11 @@ public class MilRollListDialog extends Dialog {
 			return 0;
 		}
 
-		final TableItem ti = tia[0];
+		final MilrollListModel m = (MilrollListModel) tia[0].getData();
 
-		final MilrollListModel m = new MilrollListModel();
-		m.setLaegdId(Integer.parseInt(ti.getText(8)));
+		// final TableItem ti = tia[0];
+//		final MilrollListModel m = new MilrollListModel();
+//		m.setLaegdId(Integer.parseInt(ti.getText(8)));
 
 		final int slet = m.delete(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();

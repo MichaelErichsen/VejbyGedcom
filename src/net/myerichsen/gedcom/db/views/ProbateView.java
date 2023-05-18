@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 18. maj 2023
  *
  */
 public class ProbateView extends Composite {
@@ -279,19 +279,20 @@ public class ProbateView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+//		final TableItem ti = tia[0];
+//
+//		final StringBuilder sb = new StringBuilder();
+//
+//		for (int i = 0; i < 5; i++) {
+//			if (ti.getText(i).length() > 0) {
+//				sb.append(ti.getText(i) + ", ");
+//			}
+//		}
+//
+//		sb.append("\n");
 
-		final StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < 5; i++) {
-			if (ti.getText(i).length() > 0) {
-				sb.append(ti.getText(i) + ", ");
-			}
-		}
-
-		sb.append("\n");
-
-		final String string = sb.toString().replace("¤", "\n");
+		final ProbateModel m = (ProbateModel) tia[0].getData();
+		final String string = m.toString().replace("¤", "\n");
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Skifter", null, string, MessageDialog.INFORMATION,
 				new String[] { "OK", "Kopier" }, 0);

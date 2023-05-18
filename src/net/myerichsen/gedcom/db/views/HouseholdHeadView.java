@@ -42,7 +42,7 @@ import net.myerichsen.gedcom.db.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 30. apr. 2023
+ * @version 18. maj 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -341,24 +341,11 @@ public class HouseholdHeadView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
+		final HouseholdHeadModel m = (HouseholdHeadModel) tia[0].getData();
+		final String string = m.toString() + "\n";
 
-		final StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < 8; i++) {
-			if (ti.getText(i).length() > 0) {
-				if (ti.getText(i).length() > 0) {
-					sb.append(ti.getText(i).trim() + ", ");
-				}
-			}
-		}
-
-		sb.append("\n");
-
-		final String string = sb.toString();
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Begravelser", null, string,
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+		final MessageDialog dialog = new MessageDialog(getShell(), "Husbond", null, string, MessageDialog.INFORMATION,
+				new String[] { "OK", "Kopier" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {

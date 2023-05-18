@@ -35,7 +35,7 @@ import net.myerichsen.gedcom.db.populators.CensusdupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 6. maj 2023
+ * @version 18. maj 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -199,23 +199,27 @@ public class CensusDupView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final TableItem ti = tia[0];
 
-		final StringBuilder sb = new StringBuilder();
+		final CensusdupModel m = (CensusdupModel) tia[0].getData();
+//		final TableItem ti = tia[0];
+//
+//		final StringBuilder sb = new StringBuilder();
+//
+//		for (int i = 0; i < 25; i++) {
+//			if (ti.getText(i).length() > 0) {
+//				if (ti.getText(i).length() > 0) {
+//					sb.append(ti.getText(i).trim() + ", ");
+//				}
+//			}
+//		}
+//
+//		sb.append("\n");
+//
+//		final String string = sb.toString();
 
-		for (int i = 0; i < 25; i++) {
-			if (ti.getText(i).length() > 0) {
-				if (ti.getText(i).length() > 0) {
-					sb.append(ti.getText(i).trim() + ", ");
-				}
-			}
-		}
+		final String string = m.toString() + "\n";
 
-		sb.append("\n");
-
-		final String string = sb.toString();
-
-		final MessageDialog dialog = new MessageDialog(getShell(), "Begravelser", null, string,
+		final MessageDialog dialog = new MessageDialog(getShell(), "Folketællingsdubletter", null, string,
 				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
 		final int open = dialog.open();
 

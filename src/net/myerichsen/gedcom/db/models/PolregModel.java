@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a police registry event
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 18. maj 2023
  *
  */
 public class PolregModel extends ASModel {
@@ -397,13 +397,11 @@ public class PolregModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return "PolregRecord [id=" + id + ", " + (name != null ? "name=" + name + ", " : "")
-				+ (birthDate != null ? "birthDate=" + birthDate + ", " : "")
-				+ (occupation != null ? "occupation=" + occupation + ", " : "")
-				+ (street != null ? "street=" + street + ", " : "") + "number=" + number + ", "
-				+ (letter != null ? "letter=" + letter + ", " : "") + (floor != null ? "floor=" + floor + ", " : "")
-				+ (place != null ? "place=" + place + ", " : "") + (host != null ? "host=" + host + ", " : "") + "day="
-				+ day + ", month=" + month + ", year=" + year + ", "
-				+ (fullAddress != null ? "fullAddress=" + fullAddress : "") + "]";
+		return id + ", " + (name != null ? name + ", " : "") + (birthDate != null ? birthDate + ", " : "")
+				+ (occupation != null ? occupation + ", " : "") + (street != null ? street + ", " : "") + number + ", "
+				+ (letter != null ? letter + ", " : "") + (floor != null ? floor + ", " : "")
+				+ (place != null ? place + ", " : "") + (host != null ? host + ", " : "") + day + ", " + month + ", "
+				+ year + ", " + (fullAddress != null ? fullAddress : "");
 	}
+
 }
