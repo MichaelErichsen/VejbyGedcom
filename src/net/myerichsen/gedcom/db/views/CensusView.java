@@ -53,7 +53,7 @@ import net.myerichsen.gedcom.db.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 19. maj 2023
  *
  */
 
@@ -680,18 +680,12 @@ public class CensusView extends Composite {
 	private void popup() throws SQLException {
 		final TableItem[] tia = table.getSelection();
 		final CensusModel m = (CensusModel) tia[0].getData();
-
 		final StringBuilder sb = new StringBuilder(m.toString());
-//		for (int i = 0; i < 24; i++) {
-//			if (ti.getText(i).length() > 0) {
-//				sb.append(ti.getText(i) + ", ");
-//			}
-//		}
 		sb.append("\n\n");
 
 		try {
 			sb.append(getCensusHousehold(m.getKIPnr(), m.getKildestednavn(), m.getHusstands_familienr(),
-					m.getMatrikel(), m.getKildehenvisning()));
+					m.getMatr_nr_Adresse(), m.getKildehenvisning()));
 		} catch (final SQLException e) {
 			final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 			as.setErrorMessage(e.getMessage());
@@ -705,8 +699,9 @@ public class CensusView extends Composite {
 		if (open == 1) {
 			try {
 				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), m.getKIPnr(),
-						m.getKildestednavn(), m.getGade_nr(), m.getMatrikel(), m.getKildehenvisning(),
-						props.getProperty("censusSchema"));
+						m.getKildestednavn(), m.getHusstands_familienr(), m.getMatr_nr_Adresse(),
+						m.getKildehenvisning(), props.getProperty("censusSchema"));
+
 				final StringBuilder sb2 = new StringBuilder();
 
 				for (final CensusModel element : lcr) {
@@ -725,7 +720,7 @@ public class CensusView extends Composite {
 			}
 		} else if (open == 2) {
 			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), m.getKIPnr(),
-					m.getKildestednavn(), m.getHusstands_familienr(), m.getMatrikel(), m.getKildehenvisning(),
+					m.getKildestednavn(), m.getHusstands_familienr(), m.getMatr_nr_Adresse(), m.getKildehenvisning(),
 					props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);
 			final String headOfHousehold = CensusHouseholdModel.getHeadOfHousehold(props, censusModel);

@@ -108,15 +108,15 @@ public class CensusHouseholdModel extends ASModel {
 	 * @param dbPath
 	 * @param kipNr
 	 * @param kildested
-	 * @param nr
-	 * @param matr
+	 * @param husstandsFamilieNr
+	 * @param matrAddr
 	 * @param kildeHenvisning
 	 * @param schema
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CensusModel> load(String dbPath, String kipNr, String kildested, String nr, String matr,
-			String kildeHenvisning, String schema) throws SQLException {
+	public static List<CensusModel> load(String dbPath, String kipNr, String kildested, String husstandsFamilieNr,
+			String matrAddr, String kildeHenvisning, String schema) throws SQLException {
 		CensusModel ci;
 		final List<CensusModel> cil = new ArrayList<>();
 
@@ -127,21 +127,21 @@ public class CensusHouseholdModel extends ASModel {
 		statement = conn.prepareStatement(SELECT_CENSUS_HOUSEHOLD);
 		statement.setString(1, kipNr);
 		statement.setString(2, kildested);
-		statement.setString(3, nr);
-		statement.setString(4, matr);
+		statement.setString(3, husstandsFamilieNr);
+		statement.setString(4, matrAddr);
 		statement.setString(5, kildeHenvisning);
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
 			ci = new CensusModel();
-			ci.setKIPnr(rs.getString("kipNr"));
+			ci.setKIPnr(kipNr);
 			ci.setLoebenr(rs.getInt("Loebenr"));
-			ci.setKildestednavn(rs.getString("Kildestednavn"));
+			ci.setKildestednavn(kildested);
 			ci.setAmt(rs.getString("Amt"));
 			ci.setHerred(rs.getString("Herred"));
 			ci.setSogn(rs.getString("Sogn"));
-			ci.setHusstands_familienr(rs.getString("Husstands_familienr"));
-			ci.setMatr_nr_Adresse(rs.getString("Matr_nr_Adresse"));
+			ci.setHusstands_familienr(husstandsFamilieNr);
+			ci.setMatr_nr_Adresse(matrAddr);
 			ci.setKildenavn(rs.getString("Kildenavn"));
 			ci.setKoen(rs.getString("Koen"));
 			ci.setAlder(rs.getInt("Alder"));
@@ -155,7 +155,7 @@ public class CensusHouseholdModel extends ASModel {
 			ci.setMatrikel(rs.getString("Matrikel"));
 			ci.setGade_nr(rs.getString("Gade_nr"));
 			ci.setFTaar(rs.getInt("FTaar"));
-			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
+			ci.setKildehenvisning(kildeHenvisning);
 			ci.setKildekommentar(rs.getString("Kildekommentar"));
 			cil.add(ci);
 		}
