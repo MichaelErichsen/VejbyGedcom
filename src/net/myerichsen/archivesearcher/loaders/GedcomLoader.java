@@ -46,7 +46,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * @author Michael Erichsen
  * @version 29. apr. 2023
  */
-// FIXME Should use christening when it has two parents and family onlky has one
+
 public class GedcomLoader {
 	/**
 	 * Static constants and variables
@@ -625,6 +625,9 @@ public class GedcomLoader {
 	 * @throws SQLException
 	 *
 	 */
+
+//	FIXME Should use christening when it has two parents and family only has one
+
 	private void parseParents() throws SQLException {
 		StringBuilder sb;
 		String parents = "";

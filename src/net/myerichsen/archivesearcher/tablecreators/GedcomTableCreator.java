@@ -10,7 +10,7 @@ import java.util.Properties;
  * Class to create Derby tables for the program
  *
  * @author Michael Erichsen
- * @version 25. apr. 2023
+ * @version 25. maj 2023
  *
  */
 public class GedcomTableCreator {
@@ -29,7 +29,7 @@ public class GedcomTableCreator {
 			+ " FAMC CHAR(12), PHONNAME CHAR(64), BIRTHDATE DATE, "
 			+ " BIRTHPLACE VARCHAR(256), DEATHDATE DATE, DEATHPLACE VARCHAR(256), PARENTS VARCHAR(256) )";
 	private static String TABLE_PARENTS = "CREATE TABLE PARENTS ( INDIVIDUALKEY CHAR(12) NOT NULL, "
-			+ " BIRTHYEAR INT, NAME VARCHAR(128), PARENTS VARCHAR(256), "
+			+ " BIRTHYEAR INT, NAME VARCHAR(256), PARENTS VARCHAR(256), "
 			+ " FATHERPHONETIC CHAR(64), MOTHERPHONETIC CHAR(64), PLACE VARCHAR(256) )";
 	private static String TABLE_FAMILY = "CREATE TABLE FAMILY ( ID CHAR(12) PRIMARY KEY NOT NULL, HUSBAND CHAR(12), WIFE CHAR(12) )";
 	private static final String CRA = "CREATE INDEX EVENT_TYPE ON EVENT (TYPE ASC)";
@@ -56,7 +56,10 @@ public class GedcomTableCreator {
 			final Connection conn = DriverManager
 					.getConnection("jdbc:derby:" + props.getProperty("vejbyPath") + ";create=true");
 			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("vejbySchema"));
-			statement.execute();
+			try {
+				statement.execute();
+			} catch (Exception e) {
+			}
 			statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("vejbySchema"));
 			statement.execute();
