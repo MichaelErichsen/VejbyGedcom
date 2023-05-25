@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 25. maj 2023
  *
  */
 public class BurregView extends Composite {
@@ -538,23 +538,7 @@ public class BurregView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-
 		final BurregModel m = (BurregModel) tia[0].getData();
-//		final TableItem ti = tia[0];
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		for (int i = 0; i < 25; i++) {
-//			if (ti.getText(i).length() > 0) {
-//				if (ti.getText(i).length() > 0) {
-//					sb.append(ti.getText(i).trim() + ", ");
-//				}
-//			}
-//		}
-//
-//		sb.append("\n");
-//		final String string = sb.toString();
-
 		final String string = m.toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Begravelser", null, string,

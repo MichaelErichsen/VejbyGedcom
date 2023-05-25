@@ -14,7 +14,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 18, maj 2023
+ * @version 25. maj 2023
  *
  */
 public class BurregModel extends ASModel {
@@ -45,8 +45,8 @@ public class BurregModel extends ASModel {
 		statement.setString(1, phonName);
 		final ResultSet rs = statement.executeQuery();
 
-		BurregModel br;
-		final List<BurregModel> lbr = new ArrayList<>();
+		BurregModel model;
+		final List<BurregModel> list = new ArrayList<>();
 
 		String name;
 		final Fonkod fk = new Fonkod();
@@ -62,43 +62,43 @@ public class BurregModel extends ASModel {
 				System.out.println(e.getMessage() + ": " + name + ", " + phonName);
 			}
 
-			br = new BurregModel();
+			model = new BurregModel();
 
-			br.setFirstNames(rs.getString("FIRSTNAMES"));
-			br.setLastName(rs.getString("LASTNAME"));
-			br.setDateOfDeath(rs.getString("DATEOFDEATH"));
-			br.setYearOfBirth(rs.getString("YEAROFBIRTH"));
-			br.setDeathPlace(rs.getString("DEATHPLACE"));
-			br.setCivilStatus(rs.getString("CIVILSTATUS"));
-			br.setAdressOutsideCph(rs.getString("ADRESSOUTSIDECPH"));
-			br.setSex(rs.getString("SEX"));
-			br.setComment(rs.getString("COMMENT"));
-			br.setCemetary(rs.getString("CEMETARY"));
-			br.setChapel(rs.getString("CHAPEL"));
-			br.setParish(rs.getString("PARISH"));
-			br.setStreet(rs.getString("STREET"));
-			br.setHood(rs.getString("HOOD"));
-			br.setStreetNumber(rs.getString("STREET_NUMBER"));
-			br.setLetter(rs.getString("LETTER"));
-			br.setFloor(rs.getString("FLOOR"));
-			br.setInstitution(rs.getString("INSTITUTION"));
-			br.setInstitutionStreet(rs.getString("INSTITUTION_STREET"));
-			br.setInstitutionHood(rs.getString("INSTITUTION_HOOD"));
-			br.setInstitutionStreetNumber(rs.getString("INSTITUTION_STREET_NUMBER"));
-			br.setOccuptations(rs.getString("OCCUPATIONS"));
-			br.setOccupationRelationTypes(rs.getString("OCCUPATION_RELATION_TYPES"));
-			br.setDeathCauses(rs.getString("DEATHCAUSES"));
-			br.setDeathCausesDanish(rs.getString("DEATHCAUSES_DANISH"));
+			model.setFirstNames(rs.getString("FIRSTNAMES"));
+			model.setLastName(rs.getString("LASTNAME"));
+			model.setDateOfDeath(rs.getString("DATEOFDEATH"));
+			model.setYearOfBirth(rs.getString("YEAROFBIRTH"));
+			model.setDeathPlace(rs.getString("DEATHPLACE"));
+			model.setCivilStatus(rs.getString("CIVILSTATUS"));
+			model.setAdressOutsideCph(rs.getString("ADRESSOUTSIDECPH"));
+			model.setSex(rs.getString("SEX"));
+			model.setComment(rs.getString("COMMENT"));
+			model.setCemetary(rs.getString("CEMETARY"));
+			model.setChapel(rs.getString("CHAPEL"));
+			model.setParish(rs.getString("PARISH"));
+			model.setStreet(rs.getString("STREET"));
+			model.setHood(rs.getString("HOOD"));
+			model.setStreetNumber(rs.getString("STREET_NUMBER"));
+			model.setLetter(rs.getString("LETTER"));
+			model.setFloor(rs.getString("FLOOR"));
+			model.setInstitution(rs.getString("INSTITUTION"));
+			model.setInstitutionStreet(rs.getString("INSTITUTION_STREET"));
+			model.setInstitutionHood(rs.getString("INSTITUTION_HOOD"));
+			model.setInstitutionStreetNumber(rs.getString("INSTITUTION_STREET_NUMBER"));
+			model.setOccuptations(rs.getString("OCCUPATIONS"));
+			model.setOccupationRelationTypes(rs.getString("OCCUPATION_RELATION_TYPES"));
+			model.setDeathCauses(rs.getString("DEATHCAUSES"));
+			model.setDeathCausesDanish(rs.getString("DEATHCAUSES_DANISH"));
 
-			lbr.add(br);
+			list.add(model);
 		}
 
 		statement.close();
 
-		final BurregModel[] bra = new BurregModel[lbr.size()];
+		final BurregModel[] bra = new BurregModel[list.size()];
 
-		for (int i = 0; i < lbr.size(); i++) {
-			bra[i] = lbr.get(i);
+		for (int i = 0; i < list.size(); i++) {
+			bra[i] = list.get(i);
 		}
 
 		return bra;
