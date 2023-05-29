@@ -213,12 +213,14 @@ public class LastEventView extends Composite {
 					final LastEventModel[] array = (LastEventModel[]) listener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Sidste hændelser i " + location + " er hentet"));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage("Sidste hændelser i " + location + " er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage(e.getMessage()));
 				}
 			}
 		});

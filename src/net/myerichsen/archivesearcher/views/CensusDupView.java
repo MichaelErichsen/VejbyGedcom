@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusdupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 26. maj 2023
+ * @version 29. maj 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -183,11 +183,13 @@ public class CensusDupView extends Composite {
 					final CensusdupModel[] censusdupRecords = (CensusdupModel[]) listener.load(loadArgs);
 
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Folketællingsdubletter er hentet"));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage("Folketællingsdubletter er hentet"));
 				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage(e.getMessage()));
 				}
 			}
 		});

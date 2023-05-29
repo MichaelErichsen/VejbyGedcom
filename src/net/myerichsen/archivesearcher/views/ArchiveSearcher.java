@@ -176,39 +176,33 @@ public class ArchiveSearcher extends Shell {
 		householdHeadView.setProperties(props);
 		tbtmHusbond.setControl(householdHeadView);
 
-//		final TabItem tbtmLastEvent = new TabItem(tabFolder, SWT.NONE);
-//		tbtmLastEvent.setText("Sidste h&ændelse");
-//		lastEventView = new LastEventView(tabFolder, SWT.NONE);
-//		tbtmLastEvent.setControl(lastEventView);
-//		lastEventView.setProperties(props);
-
 		TabItem tbtmKrydsreferencer = new TabItem(tabFolder, SWT.NONE);
-		tbtmKrydsreferencer.setText("Krydsreferencer");
+		tbtmKrydsreferencer.setText("Kr&ydsreferencer");
 
-		TabFolder tabFolder_1 = new TabFolder(tabFolder, SWT.NONE);
-		tbtmKrydsreferencer.setControl(tabFolder_1);
+		TabFolder tabFolderXref = new TabFolder(tabFolder, SWT.NONE);
+		tbtmKrydsreferencer.setControl(tabFolderXref);
 
-		final TabItem tbtmEfterkommere = new TabItem(tabFolder_1, SWT.NONE);
+		final TabItem tbtmEfterkommere = new TabItem(tabFolderXref, SWT.NONE);
 		tbtmEfterkommere.setText("&Efterkommere");
-		descendantCounterView = new DescendantCounterView(tabFolder_1, SWT.NONE);
+		descendantCounterView = new DescendantCounterView(tabFolderXref, SWT.NONE);
 		tbtmEfterkommere.setControl(descendantCounterView);
 		descendantCounterView.setProperties(props);
 
-		final TabItem tbtmFtDubletter = new TabItem(tabFolder_1, SWT.NONE);
+		final TabItem tbtmFtDubletter = new TabItem(tabFolderXref, SWT.NONE);
 		tbtmFtDubletter.setText("Ft. &dubletter");
-		censusDupView = new CensusDupView(tabFolder_1, SWT.NONE);
+		censusDupView = new CensusDupView(tabFolderXref, SWT.NONE);
 		tbtmFtDubletter.setControl(censusDupView);
 		censusDupView.setProperties(props);
 
-		final TabItem tbtmLgdsruller = new TabItem(tabFolder_1, SWT.NONE);
+		final TabItem tbtmLgdsruller = new TabItem(tabFolderXref, SWT.NONE);
 		tbtmLgdsruller.setText("&L\u00E6gdsruller");
-		milrollEntryView = new MilRollEntryView(tabFolder_1, SWT.NONE);
+		milrollEntryView = new MilRollEntryView(tabFolderXref, SWT.NONE);
 		tbtmLgdsruller.setControl(milrollEntryView);
 		milrollEntryView.setProperties(props);
 
-		final TabItem tbtmLastEvent = new TabItem(tabFolder_1, SWT.NONE);
+		final TabItem tbtmLastEvent = new TabItem(tabFolderXref, SWT.NONE);
 		tbtmLastEvent.setText("Sidste h&ændelse");
-		lastEventView = new LastEventView(tabFolder_1, SWT.NONE);
+		lastEventView = new LastEventView(tabFolderXref, SWT.NONE);
 		tbtmLastEvent.setControl(lastEventView);
 		lastEventView.setProperties(props);
 

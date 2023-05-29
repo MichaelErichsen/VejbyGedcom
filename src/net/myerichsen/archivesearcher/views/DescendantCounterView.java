@@ -28,7 +28,7 @@ import net.myerichsen.archivesearcher.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 29. maj 2023
  *
  */
 public class DescendantCounterView extends Composite {
@@ -152,11 +152,13 @@ public class DescendantCounterView extends Composite {
 
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(descendantRecords));
 
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Efterkommere er hentet"));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage("Efterkommere er hentet"));
 				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage(e.getMessage()));
 				}
 			}
 		});

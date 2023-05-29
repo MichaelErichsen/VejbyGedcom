@@ -49,7 +49,7 @@ import net.myerichsen.archivesearcher.populators.MilrollPopulator;
  * Military roll entry view
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 29. maj 2023
  *
  */
 
@@ -528,12 +528,14 @@ public class MilRollEntryView extends Composite {
 
 					Display.getDefault().asyncExec(() -> tableViewer.setInput(MilrollRecords));
 
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Lægdsruller er hentet"));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage("Lægdsruller er hentet"));
 				} catch (final Exception e) {
 					e.printStackTrace();
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+					Display.getDefault()
+							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+									.setMessage(e.getMessage()));
 				}
 			}
 		});

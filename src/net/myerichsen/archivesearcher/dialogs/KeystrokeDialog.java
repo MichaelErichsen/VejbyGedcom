@@ -14,7 +14,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Michael Erichsen
- * @version 27. maj 2023
+ * @version 29. maj 2023
  *
  */
 public class KeystrokeDialog extends Dialog {
@@ -152,6 +152,10 @@ public class KeystrokeDialog extends Dialog {
 		final Label lblT = new Label(container, SWT.NONE);
 		lblT.setText("Alt+T Politiets registerblade faneblad");
 
+		new Label(container, SWT.NONE);
+
+		Label lblAltyKruydsreferencerFanebladsfolder = new Label(container, SWT.NONE);
+		lblAltyKruydsreferencerFanebladsfolder.setText("Alt+Y Kruydsreferencer fanebladsfolder");
 		new Label(container, SWT.NONE);
 
 		Label lblAltHndelserFaneblad = new Label(container, SWT.NONE);
