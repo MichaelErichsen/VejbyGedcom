@@ -15,7 +15,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 29. maj 2023
  *
  */
 public class IndividualModel extends ASModel {
@@ -125,6 +125,66 @@ public class IndividualModel extends ASModel {
 		}
 
 		return "";
+	}
+
+	/**
+	 * Find individual from its id
+	 *
+	 * @param conn
+	 * @param id
+	 * @return
+	 * @throws SQLException
+	 */
+	public static IndividualModel getIndividualFromId(Connection conn, String schema, String id) throws SQLException {
+		IndividualModel model = new IndividualModel();
+		String givenName = "";
+		String surName = "";
+
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
+		statement.setString(1, id);
+		ResultSet rs = statement.executeQuery();
+
+		if (rs.next()) {
+			model.setId(id);
+
+			if (rs.getString("GIVENNAME") != null) {
+				givenName = rs.getString("GIVENNAME").trim();
+			}
+			if (rs.getString("SURNAME") != null) {
+				surName = rs.getString("SURNAME");
+			}
+			model.setName((givenName + " " + surName).trim());
+
+			if (rs.getString("SEX") != null) {
+				model.setSex(rs.getString("SEX"));
+			}
+			if (rs.getString("FAMC") != null) {
+				model.setFamc(rs.getString("FAMC"));
+			}
+			if (rs.getString("PHONNAME") != null) {
+				model.setPhonName(rs.getString("PHONNAME"));
+			}
+
+			final PreparedStatement statement2 = conn.prepareStatement(SELECT_BIRTH_EVENT);
+			statement2.setString(1, id);
+			rs = statement2.executeQuery();
+
+			if (rs.next()) {
+				if (rs.getDate("DATE") != null) {
+					model.setBirthDate(rs.getDate("DATE"));
+				}
+
+				if (rs.getString("PLACE") != null) {
+					model.setBirthPlace(rs.getString("PLACE"));
+				}
+			}
+
+		}
+
+		return model;
 	}
 
 	/**

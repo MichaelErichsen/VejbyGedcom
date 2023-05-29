@@ -58,7 +58,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 8. maj 2023
+ * @version 27. maj 2023
  *
  */
 
@@ -110,6 +110,7 @@ public class ArchiveSearcher extends Shell {
 	private final HouseholdHeadView householdHeadView;
 	private final CensusDupView censusDupView;
 	private final MilRollEntryView milrollEntryView;
+	private final LastEventView lastEventView;
 
 	/**
 	 * Create the shell.
@@ -192,6 +193,12 @@ public class ArchiveSearcher extends Shell {
 		milrollEntryView = new MilRollEntryView(tabFolder, SWT.NONE);
 		milrollEntryView.setProperties(props);
 		tbtmLgdsruller.setControl(milrollEntryView);
+
+		final TabItem tbtmLastEvent = new TabItem(tabFolder, SWT.NONE);
+		tbtmLastEvent.setText("Sidste h&ændelse");
+		lastEventView = new LastEventView(tabFolder, SWT.NONE);
+		lastEventView.setProperties(props);
+		tbtmLastEvent.setControl(lastEventView);
 
 		messageComboBox = new Combo(this, SWT.READ_ONLY);
 		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

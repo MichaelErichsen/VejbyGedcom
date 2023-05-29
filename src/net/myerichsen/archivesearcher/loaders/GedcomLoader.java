@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM and load data into a Derby database
  *
  * @author Michael Erichsen
- * @version 29. apr. 2023
+ * @version 29. maj 2023
  */
 
 public class GedcomLoader {
@@ -114,6 +114,223 @@ public class GedcomLoader {
 	private String sted;
 
 	/**
+	 * @throws SQLException
+	 *
+	 */
+	private void addChildBirthEvents(Connection conn, String schema) throws SQLException {
+		Family family;
+
+		final Map<String, Family> families = gedcom.getFamilies();
+
+		for (final Entry<String, Family> familyNode : families.entrySet()) {
+			family = familyNode.getValue();
+
+			final List<IndividualReference> children = family.getChildren();
+
+			if (children == null) {
+				continue;
+			}
+
+			for (final IndividualReference individualReference : children) {
+				if (family.getHusband() != null) {
+					final String xref = individualReference.getIndividual().getXref();
+					final IndividualModel model = IndividualModel.getIndividualFromId(conn, schema, xref);
+
+					psINSERT_INDIVIDUAL_EVENT.setString(1, "Child");
+					psINSERT_INDIVIDUAL_EVENT.setString(2, "Birth");
+					psINSERT_INDIVIDUAL_EVENT.setDate(3, model.getBirthDate());
+					psINSERT_INDIVIDUAL_EVENT.setString(4, family.getHusband().getIndividual().getXref());
+					psINSERT_INDIVIDUAL_EVENT.setString(5, model.getFamc());
+					psINSERT_INDIVIDUAL_EVENT.setString(6, model.getBirthPlace());
+					psINSERT_INDIVIDUAL_EVENT.setString(7, "");
+					psINSERT_INDIVIDUAL_EVENT.setString(8, model.getName());
+					psINSERT_INDIVIDUAL_EVENT.executeUpdate();
+				}
+
+				if (family.getWife() != null) {
+					final String xref = individualReference.getIndividual().getXref();
+					final IndividualModel model = IndividualModel.getIndividualFromId(conn, schema, xref);
+
+					psINSERT_INDIVIDUAL_EVENT.setString(1, "Child");
+					psINSERT_INDIVIDUAL_EVENT.setString(2, "Birth");
+					psINSERT_INDIVIDUAL_EVENT.setDate(3, model.getBirthDate());
+					psINSERT_INDIVIDUAL_EVENT.setString(4, family.getWife().getIndividual().getXref());
+					psINSERT_INDIVIDUAL_EVENT.setString(5, model.getFamc());
+					psINSERT_INDIVIDUAL_EVENT.setString(6, model.getBirthPlace());
+					psINSERT_INDIVIDUAL_EVENT.setString(7, "");
+					psINSERT_INDIVIDUAL_EVENT.setString(8, model.getName());
+					psINSERT_INDIVIDUAL_EVENT.executeUpdate();
+				}
+
+			}
+		}
+	}
+
+	/**
+	 * @throws SQLException
+	 *
+	 */
+	private void addSharedCensusEvents() throws SQLException {
+		// TODO Eliminate duplicates, e.g. 9212 Year 1890
+		Family family;
+		String string;
+
+		final Map<String, Family> families = gedcom.getFamilies();
+
+		for (final Entry<String, Family> familyNode : families.entrySet()) {
+			family = familyNode.getValue();
+
+			final List<FamilyEvent> events = family.getEvents();
+
+			if (events == null) {
+				continue;
+			}
+
+			for (final FamilyEvent familyEvent : events) {
+				final String type = familyEvent.getType().getDisplay();
+
+				if (!type.equals("Census")) {
+					continue;
+				}
+
+				for (final FamilyEvent familyEvent2 : events) {
+					if (!familyEvent2.getType().getDisplay().equals("Census") || familyEvent2.getPlace() == null) {
+						continue;
+					}
+
+					final String place = familyEvent2.getPlace().getPlaceName();
+					final List<CustomFact> customFacts2 = familyEvent2.getCustomFacts();
+
+					for (final CustomFact cf3 : customFacts2) {
+						if (cf3.getTag().equals("_SHAR")) {
+							psINSERT_INDIVIDUAL_EVENT.setString(1, "Census");
+							psINSERT_INDIVIDUAL_EVENT.setString(2, "Witness");
+							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(familyEvent2.getDate()));
+							psINSERT_INDIVIDUAL_EVENT.setString(4, cf3.getDescription().getValue());
+							psINSERT_INDIVIDUAL_EVENT.setString(5, familyNode.getKey());
+							psINSERT_INDIVIDUAL_EVENT.setString(6, place);
+							psINSERT_INDIVIDUAL_EVENT.setString(7, "");
+
+							final List<AbstractCitation> citations = familyEvent2.getCitations();
+							if (citations == null) {
+								psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+							} else {
+								final CitationWithSource cfs = (CitationWithSource) citations.get(0);
+								final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
+
+								if (whereInSource == null) {
+									psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+								} else {
+									final List<CustomFact> customFacts1 = whereInSource.getCustomFacts();
+
+									if (customFacts1 == null) {
+										if (whereInSource.getValue() != null) {
+											psINSERT_INDIVIDUAL_EVENT.setString(8, whereInSource.getValue());
+										} else {
+											psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+										}
+									} else {
+										final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
+
+										for (final CustomFact customFact : customFacts1) {
+											sb2.append(customFact.getDescription().getValue());
+										}
+
+										string = sb2.toString().replace("'", "¤");
+										string = string.length() > 256 ? string.substring(0, 255) : string;
+										string = string + "', '";
+										psINSERT_INDIVIDUAL_EVENT.setString(8, string);
+									}
+								}
+							}
+
+							psINSERT_INDIVIDUAL_EVENT.executeUpdate();
+						}
+					}
+				}
+			}
+		}
+
+		Individual individual;
+
+		final Map<String, Individual> individuals = gedcom.getIndividuals();
+
+		for (final Entry<String, Individual> individualNode : individuals.entrySet()) {
+			individual = individualNode.getValue();
+
+			final List<IndividualEvent> individualEvents = individual.getEvents();
+
+			if (individualEvents == null) {
+				continue;
+			}
+
+			for (final IndividualEvent individualEvent : individualEvents) {
+				final String type = individualEvent.getType().getDisplay();
+
+				if (!type.equals("Census")) {
+					continue;
+				}
+
+				for (final IndividualEvent individualEvent2 : individualEvents) {
+					if (!individualEvent2.getType().getDisplay().equals("Census")) {
+						continue;
+					}
+
+					final String place = individualEvent2.getPlace().getPlaceName();
+					final List<CustomFact> customFacts2 = individualEvent2.getCustomFacts();
+
+					for (final CustomFact cf3 : customFacts2) {
+						if (cf3.getTag().equals("_SHAR")) {
+							psINSERT_INDIVIDUAL_EVENT.setString(1, "Census");
+							psINSERT_INDIVIDUAL_EVENT.setString(2, "Witness");
+							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(individualEvent2.getDate()));
+							psINSERT_INDIVIDUAL_EVENT.setString(4, cf3.getDescription().getValue());
+							psINSERT_INDIVIDUAL_EVENT.setString(5, individualNode.getKey());
+							psINSERT_INDIVIDUAL_EVENT.setString(6, place);
+							psINSERT_INDIVIDUAL_EVENT.setString(7, "");
+
+							final List<AbstractCitation> citations = individualEvent2.getCitations();
+							if (citations == null) {
+								psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+							} else {
+								final CitationWithSource cfs = (CitationWithSource) citations.get(0);
+								final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
+
+								if (whereInSource == null) {
+									psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+								} else {
+									final List<CustomFact> customFacts1 = whereInSource.getCustomFacts();
+
+									if (customFacts1 == null) {
+										if (whereInSource.getValue() != null) {
+											psINSERT_INDIVIDUAL_EVENT.setString(8, whereInSource.getValue());
+										} else {
+											psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+										}
+									} else {
+										final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
+
+										for (final CustomFact customFact : customFacts1) {
+											sb2.append(customFact.getDescription().getValue());
+										}
+
+										string = sb2.toString().replace("'", "¤");
+										string = string.length() > 256 ? string.substring(0, 255) : string;
+										string = string + "', '";
+										psINSERT_INDIVIDUAL_EVENT.setString(8, string);
+									}
+								}
+							}
+
+							psINSERT_INDIVIDUAL_EVENT.executeUpdate();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Delete all rows from all tables
 	 *
 	 * @param conn
@@ -143,9 +360,10 @@ public class GedcomLoader {
 	 */
 	private void execute(String[] args, ArchiveSearcher as) throws Exception {
 		final String dbURL = "jdbc:derby:" + args[1];
+		final String schema = args[2];
 		final Connection conn = DriverManager.getConnection(dbURL);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, args[2]);
+		statement.setString(1, schema);
 		statement.execute();
 
 		prepareStatements(conn);
@@ -167,6 +385,12 @@ public class GedcomLoader {
 
 		parseParents();
 		Display.getDefault().asyncExec(() -> as.setMessage("Forældre er analyseret"));
+
+		addSharedCensusEvents();
+		Display.getDefault().asyncExec(() -> as.setMessage("Yderligere folketællingshændelser er indsat"));
+
+		addChildBirthEvents(conn, schema);
+		Display.getDefault().asyncExec(() -> as.setMessage("Barnefødselshændelser er indsat"));
 
 		conn.close();
 
@@ -626,7 +850,7 @@ public class GedcomLoader {
 	 *
 	 */
 
-//	FIXME Should use christening when it has two parents and family only has one
+//	FIXME Should use christening data when it has two parents and family only has one
 
 	private void parseParents() throws SQLException {
 		StringBuilder sb;

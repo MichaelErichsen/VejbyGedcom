@@ -43,7 +43,7 @@ import net.myerichsen.archivesearcher.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 26. maj 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -144,8 +144,8 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel pr = (SiblingsModel) element;
-				return pr.getIndividualKey();
+				final SiblingsModel model = (SiblingsModel) element;
+				return model.getIndividualKey();
 			}
 		});
 
@@ -157,8 +157,8 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel pr = (SiblingsModel) element;
-				return pr.getBirthYear() + "";
+				final SiblingsModel model = (SiblingsModel) element;
+				return model.getBirthYear() + "";
 			}
 		});
 
@@ -170,8 +170,8 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel pr = (SiblingsModel) element;
-				return pr.getName();
+				final SiblingsModel model = (SiblingsModel) element;
+				return model.getName();
 			}
 		});
 
@@ -183,8 +183,8 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel pr = (SiblingsModel) element;
-				return pr.getParents();
+				final SiblingsModel model = (SiblingsModel) element;
+				return model.getParents();
 			}
 		});
 
@@ -196,8 +196,8 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel pr = (SiblingsModel) element;
-				return pr.getPlace();
+				final SiblingsModel model = (SiblingsModel) element;
+				return model.getPlace();
 			}
 		});
 
@@ -294,22 +294,6 @@ public class SiblingsView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-//		final TableItem ti = tia[0];
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		for (int i = 0; i < 25; i++) {
-//			if (ti.getText(i).length() > 0) {
-//				if (ti.getText(i).length() > 0) {
-//					sb.append(ti.getText(i).trim() + ", ");
-//				}
-//			}
-//		}
-//
-//		sb.append("\n");
-//
-//		final String string = sb.toString();
-
 		final SiblingsModel m = (SiblingsModel) tia[0].getData();
 		final String string = m.toString() + "\n";
 

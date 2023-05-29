@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusdupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 26. maj 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -199,24 +199,7 @@ public class CensusDupView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-
 		final CensusdupModel m = (CensusdupModel) tia[0].getData();
-//		final TableItem ti = tia[0];
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		for (int i = 0; i < 25; i++) {
-//			if (ti.getText(i).length() > 0) {
-//				if (ti.getText(i).length() > 0) {
-//					sb.append(ti.getText(i).trim() + ", ");
-//				}
-//			}
-//		}
-//
-//		sb.append("\n");
-//
-//		final String string = sb.toString();
-
 		final String string = m.toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketællingsdubletter", null, string,
