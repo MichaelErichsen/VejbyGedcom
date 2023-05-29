@@ -574,9 +574,9 @@ public class MilRollEntryView extends Composite {
 		case 2: {
 			final String id = m.getGedcomId();
 			if (id.length() > 0 && id.startsWith("@I")) {
-				final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
-				grandParent.getSearchId().setText(id);
-				grandParent.searchById(null);
+				final ArchiveSearcher greatGrandParent = (ArchiveSearcher) getParent().getParent().getParent();
+				greatGrandParent.getSearchId().setText(id);
+				greatGrandParent.searchById(null);
 			}
 			break;
 		}

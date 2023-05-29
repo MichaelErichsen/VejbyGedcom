@@ -241,9 +241,9 @@ public class LastEventView extends Composite {
 
 		if (open == 1) {
 			final String siblingsId = m.getIndividualId();
-			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
-			grandParent.getSearchId().setText(siblingsId);
-			grandParent.searchById(null);
+			final ArchiveSearcher greatGrandParent = (ArchiveSearcher) getParent().getParent().getParent();
+			greatGrandParent.getSearchId().setText(siblingsId);
+			greatGrandParent.searchById(null);
 		}
 	}
 
