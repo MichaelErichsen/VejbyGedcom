@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM and load data into a Derby database
  *
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 31. maj 2023
  */
 
 public class GedcomLoader {
@@ -171,7 +171,6 @@ public class GedcomLoader {
 	 *
 	 */
 	private void addSharedCensusEvents() throws SQLException {
-		// TODO Eliminate duplicates, e.g. 9212 Year 1890
 		Family family;
 		String string;
 
@@ -850,7 +849,7 @@ public class GedcomLoader {
 	 *
 	 */
 
-//	FIXME Should use christening data when it has two parents and family only has one
+//	FIXME Should use christening data when it has two parents and family only has one e.g. 8673
 
 	private void parseParents() throws SQLException {
 		StringBuilder sb;

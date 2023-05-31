@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 1. jun. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -260,9 +260,9 @@ public class ProbateView extends Composite {
 				try {
 					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
 							props.getProperty("probatePath"), phonName, birthDate, deathDate };
-					final ProbateModel[] probateRecords = (ProbateModel[]) listener.load(loadArgs);
+					final ProbateModel[] modelArray = (ProbateModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(probateRecords));
+					Display.getDefault().asyncExec(() -> tableViewer.setInput(modelArray));
 					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 							.setMessage("Skifter er hentet"));
 				} catch (final Exception e) {

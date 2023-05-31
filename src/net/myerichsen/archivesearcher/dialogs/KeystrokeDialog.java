@@ -154,11 +154,11 @@ public class KeystrokeDialog extends Dialog {
 
 		new Label(container, SWT.NONE);
 
-		Label lblAltyKruydsreferencerFanebladsfolder = new Label(container, SWT.NONE);
+		final Label lblAltyKruydsreferencerFanebladsfolder = new Label(container, SWT.NONE);
 		lblAltyKruydsreferencerFanebladsfolder.setText("Alt+Y Kruydsreferencer fanebladsfolder");
 		new Label(container, SWT.NONE);
 
-		Label lblAltHndelserFaneblad = new Label(container, SWT.NONE);
+		final Label lblAltHndelserFaneblad = new Label(container, SWT.NONE);
 		lblAltHndelserFaneblad.setText("Alt+\u00C6 Sidste h\u00E6ndelser faneblad");
 		new Label(container, SWT.NONE);
 

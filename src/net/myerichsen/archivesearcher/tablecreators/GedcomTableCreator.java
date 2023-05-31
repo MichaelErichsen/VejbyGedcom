@@ -58,7 +58,7 @@ public class GedcomTableCreator {
 			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("vejbySchema"));
 			try {
 				statement.execute();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 			statement = conn.prepareStatement(SET_SCHEMA);
 			statement.setString(1, props.getProperty("vejbySchema"));

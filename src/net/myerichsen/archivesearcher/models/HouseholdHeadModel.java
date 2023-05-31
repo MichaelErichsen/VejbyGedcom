@@ -7,9 +7,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.myerichsen.archivesearcher.comparators.HouseholdHeadSetComparator;
 
 /**
  * Class representing a HouseholdHead relocation or census event or military
@@ -320,21 +325,26 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 */
 	public static HouseholdHeadModel[] load(String vejbyDbPath, String vejbySchema, String censusDbPath,
 			String censusSchema, String milrollPath, String milrollSchema, String headId) throws Exception {
-		final List<HouseholdHeadModel> lhhm = getRelocationEvents(vejbySchema, vejbyDbPath, headId);
+		final List<HouseholdHeadModel> list = getRelocationEvents(vejbySchema, vejbyDbPath, headId);
 		final List<HouseholdHeadModel> lhhm1 = getCensusEvents(vejbySchema, vejbyDbPath, censusSchema, censusDbPath,
 				headId);
 		final List<HouseholdHeadModel> lhhm2 = getMilRollEvents(milrollPath, milrollSchema, headId);
 
-		lhhm.addAll(lhhm1);
-		lhhm.addAll(lhhm2);
+		list.addAll(lhhm1);
+		list.addAll(lhhm2);
 
-		final HouseholdHeadModel[] hhma = new HouseholdHeadModel[lhhm.size()];
+		final SortedSet<HouseholdHeadModel> set = new TreeSet<>(new HouseholdHeadSetComparator());
+		set.addAll(list);
 
-		for (int i = 0; i < lhhm.size(); i++) {
-			hhma[i] = lhhm.get(i);
+		final HouseholdHeadModel[] array = new HouseholdHeadModel[set.size()];
+		int i = 0;
+
+		for (final Iterator<HouseholdHeadModel> iterator = set.iterator(); iterator.hasNext();) {
+			array[i++] = iterator.next();
+
 		}
 
-		return hhma;
+		return array;
 	}
 
 	private String headId = "";

@@ -7,14 +7,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import net.myerichsen.archivesearcher.comparators.LastEventComparator;
 
 /**
  * Class representing the last event for a person in a location
  *
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 31. maj 2023
  *
  */
 public class LastEventModel extends ASModel {
@@ -98,22 +103,42 @@ public class LastEventModel extends ASModel {
 			}
 		}
 
-		list.sort(Comparator.comparing(LastEventModel::getDate));
-		final LastEventModel[] array = new LastEventModel[list.size()];
+		final SortedSet<LastEventModel> set = new TreeSet<>(new LastEventComparator());
+		set.addAll(list);
 
-		for (int i = 0; i < list.size(); i++) {
-			array[i] = list.get(i);
+		final LastEventModel[] array = new LastEventModel[set.size()];
+		int i = 0;
+
+		for (final Iterator<LastEventModel> iterator = set.iterator(); iterator.hasNext();) {
+			array[i] = iterator.next();
+			i++;
 		}
 
 		return array;
 	}
 
 	private String individualId = "";
+
 	private String name;
+
 	private Date date = null;
 	private String type = "";
 	private String subType = "";
 	private String sourceDetail = "";
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final LastEventModel other = (LastEventModel) obj;
+		return Objects.equals(date, other.date) && Objects.equals(individualId, other.individualId)
+				&& Objects.equals(name, other.name) && Objects.equals(sourceDetail, other.sourceDetail)
+				&& Objects.equals(subType, other.subType) && Objects.equals(type, other.type);
+	}
 
 	/**
 	 * @return the date
@@ -155,6 +180,11 @@ public class LastEventModel extends ASModel {
 	 */
 	public String getType() {
 		return type;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(date, individualId, name, sourceDetail, subType, type);
 	}
 
 	/**

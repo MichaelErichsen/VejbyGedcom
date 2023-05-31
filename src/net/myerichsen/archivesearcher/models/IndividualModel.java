@@ -105,29 +105,6 @@ public class IndividualModel extends ASModel {
 	}
 
 	/**
-	 * Find name of individual from its id
-	 *
-	 * @param conn
-	 * @param id
-	 * @return
-	 * @throws SQLException
-	 */
-	private static String getNameFromId(Connection conn, String id, String schema) throws SQLException {
-		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
-		statement.setString(1, schema);
-		statement.execute();
-		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
-		statement.setString(1, id);
-		final ResultSet rs = statement.executeQuery();
-
-		if (rs.next()) {
-			return (rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME")).trim();
-		}
-
-		return "";
-	}
-
-	/**
 	 * Find individual from its id
 	 *
 	 * @param conn
@@ -136,7 +113,7 @@ public class IndividualModel extends ASModel {
 	 * @throws SQLException
 	 */
 	public static IndividualModel getIndividualFromId(Connection conn, String schema, String id) throws SQLException {
-		IndividualModel model = new IndividualModel();
+		final IndividualModel model = new IndividualModel();
 		String givenName = "";
 		String surName = "";
 
@@ -185,6 +162,29 @@ public class IndividualModel extends ASModel {
 		}
 
 		return model;
+	}
+
+	/**
+	 * Find name of individual from its id
+	 *
+	 * @param conn
+	 * @param id
+	 * @return
+	 * @throws SQLException
+	 */
+	private static String getNameFromId(Connection conn, String id, String schema) throws SQLException {
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+		statement = conn.prepareStatement(SELECT_INDIVIDUAL_FROM_ID);
+		statement.setString(1, id);
+		final ResultSet rs = statement.executeQuery();
+
+		if (rs.next()) {
+			return (rs.getString("GIVENNAME").trim() + " " + rs.getString("SURNAME")).trim();
+		}
+
+		return "";
 	}
 
 	/**

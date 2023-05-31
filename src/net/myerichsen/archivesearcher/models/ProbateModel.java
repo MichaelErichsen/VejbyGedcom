@@ -6,15 +6,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.myerichsen.archivesearcher.comparators.ProbateComparator;
 
 /**
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 1. jun. 2023
  *
  */
 public class ProbateModel extends ASModel {
@@ -88,17 +93,21 @@ public class ProbateModel extends ASModel {
 
 		statement.close();
 
-		final ProbateModel[] pra = new ProbateModel[lp.size()];
+		final SortedSet<ProbateModel> set = new TreeSet<>(new ProbateComparator());
+		set.addAll(lp);
 
-		for (int i = 0; i < lp.size(); i++) {
-			pra[i] = lp.get(i);
+		final ProbateModel[] array = new ProbateModel[set.size()];
+		int i = 0;
+
+		for (final Iterator<ProbateModel> iterator = set.iterator(); iterator.hasNext();) {
+			array[i] = iterator.next();
+			i++;
 		}
 
-		return pra;
+		return array;
 	}
 
 	private String name = "";
-
 	private String fromDate = "";
 	private String toDate = "";
 	private String place = "";

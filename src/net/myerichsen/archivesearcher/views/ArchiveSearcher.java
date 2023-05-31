@@ -176,10 +176,10 @@ public class ArchiveSearcher extends Shell {
 		householdHeadView.setProperties(props);
 		tbtmHusbond.setControl(householdHeadView);
 
-		TabItem tbtmKrydsreferencer = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmKrydsreferencer = new TabItem(tabFolder, SWT.NONE);
 		tbtmKrydsreferencer.setText("Kr&ydsreferencer");
 
-		TabFolder tabFolderXref = new TabFolder(tabFolder, SWT.NONE);
+		final TabFolder tabFolderXref = new TabFolder(tabFolder, SWT.NONE);
 		tbtmKrydsreferencer.setControl(tabFolderXref);
 
 		final TabItem tbtmEfterkommere = new TabItem(tabFolderXref, SWT.NONE);
@@ -280,6 +280,8 @@ public class ArchiveSearcher extends Shell {
 	protected void createContents() {
 		setText("Arkivsøgning");
 		setSize(1037, 625);
+//		Image icon = new Image(getDisplay(), "icons/ArchiveSearcher.png");
+//		setImage(icon);
 	}
 
 	/**
