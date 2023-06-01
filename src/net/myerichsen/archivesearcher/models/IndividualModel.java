@@ -15,7 +15,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing the individual data
  *
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 1. jun. 2023
  *
  */
 public class IndividualModel extends ASModel {
@@ -203,6 +203,8 @@ public class IndividualModel extends ASModel {
 		String wifeId = "";
 		String husbandName = "";
 		String wifeName = "";
+		boolean husb = false;
+		boolean wife = false;
 
 		// Read all individuals into a list
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -272,6 +274,8 @@ public class IndividualModel extends ASModel {
 
 		// Add parents
 		for (final IndividualModel dbi : ldbi) {
+			husb = false;
+			wife = false;
 			// Try to find from FAMC record
 			final PreparedStatement statement4 = conn.prepareStatement(SELECT_PARENTS);
 			statement4.setString(1, dbi.getFamc());
@@ -284,14 +288,18 @@ public class IndividualModel extends ASModel {
 
 				if (husbandId != null) {
 					husbandName = getNameFromId(conn, husbandId, schema);
+					husb = true;
 				}
 
 				if (wifeId != null) {
 					wifeName = getNameFromId(conn, wifeId, schema);
+					wife = true;
 				}
 
 				dbi.setParents(husbandName + " og " + wifeName);
-			} else {
+			}
+
+			if (!husb || !wife) {
 				// Find names from christening event source detail
 				dbi.setParents(findParentsFromChristeningEvent(conn, dbi.getId(), schema));
 			}

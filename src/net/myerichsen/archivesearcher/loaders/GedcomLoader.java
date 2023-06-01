@@ -849,12 +849,12 @@ public class GedcomLoader {
 	 *
 	 */
 
-//	FIXME Should use christening data when it has two parents and family only has one e.g. 8673
-
 	private void parseParents() throws SQLException {
 		StringBuilder sb;
 		String parents = "";
 		IndividualEvent christening;
+		boolean husb = false;
+		boolean wife = false;
 
 		// For each individual
 		final Map<String, Individual> individuals = gedcom.getIndividuals();
@@ -867,6 +867,8 @@ public class GedcomLoader {
 			final Individual individual = individualMapEntry.getValue();
 
 			sb = new StringBuilder();
+			husb = false;
+			wife = false;
 
 			// Get all families where the individual is a child
 			try {
@@ -876,8 +878,6 @@ public class GedcomLoader {
 					final Family family = familyWhereChild.getFamily();
 
 					// Get the father
-					boolean husb = false;
-
 					try {
 						sb.append(family.getHusband().getIndividual().getNames().get(0));
 						husb = true;
@@ -893,6 +893,7 @@ public class GedcomLoader {
 						}
 
 						sb.append(w);
+						wife = true;
 					} catch (final Exception e) {
 					}
 				}
@@ -914,9 +915,19 @@ public class GedcomLoader {
 					} catch (final Exception e1) {
 					}
 				}
-			} else {
+			}
+
+			if (!husb || !wife) {
 				parents = getParentsFromSource(individual);
 			}
+
+			if (parents.isBlank()) {
+				continue;
+			}
+
+			psUPDATE_INDIVIDUAL_PARENTS.setString(1, parents);
+			psUPDATE_INDIVIDUAL_PARENTS.setString(2, individual.getXref());
+			psUPDATE_INDIVIDUAL_PARENTS.executeUpdate();
 
 			final String[] splitParents = splitParents(parents);
 			String a = "";

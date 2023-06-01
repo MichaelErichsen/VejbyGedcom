@@ -58,7 +58,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 1. jun. 2023
  *
  */
 
@@ -280,8 +280,6 @@ public class ArchiveSearcher extends Shell {
 	protected void createContents() {
 		setText("Arkivsøgning");
 		setSize(1037, 625);
-//		Image icon = new Image(getDisplay(), "icons/ArchiveSearcher.png");
-//		setImage(icon);
 	}
 
 	/**

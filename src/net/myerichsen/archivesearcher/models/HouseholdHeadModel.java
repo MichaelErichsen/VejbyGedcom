@@ -340,7 +340,8 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 		int i = 0;
 
 		for (final Iterator<HouseholdHeadModel> iterator = set.iterator(); iterator.hasNext();) {
-			array[i++] = iterator.next();
+			array[i] = iterator.next();
+			i++;
 
 		}
 

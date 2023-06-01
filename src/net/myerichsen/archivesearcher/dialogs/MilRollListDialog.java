@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Military rolls view
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 1. jun. 2023
  *
  */
 
@@ -315,13 +315,6 @@ public class MilRollListDialog extends Dialog {
 
 		final MilrollListModel m = (MilrollListModel) tia[0].getData();
 
-//		final TableItem ti = tia[0];
-//		final MilrollListModel m = new MilrollListModel();
-//		m.setAmt(ti.getText(0));
-//		m.setLaegdNr(Integer.parseInt(ti.getText(3)));
-//		m.setRulleType(ti.getText(6));
-//		m.setSogn(ti.getText(7));
-
 		tableViewer.add(m);
 
 		return;
@@ -335,23 +328,11 @@ public class MilRollListDialog extends Dialog {
 		final TableItem[] tia = table.getSelection();
 
 		if (tia.length == 0) {
-			System.out.println("Intet valgt");
+			as.setErrorMessage("Intet valgt");
 			return 0;
 		}
 
 		final MilrollListModel m = (MilrollListModel) tia[0].getData();
-
-//		final TableItem ti = tia[0];
-//		final MilrollListModel m = new MilrollListModel();
-//		m.setAmt(ti.getText(0));
-//		m.setAar(Integer.parseInt(ti.getText(1)));
-//		m.setLitra(ti.getText(2));
-//		m.setRulleType(ti.getText(3));
-//		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
-//		m.setSogn(ti.getText(5));
-//		m.setLaegdId(Integer.parseInt(ti.getText(6)));
-//		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
-
 		final int insert = m.insert(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();
 		return insert;
@@ -386,22 +367,11 @@ public class MilRollListDialog extends Dialog {
 		final TableItem[] tia = table.getSelection();
 
 		if (tia.length == 0) {
-			System.out.println("Intet valgt");
+			as.setErrorMessage("Intet valgt");
 			return 0;
 		}
 
 		final MilrollListModel m = (MilrollListModel) tia[0].getData();
-
-//		final TableItem ti = tia[0];
-//		final MilrollListModel m = new MilrollListModel();
-//		m.setAmt(ti.getText(0));
-//		m.setAar(Integer.parseInt(ti.getText(1)));
-//		m.setLitra(ti.getText(2));
-//		m.setRulleType(ti.getText(3));
-//		m.setLaegdNr(Integer.parseInt(ti.getText(4)));
-//		m.setSogn(ti.getText(5));
-//		m.setLaegdId(Integer.parseInt(ti.getText(6)));
-//		m.setNextLaegdId(Integer.parseInt(ti.getText(7)));
 
 		final int update = m.update(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();
@@ -424,15 +394,11 @@ public class MilRollListDialog extends Dialog {
 		final TableItem[] tia = table.getSelection();
 
 		if (tia.length == 0) {
-			System.out.println("Intet valgt");
+			as.setErrorMessage("Intet valgt");
 			return 0;
 		}
 
 		final MilrollListModel m = (MilrollListModel) tia[0].getData();
-
-		// final TableItem ti = tia[0];
-//		final MilrollListModel m = new MilrollListModel();
-//		m.setLaegdId(Integer.parseInt(ti.getText(8)));
 
 		final int slet = m.delete(props.getProperty("milrollPath"), props.getProperty("milrollSchema"));
 		populate();

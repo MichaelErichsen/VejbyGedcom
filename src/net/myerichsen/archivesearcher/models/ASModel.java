@@ -63,8 +63,6 @@ public abstract class ASModel {
 			sb.append(rsmd.getColumnName(i).trim() + ";");
 		}
 
-		System.out.println(sb.toString());
-
 		while (rs.next()) {
 			sb = new StringBuilder();
 
@@ -76,7 +74,6 @@ public abstract class ASModel {
 				}
 			}
 
-			System.out.println(sb.toString());
 		}
 	}
 
