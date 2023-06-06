@@ -19,6 +19,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -54,16 +55,19 @@ import net.myerichsen.archivesearcher.tablecreators.CphTableCreator;
 import net.myerichsen.archivesearcher.tablecreators.GedcomTableCreator;
 import net.myerichsen.archivesearcher.tablecreators.MilRollTableCreator;
 import net.myerichsen.archivesearcher.tablecreators.ProbateTableCreator;
+import net.myerichsen.archivesearcher.util.Constants;
 import net.myerichsen.archivesearcher.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 1. jun. 2023
+ * @version 6. jun. 2023
  *
  */
 
 public class ArchiveSearcher extends Shell {
 	private static Display display;
+
+	private static Properties props;
 
 	/**
 	 * Launch the application.
@@ -75,6 +79,15 @@ public class ArchiveSearcher extends Shell {
 			display = Display.getDefault();
 
 			final ArchiveSearcher shell = new ArchiveSearcher(display);
+
+			shell.addListener(SWT.Dispose, event -> {
+				final Rectangle bounds = shell.getBounds();
+				props.setProperty("x", Integer.toString(bounds.x));
+				props.setProperty("y", Integer.toString(bounds.y));
+				props.setProperty("width", Integer.toString(bounds.width));
+				props.setProperty("height", Integer.toString(bounds.height));
+				shell.storeProperties();
+			});
 
 			shell.open();
 			shell.layout();
@@ -88,7 +101,6 @@ public class ArchiveSearcher extends Shell {
 		}
 	}
 
-	private Properties props;
 	private final Combo messageComboBox;
 	private Text searchId;
 	private Text searchName;
@@ -279,7 +291,27 @@ public class ArchiveSearcher extends Shell {
 	 */
 	protected void createContents() {
 		setText("Arkivsøgning");
-		setSize(1037, 625);
+
+		final Rectangle screenBounds = getShell().getMonitor().getBounds();
+		int x = Integer.parseInt(props.getProperty("x"));
+		int y = Integer.parseInt(props.getProperty("y"));
+		int width = Integer.parseInt(props.getProperty("width"));
+		int height = Integer.parseInt(props.getProperty("height"));
+
+		width = Math.min(screenBounds.width, width);
+		height = Math.min(screenBounds.height, height);
+		setSize(width, height);
+
+		if (x + width > screenBounds.width) {
+			x = screenBounds.width - width;
+		}
+
+		if (y + height > screenBounds.height) {
+			y = screenBounds.height - height;
+		}
+
+		setLocation(x, y);
+
 	}
 
 	/**
@@ -642,6 +674,10 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
 			props.setProperty("laegdid", Constants.LAEGDID);
 			props.setProperty("uri", Constants.MILROLL_URI);
+			props.setProperty("x", Constants.x);
+			props.setProperty("y", Constants.y);
+			props.setProperty("width", Constants.width);
+			props.setProperty("height", Constants.height);
 
 			storeProperties();
 			System.out.println("Egenskaber gemt i " + Constants.PROPERTIES_PATH);
@@ -984,7 +1020,11 @@ public class ArchiveSearcher extends Shell {
 			final OutputStream output = new FileOutputStream(Constants.PROPERTIES_PATH);
 			props.store(output, "Archive searcher properties");
 		} catch (final Exception e2) {
-			setMessage("Kan ikke gemme egenskaber i " + Constants.PROPERTIES_PATH);
+			if (this.isDisposed()) {
+				System.out.println("Kan ikke gemme egenskaber i " + Constants.PROPERTIES_PATH);
+			} else {
+				setMessage("Kan ikke gemme egenskaber i " + Constants.PROPERTIES_PATH);
+			}
 			e2.printStackTrace();
 		}
 	}

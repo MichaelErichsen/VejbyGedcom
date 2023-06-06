@@ -19,8 +19,7 @@ import net.myerichsen.archivesearcher.comparators.ProbateComparator;
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 1. jun. 2023
- *
+ * @version 1. jun. 2023 4
  */
 public class ProbateModel extends ASModel {
 	/**
@@ -42,8 +41,8 @@ public class ProbateModel extends ASModel {
 	 */
 	public static ProbateModel[] load(String schema, String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
-		ProbateModel probateRecord;
-		final List<ProbateModel> lp = new ArrayList<>();
+		ProbateModel model;
+		final List<ProbateModel> list = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -75,33 +74,32 @@ public class ProbateModel extends ASModel {
 		String data;
 
 		while (rs.next()) {
-			probateRecord = new ProbateModel();
+			model = new ProbateModel();
 			name = rs.getString("NAME").trim();
-			probateRecord.setName(name);
+			model.setName(name);
 			data = rs.getString("COVERED_DATA").replaceAll("\\r\\n", " ¤ ");
-			probateRecord.setData(data);
+			model.setData(data);
 			source = rs.getString("SOURCE");
-			probateRecord.setSource(source);
+			model.setSource(source);
 
 			if (data.contains(name)) {
-				probateRecord.setFromDate(rs.getString("FROMDATE").trim());
-				probateRecord.setToDate(rs.getString("TODATE").trim());
-				probateRecord.setPlace(rs.getString("PLACE").trim());
-				lp.add(probateRecord);
+				model.setFromDate(rs.getString("FROMDATE").trim());
+				model.setToDate(rs.getString("TODATE").trim());
+				model.setPlace(rs.getString("PLACE").trim());
+				list.add(model);
 			}
 		}
 
 		statement.close();
 
 		final SortedSet<ProbateModel> set = new TreeSet<>(new ProbateComparator());
-		set.addAll(lp);
+		set.addAll(list);
 
 		final ProbateModel[] array = new ProbateModel[set.size()];
 		int i = 0;
 
 		for (final Iterator<ProbateModel> iterator = set.iterator(); iterator.hasNext();) {
-			array[i] = iterator.next();
-			i++;
+			array[i++] = iterator.next();
 		}
 
 		return array;

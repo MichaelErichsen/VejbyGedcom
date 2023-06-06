@@ -1,10 +1,10 @@
-package net.myerichsen.archivesearcher.views;
+package net.myerichsen.archivesearcher.util;
 
 /**
  * Constants used for initialization of Archive Searcher
  *
  * @author Michael Erichsen
- * @version 8. maj 2023
+ * @version 6. jun. 2023
  *
  */
 public class Constants {
@@ -39,5 +39,9 @@ public class Constants {
 	public static final String LITRA = " ";
 	public static final String LAEGDID = "1";
 	public static final String prevlaegdid = "0";
+	public static final String width = "1037";
+	public static final String height = "625";
+	public static final String x = "286";
+	public static final String y = "286";
 
 }

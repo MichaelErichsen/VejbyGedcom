@@ -13,10 +13,10 @@ import java.util.List;
  * Class representing a census duplicate
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 4. jun. 2023
  *
  */
-public class CensusdupModel extends ASModel {
+public class CensusDupModel extends ASModel {
 	/*
 	 * Constants
 	 */
@@ -31,45 +31,44 @@ public class CensusdupModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CensusdupModel[] load(String schema, String dbPath) throws SQLException {
+	public static CensusDupModel[] load(String schema, String dbPath) throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
 		statement = conn.prepareStatement(SELECT);
 		final ResultSet rs = statement.executeQuery();
-		CensusdupModel cd;
-		final List<CensusdupModel> lcd = new ArrayList<>();
+		CensusDupModel model;
+		final List<CensusDupModel> list = new ArrayList<>();
 
 		while (rs.next()) {
-			cd = new CensusdupModel();
-			cd.setIndividual(rs.getString("INDIVIDUAL").trim());
-			cd.setDate(rs.getDate("DATE"));
-			cd.setPlace(rs.getString("PLACE"));
-			cd.setSourceDetail(rs.getString("SOURCEDETAIL"));
-			lcd.add(cd);
+			model = new CensusDupModel();
+			model.setIndividual(rs.getString("INDIVIDUAL").trim());
+			model.setDate(rs.getDate("DATE"));
+			model.setPlace(rs.getString("PLACE"));
+			model.setSourceDetail(rs.getString("SOURCEDETAIL"));
+			list.add(model);
 		}
 
 		statement.close();
-		conn.close();
 
-		final List<CensusdupModel> lcd2 = new ArrayList<>();
+		final List<CensusDupModel> list2 = new ArrayList<>();
 
-		for (int i = 0; i < lcd.size(); i++) {
-			for (int j = i + 1; j < lcd.size(); j++) {
-				if (lcd.get(i).equals(lcd.get(j))) {
-					lcd2.add(lcd.get(i));
+		for (int i = 0; i < list.size(); i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				if (list.get(i).equals(list.get(j))) {
+					list2.add(list.get(i));
 				}
 			}
 		}
 
-		final CensusdupModel[] cda = new CensusdupModel[lcd2.size()];
+		final CensusDupModel[] array = new CensusDupModel[list2.size()];
 
-		for (int i = 0; i < lcd2.size(); i++) {
-			cda[i] = lcd2.get(i);
+		for (int i = 0; i < list2.size(); i++) {
+			array[i] = list2.get(i);
 		}
 
-		return cda;
+		return array;
 	}
 
 	private String individual;
@@ -79,7 +78,7 @@ public class CensusdupModel extends ASModel {
 
 	@Override
 	public boolean equals(Object obj) {
-		final CensusdupModel cd = (CensusdupModel) obj;
+		final CensusDupModel cd = (CensusDupModel) obj;
 		if (this.individual.equals(cd.getIndividual()) && this.date.equals(cd.getDate())) {
 			return true;
 		}

@@ -44,8 +44,8 @@ import net.myerichsen.archivesearcher.models.MilRollModel;
 import net.myerichsen.archivesearcher.models.MilrollListModel;
 import net.myerichsen.archivesearcher.providers.FoedestedProvider;
 import net.myerichsen.archivesearcher.providers.OpholdProvider;
+import net.myerichsen.archivesearcher.util.Constants;
 import net.myerichsen.archivesearcher.util.Fonkod;
-import net.myerichsen.archivesearcher.views.Constants;
 
 /**
  * Input application for military roll entries
