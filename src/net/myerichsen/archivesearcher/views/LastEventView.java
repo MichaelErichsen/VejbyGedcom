@@ -34,7 +34,7 @@ import net.myerichsen.archivesearcher.populators.LastEventViewPopulator;
  * individual to search for burials
  *
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 9. jun. 2023
  *
  */
 public class LastEventView extends Composite {
@@ -138,7 +138,7 @@ public class LastEventView extends Composite {
 
 		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnDetaljer = tableViewerColumn_6.getColumn();
-		tblclmnDetaljer.setWidth(313);
+		tblclmnDetaljer.setWidth(494);
 		tblclmnDetaljer.setText("Detaljer");
 		tableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 

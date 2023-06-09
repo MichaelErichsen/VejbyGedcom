@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -60,7 +59,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
 
 /**
  * @author Michael Erichsen
- * @version 6. jun. 2023
+ * @version 9. jun. 2023
  *
  */
 
@@ -109,7 +108,6 @@ public class ArchiveSearcher extends Shell {
 	private Text searchFather;
 	private Text searchMother;
 	private final Shell shell;
-	private Table siblingsTable;
 	private final TabFolder tabFolder;
 	private final IndividualView individualView;
 	private final RelocationView relocationView;
@@ -279,9 +277,7 @@ public class ArchiveSearcher extends Shell {
 		probateView.clear();
 		relocationView.clear();
 		siblingsView.clear();
-		descendantCounterView.clear();
 		householdHeadView.clear();
-		censusDupView.clear();
 		searchId.setFocus();
 		setMessage("Felter er ryddet");
 	}
@@ -787,8 +783,6 @@ public class ArchiveSearcher extends Shell {
 		searchMother.setText("");
 		searchName.setText("");
 		individualView.clear();
-		descendantCounterView.clear();
-		censusDupView.clear();
 
 		if (searchId.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -865,7 +859,6 @@ public class ArchiveSearcher extends Shell {
 				householdHeadView.populate(individual.getId());
 			}
 
-//			milrollEntryView.populate();
 		} catch (final SQLException e1) {
 			messageComboBox.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -971,9 +964,7 @@ public class ArchiveSearcher extends Shell {
 
 		try {
 			siblingsView.populate(searchFather.getText(), searchMother.getText());
-			if (siblingsTable != null) {
-				siblingsTable.forceFocus();
-			}
+			siblingsView.setFocus();
 		} catch (final Exception e2) {
 			setErrorMessage(e2.getMessage());
 			e2.printStackTrace();
