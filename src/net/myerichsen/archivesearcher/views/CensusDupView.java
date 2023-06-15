@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 9. jun. 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -197,6 +197,8 @@ public class CensusDupView extends Composite {
 	}
 
 	/**
+	 * Popup
+	 *
 	 * @param display
 	 */
 	private void popup(Display display) {
@@ -205,7 +207,7 @@ public class CensusDupView extends Composite {
 		final String string = m.toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketællingsdubletter", null, string,
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Søg efter" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -213,6 +215,11 @@ public class CensusDupView extends Composite {
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
+		} else if (open == 2) {
+			final String siblingsId = m.getIndividual();
+			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent().getParent();
+			grandParent.getSearchId().setText(siblingsId);
+			grandParent.searchById(null);
 		}
 	}
 

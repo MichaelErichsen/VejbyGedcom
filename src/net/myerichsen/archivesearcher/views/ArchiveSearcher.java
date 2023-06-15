@@ -58,18 +58,20 @@ import net.myerichsen.archivesearcher.util.Constants;
 import net.myerichsen.archivesearcher.util.Fonkod;
 
 /**
+ * Main class in archive searcher application. Contains main view and all
+ * included views.
+ * 
  * @author Michael Erichsen
- * @version 9. jun. 2023
+ * @version 15. jun. 2023
  *
  */
 
 public class ArchiveSearcher extends Shell {
 	private static Display display;
-
 	private static Properties props;
 
 	/**
-	 * Launch the application.
+	 * Launch the application
 	 *
 	 * @param args
 	 */
@@ -79,6 +81,8 @@ public class ArchiveSearcher extends Shell {
 
 			final ArchiveSearcher shell = new ArchiveSearcher(display);
 
+			// Add a listener to save the main window size and location when closing the
+			// application
 			shell.addListener(SWT.Dispose, event -> {
 				final Rectangle bounds = shell.getBounds();
 				props.setProperty("x", Integer.toString(bounds.x));
@@ -100,8 +104,8 @@ public class ArchiveSearcher extends Shell {
 		}
 	}
 
-	private final Combo messageComboBox;
-	private Text searchId;
+	private final Combo messageCombo;
+	private Combo searchIdCombo;
 	private Text searchName;
 	private Text searchBirth;
 	private Text searchDeath;
@@ -119,11 +123,11 @@ public class ArchiveSearcher extends Shell {
 	private final DescendantCounterView descendantCounterView;
 	private final HouseholdHeadView householdHeadView;
 	private final CensusDupView censusDupView;
-	private final MilRollEntryView milrollEntryView;
+	private final MilRollEntryView milRollEntryView;
 	private final LastEventView lastEventView;
 
 	/**
-	 * Create the shell.
+	 * Create the shell
 	 *
 	 * @param display
 	 */
@@ -206,9 +210,9 @@ public class ArchiveSearcher extends Shell {
 
 		final TabItem tbtmLgdsruller = new TabItem(tabFolderXref, SWT.NONE);
 		tbtmLgdsruller.setText("&L\u00E6gdsruller");
-		milrollEntryView = new MilRollEntryView(tabFolderXref, SWT.NONE);
-		tbtmLgdsruller.setControl(milrollEntryView);
-		milrollEntryView.setProperties(props);
+		milRollEntryView = new MilRollEntryView(tabFolderXref, SWT.NONE);
+		tbtmLgdsruller.setControl(milRollEntryView);
+		milRollEntryView.setProperties(props);
 
 		final TabItem tbtmLastEvent = new TabItem(tabFolderXref, SWT.NONE);
 		tbtmLastEvent.setText("Sidste h&ændelse");
@@ -216,8 +220,8 @@ public class ArchiveSearcher extends Shell {
 		tbtmLastEvent.setControl(lastEventView);
 		lastEventView.setProperties(props);
 
-		messageComboBox = new Combo(this, SWT.READ_ONLY);
-		messageComboBox.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		messageCombo = new Combo(this, SWT.READ_ONLY);
+		messageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		createContents();
 	}
@@ -246,7 +250,7 @@ public class ArchiveSearcher extends Shell {
 						props.getProperty("burialPersonComplete") };
 				final String message = LoadBurialPersonComplete.loadCsvFiles(sa);
 
-				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
+				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();
 			break;
 		case SWT.CANCEL:
@@ -266,7 +270,7 @@ public class ArchiveSearcher extends Shell {
 		searchBirth.setText("");
 		searchDeath.setText("");
 		searchFather.setText("");
-		searchId.setText("");
+		searchIdCombo.setText("");
 		searchMother.setText("");
 		searchName.setText("");
 		burregView.clear();
@@ -278,12 +282,12 @@ public class ArchiveSearcher extends Shell {
 		relocationView.clear();
 		siblingsView.clear();
 		householdHeadView.clear();
-		searchId.setFocus();
+		searchIdCombo.setFocus();
 		setMessage("Felter er ryddet");
 	}
 
 	/**
-	 * Create contents of the shell.
+	 * Create contents of the shell
 	 */
 	protected void createContents() {
 		setText("Arkivsøgning");
@@ -502,8 +506,8 @@ public class ArchiveSearcher extends Shell {
 		lblId.setBounds(0, 0, 55, 15);
 		lblId.setText("ID");
 
-		searchId = new Text(searchComposite, SWT.BORDER);
-		searchId.addKeyListener(new KeyAdapter() {
+		searchIdCombo = new Combo(searchComposite, SWT.DROP_DOWN);
+		searchIdCombo.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.CR) {
@@ -511,8 +515,8 @@ public class ArchiveSearcher extends Shell {
 				}
 			}
 		});
-		searchId.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		searchId.setBounds(0, 0, 56, 21);
+		searchIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		searchIdCombo.setBounds(0, 0, 56, 21);
 
 		final Button btnSearchId = new Button(searchComposite, SWT.NONE);
 		btnSearchId.addSelectionListener(new SelectionAdapter() {
@@ -597,6 +601,8 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Load GEDCOM export files
+	 * 
 	 * @param e
 	 */
 	private void gedcomLoader(SelectionEvent e) {
@@ -616,7 +622,7 @@ public class ArchiveSearcher extends Shell {
 						props.getProperty("vejbySchema") };
 				final String message = GedcomLoader.loadCsvFiles(sa, this);
 
-				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
+				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
 
 			}).start();
 			break;
@@ -681,10 +687,10 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * @return the searchId
+	 * @return the searchIdCombo text
 	 */
-	public Text getSearchId() {
-		return searchId;
+	public Combo getSearchId() {
+		return searchIdCombo;
 	}
 
 	/**
@@ -695,6 +701,8 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Load source input project files
+	 * 
 	 * @param e
 	 */
 	private void kipFileLoader(SelectionEvent e) {
@@ -715,7 +723,7 @@ public class ArchiveSearcher extends Shell {
 						props.getProperty("censusSchema") };
 				final String message = CensusDbLoader.loadCsvFiles(sa, this);
 
-				messageComboBox.getDisplay().asyncExec(() -> setMessage(message));
+				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();
 
 			break;
@@ -725,7 +733,7 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 *
+	 * Open the military roll list dialog
 	 */
 	public void laegdsRulleListe() {
 		final MilRollListDialog m = new MilRollListDialog(getShell());
@@ -734,6 +742,8 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Load police registry files
+	 * 
 	 * @param e
 	 */
 	protected void polregLoader(SelectionEvent e) {
@@ -752,17 +762,17 @@ public class ArchiveSearcher extends Shell {
 				String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
 						props.getProperty("cphSchema"), props.getProperty("policeAddress") };
 				final String message1 = LoadPoliceAddress.loadCsvFiles(sa);
-				messageComboBox.getDisplay().asyncExec(() -> setMessage(message1));
+				messageCombo.getDisplay().asyncExec(() -> setMessage(message1));
 
 				sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
 						props.getProperty("cphSchema"), props.getProperty("policePosition") };
 				final String message2 = LoadPolicePosition.loadCsvFiles(sa);
-				messageComboBox.getDisplay().asyncExec(() -> setMessage(message2));
+				messageCombo.getDisplay().asyncExec(() -> setMessage(message2));
 
 				sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
 						props.getProperty("cphSchema"), props.getProperty("policePerson") };
 				final String message3 = LoadPolicePerson.loadCsvFiles(sa);
-				messageComboBox.getDisplay().asyncExec(() -> setMessage(message3));
+				messageCombo.getDisplay().asyncExec(() -> setMessage(message3));
 
 			}).start();
 			break;
@@ -784,18 +794,25 @@ public class ArchiveSearcher extends Shell {
 		searchName.setText("");
 		individualView.clear();
 
-		if (searchId.getText().equals("")) {
+		if (searchIdCombo.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
 			messageBox.setText("Advarsel");
 			messageBox.setMessage("Indtast venligst et tal");
 			messageBox.open();
-			searchId.setFocus();
+			searchIdCombo.setFocus();
 			return;
 		}
 
-		final String idx = searchId.getText();
-		final String id = idx.contains("@") ? idx : "@I" + searchId.getText().trim() + "@";
+		final String idx = searchIdCombo.getText();
+		final String id = idx.contains("@") ? idx : "@I" + searchIdCombo.getText().trim() + "@";
+
+		searchIdCombo.add(id, 0);
+		searchIdCombo.select(0);
+
+		if (searchIdCombo.getItemCount() > 8) {
+			searchIdCombo.remove(8);
+		}
 
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
@@ -803,7 +820,7 @@ public class ArchiveSearcher extends Shell {
 
 			if (individual.getName().equals("")) {
 				setErrorMessage("ID " + id + " findes ikke i databasen");
-				searchId.setFocus();
+				searchIdCombo.setFocus();
 				return;
 			}
 
@@ -860,7 +877,7 @@ public class ArchiveSearcher extends Shell {
 			}
 
 		} catch (final SQLException e1) {
-			messageComboBox.setText(e1.getMessage());
+			messageCombo.setText(e1.getMessage());
 			e1.printStackTrace();
 		}
 	}
@@ -871,7 +888,7 @@ public class ArchiveSearcher extends Shell {
 	 * @param e
 	 */
 	protected void searchByName(TypedEvent e) {
-		searchId.setText("");
+		searchIdCombo.setText("");
 		individualView.clear();
 		siblingsView.clear();
 		householdHeadView.clear();
@@ -932,7 +949,6 @@ public class ArchiveSearcher extends Shell {
 				siblingsView.populate(searchFather.getText(), searchMother.getText());
 			}
 
-//			milrollEntryView.populate();
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
@@ -947,7 +963,7 @@ public class ArchiveSearcher extends Shell {
 		searchBirth.setText("");
 		searchDeath.setText("");
 		searchName.setText("");
-		searchId.setText("");
+		searchIdCombo.setText("");
 		individualView.clear();
 		siblingsView.clear();
 		householdHeadView.clear();
@@ -973,14 +989,14 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Set the message in the message combo box
+	 * Set the message in the message combo box and mark as an error message
 	 *
 	 * @param string
 	 *
 	 */
 	public void setErrorMessage(String string) {
 		setMessage(string);
-		messageComboBox.setBackground(new Color(255, 0, 0, 255));
+		messageCombo.setBackground(new Color(255, 0, 0, 255));
 	}
 
 	/**
@@ -993,18 +1009,18 @@ public class ArchiveSearcher extends Shell {
 
 		final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 		final LocalTime localTime = LocalTime.now();
-		messageComboBox.add(dtf.format(localTime) + " " + string, 0);
-		messageComboBox.select(0);
-		messageComboBox.setBackground(new Color(255, 255, 255, 255));
+		messageCombo.add(dtf.format(localTime) + " " + string, 0);
+		messageCombo.select(0);
+		messageCombo.setBackground(new Color(255, 255, 255, 255));
 		final int lastItem = Integer.parseInt(props.getProperty("msgLogLen"));
 
-		if (messageComboBox.getItemCount() > lastItem) {
-			messageComboBox.remove(lastItem);
+		if (messageCombo.getItemCount() > lastItem) {
+			messageCombo.remove(lastItem);
 		}
 	}
 
 	/**
-	 * Store properties in file
+	 * Store properties in a file
 	 */
 	private void storeProperties() {
 		try {
