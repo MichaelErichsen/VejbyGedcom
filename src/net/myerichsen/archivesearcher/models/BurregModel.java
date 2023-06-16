@@ -14,7 +14,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a burial registry record
  *
  * @author Michael Erichsen
- * @version 25. maj 2023
+ * @version 16. jun. 2023
  *
  */
 public class BurregModel extends ASModel {
@@ -49,6 +49,7 @@ public class BurregModel extends ASModel {
 		final List<BurregModel> list = new ArrayList<>();
 
 		String name;
+		String cs;
 		final Fonkod fk = new Fonkod();
 
 		while (rs.next()) {
@@ -64,12 +65,13 @@ public class BurregModel extends ASModel {
 
 			model = new BurregModel();
 
-			model.setFirstNames(rs.getString("FIRSTNAMES"));
-			model.setLastName(rs.getString("LASTNAME"));
+			model.setFirstNames(rs.getString("FIRSTNAMES").trim());
+			model.setLastName(rs.getString("LASTNAME").trim());
 			model.setDateOfDeath(rs.getString("DATEOFDEATH"));
 			model.setYearOfBirth(rs.getString("YEAROFBIRTH"));
 			model.setDeathPlace(rs.getString("DEATHPLACE"));
-			model.setCivilStatus(rs.getString("CIVILSTATUS"));
+			cs = rs.getString("CIVILSTATUS");
+			model.setCivilStatus(cs == null ? "" : cs.trim());
 			model.setAdressOutsideCph(rs.getString("ADRESSOUTSIDECPH"));
 			model.setSex(rs.getString("SEX"));
 			model.setComment(rs.getString("COMMENT"));

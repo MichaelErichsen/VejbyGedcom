@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 16. jun. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -56,7 +56,7 @@ public class HouseholdHeadView extends Composite {
 	private Thread thread;
 
 	/**
-	 * Create the composite.
+	 * Create the composite
 	 *
 	 * @param parent
 	 * @param style
@@ -294,7 +294,7 @@ public class HouseholdHeadView extends Composite {
 	}
 
 	/**
-	 *
+	 * Clear search filters
 	 */
 	private void clearFilters() {
 		HouseholdHeadPlaceFilter.getInstance().setSearchText("");
@@ -310,9 +310,9 @@ public class HouseholdHeadView extends Composite {
 	}
 
 	/**
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
+	 * Populate table
+	 * 
+	 * @param headId
 	 */
 	public void populate(String headId) {
 		thread = new Thread(() -> {
@@ -337,6 +337,8 @@ public class HouseholdHeadView extends Composite {
 	}
 
 	/**
+	 * Popup
+	 * 
 	 * @param display
 	 */
 	private void popup(Display display) {
@@ -345,7 +347,7 @@ public class HouseholdHeadView extends Composite {
 		final String string = m.toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Husbond", null, string, MessageDialog.INFORMATION,
-				new String[] { "OK", "Kopier" }, 0);
+				new String[] { "OK", "Kopier", "Søg husbond", "Søg tjenende" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -353,10 +355,21 @@ public class HouseholdHeadView extends Composite {
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
+		} else if (open == 2) {
+			final String headId = m.getHeadId();
+			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+			grandParent.getSearchId().setText(headId);
+		} else if (open == 3) {
+			final String relocatorId = m.getRelocatorId();
+			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+			grandParent.getSearchId().setText(relocatorId);
+			grandParent.searchById(null);
 		}
 	}
 
 	/**
+	 * Set properties
+	 * 
 	 * @param props
 	 */
 	public void setProperties(Properties props) {

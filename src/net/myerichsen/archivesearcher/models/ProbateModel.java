@@ -19,7 +19,7 @@ import net.myerichsen.archivesearcher.comparators.ProbateComparator;
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 1. jun. 2023 4
+ * @version 16. jun. 2023
  */
 public class ProbateModel extends ASModel {
 	/**
@@ -79,7 +79,7 @@ public class ProbateModel extends ASModel {
 			model.setName(name);
 			data = rs.getString("COVERED_DATA").replaceAll("\\r\\n", " ¤ ");
 			model.setData(data);
-			source = rs.getString("SOURCE");
+			source = rs.getString("SOURCE").trim();
 			model.setSource(source);
 
 			if (data.contains(name)) {
