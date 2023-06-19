@@ -10,12 +10,18 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -34,7 +40,7 @@ import net.myerichsen.archivesearcher.populators.LastEventViewPopulator;
  * individual to search for burials
  *
  * @author Michael Erichsen
- * @version 9. jun. 2023
+ * @version 19. jun. 2023
  *
  */
 public class LastEventView extends Composite {
@@ -178,19 +184,28 @@ public class LastEventView extends Composite {
 		textLocation.setToolTipText("Benyt store og sm\u00E5 bogstaver. Tryk ENTER for at s\u00F8ge");
 		textLocation.setLayoutData(new RowData(729, SWT.DEFAULT));
 
-//		final Button btnSg = new Button(searchComposite, SWT.NONE);
-//		btnSg.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				if (textLocation.getText().isBlank()) {
-//					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Indtast venligst et sted");
-//					textLocation.setFocus();
-//				} else {
-//					populate(textLocation.getText());
-//				}
-//			}
-//		});
-//		btnSg.setText("S\u00F8g");
+		final Button btnKopir = new Button(searchComposite, SWT.NONE);
+		btnKopir.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final TableItem[] array = table.getItems();
+				LastEventModel model;
+				final StringBuilder sb = new StringBuilder("");
+
+				for (final TableItem tableItem : array) {
+					model = (LastEventModel) tableItem.getData();
+					sb.append(model.toString() + "\n");
+				}
+
+				if (sb.length() > 0) {
+					final Clipboard clipboard = new Clipboard(getDisplay());
+					final TextTransfer textTransfer = TextTransfer.getInstance();
+					clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
+					clipboard.dispose();
+				}
+			}
+		});
+		btnKopir.setText("Kopi\u00E9r");
 
 	}
 

@@ -44,13 +44,17 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM and load data into a Derby database
  *
  * @author Michael Erichsen
- * @version 31. maj 2023
+ * @version 18. jun. 2023
  */
 
 public class GedcomLoader {
 	/**
 	 * Static constants and variables
 	 */
+	private static final String[] filter = new String[] { "af", "bager", "gamle", "gmd", "hustru", "i", "inds",
+			"junior", "kirkesanger", "pige", "pigen", "portner", "proprietær", "sadelmager", "skolelærer", "skovfoged",
+			"slagter", "smed", "smedesvend", "snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
+
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String DELETE_EVENT = "DELETE FROM EVENT";
 	private static final String DELETE_INDIVIDUAL = "DELETE FROM INDIVIDUAL";
@@ -989,6 +993,8 @@ public class GedcomLoader {
 	}
 
 	/**
+	 * Split a string with a parent pair into two parents while removing noise words
+	 * 
 	 * @param parents2
 	 * @return
 	 */
@@ -1001,10 +1007,6 @@ public class GedcomLoader {
 		s = s.replace(", f.", "");
 		String[] sa = s.split(",");
 		final String[] words = sa[0].split(" ");
-
-		final String[] filter = new String[] { "af", "bager", "gamle", "gmd", "i", "inds", "junior", "kirkesanger",
-				"pige", "pigen", "portner", "proprietær", "sadelmager", "skolelærer", "skovfoged", "slagter", "smed",
-				"smedesvend", "snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
 
 		final StringBuilder sb = new StringBuilder();
 

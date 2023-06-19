@@ -26,7 +26,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * @author Michael Erichsen
  * @version 22. apr. 2023
  */
-public class CensusDbLoader {
+public class CensusLoader {
 	/**
 	 * Constants
 	 */
@@ -41,10 +41,10 @@ public class CensusDbLoader {
 	 * @param args
 	 */
 	public static String loadCsvFiles(String[] args, ArchiveSearcher as) {
-		final CensusDbLoader censusDbLoader = new CensusDbLoader();
+		final CensusLoader censusLoader = new CensusLoader();
 
 		try {
-			censusDbLoader.execute(args, as);
+			censusLoader.execute(args, as);
 
 		} catch (final Exception e) {
 

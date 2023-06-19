@@ -19,7 +19,7 @@ import net.myerichsen.archivesearcher.comparators.LastEventComparator;
  * Class representing the last event for a person in a location
  *
  * @author Michael Erichsen
- * @version 31. maj 2023
+ * @version 19. jun. 2023
  *
  */
 public class LastEventModel extends ASModel {
@@ -231,9 +231,9 @@ public class LastEventModel extends ASModel {
 
 	@Override
 	public String toString() {
-		return (individualId != null ? individualId + ", " : "") + (name != null ? name : "")
-				+ (date != null ? date + ", " : "") + (type != null ? type + ", " : "")
-				+ (subType != null ? subType + ", " : "") + (sourceDetail != null ? sourceDetail + ", " : "");
+		return (!individualId.isBlank() ? individualId.trim() + ", " : "") + (!name.isBlank() ? name + ", " : "")
+				+ (date != null ? date + ", " : "") + (!type.isBlank() ? type + ", " : "")
+				+ (!subType.isBlank() ? subType + ", " : "") + (!sourceDetail.isBlank() ? sourceDetail : "");
 	}
 
 }

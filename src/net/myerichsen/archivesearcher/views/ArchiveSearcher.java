@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.dialogs.KeystrokeDialog;
 import net.myerichsen.archivesearcher.dialogs.MilRollEntryDialog;
 import net.myerichsen.archivesearcher.dialogs.MilRollListDialog;
 import net.myerichsen.archivesearcher.dialogs.SettingsWizard;
-import net.myerichsen.archivesearcher.loaders.CensusDbLoader;
+import net.myerichsen.archivesearcher.loaders.CensusLoader;
 import net.myerichsen.archivesearcher.loaders.GedcomLoader;
 import net.myerichsen.archivesearcher.loaders.LoadBurialPersonComplete;
 import net.myerichsen.archivesearcher.loaders.LoadPoliceAddress;
@@ -60,9 +60,9 @@ import net.myerichsen.archivesearcher.util.Fonkod;
 /**
  * Main class in archive searcher application. Contains main view and all
  * included views.
- * 
+ *
  * @author Michael Erichsen
- * @version 15. jun. 2023
+ * @version 18. jun. 2023
  *
  */
 
@@ -602,7 +602,7 @@ public class ArchiveSearcher extends Shell {
 
 	/**
 	 * Load GEDCOM export files
-	 * 
+	 *
 	 * @param e
 	 */
 	private void gedcomLoader(SelectionEvent e) {
@@ -702,7 +702,7 @@ public class ArchiveSearcher extends Shell {
 
 	/**
 	 * Load source input project files
-	 * 
+	 *
 	 * @param e
 	 */
 	private void kipFileLoader(SelectionEvent e) {
@@ -721,7 +721,7 @@ public class ArchiveSearcher extends Shell {
 				final String[] sa = new String[] { props.getProperty("kipTextFilename"),
 						props.getProperty("censusCsvFileDirectory"), props.getProperty("censusPath"),
 						props.getProperty("censusSchema") };
-				final String message = CensusDbLoader.loadCsvFiles(sa, this);
+				final String message = CensusLoader.loadCsvFiles(sa, this);
 
 				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
 			}).start();
@@ -743,7 +743,7 @@ public class ArchiveSearcher extends Shell {
 
 	/**
 	 * Load police registry files
-	 * 
+	 *
 	 * @param e
 	 */
 	protected void polregLoader(SelectionEvent e) {
@@ -805,9 +805,9 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		final String idx = searchIdCombo.getText();
+		setSearchMessage("Søger efter ID " + idx);
+		searchIdCombo.add(idx, 0);
 		final String id = idx.contains("@") ? idx : "@I" + searchIdCombo.getText().trim() + "@";
-
-		searchIdCombo.add(id, 0);
 		searchIdCombo.select(0);
 
 		if (searchIdCombo.getItemCount() > 8) {
@@ -903,6 +903,8 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
+		setSearchMessage("Søger efter " + searchName.getText());
+
 		final Fonkod fk = new Fonkod();
 		try {
 			final String phonName = fk.generateKey(searchName.getText());
@@ -978,8 +980,26 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
+		final StringBuilder sb = new StringBuilder();
+		final String father = searchFather.getText();
+		final String mother = searchMother.getText();
+
+		if (!father.isBlank()) {
+			sb.append(father);
+		}
+
+		if (!father.isBlank() && !mother.isBlank()) {
+			sb.append(" og ");
+		}
+
+		if (!mother.isBlank()) {
+			sb.append(mother);
+		}
+
+		setSearchMessage("Søger efter " + sb);
+
 		try {
-			siblingsView.populate(searchFather.getText(), searchMother.getText());
+			siblingsView.populate(father, mother);
 			siblingsView.setFocus();
 		} catch (final Exception e2) {
 			setErrorMessage(e2.getMessage());
@@ -997,6 +1017,17 @@ public class ArchiveSearcher extends Shell {
 	public void setErrorMessage(String string) {
 		setMessage(string);
 		messageCombo.setBackground(new Color(255, 0, 0, 255));
+	}
+
+	/**
+	 * Set the message in the message combo box and mark as a search message
+	 *
+	 * @param string
+	 *
+	 */
+	public void setSearchMessage(String string) {
+		messageCombo.setBackground(new Color(255, 255, 0, 255));
+		setMessage(string);
 	}
 
 	/**
