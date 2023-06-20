@@ -24,7 +24,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 20. jun. 2023
  */
 public class CensusLoader {
 	/**
@@ -40,7 +40,7 @@ public class CensusLoader {
 	 *
 	 * @param args
 	 */
-	public static String loadCsvFiles(String[] args, ArchiveSearcher as) {
+	public static String main(String[] args, ArchiveSearcher as) {
 		final CensusLoader censusLoader = new CensusLoader();
 
 		try {
@@ -65,8 +65,14 @@ public class CensusLoader {
 	 * @throws SQLException
 	 *
 	 */
-	private void connectToDB(String[] args) throws SQLException {
+	private void connectToDB(String[] args, ArchiveSearcher as) throws SQLException {
 		final String dbURL = "jdbc:derby:" + args[2];
+		try {
+			DriverManager.getConnection(dbURL + ";shutdown=true");
+		} catch (SQLException e) {
+			// Shutdown message is expected
+			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
+		}
 		conn = DriverManager.getConnection(dbURL);
 		conn.setAutoCommit(false);
 		statement = conn.prepareStatement(SET_SCHEMA);
@@ -84,7 +90,7 @@ public class CensusLoader {
 	private void execute(String[] args, ArchiveSearcher as) throws Exception {
 
 		// Connect to Derby
-		connectToDB(args);
+		connectToDB(args, as);
 
 		// Find all census csv files from the index file
 		Display.getDefault().asyncExec(() -> as.setMessage("Finder alle folketællinger i " + args[1] + "/" + args[0]));

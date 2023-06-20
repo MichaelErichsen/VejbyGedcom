@@ -226,38 +226,6 @@ public class ArchiveSearcher extends Shell {
 		createContents();
 	}
 
-	/**
-	 * Load burial registry
-	 *
-	 * @param e
-	 */
-	protected void runBurregLoader(SelectionEvent e) {
-		final Shell[] shells = e.widget.getDisplay().getShells();
-		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
-		messageBox.setText("Advarsel");
-		messageBox.setMessage("Dette valg sletter indholdet i tabellerne før opdatering!");
-		final int buttonID = messageBox.open();
-
-		switch (buttonID) {
-		case SWT.OK:
-			setMessage("Data hentes fra " + props.getProperty("cphCsvFileDirectory") + "/"
-					+ props.getProperty("burialPersonComplete") + " ind i tabellerne i "
-					+ props.getProperty("cphDbPath"));
-
-			new Thread(() -> {
-				final String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"),
-						props.getProperty("cphDbPath"), props.getProperty("cphSchema"),
-						props.getProperty("burialPersonComplete") };
-				final String message = LoadBurialPersonComplete.loadCsvFiles(sa);
-
-				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
-			}).start();
-			break;
-		case SWT.CANCEL:
-			break;
-		}
-	}
-
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
@@ -601,34 +569,52 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Load GEDCOM export files
-	 *
-	 * @param e
+	 * Get burial registry
 	 */
-	private void runGedcomLoader(SelectionEvent e) {
-		final Shell[] shells = e.widget.getDisplay().getShells();
-		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
-		messageBox.setText("Advarsel");
-		messageBox.setMessage("Dette valg sletter indholdet i tabellerne før opdatering!");
-		final int buttonID = messageBox.open();
+	private void getBurialregistry() {
+		final String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+				props.getProperty("cphSchema"), props.getProperty("burialPersonComplete") };
+		final String message = LoadBurialPersonComplete.main(sa, null);
+		messageCombo.getDisplay().asyncExec(() -> setMessage(message));
+	}
 
-		switch (buttonID) {
-		case SWT.OK:
-			setMessage("Data hentes fra " + props.getProperty("gedcomFilePath") + " ind i tabellerne i "
-					+ props.getProperty("vejbyPath"));
+	/**
+	 * Get GEDCOM file
+	 */
+	private void getGedcom() {
+		final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
+				props.getProperty("vejbySchema") };
+		final String message = GedcomLoader.main(sa, this);
+		messageCombo.getDisplay().asyncExec(() -> setMessage(message));
+	}
 
-			new Thread(() -> {
-				final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
-						props.getProperty("vejbySchema") };
-				final String message = GedcomLoader.main(sa, this);
+	/**
+	 * Get KIP files
+	 */
+	private void getKipFiles() {
+		final String[] sa = new String[] { props.getProperty("kipTextFilename"),
+				props.getProperty("censusCsvFileDirectory"), props.getProperty("censusPath"),
+				props.getProperty("censusSchema") };
+		final String message = CensusLoader.main(sa, this);
+		messageCombo.getDisplay().asyncExec(() -> setMessage(message));
+	}
 
-				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
-
-			}).start();
-			break;
-		case SWT.CANCEL:
-			break;
-		}
+	/**
+	 * Get Police registry
+	 */
+	private void getPolReg() {
+		String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+				props.getProperty("cphSchema"), props.getProperty("policeAddress") };
+		final String message1 = LoadPoliceAddress.main(sa, this);
+		messageCombo.getDisplay().asyncExec(() -> setMessage(message1));
+		sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+				props.getProperty("cphSchema"), props.getProperty("policePosition") };
+		final String message2 = LoadPolicePosition.main(sa, this);
+		messageCombo.getDisplay().asyncExec(() -> setMessage(message2));
+		sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
+				props.getProperty("cphSchema"), props.getProperty("policePerson") };
+		final String message3 = LoadPolicePerson.main(sa, this);
+		messageCombo.getDisplay().asyncExec(() -> setMessage(message3));
 	}
 
 	/**
@@ -701,6 +687,64 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Open the military roll list dialog
+	 */
+	public void laegdsRulleListe() {
+		final MilRollListDialog m = new MilRollListDialog(getShell());
+		m.setProperties(props);
+		m.open();
+	}
+
+	/**
+	 * Load burial registry
+	 *
+	 * @param e
+	 */
+	protected void runBurregLoader(SelectionEvent e) {
+		final Shell[] shells = e.widget.getDisplay().getShells();
+		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+		messageBox.setText("Advarsel");
+		messageBox.setMessage("Dette valg sletter indholdet i tabellerne før opdatering!");
+		final int buttonID = messageBox.open();
+
+		switch (buttonID) {
+		case SWT.OK:
+			setMessage("Data hentes fra " + props.getProperty("cphCsvFileDirectory") + "/"
+					+ props.getProperty("burialPersonComplete") + " ind i tabellerne i "
+					+ props.getProperty("cphDbPath"));
+
+			new Thread(this::getBurialregistry).start();
+			break;
+		case SWT.CANCEL:
+			break;
+		}
+	}
+
+	/**
+	 * Load GEDCOM export files
+	 *
+	 * @param e
+	 */
+	private void runGedcomLoader(SelectionEvent e) {
+		final Shell[] shells = e.widget.getDisplay().getShells();
+		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+		messageBox.setText("Advarsel");
+		messageBox.setMessage("Dette valg sletter indholdet i tabellerne før opdatering!");
+		final int buttonID = messageBox.open();
+
+		switch (buttonID) {
+		case SWT.OK:
+			setMessage("Data hentes fra " + props.getProperty("gedcomFilePath") + " ind i tabellerne i "
+					+ props.getProperty("vejbyPath"));
+
+			new Thread(this::getGedcom).start();
+			break;
+		case SWT.CANCEL:
+			break;
+		}
+	}
+
+	/**
 	 * Load source input project files
 	 *
 	 * @param e
@@ -717,28 +761,12 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra KIP-filerne " + props.getProperty("censusCsvFileDirectory")
 					+ " ind i tabellen i " + props.getProperty("censusPath"));
 
-			new Thread(() -> {
-				final String[] sa = new String[] { props.getProperty("kipTextFilename"),
-						props.getProperty("censusCsvFileDirectory"), props.getProperty("censusPath"),
-						props.getProperty("censusSchema") };
-				final String message = CensusLoader.loadCsvFiles(sa, this);
-
-				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
-			}).start();
+			new Thread(this::getKipFiles).start();
 
 			break;
 		case SWT.CANCEL:
 			break;
 		}
-	}
-
-	/**
-	 * Open the military roll list dialog
-	 */
-	public void laegdsRulleListe() {
-		final MilRollListDialog m = new MilRollListDialog(getShell());
-		m.setProperties(props);
-		m.open();
 	}
 
 	/**
@@ -758,23 +786,7 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra " + props.getProperty("cphCsvFileDirectory") + " ind i tabellerne i "
 					+ props.getProperty("cphDbPath"));
 
-			new Thread(() -> {
-				String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
-						props.getProperty("cphSchema"), props.getProperty("policeAddress") };
-				final String message1 = LoadPoliceAddress.loadCsvFiles(sa);
-				messageCombo.getDisplay().asyncExec(() -> setMessage(message1));
-
-				sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
-						props.getProperty("cphSchema"), props.getProperty("policePosition") };
-				final String message2 = LoadPolicePosition.loadCsvFiles(sa);
-				messageCombo.getDisplay().asyncExec(() -> setMessage(message2));
-
-				sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
-						props.getProperty("cphSchema"), props.getProperty("policePerson") };
-				final String message3 = LoadPolicePerson.loadCsvFiles(sa);
-				messageCombo.getDisplay().asyncExec(() -> setMessage(message3));
-
-			}).start();
+			new Thread(this::getPolReg).start();
 			break;
 		case SWT.CANCEL:
 			break;
@@ -1020,17 +1032,6 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Set the message in the message combo box and mark as a search message
-	 *
-	 * @param string
-	 *
-	 */
-	public void setSearchMessage(String string) {
-		messageCombo.setBackground(new Color(255, 255, 0, 255));
-		setMessage(string);
-	}
-
-	/**
 	 * Set the message in the message combo box
 	 *
 	 * @param string
@@ -1048,6 +1049,17 @@ public class ArchiveSearcher extends Shell {
 		if (messageCombo.getItemCount() > lastItem) {
 			messageCombo.remove(lastItem);
 		}
+	}
+
+	/**
+	 * Set the message in the message combo box and mark as a search message
+	 *
+	 * @param string
+	 *
+	 */
+	public void setSearchMessage(String string) {
+		messageCombo.setBackground(new Color(255, 255, 0, 255));
+		setMessage(string);
 	}
 
 	/**

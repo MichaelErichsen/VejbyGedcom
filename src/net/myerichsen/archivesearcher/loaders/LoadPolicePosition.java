@@ -1,10 +1,12 @@
 package net.myerichsen.archivesearcher.loaders;
 
+import net.myerichsen.archivesearcher.views.ArchiveSearcher;
+
 /**
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 31. jan. 2023
+ * @version 20. jun. 2023
  *
  */
 public class LoadPolicePosition extends LoadCphArch {
@@ -18,15 +20,16 @@ public class LoadPolicePosition extends LoadCphArch {
 	static int counter = 0;
 
 	/**
-	 * MilRollEntryDialog method
+	 * Main method
 	 *
 	 * @param args
+	 * @param as
 	 */
-	public static String loadCsvFiles(String[] args) {
+	public static String main(String[] args, ArchiveSearcher as) {
 		final LoadPolicePosition lba = new LoadPolicePosition();
 
 		try {
-			lba.execute(args);
+			lba.execute(args, as);
 		} catch (final Exception e) {
 			e.printStackTrace();
 			return e.getMessage();
