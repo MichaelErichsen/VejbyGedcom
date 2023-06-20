@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 18. jun. 2023
+ * @version 20. jun. 2023
  *
  */
 
@@ -231,7 +231,7 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param e
 	 */
-	protected void burregLoader(SelectionEvent e) {
+	protected void runBurregLoader(SelectionEvent e) {
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -410,7 +410,7 @@ public class ArchiveSearcher extends Shell {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				gedcomLoader(e);
+				runGedcomLoader(e);
 			}
 		});
 		mntmL.setText("Indl\u00E6s GEDCOM i databasen");
@@ -419,7 +419,7 @@ public class ArchiveSearcher extends Shell {
 		mntmIndlsKipFiler.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				kipFileLoader(e);
+				runKipFileLoader(e);
 			}
 		});
 		mntmIndlsKipFiler.setText("Indl\u00E6s folket\u00E6llinger i databasen");
@@ -428,7 +428,7 @@ public class ArchiveSearcher extends Shell {
 		mntmIndlsPolitietsRegisterblade.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				polregLoader(e);
+				runPolregLoader(e);
 			}
 		});
 		mntmIndlsPolitietsRegisterblade.setText("Indl\u00E6s Politiets Registerblade");
@@ -437,7 +437,7 @@ public class ArchiveSearcher extends Shell {
 		mntmIndlsBegravelsregisteret.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				burregLoader(e);
+				runBurregLoader(e);
 			}
 		});
 		mntmIndlsBegravelsregisteret.setText("Indl\u00E6s Begravelsesregisteret");
@@ -605,7 +605,7 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param e
 	 */
-	private void gedcomLoader(SelectionEvent e) {
+	private void runGedcomLoader(SelectionEvent e) {
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -620,7 +620,7 @@ public class ArchiveSearcher extends Shell {
 			new Thread(() -> {
 				final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
 						props.getProperty("vejbySchema") };
-				final String message = GedcomLoader.loadCsvFiles(sa, this);
+				final String message = GedcomLoader.main(sa, this);
 
 				messageCombo.getDisplay().asyncExec(() -> setMessage(message));
 
@@ -705,7 +705,7 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param e
 	 */
-	private void kipFileLoader(SelectionEvent e) {
+	private void runKipFileLoader(SelectionEvent e) {
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");
@@ -746,7 +746,7 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param e
 	 */
-	protected void polregLoader(SelectionEvent e) {
+	protected void runPolregLoader(SelectionEvent e) {
 		final Shell[] shells = e.widget.getDisplay().getShells();
 		final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
 		messageBox.setText("Advarsel");

@@ -41,10 +41,10 @@ import net.myerichsen.archivesearcher.util.Fonkod;
 import net.myerichsen.archivesearcher.views.ArchiveSearcher;
 
 /**
- * Read and analyze a GEDCOM and load data into a Derby database
+ * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 18. jun. 2023
+ * @version 20. jun. 2023
  */
 
 public class GedcomLoader {
@@ -94,13 +94,13 @@ public class GedcomLoader {
 	private static Gedcom gedcom;
 
 	/**
-	 * MilRollEntryDialog called method
+	 * Load and analyze GEDCOM file
 	 *
 	 * @param args
 	 * @param shells
 	 * @return
 	 */
-	public static String loadCsvFiles(String[] args, ArchiveSearcher as) {
+	public static String main(String[] args, ArchiveSearcher as) {
 		final GedcomLoader ir = new GedcomLoader();
 
 		try {
@@ -118,6 +118,8 @@ public class GedcomLoader {
 	private String sted;
 
 	/**
+	 * Add child birth events
+	 * 
 	 * @throws SQLException
 	 *
 	 */
@@ -171,6 +173,8 @@ public class GedcomLoader {
 	}
 
 	/**
+	 * Add census events marked as shared
+	 * 
 	 * @throws SQLException
 	 *
 	 */
@@ -364,6 +368,12 @@ public class GedcomLoader {
 	private void execute(String[] args, ArchiveSearcher as) throws Exception {
 		final String dbURL = "jdbc:derby:" + args[1];
 		final String schema = args[2];
+		try {
+			DriverManager.getConnection(dbURL + ";shutdown=true");
+		} catch (SQLException e) {
+			// Shutdown message is expected
+			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
+		}
 		final Connection conn = DriverManager.getConnection(dbURL);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
@@ -400,7 +410,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * Extract birthYear from date string
+	 * Extract birth year from date string
 	 *
 	 * @param dateString
 	 * @return
@@ -419,7 +429,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * Insert a family event into Derby for husband and wife
+	 * Find all family events for husband and wife
 	 *
 	 * @param family
 	 * @throws SQLException
@@ -437,7 +447,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * Insert an individual event into Derby
+	 * Find all individual events
 	 *
 	 * @param individual
 	 * @throws SQLException
@@ -512,8 +522,6 @@ public class GedcomLoader {
 
 	/**
 	 * Insert an empty family into Derby
-	 * <p>
-	 * INSERT INTO FAMILY (ID, HUSBAND, WIFE) VALUES (?, NULL, NULL)
 	 *
 	 * @param key
 	 * @throws SQLException
@@ -846,8 +854,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * INSERT INTO PARENTS (INDIVIDUALKEY, BIRTHDATE, NAME, PARENTS, FATHERPHONETIC,
-	 * MOTHERPHONETIC, PLACE) VALUES(?, ?, ?, ?, ?, ?, ?)
+	 * Load the parent table
 	 *
 	 * @throws SQLException
 	 *
@@ -963,6 +970,8 @@ public class GedcomLoader {
 	}
 
 	/**
+	 * Prepare all SQL statements
+	 * 
 	 * @param conn
 	 * @throws SQLException
 	 */
@@ -994,7 +1003,7 @@ public class GedcomLoader {
 
 	/**
 	 * Split a string with a parent pair into two parents while removing noise words
-	 * 
+	 *
 	 * @param parents2
 	 * @return
 	 */
@@ -1042,7 +1051,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * UPDATE FAMILY SET HUSBAND = ? WHERE ID = ?
+	 * Update a family by inserting the husband
 	 *
 	 * @param husband
 	 * @throws Exception
@@ -1055,7 +1064,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * UPDATE FAMILY SET WIFE = '' WHERE ID = ''
+	 * Update a family by inserting the wife
 	 *
 	 * @param statement
 	 * @param ID
@@ -1069,9 +1078,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * Update an individual by adding FAMC
-	 * <p>
-	 * UPDATE INDIVIDUAL SET FAMC = ? WHERE ID = ?
+	 * Update an individual by adding the family in which it is a child
 	 *
 	 * @param individual
 	 * @throws Exception
@@ -1121,8 +1128,6 @@ public class GedcomLoader {
 
 	/**
 	 * Update an individual by adding parents
-	 * <p>
-	 * UPDATE INDIVIDUAL SET PARENTS = ? WHERE ID = ?
 	 *
 	 * @param individual
 	 * @throws Exception
@@ -1149,10 +1154,7 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * Update birth and death data for all individuals
-	 * <p>
-	 * UPDATE INDIVIDUAL SET BIRTHDATE = ?, BIRTHPLACE = ?, DEATHDATE = ?,
-	 * DEATHPLACE = ? WHERE ID = ?
+	 * Update birth and death dates and places for all individuals
 	 *
 	 * @param ldbi
 	 * @throws SQLException
