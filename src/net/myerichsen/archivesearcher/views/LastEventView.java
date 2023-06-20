@@ -172,7 +172,7 @@ public class LastEventView extends Composite {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.CR) {
 					if (textLocation.getText().isBlank()) {
-						((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.setMessage("Indtast venligst et sted og tryk ENTER");
 						textLocation.setFocus();
 					} else {
