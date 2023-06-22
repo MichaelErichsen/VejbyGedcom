@@ -42,7 +42,6 @@ import net.myerichsen.archivesearcher.filters.CensusBirthPlaceFilter;
 import net.myerichsen.archivesearcher.filters.CensusCountyFilter;
 import net.myerichsen.archivesearcher.filters.CensusNameFilter;
 import net.myerichsen.archivesearcher.filters.CensusParishFilter;
-import net.myerichsen.archivesearcher.filters.CensusSexFilter;
 import net.myerichsen.archivesearcher.filters.CensusYearFilter;
 import net.myerichsen.archivesearcher.models.CensusHouseholdModel;
 import net.myerichsen.archivesearcher.models.CensusModel;
@@ -53,8 +52,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 19. maj 2023
- *
+ * @version 22. jun. 2023
  */
 
 public class CensusView extends Composite {
@@ -62,7 +60,6 @@ public class CensusView extends Composite {
 	private Text txtCensusCounty;
 	private Text txtCensusParish;
 	private Text txtCensusName;
-	private Text txtCensusSex;
 	private Text txtCensusAge;
 	private Text txtCensusBirthPlace;
 	private Text txtCensusBirthDate;
@@ -72,6 +69,13 @@ public class CensusView extends Composite {
 	private List<CensusModel> household;
 	private Properties props;
 	private Thread thread;
+	private boolean spouseFilterFlag;
+	private CensusModel[] model;
+	private String id;
+	private String phonName;
+	private String birthDate;
+	private String deathDate;
+	private Button btngtefller;
 
 	/**
 	 * Create the view
@@ -158,23 +162,6 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblKn = new Label(censusFilterComposite, SWT.NONE);
-		lblKn.setText("K\u00F8n");
-
-		txtCensusSex = new Text(censusFilterComposite, SWT.BORDER);
-		txtCensusSex.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (txtCensusSex.getText().length() > 0) {
-					txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
-				} else {
-					txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-				}
-				CensusSexFilter.getInstance().setSearchText(txtCensusSex.getText());
-				tableViewer.refresh();
-			}
-		});
-
 		final Label lblAlder = new Label(censusFilterComposite, SWT.NONE);
 		lblAlder.setText("Alder +/- 2 \u00E5r");
 
@@ -225,6 +212,25 @@ public class CensusView extends Composite {
 				tableViewer.refresh();
 			}
 		});
+
+		btngtefller = new Button(censusFilterComposite, SWT.CHECK);
+		btngtefller.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Button button = (Button) e.widget;
+				final boolean selection = button.getSelection();
+				spouseFilterFlag = selection;
+
+				btngtefller.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				try {
+					populate(id, phonName, birthDate, deathDate);
+				} catch (final SQLException e1) {
+					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+				}
+			}
+		});
+		btngtefller.setText("\u00C6gtef\u00E6ller");
+
 		final Button btnRydFelterneCensus = new Button(censusFilterComposite, SWT.NONE);
 		btnRydFelterneCensus.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -242,23 +248,16 @@ public class CensusView extends Composite {
 
 		tableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 		tableViewer.setUseHashlookup(true);
-		tableViewer.addDoubleClickListener(event -> {
-			try {
-				popup();
-			} catch (final SQLException e1) {
-				e1.printStackTrace();
-			}
-		});
+		tableViewer.addDoubleClickListener(event -> displayPopup());
 
-		final ViewerFilter[] filters = new ViewerFilter[8];
+		final ViewerFilter[] filters = new ViewerFilter[7];
 		filters[0] = CensusBirthPlaceFilter.getInstance();
 		filters[1] = CensusCountyFilter.getInstance();
 		filters[2] = CensusNameFilter.getInstance();
 		filters[3] = CensusParishFilter.getInstance();
-		filters[4] = CensusSexFilter.getInstance();
-		filters[5] = CensusYearFilter.getInstance();
-		filters[6] = CensusAgeFilter.getInstance();
-		filters[7] = CensusBirthDateFilter.getInstance();
+		filters[4] = CensusYearFilter.getInstance();
+		filters[5] = CensusAgeFilter.getInstance();
+		filters[6] = CensusBirthDateFilter.getInstance();
 		tableViewer.setFilters(filters);
 		tableViewer.setComparator(new CensusComparator());
 		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -573,6 +572,7 @@ public class CensusView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
+
 		final CensusModel[] input = new CensusModel[0];
 		tableViewer.setInput(input);
 		clearFilters();
@@ -587,7 +587,6 @@ public class CensusView extends Composite {
 		CensusCountyFilter.getInstance().setSearchText("");
 		CensusNameFilter.getInstance().setSearchText("");
 		CensusParishFilter.getInstance().setSearchText("");
-		CensusSexFilter.getInstance().setSearchText("");
 		CensusAgeFilter.getInstance().setSearchText("");
 		CensusYearFilter.getInstance().setSearchText("");
 		txtCensusBirthPlace.setText("");
@@ -595,7 +594,6 @@ public class CensusView extends Composite {
 		txtCensusCounty.setText("");
 		txtCensusName.setText("");
 		txtCensusParish.setText("");
-		txtCensusSex.setText("");
 		txtCensusAge.setText("");
 		txtCensusYear.setText("");
 		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -604,9 +602,64 @@ public class CensusView extends Composite {
 		txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusSex.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		btngtefller.setSelection(false);
+		spouseFilterFlag = false;
+		btngtefller.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		try {
+			populate(id, phonName, birthDate, deathDate);
+		} catch (final SQLException e1) {
+			((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+		}
+
 		tableViewer.refresh();
+	}
+
+	/**
+	 * Display the popup
+	 */
+	private void displayPopup() {
+		try {
+			popup();
+		} catch (final SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	/**
+	 * Get the census data
+	 *
+	 * @param dbPath
+	 * @param schema
+	 * @param id
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 */
+	private void getCensus(String id, String phonName, String birthDate, String deathDate) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
+						props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
+						deathDate.substring(0, 4) };
+
+				model = (CensusModel[]) listener.load(loadArgs);
+
+				if (spouseFilterFlag && !id.isBlank()) {
+					model = CensusModel.filterForSpouses(props.getProperty("censusPath"),
+							props.getProperty("censusSchema"), id, model);
+				}
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(model));
+
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Folketællinger er hentet"));
+			} catch (final Exception e) {
+				e.printStackTrace();
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			}
+		}
 	}
 
 	/**
@@ -644,31 +697,19 @@ public class CensusView extends Composite {
 	/**
 	 * Populate census table
 	 *
+	 * @param id
 	 * @param phonName
 	 * @param birthDate
 	 * @param deathDate
 	 * @throws SQLException
 	 */
-	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
-							props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
-							deathDate.substring(0, 4) };
-					final CensusModel[] CensusRecords = (CensusModel[]) listener.load(loadArgs);
+	public void populate(String id, String phonName, String birthDate, String deathDate) throws SQLException {
+		this.id = id;
+		this.phonName = phonName;
+		this.birthDate = birthDate;
+		this.deathDate = deathDate;
 
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(CensusRecords));
-
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Folketællinger er hentet"));
-				} catch (final Exception e) {
-					e.printStackTrace();
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getCensus(id, phonName, birthDate, deathDate));
 		thread.start();
 	}
 

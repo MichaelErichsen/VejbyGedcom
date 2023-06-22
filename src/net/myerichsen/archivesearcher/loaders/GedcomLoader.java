@@ -119,7 +119,7 @@ public class GedcomLoader {
 
 	/**
 	 * Add child birth events
-	 * 
+	 *
 	 * @throws SQLException
 	 *
 	 */
@@ -174,7 +174,7 @@ public class GedcomLoader {
 
 	/**
 	 * Add census events marked as shared
-	 * 
+	 *
 	 * @throws SQLException
 	 *
 	 */
@@ -370,7 +370,7 @@ public class GedcomLoader {
 		final String schema = args[2];
 		try {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			// Shutdown message is expected
 			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
@@ -971,7 +971,7 @@ public class GedcomLoader {
 
 	/**
 	 * Prepare all SQL statements
-	 * 
+	 *
 	 * @param conn
 	 * @throws SQLException
 	 */

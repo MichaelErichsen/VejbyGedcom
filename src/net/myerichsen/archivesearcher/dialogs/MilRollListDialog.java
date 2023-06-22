@@ -39,10 +39,10 @@ import net.myerichsen.archivesearcher.util.MilrollListRulletypeEditingSupport;
 import net.myerichsen.archivesearcher.views.ArchiveSearcher;
 
 /**
- * Military rolls view
+ * Military rolls dialog
  *
  * @author Michael Erichsen
- * @version 1. jun. 2023
+ * @version 21. jun. 2023
  *
  */
 
@@ -302,8 +302,25 @@ public class MilRollListDialog extends Dialog {
 	}
 
 	/**
+	 * Get the military roll list
+	 */
+	private void getMilRollList() {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
+						props.getProperty("milrollSchema") };
+				final MilrollListModel[] array = (MilrollListModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
+			} catch (final Exception e) {
+				Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage()));
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
 	 * New empty item with backwards references copied into
-	 *
 	 */
 	protected void kopier() {
 		final TableItem[] tia = table.getSelection();
@@ -321,6 +338,8 @@ public class MilRollListDialog extends Dialog {
 	}
 
 	/**
+	 * Insert
+	 *
 	 * @throws SQLException
 	 *
 	 */
@@ -339,27 +358,16 @@ public class MilRollListDialog extends Dialog {
 	}
 
 	/**
-	 *
+	 * Populate the table
 	 */
 	public void populate() {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
-							props.getProperty("milrollSchema") };
-					final MilrollListModel[] milrolllistRecords = (MilrollListModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(milrolllistRecords));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage()));
-					e.printStackTrace();
-				}
-			}
-		});
+		thread = new Thread(this::getMilRollList);
 		thread.start();
 	}
 
 	/**
+	 * Update
+	 *
 	 * @throws SQLException
 	 *
 	 */
@@ -387,6 +395,8 @@ public class MilRollListDialog extends Dialog {
 	}
 
 	/**
+	 * Delete
+	 *
 	 * @throws SQLException
 	 *
 	 */

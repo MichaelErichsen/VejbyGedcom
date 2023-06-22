@@ -16,7 +16,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing an individual in the census table
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 22. jun. 2023
  *
  */
 
@@ -36,6 +36,157 @@ public class CensusModel extends ASModel {
 			+ "FTAAR, KILDEHENVISNING, KILDEKOMMENTAR) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
 			+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String SELECT = "SELECT * FROM CENSUS WHERE FONNAVN = ? " + "AND FTAAR >= ? AND FTAAR <= ?";
+	private static final String SELECT_WIFE = "SELECT WIFE FROM FAMILY WHERE HUSBAND = ?";
+	private static final String SELECT_HUSBAND = "SELECT HUSBAND FROM FAMILY WHERE WIFE = ?";
+	private static final String SELECT_HOUSEHOLD = "SELECT * FROM CENSUS "
+			+ "WHERE KIPNR = ? AND KILDESTEDNAVN = ? AND HUSSTANDS_FAMILIENR = ? AND MATR_NR_ADRESSE = ? "
+			+ "AND KILDEHENVISNING = ?";
+	private static Connection conn;
+	private static String schema;
+
+	/**
+	 * Filter an array of census records by spouse
+	 *
+	 * @param dbPath
+	 * @param schema
+	 * @param ID
+	 * @param sourceArray
+	 * @return
+	 * @throws SQLException
+	 */
+	public static CensusModel[] filterForSpouses(String dbPath, String schema, String ID, CensusModel[] sourceArray)
+			throws SQLException {
+		final List<CensusModel> list = new ArrayList<>();
+		List<CensusModel> houseHold;
+		final List<SpouseModel> spouseList = getSpouseList(ID);
+		int fTaar = 0;
+
+		for (final CensusModel censusModel : sourceArray) {
+			fTaar = censusModel.getFTaar();
+			houseHold = getHouseHold(dbPath, schema, censusModel);
+
+			for (final CensusModel householdModel : houseHold) {
+				for (final SpouseModel spouseModel : spouseList) {
+					if (spouseModel.getStartYear() <= fTaar && spouseModel.getEndYear() >= fTaar
+							&& householdModel.getFonnavn().equals(spouseModel.getPhoneticName().trim())) {
+						list.add(censusModel);
+					}
+				}
+			}
+		}
+
+		final CensusModel[] array = new CensusModel[list.size()];
+
+		for (int i = 0; i < list.size(); i++) {
+			array[i] = list.get(i);
+		}
+
+		return array;
+	}
+
+	/**
+	 * Get a list of households of the primary person in a census
+	 *
+	 * @param dbPath
+	 * @param schema
+	 * @param sourceModel
+	 * @return
+	 * @throws SQLException
+	 */
+	private static List<CensusModel> getHouseHold(String dbPath, String schema, CensusModel sourceModel)
+			throws SQLException {
+		CensusModel model;
+		final List<CensusModel> list = new ArrayList<>();
+
+		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, schema);
+		statement.execute();
+
+		statement = conn.prepareStatement(SELECT_HOUSEHOLD);
+		statement.setString(1, sourceModel.getKIPnr());
+		statement.setString(2, sourceModel.getKildestednavn());
+		statement.setString(3, sourceModel.getHusstands_familienr());
+		statement.setString(4, sourceModel.getMatr_nr_Adresse());
+		statement.setString(5, sourceModel.getKildehenvisning());
+		final ResultSet rs = statement.executeQuery();
+
+		while (rs.next()) {
+			model = new CensusModel();
+			model.setKIPnr(rs.getString("kipNr"));
+			model.setLoebenr(rs.getInt("Loebenr"));
+			model.setKildestednavn(rs.getString("Kildestednavn"));
+			model.setAmt(rs.getString("Amt"));
+			model.setHerred(rs.getString("Herred"));
+			model.setSogn(rs.getString("Sogn"));
+			model.setHusstands_familienr(rs.getString("Husstands_familienr"));
+			model.setMatr_nr_Adresse(rs.getString("Matr_nr_Adresse"));
+			model.setKildenavn(rs.getString("Kildenavn"));
+			model.setKoen(rs.getString("Koen"));
+			model.setAlder(rs.getInt("ALDER"));
+			model.setCivilstand(rs.getString("Civilstand"));
+			model.setKildeerhverv(rs.getString("Kildeerhverv"));
+			model.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
+			model.setKildefoedested(rs.getString("Kildefoedested"));
+			model.setFoedt_kildedato(rs.getString("Foedt_kildedato"));
+			model.setFoedeaar(rs.getInt("Foedeaar"));
+			model.setAdresse(rs.getString("Adresse"));
+			model.setMatrikel(rs.getString("Matrikel"));
+			model.setGade_nr(rs.getString("Gade_nr"));
+			model.setFTaar(rs.getInt("FTAar"));
+			model.setKildehenvisning(rs.getString("Kildehenvisning"));
+			model.setKildekommentar(rs.getString("Kildekommentar"));
+			list.add(model);
+		}
+
+		statement.close();
+		conn.close();
+		return list;
+
+	}
+
+	/**
+	 * @return the schema
+	 */
+	public static String getSchema() {
+		return schema;
+	}
+
+	/**
+	 * Get list of spouses for primary person
+	 *
+	 * @param iD
+	 * @return
+	 * @throws SQLException
+	 */
+	private static List<SpouseModel> getSpouseList(String iD) throws SQLException {
+		SpouseModel model;
+		final List<SpouseModel> list = new ArrayList<>();
+
+		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
+		statement.setString(1, getSchema());
+		statement.execute();
+
+		statement = conn.prepareStatement(SELECT_WIFE);
+		statement.setString(1, iD);
+		ResultSet rs = statement.executeQuery();
+
+		while (rs.next()) {
+			model = new SpouseModel(conn, getSchema(), iD, rs.getString("WIFE"));
+			list.add(model);
+		}
+
+		statement = conn.prepareStatement(SELECT_HUSBAND);
+		statement.setString(1, iD);
+		rs = statement.executeQuery();
+
+		while (rs.next()) {
+			model = new SpouseModel(conn, getSchema(), iD, rs.getString("HUSBAND"));
+			list.add(model);
+		}
+
+		return list;
+	}
 
 	/**
 	 * Get a list of census records from the Derby table
@@ -46,10 +197,11 @@ public class CensusModel extends ASModel {
 	 */
 	public static CensusModel[] load(String schema, String dbPath, String phonName, String birthYear, String deathYear)
 			throws Exception {
-		CensusModel ci;
-		final List<CensusModel> cil = new ArrayList<>();
+		setSchema(schema);
+		CensusModel model;
+		final List<CensusModel> list = new ArrayList<>();
 
-		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
+		conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
 		statement.execute();
@@ -106,40 +258,47 @@ public class CensusModel extends ASModel {
 				}
 			}
 
-			ci = new CensusModel();
-			ci.setKIPnr(rs.getString("kipNr"));
-			ci.setLoebenr(rs.getInt("Loebenr"));
-			ci.setKildestednavn(rs.getString("Kildestednavn"));
-			ci.setAmt(rs.getString("Amt"));
-			ci.setHerred(rs.getString("Herred"));
-			ci.setSogn(rs.getString("Sogn"));
-			ci.setHusstands_familienr(rs.getString("Husstands_familienr"));
-			ci.setMatr_nr_Adresse(rs.getString("Matr_nr_Adresse"));
-			ci.setKildenavn(rs.getString("Kildenavn"));
-			ci.setKoen(rs.getString("Koen"));
-			ci.setAlder(alder);
-			ci.setCivilstand(rs.getString("Civilstand"));
-			ci.setKildeerhverv(rs.getString("Kildeerhverv"));
-			ci.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
-			ci.setKildefoedested(rs.getString("Kildefoedested"));
-			ci.setFoedt_kildedato(fkd);
-			ci.setFoedeaar(rs.getInt("Foedeaar"));
-			ci.setAdresse(rs.getString("Adresse"));
-			ci.setMatrikel(rs.getString("Matrikel"));
-			ci.setGade_nr(rs.getString("Gade_nr"));
-			ci.setFTaar(ftYear);
-			ci.setKildehenvisning(rs.getString("Kildehenvisning"));
-			ci.setKildekommentar(rs.getString("Kildekommentar"));
-			cil.add(ci);
+			model = new CensusModel();
+			model.setKIPnr(rs.getString("kipNr"));
+			model.setLoebenr(rs.getInt("Loebenr"));
+			model.setKildestednavn(rs.getString("Kildestednavn"));
+			model.setAmt(rs.getString("Amt"));
+			model.setHerred(rs.getString("Herred"));
+			model.setSogn(rs.getString("Sogn"));
+			model.setHusstands_familienr(rs.getString("Husstands_familienr"));
+			model.setMatr_nr_Adresse(rs.getString("Matr_nr_Adresse"));
+			model.setKildenavn(rs.getString("Kildenavn"));
+			model.setKoen(rs.getString("Koen"));
+			model.setAlder(alder);
+			model.setCivilstand(rs.getString("Civilstand"));
+			model.setKildeerhverv(rs.getString("Kildeerhverv"));
+			model.setStilling_i_husstanden(rs.getString("Stilling_i_husstanden"));
+			model.setKildefoedested(rs.getString("Kildefoedested"));
+			model.setFoedt_kildedato(fkd);
+			model.setFoedeaar(rs.getInt("Foedeaar"));
+			model.setAdresse(rs.getString("Adresse"));
+			model.setMatrikel(rs.getString("Matrikel"));
+			model.setGade_nr(rs.getString("Gade_nr"));
+			model.setFTaar(ftYear);
+			model.setKildehenvisning(rs.getString("Kildehenvisning"));
+			model.setKildekommentar(rs.getString("Kildekommentar"));
+			list.add(model);
 		}
 
-		final CensusModel[] cra = new CensusModel[cil.size()];
+		final CensusModel[] array = new CensusModel[list.size()];
 
-		for (int i = 0; i < cra.length; i++) {
-			cra[i] = cil.get(i);
+		for (int i = 0; i < array.length; i++) {
+			array[i] = list.get(i);
 		}
 
-		return cra;
+		return array;
+	}
+
+	/**
+	 * @param schema the schema to set
+	 */
+	public static void setSchema(String schema) {
+		CensusModel.schema = schema;
 	}
 
 	private String KIPnr = "";

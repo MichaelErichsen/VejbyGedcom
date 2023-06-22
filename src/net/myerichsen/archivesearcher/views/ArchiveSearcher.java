@@ -864,7 +864,7 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			if (props.getProperty("censusSearch").equals("true")) {
-				censusView.populate(phonName, birthDate, deathDate);
+				censusView.populate(individual.getId(), phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("probateSearch").equals("true")) {
@@ -944,7 +944,7 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			if (props.getProperty("censusSearch").equals("true")) {
-				censusView.populate(phonName, birthDate, deathDate);
+				censusView.populate("", phonName, birthDate, deathDate);
 			}
 
 			if (props.getProperty("probateSearch").equals("true")) {

@@ -99,7 +99,8 @@ public class ProbateModel extends ASModel {
 		int i = 0;
 
 		for (final Iterator<ProbateModel> iterator = set.iterator(); iterator.hasNext();) {
-			array[i++] = iterator.next();
+			array[i] = iterator.next();
+			i++;
 		}
 
 		return array;

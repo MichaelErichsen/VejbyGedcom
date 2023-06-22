@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 16. jun. 2023
+ * @version 21. jun. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -310,35 +310,40 @@ public class HouseholdHeadView extends Composite {
 	}
 
 	/**
+	 * @param headId
+	 */
+	private void getHouseholds(String headId) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("vejbyPath"),
+						props.getProperty("vejbySchema"), props.getProperty("censusPath"),
+						props.getProperty("censusSchema"), props.getProperty("milrollPath"),
+						props.getProperty("milrollSchema"), headId };
+				final HouseholdHeadModel[] HouseholdHeadRecords = (HouseholdHeadModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViever.setInput(HouseholdHeadRecords));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Husbond er hentet"));
+			} catch (final Exception e) {
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate table
-	 * 
+	 *
 	 * @param headId
 	 */
 	public void populate(String headId) {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbyPath"),
-							props.getProperty("vejbySchema"), props.getProperty("censusPath"),
-							props.getProperty("censusSchema"), props.getProperty("milrollPath"),
-							props.getProperty("milrollSchema"), headId };
-					final HouseholdHeadModel[] HouseholdHeadRecords = (HouseholdHeadModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViever.setInput(HouseholdHeadRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Husbond er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getHouseholds(headId));
 		thread.start();
 	}
 
 	/**
 	 * Popup
-	 * 
+	 *
 	 * @param display
 	 */
 	private void popup(Display display) {
@@ -350,26 +355,35 @@ public class HouseholdHeadView extends Composite {
 				new String[] { "OK", "Kopier", "Søg husbond", "Søg tjenende" }, 0);
 		final int open = dialog.open();
 
-		if (open == 1) {
+		switch (open) {
+		case 1: {
 			final Clipboard clipboard = new Clipboard(display);
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
-		} else if (open == 2) {
+			break;
+		}
+		case 2: {
 			final String headId = m.getHeadId();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(headId);
-		} else if (open == 3) {
+			break;
+		}
+		case 3: {
 			final String relocatorId = m.getRelocatorId();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(relocatorId);
 			grandParent.searchById(null);
+			break;
+		}
+		default:
+			break;
 		}
 	}
 
 	/**
 	 * Set properties
-	 * 
+	 *
 	 * @param props
 	 */
 	public void setProperties(Properties props) {

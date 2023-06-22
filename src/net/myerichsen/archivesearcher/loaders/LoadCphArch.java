@@ -86,7 +86,7 @@ public abstract class LoadCphArch {
 		final String dbURL = "jdbc:derby:" + args[1];
 		try {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			// Shutdown message is expected
 			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
