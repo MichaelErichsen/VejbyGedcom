@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 20. jun. 2023
+ * @version 26. jun. 2023
  */
 
 public class GedcomLoader {
@@ -372,7 +372,6 @@ public class GedcomLoader {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
 		} catch (final SQLException e) {
 			// Shutdown message is expected
-			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
 		final Connection conn = DriverManager.getConnection(dbURL);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
