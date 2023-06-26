@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 20. jun. 2023
+ * @version 26. jun. 2023
  *
  */
 
@@ -627,45 +627,39 @@ public class ArchiveSearcher extends Shell {
 			final InputStream input = new FileInputStream(Constants.PROPERTIES_PATH);
 			props.load(input);
 		} catch (final Exception e) {
+			props.setProperty("aar", Constants.AAR);
+			props.setProperty("amt", Constants.AMT);
 			props.setProperty("burialPersonComplete", Constants.HACK4DK_BURIAL_PERSON_COMPLETE);
-			props.setProperty("burregSearch", "true");
 			props.setProperty("censusCsvFileDirectory", Constants.CENSUS_CSV_FILE_DIRECTORY);
 			props.setProperty("censusPath", Constants.CENSUSDB_PATH);
 			props.setProperty("censusSchema", Constants.CENSUSDB_SCHEMA);
-			props.setProperty("censusSearch", "true");
 			props.setProperty("cphCsvFileDirectory", Constants.CPH_CSV_FILE_DIRECTORY);
 			props.setProperty("cphDbPath", Constants.CPHDB_PATH);
 			props.setProperty("cphSchema", Constants.CPHDB_SCHEMA);
 			props.setProperty("gedcomFilePath", Constants.GEDCOM_FILE_PATH);
-			props.setProperty("headSearch", "true");
+			props.setProperty("height", Constants.height);
 			props.setProperty("kipTextFilename", Constants.KIP_TEXT_FILENAME);
+			props.setProperty("laegdid", Constants.LAEGDID);
+			props.setProperty("laegdnr", Constants.LAEGDNR);
+			props.setProperty("litra", Constants.LITRA);
+			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
+			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
+			props.setProperty("msgLogLen", "20");
 			props.setProperty("policeAddress", Constants.HACK4DK_POLICE_ADDRESS);
 			props.setProperty("policePerson", Constants.HACK4DK_POLICE_PERSON);
 			props.setProperty("policePosition", Constants.HACK4DK_POLICE_POSITION);
-			props.setProperty("polregSearch", "true");
 			props.setProperty("probatePath", Constants.PROBATEDB_PATH);
 			props.setProperty("probateSchema", Constants.PROBATEDB_SCHEMA);
-			props.setProperty("probateSearch", "true");
 			props.setProperty("probateSource", Constants.PROBATE_SOURCE);
 			props.setProperty("relocationSearch", "true");
-			props.setProperty("siblingSearch", "true");
+			props.setProperty("rulletype", Constants.HOVEDRULLE);
+			props.setProperty("sogn", Constants.SOGN);
+			props.setProperty("uri", Constants.MILROLL_URI);
 			props.setProperty("vejbyPath", Constants.VEJBYDB_PATH);
 			props.setProperty("vejbySchema", Constants.VEJBYDB_SCHEMA);
-			props.setProperty("msgLogLen", "20");
-			props.setProperty("amt", Constants.AMT);
-			props.setProperty("aar", Constants.AAR);
-			props.setProperty("litra", Constants.LITRA);
-			props.setProperty("rulletype", Constants.HOVEDRULLE);
-			props.setProperty("laegdnr", Constants.LAEGDNR);
-			props.setProperty("sogn", Constants.SOGN);
-			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
-			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
-			props.setProperty("laegdid", Constants.LAEGDID);
-			props.setProperty("uri", Constants.MILROLL_URI);
+			props.setProperty("width", Constants.width);
 			props.setProperty("x", Constants.x);
 			props.setProperty("y", Constants.y);
-			props.setProperty("width", Constants.width);
-			props.setProperty("height", Constants.height);
 
 			storeProperties();
 			System.out.println("Egenskaber gemt i " + Constants.PROPERTIES_PATH);
@@ -858,36 +852,17 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			individualView.populate(individual);
+			relocationView.populate(phonName, birthDate);
+			censusView.populate(individual.getId(), phonName, birthDate, deathDate);
+			probateView.populate(phonName, birthDate, deathDate);
+			polregView.populate(phonName, birthDate, deathDate);
+			burregView.populate(phonName, birthDate, deathDate);
 
-			if (props.getProperty("relocationSearch").equals("true")) {
-				relocationView.populate(phonName, birthDate);
-			}
-
-			if (props.getProperty("censusSearch").equals("true")) {
-				censusView.populate(individual.getId(), phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("probateSearch").equals("true")) {
-				probateView.populate(phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("polregSearch").equals("true")) {
-				polregView.populate(phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("burregSearch").equals("true")) {
-				burregView.populate(phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("siblingSearch").equals("true") && individual.getParents() != null
-					&& individual.getParents().length() > 0) {
+			if (individual.getParents() != null && individual.getParents().length() > 0) {
 				siblingsView.populate(individual.getParents());
 			}
 
-			if (props.getProperty("headSearch").equals("true")) {
-				householdHeadView.populate(individual.getId());
-			}
-
+			householdHeadView.populate(individual.getId());
 		} catch (final SQLException e1) {
 			messageCombo.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -939,25 +914,11 @@ public class ArchiveSearcher extends Shell {
 				deathDate = searchDeath.getText();
 			}
 
-			if (props.getProperty("relocationSearch").equals("true")) {
-				relocationView.populate(phonName, birthDate);
-			}
-
-			if (props.getProperty("censusSearch").equals("true")) {
-				censusView.populate("", phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("probateSearch").equals("true")) {
-				probateView.populate(phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("polregSearch").equals("true")) {
-				polregView.populate(phonName, birthDate, deathDate);
-			}
-
-			if (props.getProperty("burregSearch").equals("true")) {
-				burregView.populate(phonName, birthDate, deathDate);
-			}
+			relocationView.populate(phonName, birthDate);
+			censusView.populate("", phonName, birthDate, deathDate);
+			probateView.populate(phonName, birthDate, deathDate);
+			polregView.populate(phonName, birthDate, deathDate);
+			burregView.populate(phonName, birthDate, deathDate);
 
 			if (searchFather.getText().length() > 0 || searchMother.getText().length() > 0) {
 				siblingsView.populate(searchFather.getText(), searchMother.getText());

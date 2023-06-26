@@ -8,7 +8,7 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 3. maj. 2023
+ * @version 26. jun. 2023
  *
  */
 public class SettingsModel {
@@ -17,22 +17,17 @@ public class SettingsModel {
 	private String censusCsvFileDirectory;
 	private String censusPath;
 	private String censusSchema;
-	private String censusSearch;
 	private String cphCsvFileDirectory;
 	private String cphDbPath;
 	private String cphSchema;
 	private String gedcomFilePath;
-	private String headSearch;
 	private String kipTextFilename;
 	private String policeAddress;
 	private String policePerson;
 	private String policePosition;
-	private String polregSearch;
 	private String probatePath;
 	private String probateSchema;
-	private String probateSearch;
 	private String relocationSearch;
-	private String siblingSearch;
 	private String vejbyPath;
 	private String vejbySchema;
 	private String msgLogLen;
@@ -50,22 +45,17 @@ public class SettingsModel {
 		censusCsvFileDirectory = props.getProperty("censusCsvFileDirectory");
 		censusPath = props.getProperty("censusPath");
 		censusSchema = props.getProperty("censusSchema");
-		censusSearch = props.getProperty("censusSearch");
 		cphCsvFileDirectory = props.getProperty("cphCsvFileDirectory");
 		cphDbPath = props.getProperty("cphDbPath");
 		cphSchema = props.getProperty("cphSchema");
 		gedcomFilePath = props.getProperty("gedcomFilePath");
-		headSearch = props.getProperty("headSearch");
 		kipTextFilename = props.getProperty("kipTextFilename");
 		policeAddress = props.getProperty("policeAddress");
 		policePerson = props.getProperty("policePerson");
 		policePosition = props.getProperty("policePosition");
-		polregSearch = props.getProperty("polregSearch");
 		probatePath = props.getProperty("probatePath");
 		probateSchema = props.getProperty("probateSchema");
-		probateSearch = props.getProperty("probateSearch");
 		relocationSearch = props.getProperty("relocationSearch");
-		siblingSearch = props.getProperty("siblingSearch");
 		vejbyPath = props.getProperty("vejbyPath");
 		vejbySchema = props.getProperty("vejbySchema");
 		msgLogLen = props.getProperty("msgLogLen");
@@ -109,13 +99,6 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @return the censusSearch
-	 */
-	public String getCensusSearch() {
-		return censusSearch;
-	}
-
-	/**
 	 * @return the cphCsvFileDirectory
 	 */
 	public String getCphCsvFileDirectory() {
@@ -148,13 +131,6 @@ public class SettingsModel {
 	 */
 	public String getGedcomFilePath() {
 		return gedcomFilePath;
-	}
-
-	/**
-	 * @return the headSearch
-	 */
-	public String getHeadSearch() {
-		return headSearch;
 	}
 
 	/**
@@ -207,13 +183,6 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @return the polregSearch
-	 */
-	public String getPolregSearch() {
-		return polregSearch;
-	}
-
-	/**
 	 * @return the probatePath
 	 */
 	public String getProbatePath() {
@@ -228,24 +197,10 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @return the probateSearch
-	 */
-	public String getProbateSearch() {
-		return probateSearch;
-	}
-
-	/**
 	 * @return the relocationSearch
 	 */
 	public String getRelocationSearch() {
 		return relocationSearch;
-	}
-
-	/**
-	 * @return the siblingSearch
-	 */
-	public String getSiblingSearch() {
-		return siblingSearch;
 	}
 
 	/**
@@ -299,13 +254,6 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @param censusSearch the censusSearch to set
-	 */
-	public void setCensusSearch(String censusSearch) {
-		this.censusSearch = censusSearch;
-	}
-
-	/**
 	 * @param cphCsvFileDirectory the cphCsvFileDirectory to set
 	 */
 	public void setCphCsvFileDirectory(String cphCsvFileDirectory) {
@@ -338,13 +286,6 @@ public class SettingsModel {
 	 */
 	public void setGedcomFilePath(String gedcomFilePath) {
 		this.gedcomFilePath = gedcomFilePath;
-	}
-
-	/**
-	 * @param headSearch the headSearch to set
-	 */
-	public void setHeadSearch(String headSearch) {
-		this.headSearch = headSearch;
 	}
 
 	/**
@@ -397,13 +338,6 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @param polregSearch the polregSearch to set
-	 */
-	public void setPolregSearch(String polregSearch) {
-		this.polregSearch = polregSearch;
-	}
-
-	/**
 	 * @param probatePath the probatePath to set
 	 */
 	public void setProbatePath(String probatePath) {
@@ -418,24 +352,10 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @param probateSearch the probateSearch to set
-	 */
-	public void setProbateSearch(String probateSearch) {
-		this.probateSearch = probateSearch;
-	}
-
-	/**
 	 * @param relocationSearch the relocationSearch to set
 	 */
 	public void setRelocationSearch(String relocationSearch) {
 		this.relocationSearch = relocationSearch;
-	}
-
-	/**
-	 * @param siblingSearch the siblingSearch to set
-	 */
-	public void setSiblingSearch(String siblingSearch) {
-		this.siblingSearch = siblingSearch;
 	}
 
 	/**
@@ -461,22 +381,17 @@ public class SettingsModel {
 		props.setProperty("censusCsvFileDirectory", censusCsvFileDirectory);
 		props.setProperty("censusPath", censusPath);
 		props.setProperty("censusSchema", censusSchema);
-		props.setProperty("censusSearch", censusSearch);
 		props.setProperty("cphCsvFileDirectory", cphCsvFileDirectory);
 		props.setProperty("cphDbPath", cphDbPath);
 		props.setProperty("cphSchema", cphSchema);
 		props.setProperty("gedcomFilePath", gedcomFilePath);
-		props.setProperty("headSearch", headSearch);
 		props.setProperty("kipTextFilename", kipTextFilename);
 		props.setProperty("policeAddress", policeAddress);
 		props.setProperty("policePerson", policePerson);
 		props.setProperty("policePosition", policePosition);
-		props.setProperty("polregSearch", polregSearch);
 		props.setProperty("probatePath", probatePath);
 		props.setProperty("probateSchema", probateSchema);
-		props.setProperty("probateSearch", probateSearch);
 		props.setProperty("relocationSearch", relocationSearch);
-		props.setProperty("siblingSearch", siblingSearch);
 		props.setProperty("vejbyPath", vejbyPath);
 		props.setProperty("vejbySchema", vejbySchema);
 		props.setProperty("msgLogLen", msgLogLen);

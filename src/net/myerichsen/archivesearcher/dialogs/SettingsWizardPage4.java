@@ -20,7 +20,7 @@ import net.myerichsen.archivesearcher.models.SettingsModel;
  * Wizard page to handle Copenhagen registries
  *
  * @author Michael Erichsen
- * @version 21. apr. 2023
+ * @version 26. jun. 2023
  *
  */
 public class SettingsWizardPage4 extends WizardPage {
@@ -32,15 +32,7 @@ public class SettingsWizardPage4 extends WizardPage {
 	private Text txtCphDbPath;
 	private Text txtCphSchema;
 
-	private Button btnRelocationTab;
-	private Button btnCensusTab;
-	private Button btnProbateTab;
-	private Button btnPolitietsRegisterblade;
-	private Button btnBegravelsesregistret;
-	private Button btnSiblings;
-
 	private SettingsModel settings;
-	private Button btnHusbond;
 	private Label lblMeddelelsesloglngde;
 	private Slider sliderMsgLogLen;
 	private Text txtMsgLogLen;
@@ -242,45 +234,6 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtCphSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		txtCphSchema.setText(settings.getCphSchema());
 		new Label(container, SWT.NONE);
-
-		final Composite checkButtoncomposite = new Composite(container, SWT.BORDER);
-		final GridData gd_checkButtoncomposite = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
-		gd_checkButtoncomposite.widthHint = 799;
-		checkButtoncomposite.setLayoutData(gd_checkButtoncomposite);
-		final GridLayout gl_checkButtoncomposite = new GridLayout(8, false);
-		gl_checkButtoncomposite.verticalSpacing = 3;
-		checkButtoncomposite.setLayout(gl_checkButtoncomposite);
-
-		final Label lblAktiveSgninger = new Label(checkButtoncomposite, SWT.NONE);
-		lblAktiveSgninger.setText("Aktive s\u00F8gninger:");
-
-		btnRelocationTab = new Button(checkButtoncomposite, SWT.CHECK);
-		btnRelocationTab.setSelection(true);
-		btnRelocationTab.setText("Flytninger");
-
-		btnCensusTab = new Button(checkButtoncomposite, SWT.CHECK);
-		btnCensusTab.setSelection(true);
-		btnCensusTab.setText("Folket\u00E6llinger");
-
-		btnProbateTab = new Button(checkButtoncomposite, SWT.CHECK);
-		btnProbateTab.setSelection(true);
-		btnProbateTab.setText("Skifter");
-
-		btnPolitietsRegisterblade = new Button(checkButtoncomposite, SWT.CHECK);
-		btnPolitietsRegisterblade.setSelection(true);
-		btnPolitietsRegisterblade.setText("Politiets registerblade");
-
-		btnBegravelsesregistret = new Button(checkButtoncomposite, SWT.CHECK);
-		btnBegravelsesregistret.setSelection(true);
-		btnBegravelsesregistret.setText("Begravelsesregistret");
-
-		btnSiblings = new Button(checkButtoncomposite, SWT.CHECK);
-		btnSiblings.setSelection(true);
-		btnSiblings.setText("S\u00F8skende");
-
-		btnHusbond = new Button(checkButtoncomposite, SWT.CHECK);
-		btnHusbond.setSelection(true);
-		btnHusbond.setText("Husbond");
 
 		setControl(container);
 
