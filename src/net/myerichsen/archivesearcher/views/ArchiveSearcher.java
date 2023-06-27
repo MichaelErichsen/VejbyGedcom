@@ -22,7 +22,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -31,6 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 26. jun. 2023
+ * @version 27. jun. 2023
  *
  */
 
@@ -104,7 +104,7 @@ public class ArchiveSearcher extends Shell {
 		}
 	}
 
-	private final Combo messageCombo;
+	private Combo messageCombo;
 	private Combo searchIdCombo;
 	private Text searchName;
 	private Text searchBirth;
@@ -125,6 +125,7 @@ public class ArchiveSearcher extends Shell {
 	private final CensusDupView censusDupView;
 	private final MilRollEntryView milRollEntryView;
 	private final LastEventView lastEventView;
+	private ProgressBar indicator;
 
 	/**
 	 * Create the shell
@@ -220,9 +221,7 @@ public class ArchiveSearcher extends Shell {
 		tbtmLastEvent.setControl(lastEventView);
 		lastEventView.setProperties(props);
 
-		messageCombo = new Combo(this, SWT.READ_ONLY);
-		messageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
+		createMessageBar();
 		createContents();
 	}
 
@@ -458,6 +457,23 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * Create the message bar with progress indicator
+	 */
+	private void createMessageBar() {
+		final Composite messageComposite = new Composite(this, SWT.NONE);
+		messageComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		messageComposite.setLayout(new GridLayout(4, false));
+
+		messageCombo = new Combo(messageComposite, SWT.READ_ONLY);
+		messageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+
+		indicator = new ProgressBar(messageComposite, SWT.INDETERMINATE);
+		indicator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		indicator.setBackground(getDisplay().getSystemColor(SWT.COLOR_CYAN));
+		indicator.setVisible(false);
+	}
+
+	/**
 	 * Create the search bar
 	 */
 	private void createSearchBar() {
@@ -562,10 +578,6 @@ public class ArchiveSearcher extends Shell {
 		});
 		btnSgPForldre.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.BOLD));
 		btnSgPForldre.setText("S\u00F8g p\u00E5 &for\u00E6ldre");
-
-		final Composite composite = new Composite(searchComposite, SWT.NONE);
-		composite.setLayout(new RowLayout(SWT.HORIZONTAL));
-		composite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 6, 1));
 	}
 
 	/**
@@ -586,6 +598,13 @@ public class ArchiveSearcher extends Shell {
 				props.getProperty("vejbySchema") };
 		final String message = GedcomLoader.main(sa, this);
 		messageCombo.getDisplay().asyncExec(() -> setMessage(message));
+	}
+
+	/**
+	 * @return the indicator
+	 */
+	public ProgressBar getIndicator() {
+		return indicator;
 	}
 
 	/**
@@ -863,6 +882,8 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			householdHeadView.populate(individual.getId());
+
+			indicator.setVisible(true);
 		} catch (final SQLException e1) {
 			messageCombo.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -924,6 +945,7 @@ public class ArchiveSearcher extends Shell {
 				siblingsView.populate(searchFather.getText(), searchMother.getText());
 			}
 
+			indicator.setVisible(true);
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
@@ -950,6 +972,7 @@ public class ArchiveSearcher extends Shell {
 			messageBox.setMessage("Indtast venligst fader og/eller moder");
 			messageBox.open();
 			searchFather.setFocus();
+
 			return;
 		}
 
@@ -974,6 +997,7 @@ public class ArchiveSearcher extends Shell {
 		try {
 			siblingsView.populate(father, mother);
 			siblingsView.setFocus();
+			indicator.setVisible(true);
 		} catch (final Exception e2) {
 			setErrorMessage(e2.getMessage());
 			e2.printStackTrace();
@@ -993,6 +1017,13 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
+	 * @param indicator the indicator to set
+	 */
+	public void setIndicator(ProgressBar indicator) {
+		this.indicator = indicator;
+	}
+
+	/**
 	 * Set the message in the message combo box
 	 *
 	 * @param string
@@ -1009,6 +1040,10 @@ public class ArchiveSearcher extends Shell {
 
 		if (messageCombo.getItemCount() > lastItem) {
 			messageCombo.remove(lastItem);
+		}
+
+		if (Thread.activeCount() <= 6) {
+			indicator.setVisible(false);
 		}
 	}
 

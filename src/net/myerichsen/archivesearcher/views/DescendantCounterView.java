@@ -28,7 +28,7 @@ import net.myerichsen.archivesearcher.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 27. jun. 2023
  *
  */
 public class DescendantCounterView extends Composite {
@@ -141,27 +141,35 @@ public class DescendantCounterView extends Composite {
 	}
 
 	/**
+	 *
+	 */
+	private void getInput() {
+		if (listener != null) {
+			try {
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.getIndicator().setVisible(true));
+				final String[] loadArgs = new String[] { props.getProperty("gedcomFilePath") };
+				final DescendantModel[] descendantRecords = (DescendantModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(descendantRecords));
+
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage("Efterkommere er hentet"));
+			} catch (final Exception e) {
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * @param gedcomFileName
 	 */
 	public void populate() {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("gedcomFilePath") };
-					final DescendantModel[] descendantRecords = (DescendantModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(descendantRecords));
-
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage("Efterkommere er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(this::getInput);
 		thread.start();
 	}
 

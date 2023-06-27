@@ -40,7 +40,7 @@ import net.myerichsen.archivesearcher.populators.LastEventViewPopulator;
  * individual to search for burials
  *
  * @author Michael Erichsen
- * @version 19. jun. 2023
+ * @version 27. jun. 2023
  *
  */
 public class LastEventView extends Composite {
@@ -215,30 +215,38 @@ public class LastEventView extends Composite {
 	}
 
 	/**
+	 * @param location
+	 */
+	private void getInput(String location) {
+		if (listener != null) {
+			try {
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.getIndicator().setVisible(true));
+				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+						props.getProperty("vejbyPath"), location };
+				final LastEventModel[] array = (LastEventModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage("Sidste hændelser i " + location + " er hentet"));
+			} catch (final Exception e) {
+				e.printStackTrace();
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate the census duplicate tab from the database
 	 *
 	 * @throws SQLException
 	 */
 	public void populate(String location) {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath"), location };
-					final LastEventModel[] array = (LastEventModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage("Sidste hændelser i " + location + " er hentet"));
-				} catch (final Exception e) {
-					e.printStackTrace();
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getInput(location));
 		thread.start();
 	}
 

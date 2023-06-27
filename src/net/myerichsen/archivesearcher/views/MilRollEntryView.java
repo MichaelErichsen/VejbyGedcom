@@ -49,7 +49,7 @@ import net.myerichsen.archivesearcher.populators.MilrollPopulator;
  * Military roll entry view
  *
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 27. jun. 2023
  *
  */
 
@@ -511,6 +511,33 @@ public class MilRollEntryView extends Composite {
 	}
 
 	/**
+	 *
+	 */
+	private void getInput() {
+		if (listener != null) {
+			try {
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.getIndicator().setVisible(true));
+				final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
+						props.getProperty("milrollSchema") };
+				final MilRollEntryModel[] MilrollRecords = (MilRollEntryModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(MilrollRecords));
+
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage("Lægdsruller er hentet"));
+			} catch (final Exception e) {
+				e.printStackTrace();
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate Milroll table
 	 *
 	 * @param phonName
@@ -519,26 +546,7 @@ public class MilRollEntryView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate() throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
-							props.getProperty("milrollSchema") };
-					final MilRollEntryModel[] MilrollRecords = (MilRollEntryModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(MilrollRecords));
-
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage("Lægdsruller er hentet"));
-				} catch (final Exception e) {
-					e.printStackTrace();
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(this::getInput);
 		thread.start();
 	}
 

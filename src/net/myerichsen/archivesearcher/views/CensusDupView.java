@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 9. jun. 2023
+ * @version 27. jun. 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -170,29 +170,38 @@ public class CensusDupView extends Composite {
 	}
 
 	/**
+	 *
+	 */
+	private void getInput() {
+		if (listener != null) {
+			try {
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.getIndicator().setVisible(true));
+				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+
+						props.getProperty("vejbyPath") };
+				final CensusDupModel[] censusdupRecords = (CensusDupModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage("Folketællingsdubletter er hentet"));
+			} catch (final Exception e) {
+				Display.getDefault()
+						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+								.setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate the census duplicate tab from the database
 	 *
 	 * @throws SQLException
 	 */
 	public void populate() throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath") };
-					final CensusDupModel[] censusdupRecords = (CensusDupModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage("Folketællingsdubletter er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault()
-							.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-									.setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(this::getInput);
 		thread.start();
 	}
 
