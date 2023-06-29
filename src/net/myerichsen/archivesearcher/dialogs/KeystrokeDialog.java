@@ -14,7 +14,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Michael Erichsen
- * @version 29. maj 2023
+ * @version 28. jun. 2023
  *
  */
 public class KeystrokeDialog extends Dialog {
@@ -123,11 +123,15 @@ public class KeystrokeDialog extends Dialog {
 		final Label lblLS = new Label(container, SWT.NONE);
 		lblLS.setText("Alt+S Søg efter GEDCOM ID");
 
-		final Label lblN = new Label(container, SWT.NONE);
-		lblN.setText("Alt+N Søg efter navn");
+		Label lblAltmMuligegtefller = new Label(container, SWT.NONE);
+		lblAltmMuligegtefller.setText("Alt+M Mulige \u00E6gtef\u00E6ller faneblad");
 
 		final Label lblLT = new Label(container, SWT.NONE);
 		lblLT.setText("Alt+T Tilbage til forrige rulle");
+
+		final Label lblN = new Label(container, SWT.NONE);
+		lblN.setText("Alt+N Søg efter navn");
+		new Label(container, SWT.NONE);
 
 		final Label lblO = new Label(container, SWT.NONE);
 		lblO.setText("Alt+O Folketællinger faneblad");

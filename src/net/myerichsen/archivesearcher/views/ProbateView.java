@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.populators.ProbatePopulator;
  * Probate view
  *
  * @author Michael Erichsen
- * @version 1. jun. 2023
+ * @version 29. jun. 2023
  *
  */
 public class ProbateView extends Composite {
@@ -247,6 +247,28 @@ public class ProbateView extends Composite {
 	}
 
 	/**
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 */
+	private void getProbates(String phonName, String birthDate, String deathDate) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
+						props.getProperty("probatePath"), phonName, birthDate, deathDate };
+				final ProbateModel[] modelArray = (ProbateModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(modelArray));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Skifter er hentet"));
+			} catch (final Exception e) {
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate probate table
 	 *
 	 * @param phonName
@@ -255,22 +277,7 @@ public class ProbateView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
-							props.getProperty("probatePath"), phonName, birthDate, deathDate };
-					final ProbateModel[] modelArray = (ProbateModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(modelArray));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Skifter er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getProbates(phonName, birthDate, deathDate));
 		thread.start();
 	}
 
@@ -279,17 +286,6 @@ public class ProbateView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-//		final TableItem ti = tia[0];
-//
-//		final StringBuilder sb = new StringBuilder();
-//
-//		for (int i = 0; i < 5; i++) {
-//			if (ti.getText(i).length() > 0) {
-//				sb.append(ti.getText(i) + ", ");
-//			}
-//		}
-//
-//		sb.append("\n");
 
 		final ProbateModel m = (ProbateModel) tia[0].getData();
 		final String string = m.toString().replace("¤", "\n");

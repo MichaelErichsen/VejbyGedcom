@@ -4,10 +4,10 @@ package net.myerichsen.archivesearcher.models;
  * Class representing an event in the derby database
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 29. jun. 2023
  *
  */
-public class EventRecord extends ASModel {
+public class EventModel extends ASModel {
 	private final int id;
 	private final String individual;
 	private final String place;
@@ -23,7 +23,7 @@ public class EventRecord extends ASModel {
 	 * @param subType
 	 * @param note
 	 */
-	public EventRecord(int id, String individual, String place, String subType, String note) {
+	public EventModel(int id, String individual, String place, String subType, String note) {
 		this.id = id;
 		this.individual = individual;
 		this.place = place;

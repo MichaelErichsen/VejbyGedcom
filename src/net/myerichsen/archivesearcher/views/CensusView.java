@@ -52,7 +52,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 22. jun. 2023
+ * @version 28. jun. 2023
  */
 
 public class CensusView extends Composite {
@@ -70,7 +70,7 @@ public class CensusView extends Composite {
 	private Properties props;
 	private Thread thread;
 	private boolean spouseFilterFlag;
-	private CensusModel[] model;
+	private CensusModel[] array;
 	private String id;
 	private String phonName;
 	private String birthDate;
@@ -89,14 +89,14 @@ public class CensusView extends Composite {
 
 		listener = new CensusPopulator();
 
-		final Composite censusFilterComposite = new Composite(this, SWT.BORDER);
-		censusFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		censusFilterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+		final Composite filterComposite = new Composite(this, SWT.BORDER);
+		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		final Label aLabel = new Label(censusFilterComposite, SWT.NONE);
+		final Label aLabel = new Label(filterComposite, SWT.NONE);
 		aLabel.setText("Filtre: \u00C5r");
 
-		txtCensusYear = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusYear = new Text(filterComposite, SWT.BORDER);
 		txtCensusYear.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -110,10 +110,10 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblAmt = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblAmt = new Label(filterComposite, SWT.NONE);
 		lblAmt.setText("Amt");
 
-		txtCensusCounty = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusCounty = new Text(filterComposite, SWT.BORDER);
 		txtCensusCounty.addKeyListener(new KeyAdapter() {
 
 			@Override
@@ -128,10 +128,10 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblSogn = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblSogn = new Label(filterComposite, SWT.NONE);
 		lblSogn.setText("Sogn");
 
-		txtCensusParish = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusParish = new Text(filterComposite, SWT.BORDER);
 		txtCensusParish.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -145,10 +145,10 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblNavn = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblNavn = new Label(filterComposite, SWT.NONE);
 		lblNavn.setText("Navn");
 
-		txtCensusName = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusName = new Text(filterComposite, SWT.BORDER);
 		txtCensusName.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -162,10 +162,10 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblAlder = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblAlder = new Label(filterComposite, SWT.NONE);
 		lblAlder.setText("Alder +/- 2 \u00E5r");
 
-		txtCensusAge = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusAge = new Text(filterComposite, SWT.BORDER);
 		txtCensusAge.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -179,10 +179,10 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblFdested = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblFdested = new Label(filterComposite, SWT.NONE);
 		lblFdested.setText("F\u00F8dested");
 
-		txtCensusBirthPlace = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusBirthPlace = new Text(filterComposite, SWT.BORDER);
 		txtCensusBirthPlace.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -196,10 +196,10 @@ public class CensusView extends Composite {
 			}
 		});
 
-		final Label lblFdedato = new Label(censusFilterComposite, SWT.NONE);
+		final Label lblFdedato = new Label(filterComposite, SWT.NONE);
 		lblFdedato.setText("F\u00F8dedato");
 
-		txtCensusBirthDate = new Text(censusFilterComposite, SWT.BORDER);
+		txtCensusBirthDate = new Text(filterComposite, SWT.BORDER);
 		txtCensusBirthDate.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -213,7 +213,7 @@ public class CensusView extends Composite {
 			}
 		});
 
-		btngtefller = new Button(censusFilterComposite, SWT.CHECK);
+		btngtefller = new Button(filterComposite, SWT.CHECK);
 		btngtefller.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -231,7 +231,7 @@ public class CensusView extends Composite {
 		});
 		btngtefller.setText("\u00C6gtef\u00E6ller");
 
-		final Button btnRydFelterneCensus = new Button(censusFilterComposite, SWT.NONE);
+		final Button btnRydFelterneCensus = new Button(filterComposite, SWT.NONE);
 		btnRydFelterneCensus.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -240,13 +240,13 @@ public class CensusView extends Composite {
 		});
 		btnRydFelterneCensus.setText("Ryd felterne");
 
-		final ScrolledComposite censusScroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		censusScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		censusScroller.setSize(0, 0);
-		censusScroller.setExpandHorizontal(true);
-		censusScroller.setExpandVertical(true);
+		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		scroller.setSize(0, 0);
+		scroller.setExpandHorizontal(true);
+		scroller.setExpandVertical(true);
 
-		tableViewer = new TableViewer(censusScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer = new TableViewer(scroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.addDoubleClickListener(event -> displayPopup());
 
@@ -266,297 +266,273 @@ public class CensusView extends Composite {
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 
-		final TableViewerColumn censusTableVieverColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnr = censusTableVieverColumn.getColumn();
+		final TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnr = tableViewerColumn.getColumn();
 		tblclmnr.setWidth(50);
 		tblclmnr.setText("\u00C5r");
-		censusTableVieverColumn.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return Integer.toString(cr.getFTaar());
+				return Integer.toString(((CensusModel) element).getFTaar());
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnAmt = censusTableVieverColumn_1.getColumn();
+		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnAmt = tableViewerColumn_1.getColumn();
 		tblclmnAmt.setWidth(75);
 		tblclmnAmt.setText("Amt");
-		censusTableVieverColumn_1.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getAmt();
+				return ((CensusModel) element).getAmt();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnHerred = censusTableVieverColumn_2.getColumn();
+		final TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnHerred = tableViewerColumn_2.getColumn();
 		tblclmnHerred.setWidth(75);
 		tblclmnHerred.setText("Herred");
-		censusTableVieverColumn_2.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getHerred();
+				return ((CensusModel) element).getHerred();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnSogn = censusTableVieverColumn_3.getColumn();
+		final TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnSogn = tableViewerColumn_3.getColumn();
 		tblclmnSogn.setWidth(75);
 		tblclmnSogn.setText("Sogn");
-		censusTableVieverColumn_3.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_3.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getSogn();
+				return ((CensusModel) element).getSogn();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnKildestednavn = censusTableVieverColumn_4.getColumn();
+		final TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnKildestednavn = tableViewerColumn_4.getColumn();
 		tblclmnKildestednavn.setWidth(75);
 		tblclmnKildestednavn.setText("Kildestednavn");
-		censusTableVieverColumn_4.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_4.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildestednavn();
+				return ((CensusModel) element).getKildestednavn();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnHusstfamnr = censusTableVieverColumn_5.getColumn();
+		final TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnHusstfamnr = tableViewerColumn_5.getColumn();
 		tblclmnHusstfamnr.setWidth(40);
 		tblclmnHusstfamnr.setText("Husst./fam.nr.");
-		censusTableVieverColumn_5.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_5.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getHusstands_familienr();
+				return ((CensusModel) element).getHusstands_familienr();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnMatrnraddr = censusTableVieverColumn_6.getColumn();
+		final TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnMatrnraddr = tableViewerColumn_6.getColumn();
 		tblclmnMatrnraddr.setWidth(75);
 		tblclmnMatrnraddr.setText("Matr.nr.addr.");
-		censusTableVieverColumn_6.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getMatr_nr_Adresse();
+				return ((CensusModel) element).getMatr_nr_Adresse();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnKildenavn = censusTableVieverColumn_7.getColumn();
+		final TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnKildenavn = tableViewerColumn_7.getColumn();
 		tblclmnKildenavn.setWidth(75);
 		tblclmnKildenavn.setText("Kildenavn");
-		censusTableVieverColumn_7.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_7.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildenavn();
+				return ((CensusModel) element).getKildenavn();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnKn = censusTableVieverColumn_8.getColumn();
+		final TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnKn = tableViewerColumn_8.getColumn();
 		tblclmnKn.setWidth(40);
 		tblclmnKn.setText("K\u00F8n");
-		censusTableVieverColumn_8.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_8.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKoen();
+				return ((CensusModel) element).getKoen();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnAlder = censusTableVieverColumn_9.getColumn();
+		final TableViewerColumn tableViewerColumn_9 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnAlder = tableViewerColumn_9.getColumn();
 		tblclmnAlder.setWidth(40);
 		tblclmnAlder.setText("Alder");
-		censusTableVieverColumn_9.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_9.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return Integer.toString(cr.getAlder());
+				return Integer.toString(((CensusModel) element).getAlder());
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_10 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnCivilstand = censusTableVieverColumn_10.getColumn();
+		final TableViewerColumn tableViewerColumn_10 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnCivilstand = tableViewerColumn_10.getColumn();
 		tblclmnCivilstand.setWidth(75);
 		tblclmnCivilstand.setText("Civilstand");
-		censusTableVieverColumn_10.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_10.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getCivilstand();
+				return ((CensusModel) element).getCivilstand();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_11 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnErhverv = censusTableVieverColumn_11.getColumn();
+		final TableViewerColumn tableViewerColumn_11 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnErhverv = tableViewerColumn_11.getColumn();
 		tblclmnErhverv.setWidth(75);
 		tblclmnErhverv.setText("Erhverv");
-		censusTableVieverColumn_11.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_11.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildeerhverv();
+				return ((CensusModel) element).getKildeerhverv();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_12 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnStillHusst = censusTableVieverColumn_12.getColumn();
+		final TableViewerColumn tableViewerColumn_12 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnStillHusst = tableViewerColumn_12.getColumn();
 		tblclmnStillHusst.setWidth(75);
 		tblclmnStillHusst.setText("Still. husst.");
-		censusTableVieverColumn_12.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_12.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getStilling_i_husstanden();
+				return ((CensusModel) element).getStilling_i_husstanden();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_13 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnFdested = censusTableVieverColumn_13.getColumn();
+		final TableViewerColumn tableViewerColumn_13 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnFdested = tableViewerColumn_13.getColumn();
 		tblclmnFdested.setWidth(75);
 		tblclmnFdested.setText("F\u00F8dested");
-		censusTableVieverColumn_13.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_13.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildefoedested();
+				return ((CensusModel) element).getKildefoedested();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_14 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnFdedato = censusTableVieverColumn_14.getColumn();
+		final TableViewerColumn tableViewerColumn_14 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnFdedato = tableViewerColumn_14.getColumn();
 		tblclmnFdedato.setWidth(75);
 		tblclmnFdedato.setText("F\u00F8dedato");
-		censusTableVieverColumn_14.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_14.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getFoedt_kildedato();
+				return ((CensusModel) element).getFoedt_kildedato();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_15 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnFder = censusTableVieverColumn_15.getColumn();
+		final TableViewerColumn tableViewerColumn_15 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnFder = tableViewerColumn_15.getColumn();
 		tblclmnFder.setWidth(75);
 		tblclmnFder.setText("F\u00F8de\u00E5r");
-		censusTableVieverColumn_15.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_15.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return Integer.toString(cr.getFoedeaar());
+				return Integer.toString(((CensusModel) element).getFoedeaar());
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_16 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnAdresse = censusTableVieverColumn_16.getColumn();
+		final TableViewerColumn tableViewerColumn_16 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnAdresse = tableViewerColumn_16.getColumn();
 		tblclmnAdresse.setWidth(75);
 		tblclmnAdresse.setText("Adresse");
-		censusTableVieverColumn_16.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_16.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getAdresse();
+				return ((CensusModel) element).getAdresse();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_17 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnMatrikel = censusTableVieverColumn_17.getColumn();
+		final TableViewerColumn tableViewerColumn_17 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnMatrikel = tableViewerColumn_17.getColumn();
 		tblclmnMatrikel.setWidth(75);
 		tblclmnMatrikel.setText("Matrikel");
-		censusTableVieverColumn_17.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_17.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getMatrikel();
+				return ((CensusModel) element).getMatrikel();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_18 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnGadenr = censusTableVieverColumn_18.getColumn();
+		final TableViewerColumn tableViewerColumn_18 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnGadenr = tableViewerColumn_18.getColumn();
 		tblclmnGadenr.setWidth(40);
 		tblclmnGadenr.setText("Gadenr.");
-		censusTableVieverColumn_18.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_18.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getGade_nr();
+				return ((CensusModel) element).getGade_nr();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_19 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnHenvisning = censusTableVieverColumn_19.getColumn();
+		final TableViewerColumn tableViewerColumn_19 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnHenvisning = tableViewerColumn_19.getColumn();
 		tblclmnHenvisning.setWidth(75);
 		tblclmnHenvisning.setText("Henvisning");
-		censusTableVieverColumn_19.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_19.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildehenvisning();
+				return ((CensusModel) element).getKildehenvisning();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_20 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnKommentar = censusTableVieverColumn_20.getColumn();
+		final TableViewerColumn tableViewerColumn_20 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnKommentar = tableViewerColumn_20.getColumn();
 		tblclmnKommentar.setWidth(75);
 		tblclmnKommentar.setText("Kommentar");
-		censusTableVieverColumn_20.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_20.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildekommentar();
+				return ((CensusModel) element).getKildekommentar();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_21 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnKipNr = censusTableVieverColumn_21.getColumn();
+		final TableViewerColumn tableViewerColumn_21 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnKipNr = tableViewerColumn_21.getColumn();
 		tblclmnKipNr.setWidth(50);
 		tblclmnKipNr.setText("KIP nr.");
-		censusTableVieverColumn_21.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_21.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKIPnr();
+				return ((CensusModel) element).getKIPnr();
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_22 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnLbenr = censusTableVieverColumn_22.getColumn();
+		final TableViewerColumn tableViewerColumn_22 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnLbenr = tableViewerColumn_22.getColumn();
 		tblclmnLbenr.setWidth(40);
 		tblclmnLbenr.setText("L\u00F8benr.");
-		censusTableVieverColumn_22.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_22.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return Integer.toString(cr.getLoebenr());
+				return Integer.toString(((CensusModel) element).getLoebenr());
 			}
 		});
 
-		final TableViewerColumn censusTableVieverColumn_23 = new TableViewerColumn(tableViewer, SWT.NONE);
-		final TableColumn tblclmnDetaljer_1 = censusTableVieverColumn_23.getColumn();
+		final TableViewerColumn tableViewerColumn_23 = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnDetaljer_1 = tableViewerColumn_23.getColumn();
 		tblclmnDetaljer_1.setWidth(100);
 		tblclmnDetaljer_1.setText("Detaljer");
-		censusTableVieverColumn_23.setLabelProvider(new ColumnLabelProvider() {
+		tableViewerColumn_23.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final CensusModel cr = (CensusModel) element;
-				return cr.getKildedetaljer();
+				return ((CensusModel) element).getKildedetaljer();
 			}
 		});
 
-		censusScroller.setContent(table);
-		censusScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scroller.setContent(table);
+		scroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -627,7 +603,7 @@ public class CensusView extends Composite {
 	}
 
 	/**
-	 * Get the census data
+	 * Get the data
 	 *
 	 * @param dbPath
 	 * @param schema
@@ -643,14 +619,14 @@ public class CensusView extends Composite {
 						props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
 						deathDate.substring(0, 4) };
 
-				model = (CensusModel[]) listener.load(loadArgs);
+				array = (CensusModel[]) listener.load(loadArgs);
 
 				if (spouseFilterFlag && !id.isBlank()) {
-					model = CensusModel.filterForSpouses(props.getProperty("censusPath"),
-							props.getProperty("censusSchema"), id, model);
+					array = CensusModel.filterForSpouses(props.getProperty("censusPath"),
+							props.getProperty("censusSchema"), id, array);
 				}
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(model));
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 
 				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 						.setMessage("Folketællinger er hentet"));
@@ -695,7 +671,7 @@ public class CensusView extends Composite {
 	}
 
 	/**
-	 * Populate census table
+	 * Populate the table
 	 *
 	 * @param id
 	 * @param phonName
@@ -714,19 +690,19 @@ public class CensusView extends Composite {
 	}
 
 	/**
-	 * Create the census popup
+	 * Create the popup
 	 *
 	 * @throws SQLException
 	 */
 	private void popup() throws SQLException {
 		final TableItem[] tia = table.getSelection();
-		final CensusModel m = (CensusModel) tia[0].getData();
-		final StringBuilder sb = new StringBuilder(m.toString());
+		final CensusModel model = (CensusModel) tia[0].getData();
+		final StringBuilder sb = new StringBuilder(model.toString());
 		sb.append("\n\n");
 
 		try {
-			sb.append(getCensusHousehold(m.getKIPnr(), m.getKildestednavn(), m.getHusstands_familienr(),
-					m.getMatr_nr_Adresse(), m.getKildehenvisning()));
+			sb.append(getCensusHousehold(model.getKIPnr(), model.getKildestednavn(), model.getHusstands_familienr(),
+					model.getMatr_nr_Adresse(), model.getKildehenvisning()));
 		} catch (final SQLException e) {
 			final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
 			as.setErrorMessage(e.getMessage());
@@ -739,9 +715,9 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), m.getKIPnr(),
-						m.getKildestednavn(), m.getHusstands_familienr(), m.getMatr_nr_Adresse(),
-						m.getKildehenvisning(), props.getProperty("censusSchema"));
+				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"),
+						model.getKIPnr(), model.getKildestednavn(), model.getHusstands_familienr(),
+						model.getMatr_nr_Adresse(), model.getKildehenvisning(), props.getProperty("censusSchema"));
 
 				final StringBuilder sb2 = new StringBuilder();
 
@@ -760,9 +736,9 @@ public class CensusView extends Composite {
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
-			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), m.getKIPnr(),
-					m.getKildestednavn(), m.getHusstands_familienr(), m.getMatr_nr_Adresse(), m.getKildehenvisning(),
-					props.getProperty("censusSchema"));
+			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), model.getKIPnr(),
+					model.getKildestednavn(), model.getHusstands_familienr(), model.getMatr_nr_Adresse(),
+					model.getKildehenvisning(), props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);
 			final String headOfHousehold = CensusHouseholdModel.getHeadOfHousehold(props, censusModel);
 

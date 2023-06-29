@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 27. jun. 2023
+ * @version 29. jun. 2023
  *
  */
 
@@ -126,6 +126,7 @@ public class ArchiveSearcher extends Shell {
 	private final MilRollEntryView milRollEntryView;
 	private final LastEventView lastEventView;
 	private ProgressBar indicator;
+	private final PotentialSpouseView potentialSpousesView;
 
 	/**
 	 * Create the shell
@@ -191,6 +192,12 @@ public class ArchiveSearcher extends Shell {
 		householdHeadView.setProperties(props);
 		tbtmHusbond.setControl(householdHeadView);
 
+		final TabItem tbtmPotentialSpouses = new TabItem(tabFolder, SWT.NONE);
+		tbtmPotentialSpouses.setText("&Mulige ægtefæller");
+		potentialSpousesView = new PotentialSpouseView(tabFolder, SWT.NONE);
+		potentialSpousesView.setProperties(props);
+		tbtmPotentialSpouses.setControl(potentialSpousesView);
+
 		final TabItem tbtmKrydsreferencer = new TabItem(tabFolder, SWT.NONE);
 		tbtmKrydsreferencer.setText("Kr&ydsreferencer");
 
@@ -249,6 +256,7 @@ public class ArchiveSearcher extends Shell {
 		relocationView.clear();
 		siblingsView.clear();
 		householdHeadView.clear();
+		potentialSpousesView.clear();
 		searchIdCombo.setFocus();
 		setMessage("Felter er ryddet");
 	}
@@ -466,6 +474,7 @@ public class ArchiveSearcher extends Shell {
 
 		messageCombo = new Combo(messageComposite, SWT.READ_ONLY);
 		messageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		messageCombo.setBackground(new Color(255, 255, 255, 255));
 
 		indicator = new ProgressBar(messageComposite, SWT.INDETERMINATE);
 		indicator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -619,7 +628,7 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Get Police registry
+	 * Get Police Registry
 	 */
 	private void getPolReg() {
 		String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
@@ -783,7 +792,7 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Load police registry files
+	 * Load Police Registry files
 	 *
 	 * @param e
 	 */
@@ -830,7 +839,7 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		final String idx = searchIdCombo.getText();
-		setSearchMessage("Søger efter ID " + idx);
+		setMessage("Søger efter ID " + idx);
 		searchIdCombo.add(idx, 0);
 		final String id = idx.contains("@") ? idx : "@I" + searchIdCombo.getText().trim() + "@";
 		searchIdCombo.select(0);
@@ -882,6 +891,7 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			householdHeadView.populate(individual.getId());
+			potentialSpousesView.populate(individual.getId());
 
 			indicator.setVisible(true);
 		} catch (final SQLException e1) {
@@ -911,7 +921,7 @@ public class ArchiveSearcher extends Shell {
 			return;
 		}
 
-		setSearchMessage("Søger efter " + searchName.getText());
+		setMessage("Søger efter " + searchName.getText());
 
 		final Fonkod fk = new Fonkod();
 		try {
@@ -992,7 +1002,7 @@ public class ArchiveSearcher extends Shell {
 			sb.append(mother);
 		}
 
-		setSearchMessage("Søger efter " + sb);
+		setMessage("Søger efter " + sb);
 
 		try {
 			siblingsView.populate(father, mother);
@@ -1047,16 +1057,16 @@ public class ArchiveSearcher extends Shell {
 		}
 	}
 
-	/**
-	 * Set the message in the message combo box and mark as a search message
-	 *
-	 * @param string
-	 *
-	 */
-	public void setSearchMessage(String string) {
-		messageCombo.setBackground(new Color(255, 255, 0, 255));
-		setMessage(string);
-	}
+//	/**
+//	 * Set the message in the message combo box and mark as a search message
+//	 *
+//	 * @param string
+//	 *
+//	 */
+//	public void setSearchMessage(String string) {
+//		messageCombo.setBackground(new Color(255, 255, 0, 255));
+//		setMessage(string);
+//	}
 
 	/**
 	 * Store properties in a file
