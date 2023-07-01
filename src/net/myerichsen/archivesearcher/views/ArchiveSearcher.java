@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 29. jun. 2023
+ * @version 30. jun. 2023
  *
  */
 
@@ -186,17 +186,17 @@ public class ArchiveSearcher extends Shell {
 		siblingsView.setProperties(props);
 		tbtmSiblings.setControl(siblingsView);
 
-		final TabItem tbtmHusbond = new TabItem(tabFolder, SWT.NONE);
-		tbtmHusbond.setText("&Husbond");
-		householdHeadView = new HouseholdHeadView(tabFolder, SWT.NONE);
-		householdHeadView.setProperties(props);
-		tbtmHusbond.setControl(householdHeadView);
-
 		final TabItem tbtmPotentialSpouses = new TabItem(tabFolder, SWT.NONE);
 		tbtmPotentialSpouses.setText("&Mulige ægtefæller");
 		potentialSpousesView = new PotentialSpouseView(tabFolder, SWT.NONE);
 		potentialSpousesView.setProperties(props);
 		tbtmPotentialSpouses.setControl(potentialSpousesView);
+
+		final TabItem tbtmHusbond = new TabItem(tabFolder, SWT.NONE);
+		tbtmHusbond.setText("&Husbond");
+		householdHeadView = new HouseholdHeadView(tabFolder, SWT.NONE);
+		householdHeadView.setProperties(props);
+		tbtmHusbond.setControl(householdHeadView);
 
 		final TabItem tbtmKrydsreferencer = new TabItem(tabFolder, SWT.NONE);
 		tbtmKrydsreferencer.setText("Kr&ydsreferencer");

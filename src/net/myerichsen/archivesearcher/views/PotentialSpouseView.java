@@ -111,6 +111,17 @@ public class PotentialSpouseView extends Composite {
 			}
 		});
 
+		TableViewerColumn tableViewerSourceType = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnSourceType = tableViewerSourceType.getColumn();
+		tblclmnSourceType.setWidth(110);
+		tblclmnSourceType.setText("Kilde");
+		tableViewerSourceType.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((PotentialSpouseModel) element).getSourceType();
+			}
+		});
+
 		final TableViewerColumn tableViewerColumnIdListe = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tblclmnIdList = tableViewerColumnIdListe.getColumn();
 		tblclmnIdList.setWidth(300);

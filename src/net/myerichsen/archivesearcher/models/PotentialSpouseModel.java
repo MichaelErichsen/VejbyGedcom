@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -19,7 +20,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a potential spouse
  *
  * @author Michael Erichsen
- * @version 29. jun. 2023
+ * @version 1. jul. 2023
  */
 
 public class PotentialSpouseModel extends ASModel {
@@ -80,7 +81,8 @@ public class PotentialSpouseModel extends ASModel {
 		if (!rs1.next()) {
 			return new PotentialSpouseModel[0];
 		}
-		String primaryPhonetic = rs1.getString("PHONNAME");
+
+		final String primaryPhonetic = rs1.getString("PHONNAME");
 
 		gedcomStatement = gedcomConn.prepareStatement(SELECT_INDIVIDUAL_SPOUSE);
 		gedcomStatement.setString(1, individual);
@@ -101,6 +103,7 @@ public class PotentialSpouseModel extends ASModel {
 				model.setFoedt_kildedato(rs2.getString("BIRTHDATE"));
 				model.setKildefoedested(rs2.getString("BIRTHPLACE"));
 				model.setFonnavn(rs2.getString("PHONNAME").trim());
+				model.setSourceType("Hændelse " + rs1.getString("DATE").substring(0, 4));
 				list.add(model);
 			}
 		}
@@ -163,13 +166,17 @@ public class PotentialSpouseModel extends ASModel {
 					birthDate = rs4.getInt("FOEDEAAR") + "";
 
 					if (birthDate.trim().equals("0")) {
-						birthDate = rs4.getInt("FTAAR") - rs4.getInt("ALDER") + "";
+						int ftAar = rs4.getInt("FTAAR");
+						ftAar = ftAar == 0 ? Integer.parseInt(kildeHenvisning) : ftAar;
+						birthDate = ftAar - rs4.getInt("ALDER") + "";
+						model.setSourceType("Folketælling " + ftAar);
 					}
 				}
 				model.setFoedt_kildedato(birthDate);
 
 				model.setKildefoedested(rs4.getString("KILDEFOEDESTED"));
 				model.setFonnavn(rs4.getString("FONNAVN"));
+
 				list.add(model);
 			}
 		}
@@ -180,6 +187,7 @@ public class PotentialSpouseModel extends ASModel {
 
 		for (final PotentialSpouseModel psm : list) {
 			sb = new StringBuilder();
+			List<Integer> idList = new ArrayList<Integer>();
 			gedcomStatement.setString(1, psm.getFonnavn());
 			rs1 = gedcomStatement.executeQuery();
 
@@ -203,7 +211,13 @@ public class PotentialSpouseModel extends ASModel {
 					continue;
 				}
 
-				sb.append(rs1.getString("ID").replace("I", "").replace("@", "").trim() + ", ");
+				idList.add(Integer.parseInt(rs1.getString("ID").replace("I", "").replace("@", "").trim()));
+			}
+
+			Collections.sort(idList);
+
+			for (Integer anId : idList) {
+				sb.append(anId + ", ");
 			}
 
 			psm.setId(sb.toString());
@@ -231,6 +245,7 @@ public class PotentialSpouseModel extends ASModel {
 	private String Kildefoedested = "";
 	private String Foedt_kildedato = "";
 	private String id = "";
+	private String sourceType;
 
 	/**
 	 * @return the foedt_kildedato
@@ -275,6 +290,13 @@ public class PotentialSpouseModel extends ASModel {
 	}
 
 	/**
+	 * @return the sourceType
+	 */
+	public String getSourceType() {
+		return sourceType;
+	}
+
+	/**
 	 * @param foedt_kildedato the foedt_kildedato to set
 	 */
 	public void setFoedt_kildedato(String foedt_kildedato) {
@@ -316,11 +338,19 @@ public class PotentialSpouseModel extends ASModel {
 		Koen = koen;
 	}
 
+	/**
+	 * @param sourceType the sourceType to set
+	 */
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
+
 	@Override
 	public String toString() {
 		return (Kildenavn != null ? Kildenavn + ", " : "") + (Koen != null ? Koen + ", " : "")
 				+ (Fonnavn != null ? Fonnavn + ", " : "") + (Kildefoedested != null ? Kildefoedested + ", " : "")
-				+ (Foedt_kildedato != null ? Foedt_kildedato + ", " : "") + (id != null ? id : "");
+				+ (Foedt_kildedato != null ? Foedt_kildedato + ", " : "") + (id != null ? id + ", " : "")
+				+ (sourceType != null ? sourceType : "");
 	}
 
 }
