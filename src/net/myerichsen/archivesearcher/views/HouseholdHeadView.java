@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 21. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
@@ -166,8 +166,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getHeadId();
+				return ((HouseholdHeadModel) element).getHeadId();
 			}
 		});
 		final TableColumn tblclmnId = HouseholdHeadTableViewerColumn.getColumn();
@@ -182,8 +181,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getHeadName();
+				return ((HouseholdHeadModel) element).getHeadName();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_2 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -194,8 +192,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getEventDate().toString();
+				return ((HouseholdHeadModel) element).getEventDate().toString();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_6 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -205,8 +202,7 @@ public class HouseholdHeadView extends Composite {
 		HouseholdHeadTableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getNote();
+				return ((HouseholdHeadModel) element).getNote();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_3 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -217,8 +213,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getPlace();
+				return ((HouseholdHeadModel) element).getPlace();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_5 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -229,8 +224,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getRelocatorId();
+				return ((HouseholdHeadModel) element).getRelocatorId();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_8 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -241,8 +235,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getRelocatorName();
+				return ((HouseholdHeadModel) element).getRelocatorName();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_4 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -253,8 +246,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getSourceDetail();
+				return ((HouseholdHeadModel) element).getSourceDetail();
 			}
 		});
 		final TableViewerColumn HouseholdHeadTableViewerColumn_9 = new TableViewerColumn(tableViever, SWT.NONE);
@@ -265,8 +257,7 @@ public class HouseholdHeadView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final HouseholdHeadModel model = (HouseholdHeadModel) element;
-				return model.getEventType();
+				return ((HouseholdHeadModel) element).getEventType();
 			}
 		});
 
@@ -288,8 +279,7 @@ public class HouseholdHeadView extends Composite {
 			thread.interrupt();
 		}
 
-		final HouseholdHeadModel[] input = new HouseholdHeadModel[0];
-		tableViever.setInput(input);
+		tableViever.setInput(new HouseholdHeadModel[0]);
 		clearFilters();
 	}
 
@@ -312,7 +302,7 @@ public class HouseholdHeadView extends Composite {
 	/**
 	 * @param headId
 	 */
-	private void getHouseholds(String headId) {
+	private void getInput(String headId) {
 		if (listener != null) {
 			try {
 				final String[] loadArgs = new String[] { props.getProperty("vejbyPath"),
@@ -337,7 +327,7 @@ public class HouseholdHeadView extends Composite {
 	 * @param headId
 	 */
 	public void populate(String headId) {
-		thread = new Thread(() -> getHouseholds(headId));
+		thread = new Thread(() -> getInput(headId));
 		thread.start();
 	}
 
@@ -348,8 +338,7 @@ public class HouseholdHeadView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final HouseholdHeadModel m = (HouseholdHeadModel) tia[0].getData();
-		final String string = m.toString() + "\n";
+		final String string = ((HouseholdHeadModel) tia[0].getData()).toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Husbond", null, string, MessageDialog.INFORMATION,
 				new String[] { "OK", "Kopier", "Søg husbond", "Søg tjenende" }, 0);
@@ -364,13 +353,13 @@ public class HouseholdHeadView extends Composite {
 			break;
 		}
 		case 2: {
-			final String headId = m.getHeadId();
+			final String headId = ((HouseholdHeadModel) tia[0].getData()).getHeadId();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(headId);
 			break;
 		}
 		case 3: {
-			final String relocatorId = m.getRelocatorId();
+			final String relocatorId = ((HouseholdHeadModel) tia[0].getData()).getRelocatorId();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(relocatorId);
 			grandParent.searchById(null);

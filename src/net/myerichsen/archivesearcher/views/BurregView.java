@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 25. maj 2023
+ * @version 1. jul. 2023
  *
  */
 public class BurregView extends Composite {
@@ -163,8 +163,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getFirstNames();
+				return ((BurregModel) element).getFirstNames();
 			}
 		});
 
@@ -176,8 +175,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getLastName();
+				return ((BurregModel) element).getLastName();
 			}
 		});
 
@@ -189,8 +187,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getDateOfDeath();
+				return ((BurregModel) element).getDateOfDeath();
 			}
 		});
 
@@ -202,8 +199,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getYearOfBirth();
+				return ((BurregModel) element).getYearOfBirth();
 			}
 		});
 
@@ -215,8 +211,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getDeathPlace();
+				return ((BurregModel) element).getDeathPlace();
 			}
 		});
 
@@ -228,8 +223,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getCivilStatus();
+				return ((BurregModel) element).getCivilStatus();
 			}
 		});
 
@@ -241,8 +235,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getAdressOutsideCph();
+				return ((BurregModel) element).getAdressOutsideCph();
 			}
 		});
 
@@ -254,8 +247,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getSex();
+				return ((BurregModel) element).getSex();
 			}
 		});
 
@@ -267,8 +259,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getComment();
+				return ((BurregModel) element).getComment();
 			}
 		});
 
@@ -280,8 +271,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getCemetary();
+				return ((BurregModel) element).getCemetary();
 			}
 		});
 
@@ -293,8 +283,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getChapel();
+				return ((BurregModel) element).getChapel();
 			}
 		});
 
@@ -306,8 +295,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getStreet();
+				return ((BurregModel) element).getStreet();
 			}
 		});
 
@@ -319,8 +307,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getHood();
+				return ((BurregModel) element).getHood();
 			}
 		});
 
@@ -332,8 +319,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getStreetNumber();
+				return ((BurregModel) element).getStreetNumber();
 			}
 		});
 
@@ -345,8 +331,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getLetter();
+				return ((BurregModel) element).getLetter();
 			}
 		});
 
@@ -358,8 +343,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getFloor();
+				return ((BurregModel) element).getFloor();
 			}
 		});
 
@@ -371,8 +355,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getInstitution();
+				return ((BurregModel) element).getInstitution();
 			}
 		});
 
@@ -384,8 +367,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getInstitutionStreet();
+				return ((BurregModel) element).getInstitutionStreet();
 			}
 		});
 
@@ -397,8 +379,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getInstitutionStreet();
+				return ((BurregModel) element).getInstitutionStreet();
 			}
 		});
 
@@ -410,8 +391,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getInstitutionHood();
+				return ((BurregModel) element).getInstitutionHood();
 			}
 		});
 
@@ -423,8 +403,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getOccuptations();
+				return ((BurregModel) element).getOccuptations();
 			}
 		});
 
@@ -436,8 +415,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getOccupationRelationTypes();
+				return ((BurregModel) element).getOccupationRelationTypes();
 			}
 		});
 
@@ -449,8 +427,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getDeathCauses();
+				return ((BurregModel) element).getDeathCauses();
 			}
 		});
 
@@ -462,8 +439,7 @@ public class BurregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final BurregModel pr = (BurregModel) element;
-				return pr.getDeathCausesDanish();
+				return ((BurregModel) element).getDeathCausesDanish();
 			}
 		});
 
@@ -484,8 +460,7 @@ public class BurregView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final BurregModel[] input = new BurregModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new BurregModel[0]);
 		clearFilters();
 	}
 
@@ -506,6 +481,28 @@ public class BurregView extends Composite {
 	}
 
 	/**
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 */
+	private void getInput(String phonName, String birthDate, String deathDate) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("cphSchema"), props.getProperty("cphDbPath"),
+						phonName, birthDate, deathDate };
+				final BurregModel[] burregRecords = (BurregModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(burregRecords));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Begravelsesregisteret er hentet"));
+			} catch (final Exception e) {
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate the burial registry tab from the database
 	 *
 	 * @param phonName
@@ -514,22 +511,7 @@ public class BurregView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
-							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
-					final BurregModel[] burregRecords = (BurregModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(burregRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Begravelsesregisteret er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getInput(phonName, birthDate, deathDate));
 		thread.start();
 	}
 
@@ -538,8 +520,7 @@ public class BurregView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final BurregModel m = (BurregModel) tia[0].getData();
-		final String string = m.toString() + "\n";
+		final String string = ((BurregModel) tia[0].getData()).toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Begravelser", null, string,
 				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);

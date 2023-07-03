@@ -1,38 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="/gedcom4j"/>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
 		<attributes>
 			<attribute name="module" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="C:/Workspaces/AnselCharset-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Workspaces/jcalendar-1.4.jar"/>
-	<classpathentry kind="lib" path="C:/Workspaces/miglayout-4.0.jar"/>
-	<classpathentry kind="lib" path="C:/Workspaces/log4j-api-2.19.0.jar"/>
-	<classpathentry kind="lib" path="C:/Workspaces/log4j-1.2-api-2.19.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64_3.122.0.v20221123-2302.jar" sourcepath="lib/src.zip"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4.jar" sourcepath="C:/Users/michael/.m2/repository/org/apache/maven/doxia/doxia-core/1.4/doxia-core-1.4-sources.jar">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="maven.groupId" value="org.apache.maven.doxia"/>
-			<attribute name="maven.artifactId" value="doxia-core"/>
-			<attribute name="maven.version" value="1.4"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Program Files/db-derby-10.14.2.0-bin/lib/derby.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/db-derby-10.14.2.0-bin/lib/derbyclient.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.core.commands_3.9.800.v20201021-1339.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.core.commands.source_3.9.800.v20201021-1339.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.equinox.common_3.17.0.v20221108-1156.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.equinox.common.source_3.17.0.v20221108-1156.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.jface_3.28.0.v20221024-1426.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.jface.source_3.28.0.v20221024-1426.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.osgi_3.18.200.v20221116-1324.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.osgi.source_3.18.200.v20221116-1324.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.ui.workbench_3.127.0.v20221024-2137.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.ui.workbench.source_3.127.0.v20221024-2137.jar"/>
 	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.swt_3.122.0.v20221123-2302.jar" sourcepath="lib/src.zip"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.zest.core_1.7.0.202211301913.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.draw2d_3.12.0.202211301913.jar" sourcepath="C:/Workspaces/draw2d-3.8.1-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.zest.layouts_1.2.200.202211301913.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="C:/Program Files/db-derby-10.14.2.0-bin/lib/derby.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/db-derby-10.14.2.0-bin/lib/derbyclient.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

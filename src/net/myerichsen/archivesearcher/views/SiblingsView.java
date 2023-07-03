@@ -43,7 +43,7 @@ import net.myerichsen.archivesearcher.populators.SiblingsPopulator;
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 26. maj 2023
+ * @version 1. jul. 2023
  *
  */
 public class SiblingsView extends Composite {
@@ -157,8 +157,7 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel model = (SiblingsModel) element;
-				return model.getBirthYear() + "";
+				return ((SiblingsModel) element).getBirthYear() + "";
 			}
 		});
 
@@ -170,8 +169,7 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel model = (SiblingsModel) element;
-				return model.getName();
+				return ((SiblingsModel) element).getName();
 			}
 		});
 
@@ -183,8 +181,7 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel model = (SiblingsModel) element;
-				return model.getParents();
+				return ((SiblingsModel) element).getParents();
 			}
 		});
 
@@ -196,8 +193,7 @@ public class SiblingsView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final SiblingsModel model = (SiblingsModel) element;
-				return model.getPlace();
+				return ((SiblingsModel) element).getPlace();
 			}
 		});
 
@@ -218,8 +214,7 @@ public class SiblingsView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final SiblingsModel[] input = new SiblingsModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new SiblingsModel[0]);
 		clearFilters();
 	}
 
@@ -237,26 +232,53 @@ public class SiblingsView extends Composite {
 	}
 
 	/**
+	 * @param parents
+	 */
+	private void getInputbyId(String parents) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+						props.getProperty("vejbyPath"), parents };
+				final SiblingsModel[] siblingRecords = (SiblingsModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	/**
+	 * @param fathersName
+	 * @param mothersName
+	 */
+	private void getInputByParents(String fathersName, String mothersName) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+						props.getProperty("vejbyPath"), fathersName, mothersName };
+				final SiblingsModel[] SiblingRecords = (SiblingsModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Søskende er hentet"));
+
+			} catch (final Exception e) {
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate siblings table by individual parent field
 	 *
 	 * @param parents
 	 * @throws SQLException
 	 */
 	public void populate(String parents) throws SQLException {
-		new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath"), parents };
-					final SiblingsModel[] siblingRecords = (SiblingsModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-		}).start();
+		new Thread(() -> getInputbyId(parents)).start();
 	}
 
 	/**
@@ -268,23 +290,7 @@ public class SiblingsView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String fathersName, String mothersName) throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath"), fathersName, mothersName };
-					final SiblingsModel[] SiblingRecords = (SiblingsModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Søskende er hentet"));
-
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getInputByParents(fathersName, mothersName));
 		thread.start();
 	}
 
@@ -294,8 +300,7 @@ public class SiblingsView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final SiblingsModel m = (SiblingsModel) tia[0].getData();
-		final String string = m.toString() + "\n";
+		final String string = ((SiblingsModel) tia[0].getData()).toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Søskende", null, string, MessageDialog.INFORMATION,
 				new String[] { "OK", "Kopier", "Søg efter" }, 0);
@@ -307,7 +312,7 @@ public class SiblingsView extends Composite {
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		} else if (open == 2) {
-			final String siblingsId = m.getIndividualKey();
+			final String siblingsId = ((SiblingsModel) tia[0].getData()).getIndividualKey();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(siblingsId);
 			grandParent.searchById(null);

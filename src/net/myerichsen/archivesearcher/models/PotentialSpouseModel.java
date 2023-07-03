@@ -187,7 +187,7 @@ public class PotentialSpouseModel extends ASModel {
 
 		for (final PotentialSpouseModel psm : list) {
 			sb = new StringBuilder();
-			List<Integer> idList = new ArrayList<Integer>();
+			final List<Integer> idList = new ArrayList<>();
 			gedcomStatement.setString(1, psm.getFonnavn());
 			rs1 = gedcomStatement.executeQuery();
 
@@ -216,7 +216,7 @@ public class PotentialSpouseModel extends ASModel {
 
 			Collections.sort(idList);
 
-			for (Integer anId : idList) {
+			for (final Integer anId : idList) {
 				sb.append(anId + ", ");
 			}
 

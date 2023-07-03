@@ -1,6 +1,7 @@
 package net.myerichsen.archivesearcher.views;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -49,7 +50,7 @@ import net.myerichsen.archivesearcher.populators.MilrollPopulator;
  * Military roll entry view
  *
  * @author Michael Erichsen
- * @version 27. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 
@@ -197,8 +198,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getAmt();
+				return ((MilRollEntryModel) element).getAmt();
 			}
 		});
 
@@ -210,8 +210,7 @@ public class MilRollEntryView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getAar());
+				return Integer.toString(((MilRollEntryModel) element).getAar());
 			}
 		});
 
@@ -222,8 +221,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getLitra();
+				return ((MilRollEntryModel) element).getLitra();
 			}
 		});
 
@@ -234,8 +232,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_4.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getRulletype();
+				return ((MilRollEntryModel) element).getRulletype();
 			}
 		});
 
@@ -246,8 +243,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_9.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getLaegdnr());
+				return Integer.toString(((MilRollEntryModel) element).getLaegdnr());
 			}
 		});
 
@@ -258,8 +254,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_3.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getSogn();
+				return ((MilRollEntryModel) element).getSogn();
 			}
 		});
 
@@ -270,8 +265,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_prevlaegdid.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getPrevLaegdId());
+				return Integer.toString(((MilRollEntryModel) element).getPrevLaegdId());
 			}
 		});
 
@@ -282,8 +276,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_glloebenr.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getPrevLoebeNr());
+				return Integer.toString(((MilRollEntryModel) element).getPrevLoebeNr());
 			}
 		});
 
@@ -294,8 +287,7 @@ public class MilRollEntryView extends Composite {
 		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getLaegdId());
+				return Integer.toString(((MilRollEntryModel) element).getLaegdId());
 			}
 		});
 
@@ -306,8 +298,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_loebenr.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getLoebeNr());
+				return Integer.toString(((MilRollEntryModel) element).getLoebeNr());
 			}
 		});
 
@@ -318,8 +309,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_5.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getFader();
+				return ((MilRollEntryModel) element).getFader();
 			}
 		});
 
@@ -330,8 +320,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getSoen();
+				return ((MilRollEntryModel) element).getSoen();
 			}
 		});
 
@@ -342,8 +331,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_13.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getFoedeSted();
+				return ((MilRollEntryModel) element).getFoedeSted();
 			}
 		});
 
@@ -354,8 +342,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_9x.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return Integer.toString(mrem.getAlder());
+				return Integer.toString(((MilRollEntryModel) element).getAlder());
 			}
 		});
 
@@ -366,8 +353,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_7.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getStoerrelseITommer().toString();
+				return ((MilRollEntryModel) element).getStoerrelseITommer().toString();
 			}
 		});
 
@@ -378,8 +364,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_8.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getOphold();
+				return ((MilRollEntryModel) element).getOphold();
 			}
 		});
 
@@ -390,8 +375,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_10.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getAnmaerkninger();
+				return ((MilRollEntryModel) element).getAnmaerkninger();
 			}
 		});
 
@@ -402,12 +386,8 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_11.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-
-				if (mrem.getFoedt() == null) {
-					return "";
-				}
-				return mrem.getFoedt().toString();
+				final Date foedt = ((MilRollEntryModel) element).getFoedt();
+				return foedt == null ? "" : foedt.toString();
 			}
 		});
 
@@ -418,8 +398,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_12.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getGedcomId();
+				return ((MilRollEntryModel) element).getGedcomId();
 			}
 		});
 
@@ -430,8 +409,7 @@ public class MilRollEntryView extends Composite {
 		MilrollTableVieverColumn_15.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final MilRollEntryModel mrem = (MilRollEntryModel) element;
-				return mrem.getNavn();
+				return ((MilRollEntryModel) element).getNavn();
 			}
 		});
 
@@ -486,8 +464,7 @@ public class MilRollEntryView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final MilRollEntryModel[] input = new MilRollEntryModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new MilRollEntryModel[0]);
 		clearFilters();
 	}
 
@@ -557,8 +534,7 @@ public class MilRollEntryView extends Composite {
 	 */
 	private void popup() throws SQLException {
 		final TableItem[] tia = table.getSelection();
-		final MilRollEntryModel m = (MilRollEntryModel) tia[0].getData();
-		final String string = m.toString();
+		final String string = ((MilRollEntryModel) tia[0].getData()).toString();
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Lægdsruller", null, string,
 				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Søg efter", "Vis tidligere for denne" }, 0);
@@ -566,13 +542,19 @@ public class MilRollEntryView extends Composite {
 
 		switch (open) {
 		case 1: {
-			final String h = m.getStoerrelseITommer() == new BigDecimal(0) ? ""
-					: ", Højde i tommer " + m.getStoerrelseITommer();
-			final String a = m.getAnmaerkninger().length() == 0 ? "" : ", " + m.getAnmaerkninger().trim();
-			final String s = m.getAmt().trim() + " amt " + m.getAar() + m.getLitra() + ", lægd " + m.getLaegdnr()
-					+ ", Løbenr. " + m.getLoebeNr() + ", Fader " + m.getFader().trim() + ", Fødested "
-					+ m.getFoedeSted().trim() + ", Alder " + m.getAlder() + h + ", Opholdssted " + m.getOphold().trim()
-					+ a;
+			final String h = ((MilRollEntryModel) tia[0].getData()).getStoerrelseITommer() == new BigDecimal(0) ? ""
+					: ", Højde i tommer " + ((MilRollEntryModel) tia[0].getData()).getStoerrelseITommer();
+			final String a = ((MilRollEntryModel) tia[0].getData()).getAnmaerkninger().length() == 0 ? ""
+					: ", " + ((MilRollEntryModel) tia[0].getData()).getAnmaerkninger().trim();
+			final String s = ((MilRollEntryModel) tia[0].getData()).getAmt().trim() + " amt "
+					+ ((MilRollEntryModel) tia[0].getData()).getAar()
+					+ ((MilRollEntryModel) tia[0].getData()).getLitra() + ", lægd "
+					+ ((MilRollEntryModel) tia[0].getData()).getLaegdnr() + ", Løbenr. "
+					+ ((MilRollEntryModel) tia[0].getData()).getLoebeNr() + ", Fader "
+					+ ((MilRollEntryModel) tia[0].getData()).getFader().trim() + ", Fødested "
+					+ ((MilRollEntryModel) tia[0].getData()).getFoedeSted().trim() + ", Alder "
+					+ ((MilRollEntryModel) tia[0].getData()).getAlder() + h + ", Opholdssted "
+					+ ((MilRollEntryModel) tia[0].getData()).getOphold().trim() + a;
 			final Clipboard clipboard = new Clipboard(getDisplay());
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { s }, new Transfer[] { textTransfer });
@@ -580,7 +562,7 @@ public class MilRollEntryView extends Composite {
 			break;
 		}
 		case 2: {
-			final String id = m.getGedcomId();
+			final String id = ((MilRollEntryModel) tia[0].getData()).getGedcomId();
 			if (id.length() > 0 && id.startsWith("@I")) {
 				final ArchiveSearcher greatGrandParent = (ArchiveSearcher) getParent().getParent().getParent();
 				greatGrandParent.getSearchId().setText(id);
@@ -589,8 +571,9 @@ public class MilRollEntryView extends Composite {
 			break;
 		}
 		case 3: {
-			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell, m.getLaegdId() + "",
-					m.getLoebeNr() + "");
+			final MilRollTreeDialog tree = new MilRollTreeDialog(props, shell,
+					((MilRollEntryModel) tia[0].getData()).getLaegdId() + "",
+					((MilRollEntryModel) tia[0].getData()).getLoebeNr() + "");
 			tree.open();
 			break;
 		}

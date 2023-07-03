@@ -51,8 +51,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
 /**
  * Census view
  *
- * @author Michael Erichsen
- * @version 28. jun. 2023
+ * @author 1. jul. 2023
  */
 
 public class CensusView extends Composite {
@@ -549,8 +548,7 @@ public class CensusView extends Composite {
 			thread.interrupt();
 		}
 
-		final CensusModel[] input = new CensusModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new CensusModel[0]);
 		clearFilters();
 	}
 
@@ -603,6 +601,39 @@ public class CensusView extends Composite {
 	}
 
 	/**
+	 * Get the census household
+	 *
+	 * @param kipNr
+	 * @param kildested
+	 * @param nr
+	 * @param matr
+	 * @return
+	 * @throws SQLException
+	 */
+	protected String getCensusHousehold(String kipNr, String kildested, String nr, String matr, String kildeHenvisning)
+			throws SQLException {
+		final StringBuilder sb = new StringBuilder();
+		String string;
+
+		household = CensusHouseholdModel.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr,
+				kildeHenvisning, props.getProperty("censusSchema"));
+
+		for (final CensusModel hhr : household) {
+			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
+					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + ", " + hhr.getKildefoedested()
+					+ "\n");
+		}
+
+		string = sb.toString();
+
+		if (string.length() > 4096) {
+			string = string.substring(0, 4095);
+		}
+
+		return string;
+	}
+
+	/**
 	 * Get the data
 	 *
 	 * @param dbPath
@@ -612,7 +643,7 @@ public class CensusView extends Composite {
 	 * @param birthDate
 	 * @param deathDate
 	 */
-	private void getCensus(String id, String phonName, String birthDate, String deathDate) {
+	private void getInput(String id, String phonName, String birthDate, String deathDate) {
 		if (listener != null) {
 			try {
 				final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
@@ -639,38 +670,6 @@ public class CensusView extends Composite {
 	}
 
 	/**
-	 * Get the census household
-	 *
-	 * @param kipNr
-	 * @param kildested
-	 * @param nr
-	 * @param matr
-	 * @return
-	 * @throws SQLException
-	 */
-	protected String getCensusHousehold(String kipNr, String kildested, String nr, String matr, String kildeHenvisning)
-			throws SQLException {
-		final StringBuilder sb = new StringBuilder();
-		String string;
-
-		household = CensusHouseholdModel.load(props.getProperty("censusPath"), kipNr, kildested, nr, matr,
-				kildeHenvisning, props.getProperty("censusSchema"));
-
-		for (final CensusModel hhr : household) {
-			sb.append(hhr.getKildenavn() + "," + hhr.getAlder() + ", " + hhr.getCivilstand() + ", "
-					+ hhr.getKildeerhverv() + ", " + hhr.getStilling_i_husstanden() + ", " + hhr.getKildefoedested()
-					+ "\n");
-		}
-		string = sb.toString();
-
-		if (string.length() > 4096) {
-			string = string.substring(0, 4095);
-		}
-
-		return string;
-	}
-
-	/**
 	 * Populate the table
 	 *
 	 * @param id
@@ -685,7 +684,7 @@ public class CensusView extends Composite {
 		this.birthDate = birthDate;
 		this.deathDate = deathDate;
 
-		thread = new Thread(() -> getCensus(id, phonName, birthDate, deathDate));
+		thread = new Thread(() -> getInput(id, phonName, birthDate, deathDate));
 		thread.start();
 	}
 

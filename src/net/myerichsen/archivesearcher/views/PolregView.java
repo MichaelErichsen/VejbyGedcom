@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.populators.PolregPopulator;
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 21. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 public class PolregView extends Composite {
@@ -166,8 +166,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getName();
+				return ((PolregModel) element).getName();
 			}
 		});
 
@@ -179,8 +178,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getBirthDate().toString();
+				return ((PolregModel) element).getBirthDate().toString();
 			}
 		});
 
@@ -192,8 +190,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getOccupation();
+				return ((PolregModel) element).getOccupation();
 			}
 		});
 
@@ -205,8 +202,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getStreet();
+				return ((PolregModel) element).getStreet();
 			}
 		});
 
@@ -218,8 +214,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return Integer.toString(pr.getNumber());
+				return Integer.toString(((PolregModel) element).getNumber());
 			}
 		});
 
@@ -231,8 +226,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getLetter();
+				return ((PolregModel) element).getLetter();
 			}
 		});
 
@@ -244,8 +238,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getFloor();
+				return ((PolregModel) element).getFloor();
 			}
 		});
 
@@ -257,8 +250,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getPlace();
+				return ((PolregModel) element).getPlace();
 			}
 		});
 
@@ -270,8 +262,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getHost();
+				return ((PolregModel) element).getHost();
 			}
 		});
 
@@ -283,8 +274,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return Integer.toString(pr.getDay());
+				return Integer.toString(((PolregModel) element).getDay());
 			}
 		});
 
@@ -296,8 +286,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return Integer.toString(pr.getMonth());
+				return Integer.toString(((PolregModel) element).getMonth());
 			}
 		});
 
@@ -309,8 +298,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return Integer.toString(pr.getYear());
+				return Integer.toString(((PolregModel) element).getYear());
 			}
 		});
 
@@ -322,8 +310,7 @@ public class PolregView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final PolregModel pr = (PolregModel) element;
-				return pr.getFullAddress();
+				return ((PolregModel) element).getFullAddress();
 			}
 		});
 
@@ -344,8 +331,7 @@ public class PolregView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final PolregModel[] input = new PolregModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new PolregModel[0]);
 		clearFilters();
 	}
 
@@ -363,6 +349,28 @@ public class PolregView extends Composite {
 	}
 
 	/**
+	 * @param phonName
+	 * @param birthDate
+	 * @param deathDate
+	 */
+	private void getInput(String phonName, String birthDate, String deathDate) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("cphSchema"), props.getProperty("cphDbPath"),
+						phonName, birthDate, deathDate };
+				final PolregModel[] PolregRecords = (PolregModel[]) listener.load(loadArgs);
+
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(PolregRecords));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Politiets Registerblade er hentet"));
+			} catch (final Exception e) {
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			}
+		}
+	}
+
+	/**
 	 * Populate police registry table
 	 *
 	 * @param phonName
@@ -371,22 +379,7 @@ public class PolregView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("cphSchema"),
-							props.getProperty("cphDbPath"), phonName, birthDate, deathDate };
-					final PolregModel[] PolregRecords = (PolregModel[]) listener.load(loadArgs);
-
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(PolregRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Politiets Registerblade er hentet"));
-				} catch (final Exception e) {
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
-			}
-		});
+		thread = new Thread(() -> getInput(phonName, birthDate, deathDate));
 		thread.start();
 	}
 

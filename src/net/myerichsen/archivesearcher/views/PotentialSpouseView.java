@@ -28,9 +28,9 @@ import net.myerichsen.archivesearcher.populators.PotentialSpousePopulator;
 
 /**
  * View of potential spouses
- * 
+ *
  * @author Michael Erichsen
- * @version 29. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 public class PotentialSpouseView extends Composite {
@@ -111,8 +111,8 @@ public class PotentialSpouseView extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerSourceType = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnSourceType = tableViewerSourceType.getColumn();
+		final TableViewerColumn tableViewerSourceType = new TableViewerColumn(tableViewer, SWT.NONE);
+		final TableColumn tblclmnSourceType = tableViewerSourceType.getColumn();
 		tblclmnSourceType.setWidth(110);
 		tblclmnSourceType.setText("Kilde");
 		tableViewerSourceType.setLabelProvider(new ColumnLabelProvider() {
@@ -144,8 +144,7 @@ public class PotentialSpouseView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final PotentialSpouseModel[] input = new PotentialSpouseModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new PotentialSpouseModel[0]);
 	}
 
 	/**
@@ -164,7 +163,7 @@ public class PotentialSpouseView extends Composite {
 	 *
 	 * @param id
 	 */
-	private void getPotentialSpouses(String id) {
+	private void getInput(String id) {
 		if (listener != null) {
 			try {
 				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
@@ -192,7 +191,7 @@ public class PotentialSpouseView extends Composite {
 	 * @throws SQLException
 	 */
 	public void populate(String id) throws SQLException {
-		thread = new Thread(() -> getPotentialSpouses(id));
+		thread = new Thread(() -> getInput(id));
 		thread.start();
 	}
 

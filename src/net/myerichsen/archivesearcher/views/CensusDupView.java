@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 27. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -83,8 +83,7 @@ public class CensusDupView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final CensusDupModel pr = (CensusDupModel) element;
-				return pr.getIndividual();
+				return ((CensusDupModel) element).getIndividual();
 			}
 		});
 
@@ -96,8 +95,7 @@ public class CensusDupView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final CensusDupModel pr = (CensusDupModel) element;
-				return pr.getDate().toString();
+				return ((CensusDupModel) element).getDate().toString();
 			}
 		});
 
@@ -109,8 +107,7 @@ public class CensusDupView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final CensusDupModel pr = (CensusDupModel) element;
-				return pr.getPlace();
+				return ((CensusDupModel) element).getPlace();
 			}
 		});
 
@@ -122,13 +119,9 @@ public class CensusDupView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final CensusDupModel pr = (CensusDupModel) element;
-				return pr.getSourceDetail();
+				return ((CensusDupModel) element).getSourceDetail();
 			}
 		});
-
-		scrolledComposite.setContent(table);
-		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		final Composite buttonComposite = new Composite(this, SWT.BORDER);
 		buttonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -150,6 +143,8 @@ public class CensusDupView extends Composite {
 		});
 		btnFind.setText("Find");
 
+		scrolledComposite.setContent(table);
+		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	@Override
@@ -164,8 +159,7 @@ public class CensusDupView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final CensusDupModel[] input = new CensusDupModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new CensusDupModel[0]);
 		tableViewer.refresh();
 	}
 
@@ -212,8 +206,7 @@ public class CensusDupView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final CensusDupModel m = (CensusDupModel) tia[0].getData();
-		final String string = m.toString() + "\n";
+		final String string = ((CensusDupModel) tia[0].getData()).toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketællingsdubletter", null, string,
 				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Søg efter" }, 0);
@@ -225,7 +218,7 @@ public class CensusDupView extends Composite {
 			clipboard.setContents(new String[] { string }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		} else if (open == 2) {
-			final String siblingsId = m.getIndividual();
+			final String siblingsId = ((CensusDupModel) tia[0].getData()).getIndividual();
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent().getParent();
 			grandParent.getSearchId().setText(siblingsId);
 			grandParent.searchById(null);

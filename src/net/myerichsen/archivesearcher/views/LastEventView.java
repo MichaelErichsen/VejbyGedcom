@@ -40,7 +40,7 @@ import net.myerichsen.archivesearcher.populators.LastEventViewPopulator;
  * individual to search for burials
  *
  * @author Michael Erichsen
- * @version 27. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 public class LastEventView extends Composite {
@@ -73,6 +73,8 @@ public class LastEventView extends Composite {
 		tableViewer = new TableViewer(scrolledComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.addDoubleClickListener(event -> popup(getDisplay()));
+		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+
 		table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -85,8 +87,7 @@ public class LastEventView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final LastEventModel model = (LastEventModel) element;
-				return model.getIndividualId();
+				return ((LastEventModel) element).getIndividualId();
 			}
 		});
 
@@ -98,8 +99,7 @@ public class LastEventView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final LastEventModel model = (LastEventModel) element;
-				return model.getName();
+				return ((LastEventModel) element).getName();
 			}
 		});
 
@@ -111,8 +111,7 @@ public class LastEventView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final LastEventModel model = (LastEventModel) element;
-				return model.getDate().toString();
+				return ((LastEventModel) element).getDate().toString();
 			}
 		});
 
@@ -124,8 +123,7 @@ public class LastEventView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final LastEventModel model = (LastEventModel) element;
-				return model.getType();
+				return ((LastEventModel) element).getType();
 			}
 		});
 
@@ -137,8 +135,7 @@ public class LastEventView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final LastEventModel model = (LastEventModel) element;
-				return model.getSubType();
+				return ((LastEventModel) element).getSubType();
 			}
 		});
 
@@ -150,14 +147,9 @@ public class LastEventView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final LastEventModel model = (LastEventModel) element;
-				return model.getSourceDetail();
+				return ((LastEventModel) element).getSourceDetail();
 			}
 		});
-
-		tableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		scrolledComposite.setContent(table);
-		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 		final Composite searchComposite = new Composite(this, SWT.BORDER);
 		searchComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -207,6 +199,9 @@ public class LastEventView extends Composite {
 		});
 		btnKopir.setText("Kopi\u00E9r");
 
+		scrolledComposite.setContent(table);
+		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
 	}
 
 	@Override
@@ -255,15 +250,14 @@ public class LastEventView extends Composite {
 	 */
 	private void popup(Display display) {
 		final TableItem[] tia = table.getSelection();
-		final LastEventModel m = (LastEventModel) tia[0].getData();
-		final String string = m.toString() + "\n";
+		final String string = ((LastEventModel) tia[0].getData()).toString() + "\n";
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Sidste hændelse", null, string,
 				MessageDialog.INFORMATION, new String[] { "OK", "Søg efter" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
-			final String siblingsId = m.getIndividualId();
+			final String siblingsId = ((LastEventModel) tia[0].getData()).getIndividualId();
 			final ArchiveSearcher greatGrandParent = (ArchiveSearcher) getParent().getParent().getParent();
 			greatGrandParent.getSearchId().setText(siblingsId);
 			greatGrandParent.searchById(null);

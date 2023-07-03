@@ -123,7 +123,7 @@ public class KeystrokeDialog extends Dialog {
 		final Label lblLS = new Label(container, SWT.NONE);
 		lblLS.setText("Alt+S Søg efter GEDCOM ID");
 
-		Label lblAltmMuligegtefller = new Label(container, SWT.NONE);
+		final Label lblAltmMuligegtefller = new Label(container, SWT.NONE);
 		lblAltmMuligegtefller.setText("Alt+M Mulige \u00E6gtef\u00E6ller faneblad");
 
 		final Label lblLT = new Label(container, SWT.NONE);

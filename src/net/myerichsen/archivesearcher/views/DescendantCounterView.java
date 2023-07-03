@@ -28,7 +28,7 @@ import net.myerichsen.archivesearcher.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 27. jun. 2023
+ * @version 1. jul. 2023
  *
  */
 public class DescendantCounterView extends Composite {
@@ -73,8 +73,7 @@ public class DescendantCounterView extends Composite {
 		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final DescendantModel cr = (DescendantModel) element;
-				return Integer.toString(cr.getDescendantCount());
+				return Integer.toString(((DescendantModel) element).getDescendantCount());
 			}
 		});
 
@@ -85,8 +84,7 @@ public class DescendantCounterView extends Composite {
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final DescendantModel cr = (DescendantModel) element;
-				return cr.getId();
+				return ((DescendantModel) element).getId();
 			}
 		});
 
@@ -97,8 +95,7 @@ public class DescendantCounterView extends Composite {
 		tableViewerColumn_2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final DescendantModel cr = (DescendantModel) element;
-				return cr.getName();
+				return ((DescendantModel) element).getName();
 			}
 		});
 
@@ -120,7 +117,6 @@ public class DescendantCounterView extends Composite {
 
 		descendantScroller.setContent(table);
 		descendantScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
 	}
 
 	@Override
@@ -135,9 +131,7 @@ public class DescendantCounterView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final DescendantModel[] input = new DescendantModel[0];
-		tableViewer.setInput(input);
-		tableViewer.refresh();
+		tableViewer.setInput(new DescendantModel[0]);
 	}
 
 	/**

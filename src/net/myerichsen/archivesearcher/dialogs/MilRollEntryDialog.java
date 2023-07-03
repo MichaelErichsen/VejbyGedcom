@@ -27,7 +27,6 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -51,7 +50,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 12. maj 2023
+ * @version 3.jul 2023
  *
  */
 
@@ -118,6 +117,7 @@ public class MilRollEntryDialog {
 	private Button btnHentPrevLbenr;
 	private ControlDecoration controlDecorationOphold;
 	private ControlDecoration controlDecorationFoedested;
+	private Display display;
 
 	/**
 	 * Populate content assist popup with latest location
@@ -741,7 +741,7 @@ public class MilRollEntryDialog {
 	 * Open the window.
 	 */
 	public void open() {
-		final Display display = Display.getDefault();
+		display = Display.getDefault();
 		fk = new Fonkod();
 		getProperties();
 		createContents();
@@ -859,7 +859,7 @@ public class MilRollEntryDialog {
 	 */
 	public void setErrorMessage(String string) {
 		setMessage(string);
-		messageComboBox.setBackground(new Color(255, 0, 0, 255));
+		messageComboBox.setBackground(display.getSystemColor(SWT.COLOR_YELLOW));
 	}
 
 	/**
@@ -874,7 +874,7 @@ public class MilRollEntryDialog {
 		final LocalTime localTime = LocalTime.now();
 		messageComboBox.add(dtf.format(localTime) + " " + string, 0);
 		messageComboBox.select(0);
-		messageComboBox.setBackground(new Color(255, 255, 255, 255));
+		messageComboBox.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		final int lastItem = Integer.parseInt(props.getProperty("msgLogLen"));
 
 		if (messageComboBox.getItemCount() > lastItem) {

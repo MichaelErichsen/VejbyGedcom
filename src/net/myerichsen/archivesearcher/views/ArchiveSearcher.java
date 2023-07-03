@@ -18,7 +18,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TypedEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -62,7 +61,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 30. jun. 2023
+ * @version 3. jul. 2023
  *
  */
 
@@ -251,6 +250,7 @@ public class ArchiveSearcher extends Shell {
 		censusView.clear();
 		householdHeadView.clear();
 		individualView.clear();
+		potentialSpousesView.clear();
 		polregView.clear();
 		probateView.clear();
 		relocationView.clear();
@@ -474,7 +474,7 @@ public class ArchiveSearcher extends Shell {
 
 		messageCombo = new Combo(messageComposite, SWT.READ_ONLY);
 		messageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-		messageCombo.setBackground(new Color(255, 255, 255, 255));
+		messageCombo.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		indicator = new ProgressBar(messageComposite, SWT.INDETERMINATE);
 		indicator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -827,6 +827,7 @@ public class ArchiveSearcher extends Shell {
 		searchMother.setText("");
 		searchName.setText("");
 		individualView.clear();
+		potentialSpousesView.clear();
 
 		if (searchIdCombo.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -885,6 +886,7 @@ public class ArchiveSearcher extends Shell {
 			probateView.populate(phonName, birthDate, deathDate);
 			polregView.populate(phonName, birthDate, deathDate);
 			burregView.populate(phonName, birthDate, deathDate);
+			potentialSpousesView.populate(id);
 
 			if (individual.getParents() != null && individual.getParents().length() > 0) {
 				siblingsView.populate(individual.getParents());
@@ -910,6 +912,7 @@ public class ArchiveSearcher extends Shell {
 		individualView.clear();
 		siblingsView.clear();
 		householdHeadView.clear();
+		potentialSpousesView.clear();
 
 		if (searchName.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -974,6 +977,7 @@ public class ArchiveSearcher extends Shell {
 		individualView.clear();
 		siblingsView.clear();
 		householdHeadView.clear();
+		potentialSpousesView.clear();
 
 		if (searchFather.getText().equals("") && searchMother.getText().equals("")) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
@@ -1023,7 +1027,7 @@ public class ArchiveSearcher extends Shell {
 	 */
 	public void setErrorMessage(String string) {
 		setMessage(string);
-		messageCombo.setBackground(new Color(255, 0, 0, 255));
+		messageCombo.setBackground(getDisplay().getSystemColor(SWT.COLOR_YELLOW));
 	}
 
 	/**
@@ -1045,7 +1049,7 @@ public class ArchiveSearcher extends Shell {
 		final LocalTime localTime = LocalTime.now();
 		messageCombo.add(dtf.format(localTime) + " " + string, 0);
 		messageCombo.select(0);
-		messageCombo.setBackground(new Color(255, 255, 255, 255));
+		messageCombo.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		final int lastItem = Integer.parseInt(props.getProperty("msgLogLen"));
 
 		if (messageCombo.getItemCount() > lastItem) {
@@ -1056,17 +1060,6 @@ public class ArchiveSearcher extends Shell {
 			indicator.setVisible(false);
 		}
 	}
-
-//	/**
-//	 * Set the message in the message combo box and mark as a search message
-//	 *
-//	 * @param string
-//	 *
-//	 */
-//	public void setSearchMessage(String string) {
-//		messageCombo.setBackground(new Color(255, 255, 0, 255));
-//		setMessage(string);
-//	}
 
 	/**
 	 * Store properties in a file

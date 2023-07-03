@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.populators.RelocationPopulator;
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 9. maj 2023
+ * @version 1. jul. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -158,8 +158,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getGivenName();
+				return ((RelocationModel) element).getGivenName();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -170,8 +169,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getSurName();
+				return ((RelocationModel) element).getSurName();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -182,8 +180,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getDate().toString();
+				return ((RelocationModel) element).getDate().toString();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_4 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -194,8 +191,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getPlace();
+				return ((RelocationModel) element).getPlace();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -206,8 +202,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getNote();
+				return ((RelocationModel) element).getNote();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -217,8 +212,7 @@ public class RelocationView extends Composite {
 		relocationTableViewerColumn_6.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getSourceDetail();
+				return ((RelocationModel) element).getSourceDetail();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_7 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -229,8 +223,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getBirthDate().toString();
+				return ((RelocationModel) element).getBirthDate().toString();
 			}
 		});
 		final TableViewerColumn relocationTableViewerColumn_8 = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -241,8 +234,7 @@ public class RelocationView extends Composite {
 
 			@Override
 			public String getText(Object element) {
-				final RelocationModel rr = (RelocationModel) element;
-				return rr.getParents();
+				return ((RelocationModel) element).getParents();
 			}
 		});
 
@@ -263,8 +255,7 @@ public class RelocationView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
-		final RelocationModel[] input = new RelocationModel[0];
-		tableViewer.setInput(input);
+		tableViewer.setInput(new RelocationModel[0]);
 		clearFilters();
 	}
 
@@ -285,24 +276,30 @@ public class RelocationView extends Composite {
 	 * @param phonName
 	 * @param birthDate
 	 */
-	public void populate(String phonName, String birthDate) {
-		thread = new Thread(() -> {
-			if (listener != null) {
-				try {
-					final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-							props.getProperty("vejbyPath"), phonName, birthDate };
-					final RelocationModel[] relocationRecords = (RelocationModel[]) listener.load(loadArgs);
+	private void getInput(String phonName, String birthDate) {
+		if (listener != null) {
+			try {
+				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+						props.getProperty("vejbyPath"), phonName, birthDate };
+				final RelocationModel[] relocationRecords = (RelocationModel[]) listener.load(loadArgs);
 
-					Display.getDefault().asyncExec(() -> tableViewer.setInput(relocationRecords));
-					Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-							.setMessage("Flytninger er hentet"));
-				} catch (final Exception e) {
-					e.printStackTrace();
-					Display.getDefault().asyncExec(
-							() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-				}
+				Display.getDefault().asyncExec(() -> tableViewer.setInput(relocationRecords));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setMessage("Flytninger er hentet"));
+			} catch (final Exception e) {
+				e.printStackTrace();
+				Display.getDefault().asyncExec(
+						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 			}
-		});
+		}
+	}
+
+	/**
+	 * @param phonName
+	 * @param birthDate
+	 */
+	public void populate(String phonName, String birthDate) {
+		thread = new Thread(() -> getInput(phonName, birthDate));
 		thread.start();
 	}
 
@@ -311,18 +308,7 @@ public class RelocationView extends Composite {
 	 */
 	private void popup() {
 		final TableItem[] tia = table.getSelection();
-//		final TableItem ti = tia[0];
-//
-//		final StringBuilder sb = new StringBuilder();
-//		for (int i = 0; i < 9; i++) {
-//			if (ti.getText(i).length() > 0) {
-//				sb.append(ti.getText(i) + ", ");
-//			}
-//		}
-//		sb.append("\n");
-
-		final RelocationModel m = (RelocationModel) tia[0].getData();
-		final String string = m.toString() + "\n";
+		final String string = ((RelocationModel) tia[0].getData()).toString() + "\n";
 		final MessageDialog dialog = new MessageDialog(getShell(), "Flytning", null, string, MessageDialog.INFORMATION,
 				new String[] { "OK", "Kopier" }, 0);
 		final int open = dialog.open();
