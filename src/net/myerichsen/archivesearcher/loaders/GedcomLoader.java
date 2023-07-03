@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 26. jun. 2023
+ * @version 3. jul. 2023
  */
 
 public class GedcomLoader {
@@ -382,27 +382,35 @@ public class GedcomLoader {
 
 		readGedcom(args[0]);
 		Display.getDefault().asyncExec(() -> as.setMessage("GEDCOM fil analyseres"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		clearTables(conn);
 		Display.getDefault().asyncExec(() -> as.setMessage("Tabellerne er ryddet"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		parseAllFamilies();
 		Display.getDefault().asyncExec(() -> as.setMessage("Familier er analyseret"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		parseAllIndividuals();
 		Display.getDefault().asyncExec(() -> as.setMessage("Personer er analyseret"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		updateBirthDeathData(conn, args[2]);
 		Display.getDefault().asyncExec(() -> as.setMessage("Fødsels- og dødsdata er opdateret"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		parseParents();
 		Display.getDefault().asyncExec(() -> as.setMessage("Forældre er analyseret"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		addSharedCensusEvents();
 		Display.getDefault().asyncExec(() -> as.setMessage("Yderligere folketællingshændelser er indsat"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		addChildBirthEvents(conn, schema);
 		Display.getDefault().asyncExec(() -> as.setMessage("Barnefødselshændelser er indsat"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		conn.close();
 

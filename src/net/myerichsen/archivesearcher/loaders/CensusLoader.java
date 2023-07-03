@@ -24,7 +24,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 20. jun. 2023
+ * @version 3. jul. 2023
  */
 public class CensusLoader {
 	/**
@@ -71,7 +71,7 @@ public class CensusLoader {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
 		} catch (final SQLException e) {
 			// Shutdown message is expected
-			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
+//			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
 		conn = DriverManager.getConnection(dbURL);
 		conn.setAutoCommit(false);
@@ -94,6 +94,7 @@ public class CensusLoader {
 
 		// Find all census csv files from the index file
 		Display.getDefault().asyncExec(() -> as.setMessage("Finder alle folketællinger i " + args[1] + "/" + args[0]));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 		final List<KipTextEntry> lkte = parseKipText(args);
 
 		// Remove header line
@@ -101,6 +102,8 @@ public class CensusLoader {
 
 		// Parse and store contents of each census file in a single table
 		Display.getDefault().asyncExec(() -> as.setMessage("Hver folketællingsfil behandles"));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
+
 		for (final KipTextEntry kipTextEntry : lkte) {
 			if (!kipTextEntry.getAar().equals("1771")) {
 				parseCensusFile(args, kipTextEntry, as);
@@ -176,6 +179,7 @@ public class CensusLoader {
 
 		Display.getDefault().asyncExec(() -> as.setMessage("Behandler " + kipTextEntry.getAar() + ", "
 				+ kipTextEntry.getAmt() + ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn()));
+		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
 		CensusModel ci;
 		String[] fields;

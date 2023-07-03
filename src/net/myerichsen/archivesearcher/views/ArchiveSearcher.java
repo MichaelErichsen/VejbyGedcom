@@ -735,6 +735,7 @@ public class ArchiveSearcher extends Shell {
 					+ props.getProperty("burialPersonComplete") + " ind i tabellerne i "
 					+ props.getProperty("cphDbPath"));
 
+			indicator.setVisible(true);
 			new Thread(this::getBurialregistry).start();
 			break;
 		case SWT.CANCEL:
@@ -759,6 +760,7 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra " + props.getProperty("gedcomFilePath") + " ind i tabellerne i "
 					+ props.getProperty("vejbyPath"));
 
+			indicator.setVisible(true);
 			new Thread(this::getGedcom).start();
 			break;
 		case SWT.CANCEL:
@@ -783,8 +785,8 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra KIP-filerne " + props.getProperty("censusCsvFileDirectory")
 					+ " ind i tabellen i " + props.getProperty("censusPath"));
 
+			indicator.setVisible(true);
 			new Thread(this::getKipFiles).start();
-
 			break;
 		case SWT.CANCEL:
 			break;
@@ -808,6 +810,7 @@ public class ArchiveSearcher extends Shell {
 			setMessage("Data hentes fra " + props.getProperty("cphCsvFileDirectory") + " ind i tabellerne i "
 					+ props.getProperty("cphDbPath"));
 
+			indicator.setVisible(true);
 			new Thread(this::getPolReg).start();
 			break;
 		case SWT.CANCEL:

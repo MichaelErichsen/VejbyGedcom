@@ -11,8 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Display;
-
 import net.myerichsen.archivesearcher.util.Fonkod;
 import net.myerichsen.archivesearcher.views.ArchiveSearcher;
 
@@ -20,7 +18,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 20.jun. 2023
+ * @version 3. jul. 2023
  *
  */
 public abstract class LoadCphArch {
@@ -88,7 +86,7 @@ public abstract class LoadCphArch {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
 		} catch (final SQLException e) {
 			// Shutdown message is expected
-			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
+//			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
 		conn = DriverManager.getConnection(dbURL);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
