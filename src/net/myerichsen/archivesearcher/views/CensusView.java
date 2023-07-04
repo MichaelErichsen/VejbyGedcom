@@ -51,7 +51,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
 /**
  * Census view
  *
- * @author 1. jul. 2023
+ * @author 4. jul. 2023
  */
 
 public class CensusView extends Composite {
@@ -577,15 +577,10 @@ public class CensusView extends Composite {
 		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusParish.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusYear.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		btngtefller.setSelection(false);
 		spouseFilterFlag = false;
+		btngtefller.setSelection(false);
 		btngtefller.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		try {
-			populate(id, phonName, birthDate, deathDate);
-		} catch (final SQLException e1) {
-			((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
-		}
-
+		btngtefller.redraw();
 		tableViewer.refresh();
 	}
 
