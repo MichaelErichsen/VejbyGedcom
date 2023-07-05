@@ -1,0 +1,17 @@
+net.myerichsen.archivesearcher.batch
+net.myerichsen.archivesearcher.comparators
+net.myerichsen.archivesearcher.dialogs
+net.myerichsen.archivesearcher.filters
+net.myerichsen.archivesearcher.loaders
+net.myerichsen.archivesearcher.models
+net.myerichsen.archivesearcher.populators
+net.myerichsen.archivesearcher.probateFinder
+net.myerichsen.archivesearcher.providers
+net.myerichsen.archivesearcher.tablecreators
+net.myerichsen.archivesearcher.util
+net.myerichsen.archivesearcher.views
+net.myerichsen.vejby.census
+net.myerichsen.vejby.gedcom
+net.myerichsen.vejby.ui
+net.myerichsen.vejby.util
+org.eclipse.wb.swt

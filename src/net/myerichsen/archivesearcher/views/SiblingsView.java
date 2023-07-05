@@ -284,9 +284,8 @@ public class SiblingsView extends Composite {
 	/**
 	 * Populate siblings table by father and mother
 	 *
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
+	 * @param fathersName
+	 * @param mothersName
 	 * @throws SQLException
 	 */
 	public void populate(String fathersName, String mothersName) throws SQLException {

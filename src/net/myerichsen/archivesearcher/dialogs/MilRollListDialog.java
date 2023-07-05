@@ -42,7 +42,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Military rolls dialog
  *
  * @author Michael Erichsen
- * @version 21. jun. 2023
+ * @version 5. jul. 2023
  *
  */
 
@@ -63,7 +63,7 @@ public class MilRollListDialog extends Dialog {
 	/**
 	 * Create the dialog.
 	 *
-	 * @param parentShell
+	 * @param parentShell Parent shell
 	 */
 	public MilRollListDialog(Shell parentShell) {
 		super(parentShell);
@@ -387,7 +387,7 @@ public class MilRollListDialog extends Dialog {
 	}
 
 	/**
-	 * @param props
+	 * @param props The properties to set
 	 */
 	public void setProperties(Properties props) {
 		this.props = props;
@@ -398,7 +398,6 @@ public class MilRollListDialog extends Dialog {
 	 * Delete
 	 *
 	 * @throws SQLException
-	 *
 	 */
 	protected int slet() throws SQLException {
 		final TableItem[] tia = table.getSelection();

@@ -20,6 +20,11 @@ import net.myerichsen.vejby.gedcom.Family;
  * @version 10-09-2020
  * @author Michael Erichsen
  */
+/**
+ * @author Michael Erichsen
+ * @version 5. jul. 2023
+ *
+ */
 public class Census {
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	private static Census single_instance = null;
@@ -263,7 +268,7 @@ public class Census {
 	}
 
 	/**
-	 * @param fields the fields to set
+	 * @param persons the list of lists of persons to set
 	 */
 	public void setPersons(List<List<String>> persons) {
 		this.persons = persons;

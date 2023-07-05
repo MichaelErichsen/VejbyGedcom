@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 5. jul. 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -48,8 +48,8 @@ public class CensusDupView extends Composite {
 	/**
 	 * Create the composite.
 	 *
-	 * @param parent
-	 * @param style
+	 * @param parent the parent composite
+	 * @param style  the style
 	 */
 	public CensusDupView(Composite parent, int style) {
 		super(parent, style);
@@ -192,7 +192,7 @@ public class CensusDupView extends Composite {
 	/**
 	 * Populate the census duplicate tab from the database
 	 *
-	 * @throws SQLException
+	 * @throws SQLException SQL exception
 	 */
 	public void populate() throws SQLException {
 		thread = new Thread(this::getInput);
@@ -226,7 +226,7 @@ public class CensusDupView extends Composite {
 	}
 
 	/**
-	 * @param props
+	 * @param props the properties to set
 	 */
 	public void setProperties(Properties props) {
 		this.props = props;

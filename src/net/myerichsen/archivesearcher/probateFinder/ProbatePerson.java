@@ -26,9 +26,7 @@ public class ProbatePerson {
 	/**
 	 * Constructor
 	 *
-	 * @param key
-	 * @param name
-	 * @param birthDate
+	 * @param individual
 	 */
 	public ProbatePerson(Entry<String, Individual> individual) {
 		key = individual.getKey().replace("@I", "").replace("@", "");

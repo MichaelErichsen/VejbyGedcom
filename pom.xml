@@ -2,7 +2,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>VejbyGedcom</groupId>
 	<artifactId>VejbyGedcom</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>ArchiveSearcher</name>
 	<description>Local search engine</description>
 	<build>
@@ -21,7 +22,38 @@
 				<version>3.8.1</version>
 				<configuration>
 					<release>17</release>
-					<!--	<compilerArgument>-Xlint:unchecked</compilerArgument>-->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+                    ${project.build.directory}/libs
+                </outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>libs/</classpathPrefix>
+							<mainClass>net.myerichsen.archivesearcher.views.ArchiveSearcher</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -34,18 +66,43 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.platform</groupId>
+			<artifactId>org.eclipse.core.commands</artifactId>
+			<version>3.10.300</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.platform</groupId>
 			<artifactId>org.eclipse.core.runtime</artifactId>
-			<version>3.27.0</version>
+			<version>3.26.100</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.platform</groupId>
 			<artifactId>org.eclipse.jface</artifactId>
-			<version>3.30.0</version>
+			<version>3.20.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.swt</groupId>
-			<artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
-			<version>4.3</version>
+			<groupId>org.eclipse.platform</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<version>3.18.200</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.platform</groupId>
+			<artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+			<version>3.116.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.platform</groupId>
+			<artifactId>org.eclipse.equinox.common</artifactId>
+			<version>3.18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.platform</groupId>
+			<artifactId>org.eclipse.ui.workbench</artifactId>
+			<version>3.129.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.14.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.miginfocom</groupId>

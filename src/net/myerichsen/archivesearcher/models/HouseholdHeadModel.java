@@ -316,10 +316,13 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	/**
 	 * Load from database
 	 *
-	 * @param dbPath
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
+	 * @param vejbyDbPath
+	 * @param vejbySchema
+	 * @param censusDbPath
+	 * @param censusSchema
+	 * @param milrollPath
+	 * @param milrollSchema
+	 * @param headId
 	 * @return
 	 * @throws Exception
 	 */

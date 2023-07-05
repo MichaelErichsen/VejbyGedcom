@@ -109,7 +109,7 @@ public class Probate {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param aName the name to set
 	 */
 	public void setName(String aName) {
 		name = aName.replace("*", "").replace("hmd", "").replace("gmd", "").trim();

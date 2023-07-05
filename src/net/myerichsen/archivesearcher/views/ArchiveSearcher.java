@@ -61,7 +61,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 3. jul. 2023
+ * @version 5. jul. 2023
  *
  */
 
@@ -72,7 +72,7 @@ public class ArchiveSearcher extends Shell {
 	/**
 	 * Launch the application
 	 *
-	 * @param args
+	 * @param args Arguments are not used
 	 */
 	public static void main(String args[]) {
 		try {
@@ -130,7 +130,7 @@ public class ArchiveSearcher extends Shell {
 	/**
 	 * Create the shell
 	 *
-	 * @param display
+	 * @param display The system display
 	 */
 	public ArchiveSearcher(Display display) {
 		super(display, SWT.SHELL_TRIM);
@@ -1025,8 +1025,7 @@ public class ArchiveSearcher extends Shell {
 	/**
 	 * Set the message in the message combo box and mark as an error message
 	 *
-	 * @param string
-	 *
+	 * @param string the error message to set
 	 */
 	public void setErrorMessage(String string) {
 		setMessage(string);
@@ -1043,7 +1042,7 @@ public class ArchiveSearcher extends Shell {
 	/**
 	 * Set the message in the message combo box
 	 *
-	 * @param string
+	 * @param string the message to set
 	 *
 	 */
 	public void setMessage(String string) {

@@ -42,7 +42,9 @@ public class PotentialSpouseModel extends ASModel {
 	/**
 	 * @param gedcomSchema
 	 * @param gedcomDbPath
-	 * @param id
+	 * @param censusSchema
+	 * @param censusDbPath
+	 * @param individual
 	 * @return
 	 * @throws Exception
 	 */

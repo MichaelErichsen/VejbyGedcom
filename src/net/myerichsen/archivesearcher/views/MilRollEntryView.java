@@ -517,10 +517,7 @@ public class MilRollEntryView extends Composite {
 	/**
 	 * Populate Milroll table
 	 *
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @throws SQLException
+	 * @throws SQLException SQL exception
 	 */
 	public void populate() throws SQLException {
 		thread = new Thread(this::getInput);

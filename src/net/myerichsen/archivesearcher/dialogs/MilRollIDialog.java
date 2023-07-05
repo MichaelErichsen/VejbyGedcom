@@ -20,18 +20,18 @@ import org.eclipse.swt.widgets.TableColumn;
  * Find possible ID's for a phonetic name
  *
  * @author Michael Erichsen
- * @version 8. maj 2023
+ * @version 5. jul. 2023
  *
  */
 public class MilRollIDialog extends Dialog {
-	private Table soenTable;
-	private String[] mrma;
+	private Table table;
+	private String[] array;
 	private String selectedIndividual;
 
 	/**
 	 * Create the dialog.
 	 *
-	 * @param parentShell
+	 * @param parentShell Parent shell
 	 */
 	public MilRollIDialog(Shell parentShell) {
 		super(parentShell);
@@ -65,8 +65,8 @@ public class MilRollIDialog extends Dialog {
 		});
 		soenTableViewer.setUseHashlookup(true);
 		soenTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		soenTable = soenTableViewer.getTable();
-		soenTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		table = soenTableViewer.getTable();
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		final TableViewerColumn tableViewerColumn = new TableViewerColumn(soenTableViewer, SWT.NONE);
 		final TableColumn tblclmnMuligeSnner = tableViewerColumn.getColumn();
@@ -79,7 +79,7 @@ public class MilRollIDialog extends Dialog {
 				return cr;
 			}
 		});
-		soenTableViewer.setInput(mrma);
+		soenTableViewer.setInput(array);
 		return container;
 	}
 
@@ -99,10 +99,10 @@ public class MilRollIDialog extends Dialog {
 	}
 
 	/**
-	 * @param sa
+	 * @param array the array to set
 	 */
-	public void setInput(String[] sa) {
-		this.mrma = sa;
+	public void setInput(String[] array) {
+		this.array = array;
 
 	}
 

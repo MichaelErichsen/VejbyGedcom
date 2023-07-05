@@ -20,7 +20,6 @@ public class MillrollListSognEditingSupport extends EditingSupport {
 	 * Constructor
 	 *
 	 * @param viewer
-	 * @param viewer2
 	 */
 	public MillrollListSognEditingSupport(TableViewer viewer) {
 		super(viewer);

@@ -125,8 +125,8 @@ public class Fonkod {
 	/**
 	 * Transform a family name to a Danish phonetic encoding
 	 *
-	 * @param String The name as written
-	 * @return String The encoding of the name
+	 * @param slaegtsNavn a family name
+	 * @return the phonetic representation of the family name
 	 * @throws Exception If name missing or not valid
 	 */
 	public String generateKey(String slaegtsNavn) throws Exception {

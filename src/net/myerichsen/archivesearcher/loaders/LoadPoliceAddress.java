@@ -6,7 +6,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Load a dump from Copenhagen Archives.
  *
  * @author Michael Erichsen
- * @version 20. jun. 2023
+ * @version 5. jul. 2023
  *
  */
 public class LoadPoliceAddress extends LoadCphArch {
@@ -22,7 +22,9 @@ public class LoadPoliceAddress extends LoadCphArch {
 	/**
 	 * Main method
 	 *
-	 * @param args
+	 * @param args Csv file directory, db path, schema, LoadPoliceAddress
+	 * @param as   ArchiveSearcher
+	 * @return Message
 	 */
 	public static String main(String[] args, ArchiveSearcher as) {
 		final LoadPoliceAddress lba = new LoadPoliceAddress();

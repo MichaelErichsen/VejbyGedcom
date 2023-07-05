@@ -20,7 +20,6 @@ public class MillrollListPrevLaegdIdEditingSupport extends EditingSupport {
 	 * Constructor
 	 *
 	 * @param viewer
-	 * @param viewer2
 	 */
 	public MillrollListPrevLaegdIdEditingSupport(TableViewer viewer) {
 		super(viewer);

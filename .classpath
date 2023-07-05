@@ -8,20 +8,10 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
 		<attributes>
-			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.swt.win32.win32.x86_64_3.122.0.v20221123-2302.jar" sourcepath="lib/src.zip"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.core.commands_3.9.800.v20201021-1339.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.core.commands.source_3.9.800.v20201021-1339.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.equinox.common_3.17.0.v20221108-1156.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.equinox.common.source_3.17.0.v20221108-1156.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.jface_3.28.0.v20221024-1426.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.jface.source_3.28.0.v20221024-1426.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.osgi_3.18.200.v20221116-1324.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.osgi.source_3.18.200.v20221116-1324.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.ui.workbench_3.127.0.v20221024-2137.jar" sourcepath="C:/Users/michael/.p2/pool/plugins/org.eclipse.ui.workbench.source_3.127.0.v20221024-2137.jar"/>
-	<classpathentry kind="lib" path="C:/Users/michael/.p2/pool/plugins/org.eclipse.swt_3.122.0.v20221123-2302.jar" sourcepath="lib/src.zip"/>
-	<classpathentry kind="lib" path="C:/Program Files/db-derby-10.14.2.0-bin/lib/derby.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/db-derby-10.14.2.0-bin/lib/derbyclient.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

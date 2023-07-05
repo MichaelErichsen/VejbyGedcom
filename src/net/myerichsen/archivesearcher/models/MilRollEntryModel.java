@@ -15,7 +15,7 @@ import java.util.Properties;
  * Class representing an entry in a military roll
  *
  * @author Michael Erichsen
- * @version 17. maj 2023
+ * @version 5. jul. 2023
  *
  */
 
@@ -31,14 +31,14 @@ public class MilRollEntryModel extends ASModel {
 	/**
 	 * Load list of entries from data base
 	 *
-	 * @param props
-	 *
+	 * @param path
+	 * @param schema
+	 * @return
 	 * @throws SQLException
-	 *
 	 */
 	public static MilRollEntryModel[] load(String path, String schema) throws SQLException {
-		MilRollEntryModel m;
-		final List<MilRollEntryModel> lm = new ArrayList<>();
+		MilRollEntryModel model;
+		final List<MilRollEntryModel> list = new ArrayList<>();
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + path);
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -49,37 +49,37 @@ public class MilRollEntryModel extends ASModel {
 		final ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			m = new MilRollEntryModel();
-			m.setAmt(rs.getString("AMT").trim());
-			m.setAar(rs.getInt("AAR"));
-			m.setLitra(rs.getString("LITRA"));
-			m.setRulletype(rs.getString("RULLETYPE").trim());
-			m.setLaegdnr(rs.getInt("LAEGDNR"));
-			m.setSogn(rs.getString("SOGN").trim());
-			m.setLaegdId(rs.getInt("LAEGDID"));
-			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
-			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
-			m.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
-			m.setLoebeNr(rs.getInt("LOEBENR"));
-			m.setFader(rs.getString("FADER"));
-			m.setSoen(rs.getString("SOEN"));
-			m.setFoedeSted(rs.getString("FOEDESTED"));
-			m.setAlder(rs.getInt("ALDER"));
-			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
-			m.setOphold(rs.getString("OPHOLD"));
-			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
-			m.setFoedt(rs.getDate("FOEDT"));
-			m.setGedcomId(rs.getString("GEDCOMID"));
-			m.setNavn(rs.getString("NAVN"));
-			m.setFaderFon(rs.getString("FADERFON"));
-			m.setSoenFon(rs.getString("SOENFON"));
-			lm.add(m);
+			model = new MilRollEntryModel();
+			model.setAmt(rs.getString("AMT").trim());
+			model.setAar(rs.getInt("AAR"));
+			model.setLitra(rs.getString("LITRA"));
+			model.setRulletype(rs.getString("RULLETYPE").trim());
+			model.setLaegdnr(rs.getInt("LAEGDNR"));
+			model.setSogn(rs.getString("SOGN").trim());
+			model.setLaegdId(rs.getInt("LAEGDID"));
+			model.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			model.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+			model.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
+			model.setLoebeNr(rs.getInt("LOEBENR"));
+			model.setFader(rs.getString("FADER"));
+			model.setSoen(rs.getString("SOEN"));
+			model.setFoedeSted(rs.getString("FOEDESTED"));
+			model.setAlder(rs.getInt("ALDER"));
+			model.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			model.setOphold(rs.getString("OPHOLD"));
+			model.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			model.setFoedt(rs.getDate("FOEDT"));
+			model.setGedcomId(rs.getString("GEDCOMID"));
+			model.setNavn(rs.getString("NAVN"));
+			model.setFaderFon(rs.getString("FADERFON"));
+			model.setSoenFon(rs.getString("SOENFON"));
+			list.add(model);
 		}
 
-		final MilRollEntryModel[] ma = new MilRollEntryModel[lm.size()];
+		final MilRollEntryModel[] ma = new MilRollEntryModel[list.size()];
 
-		for (int i = 0; i < lm.size(); i++) {
-			ma[i] = lm.get(i);
+		for (int i = 0; i < list.size(); i++) {
+			ma[i] = list.get(i);
 
 		}
 
@@ -93,10 +93,10 @@ public class MilRollEntryModel extends ASModel {
 	 * @return
 	 */
 	public static MilRollEntryModel select(Properties props, int laegdId, int loebeNr) {
-		MilRollEntryModel m = null;
+		MilRollEntryModel model = null;
 
 		if (laegdId == 0 && loebeNr == 0) {
-			return m;
+			return model;
 		}
 
 		try {
@@ -114,35 +114,35 @@ public class MilRollEntryModel extends ASModel {
 				return null;
 			}
 
-			m = new MilRollEntryModel();
-			m.setAmt(rs.getString("AMT").trim());
-			m.setAar(rs.getInt("AAR"));
-			m.setLitra(rs.getString("LITRA"));
-			m.setRulletype(rs.getString("RULLETYPE").trim());
-			m.setLaegdnr(rs.getInt("LAEGDNR"));
-			m.setSogn(rs.getString("SOGN").trim());
-			m.setLaegdId(laegdId);
-			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
-			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
-			m.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
-			m.setLoebeNr(loebeNr);
-			m.setFader(rs.getString("FADER"));
-			m.setSoen(rs.getString("SOEN"));
-			m.setFoedeSted(rs.getString("FOEDESTED"));
-			m.setAlder(rs.getInt("ALDER"));
-			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
-			m.setOphold(rs.getString("OPHOLD"));
-			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
-			m.setFoedt(rs.getDate("FOEDT"));
-			m.setGedcomId(rs.getString("GEDCOMID"));
-			m.setNavn(rs.getString("NAVN"));
-			m.setFaderFon(rs.getString("FADERFON"));
-			m.setSoenFon(rs.getString("SOENFON"));
+			model = new MilRollEntryModel();
+			model.setAmt(rs.getString("AMT").trim());
+			model.setAar(rs.getInt("AAR"));
+			model.setLitra(rs.getString("LITRA"));
+			model.setRulletype(rs.getString("RULLETYPE").trim());
+			model.setLaegdnr(rs.getInt("LAEGDNR"));
+			model.setSogn(rs.getString("SOGN").trim());
+			model.setLaegdId(laegdId);
+			model.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			model.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+			model.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
+			model.setLoebeNr(loebeNr);
+			model.setFader(rs.getString("FADER"));
+			model.setSoen(rs.getString("SOEN"));
+			model.setFoedeSted(rs.getString("FOEDESTED"));
+			model.setAlder(rs.getInt("ALDER"));
+			model.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			model.setOphold(rs.getString("OPHOLD"));
+			model.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			model.setFoedt(rs.getDate("FOEDT"));
+			model.setGedcomId(rs.getString("GEDCOMID"));
+			model.setNavn(rs.getString("NAVN"));
+			model.setFaderFon(rs.getString("FADERFON"));
+			model.setSoenFon(rs.getString("SOENFON"));
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 
-		return m;
+		return model;
 
 	}
 
@@ -153,10 +153,10 @@ public class MilRollEntryModel extends ASModel {
 	 * @return
 	 */
 	public static MilRollEntryModel selectPrev(Properties props, int prevLaegdId, int prevLoebeNr) {
-		MilRollEntryModel m = null;
+		MilRollEntryModel model = null;
 
 		if (prevLaegdId == 0 && prevLoebeNr == 0) {
-			return m;
+			return model;
 		}
 
 		try {
@@ -174,35 +174,35 @@ public class MilRollEntryModel extends ASModel {
 				return null;
 			}
 
-			m = new MilRollEntryModel();
-			m.setAmt(rs.getString("AMT").trim());
-			m.setAar(rs.getInt("AAR"));
-			m.setLitra(rs.getString("LITRA"));
-			m.setRulletype(rs.getString("RULLETYPE").trim());
-			m.setLaegdnr(rs.getInt("LAEGDNR"));
-			m.setSogn(rs.getString("SOGN").trim());
-			m.setLaegdId(rs.getInt("LAEGDID"));
-			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
-			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
-			m.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
-			m.setLoebeNr(rs.getInt("LOEBENR"));
-			m.setFader(rs.getString("FADER"));
-			m.setSoen(rs.getString("SOEN"));
-			m.setFoedeSted(rs.getString("FOEDESTED"));
-			m.setAlder(rs.getInt("ALDER"));
-			m.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
-			m.setOphold(rs.getString("OPHOLD"));
-			m.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
-			m.setFoedt(rs.getDate("FOEDT"));
-			m.setGedcomId(rs.getString("GEDCOMID"));
-			m.setNavn(rs.getString("NAVN"));
-			m.setFaderFon(rs.getString("FADERFON"));
-			m.setSoenFon(rs.getString("SOENFON"));
+			model = new MilRollEntryModel();
+			model.setAmt(rs.getString("AMT").trim());
+			model.setAar(rs.getInt("AAR"));
+			model.setLitra(rs.getString("LITRA"));
+			model.setRulletype(rs.getString("RULLETYPE").trim());
+			model.setLaegdnr(rs.getInt("LAEGDNR"));
+			model.setSogn(rs.getString("SOGN").trim());
+			model.setLaegdId(rs.getInt("LAEGDID"));
+			model.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
+			model.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
+			model.setPrevLoebeNr(rs.getInt("PREVLOEBENR"));
+			model.setLoebeNr(rs.getInt("LOEBENR"));
+			model.setFader(rs.getString("FADER"));
+			model.setSoen(rs.getString("SOEN"));
+			model.setFoedeSted(rs.getString("FOEDESTED"));
+			model.setAlder(rs.getInt("ALDER"));
+			model.setStoerrelseITommer(rs.getBigDecimal("STOERRELSEITOMMER"));
+			model.setOphold(rs.getString("OPHOLD"));
+			model.setAnmaerkninger(rs.getString("ANMAERKNINGER"));
+			model.setFoedt(rs.getDate("FOEDT"));
+			model.setGedcomId(rs.getString("GEDCOMID"));
+			model.setNavn(rs.getString("NAVN"));
+			model.setFaderFon(rs.getString("FADERFON"));
+			model.setSoenFon(rs.getString("SOENFON"));
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
 
-		return m;
+		return model;
 
 	}
 

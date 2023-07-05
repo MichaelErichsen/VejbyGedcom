@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 5. jul. 2023
  *
  */
 public class BurregView extends Composite {
@@ -60,8 +60,8 @@ public class BurregView extends Composite {
 	/**
 	 * Create the composite.
 	 *
-	 * @param parent
-	 * @param style
+	 * @param parent Parent composite
+	 * @param style  Style
 	 */
 	public BurregView(Composite parent, int style) {
 		super(parent, style);
@@ -505,10 +505,10 @@ public class BurregView extends Composite {
 	/**
 	 * Populate the burial registry tab from the database
 	 *
-	 * @param phonName
-	 * @param birthDate
-	 * @param deathDate
-	 * @throws SQLException
+	 * @param phonName  Phonetic name
+	 * @param birthDate Birth date
+	 * @param deathDate death date
+	 * @throws SQLException SQL Exception
 	 */
 	public void populate(String phonName, String birthDate, String deathDate) throws SQLException {
 		thread = new Thread(() -> getInput(phonName, birthDate, deathDate));
@@ -535,7 +535,7 @@ public class BurregView extends Composite {
 	}
 
 	/**
-	 * @param props
+	 * @param props the properties to set
 	 */
 	public void setProperties(Properties props) {
 		this.props = props;

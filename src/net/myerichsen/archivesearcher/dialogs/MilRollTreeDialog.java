@@ -21,7 +21,7 @@ import net.myerichsen.archivesearcher.providers.MilRollTreeLabelProvider;
  * Display a tree view of connected military roll entries
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 5. jul. 2023
  *
  */
 public class MilRollTreeDialog extends Dialog {
@@ -32,11 +32,10 @@ public class MilRollTreeDialog extends Dialog {
 	/**
 	 * Constructor
 	 *
-	 * @param props
-	 * @param parentShell
-	 * @param milRollEntryView
-	 * @param laegdId
-	 * @param loebeNr
+	 * @param props       Properties
+	 * @param parentShell Parent shell
+	 * @param laegdId     Military roll id
+	 * @param loebeNr     Serial number
 	 */
 	public MilRollTreeDialog(Properties props, Shell parentShell, String laegdId, String loebeNr) {
 		super(parentShell);

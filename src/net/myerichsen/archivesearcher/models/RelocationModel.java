@@ -13,7 +13,7 @@ import java.util.List;
  * Class representing a relocation event
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 5. jul. 2023
  *
  */
 public class RelocationModel extends ASModel {
@@ -30,18 +30,18 @@ public class RelocationModel extends ASModel {
 			+ "AND (TYPE = 'Birth' OR TYPE = 'Christening')";
 
 	/**
+	 * @param schema
 	 * @param dbPath
 	 * @param phonName
 	 * @param birthDate
-	 * @param deathDate
 	 * @return
 	 * @throws SQLException
 	 */
 	public static RelocationModel[] load(String schema, String dbPath, String phonName, String birthDate)
 			throws SQLException {
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);
-		RelocationModel relocationRecord;
-		final List<RelocationModel> lr = new ArrayList<>();
+		RelocationModel model;
+		final List<RelocationModel> list = new ArrayList<>();
 
 		PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
 		statement.setString(1, schema);
@@ -71,7 +71,7 @@ public class RelocationModel extends ASModel {
 		ResultSet rs = statement.executeQuery();
 
 		while (rs.next()) {
-			relocationRecord = new RelocationModel(
+			model = new RelocationModel(
 					rs.getString(1) == null ? "" : rs.getString(1).replace("I", "").replace("@", "").trim(),
 					rs.getString(2) == null ? "" : rs.getString(2).trim(),
 					rs.getString(3) == null ? "" : rs.getString(3).trim(), rs.getDate(4),
@@ -79,7 +79,7 @@ public class RelocationModel extends ASModel {
 					rs.getString(6) == null ? "" : rs.getString(6).trim(),
 					rs.getString(7) == null ? "" : rs.getString(7).trim(),
 					rs.getString(8) == null ? "" : rs.getString(8).trim());
-			lr.add(relocationRecord);
+			list.add(model);
 		}
 
 		statement.close();
@@ -88,25 +88,25 @@ public class RelocationModel extends ASModel {
 
 		statement = conn.prepareStatement(SELECT_BIRTHDATE);
 
-		for (final RelocationModel relocation2 : lr) {
-			statement.setString(1, "@I" + relocation2.getId() + "@");
+		for (final RelocationModel model2 : list) {
+			statement.setString(1, "@I" + model2.getId() + "@");
 			rs = statement.executeQuery();
 
 			if (rs.next()) {
-				relocation2.setBirthDate(rs.getDate("DATE"));
+				model2.setBirthDate(rs.getDate("DATE"));
 			}
 
 		}
 
 		statement.close();
 
-		final RelocationModel[] rra = new RelocationModel[lr.size()];
+		final RelocationModel[] array = new RelocationModel[list.size()];
 
-		for (int i = 0; i < lr.size(); i++) {
-			rra[i] = lr.get(i);
+		for (int i = 0; i < list.size(); i++) {
+			array[i] = list.get(i);
 		}
 
-		return rra;
+		return array;
 	}
 
 	private String id = "";
@@ -234,8 +234,8 @@ public class RelocationModel extends ASModel {
 	/**
 	 * @param relocationDate the relocationDate to set
 	 */
-	public void setDate(Date date) {
-		this.relocationDate = date;
+	public void setDate(Date relocationDate) {
+		this.relocationDate = relocationDate;
 	}
 
 	/**
@@ -283,8 +283,8 @@ public class RelocationModel extends ASModel {
 	/**
 	 * @param relocationYear the relocationYear to set
 	 */
-	public void setRelocationYear(int year) {
-		this.relocationYear = year;
+	public void setRelocationYear(int relocationYear) {
+		this.relocationYear = relocationYear;
 	}
 
 	/**

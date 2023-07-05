@@ -191,9 +191,13 @@ public class CensusModel extends ASModel {
 	/**
 	 * Get a list of census records from the Derby table
 	 *
-	 * @param rs
-	 * @return
-	 * @throws SQLException
+	 * @param schema
+	 * @param dbPath
+	 * @param phonName
+	 * @param birthYear
+	 * @param deathYear
+	 * @return input data array
+	 * @throws Exception
 	 */
 	public static CensusModel[] load(String schema, String dbPath, String phonName, String birthYear, String deathYear)
 			throws Exception {
@@ -505,7 +509,7 @@ public class CensusModel extends ASModel {
 	/**
 	 * Insert a census record into a Derby database
 	 *
-	 * @param statement
+	 * @param conn Connection
 	 * @throws SQLException
 	 */
 	public void insertIntoDb(Connection conn) throws SQLException {

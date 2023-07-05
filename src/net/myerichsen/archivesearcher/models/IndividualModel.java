@@ -66,8 +66,10 @@ public class IndividualModel extends ASModel {
 	/**
 	 * Find individual data from its phonetic name and birth date
 	 *
-	 * @param conn
-	 * @param id
+	 * @param dbPath
+	 * @param schema
+	 * @param phonName
+	 * @param birthDate
 	 * @return
 	 * @throws SQLException
 	 */
@@ -509,7 +511,7 @@ public class IndividualModel extends ASModel {
 	}
 
 	/**
-	 * @param deathdater the deathdate to set
+	 * @param deathDate the deathdate to set
 	 */
 	public void setDeathDate(Date deathDate) {
 		this.deathDate = deathDate;

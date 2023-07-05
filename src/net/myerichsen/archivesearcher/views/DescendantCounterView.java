@@ -28,7 +28,7 @@ import net.myerichsen.archivesearcher.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 5. jul. 2023
  *
  */
 public class DescendantCounterView extends Composite {
@@ -160,7 +160,7 @@ public class DescendantCounterView extends Composite {
 	}
 
 	/**
-	 * @param gedcomFileName
+	 * Populate the view
 	 */
 	public void populate() {
 		thread = new Thread(this::getInput);
@@ -168,7 +168,7 @@ public class DescendantCounterView extends Composite {
 	}
 
 	/**
-	 * @param props
+	 * @param props the properties to set
 	 */
 	public void setProperties(Properties props) {
 		this.props = props;

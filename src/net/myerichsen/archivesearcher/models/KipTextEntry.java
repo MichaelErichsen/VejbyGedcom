@@ -16,10 +16,7 @@ public class KipTextEntry {
 	/**
 	 * Constructor
 	 *
-	 * @param amt
-	 * @param herred
-	 * @param sogn
-	 * @param kipNr
+	 * @param line
 	 */
 	public KipTextEntry(String line) {
 		final String[] split = line.split(";");

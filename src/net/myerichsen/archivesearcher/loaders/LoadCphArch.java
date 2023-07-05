@@ -18,7 +18,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Abstract superclass for Cph archive loader programs
  *
  * @author Michael Erichsen
- * @version 3. jul. 2023
+ * @version 5. jul. 2023
  *
  */
 public abstract class LoadCphArch {
@@ -135,17 +135,17 @@ public abstract class LoadCphArch {
 	}
 
 	/**
-	 * @return
+	 * @return Delete statement
 	 */
 	protected abstract String getDelete();
 
 	/**
-	 * @return
+	 * @return Insert statement
 	 */
 	protected abstract String getInsert();
 
 	/**
-	 * @return
+	 * @return Table name
 	 */
 	protected abstract String getTablename();
 

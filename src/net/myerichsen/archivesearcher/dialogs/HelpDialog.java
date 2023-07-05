@@ -14,7 +14,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Michael Erichsen
- * @version 24. apr. 2023
+ * @version 5. jul. 2023
  *
  */
 public class HelpDialog extends Dialog {
@@ -22,7 +22,7 @@ public class HelpDialog extends Dialog {
 	/**
 	 * Create the dialog.
 	 *
-	 * @param parentShell
+	 * @param parentShell Parent shell
 	 */
 	public HelpDialog(Shell parentShell) {
 		super(parentShell);

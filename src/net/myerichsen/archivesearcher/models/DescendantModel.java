@@ -16,34 +16,34 @@ import org.gedcom4j.parser.GedcomParser;
  * Class representing an individual with count of descendants
  *
  * @author Michael Erichsen
- * @version 22. apr. 2023
+ * @version 5. jul. 2023
  *
  */
 public class DescendantModel extends ASModel {
 	/**
-	 * @param string
-	 * @return
-	 * @throws GedcomParserException
+	 * @param gedcomFileName
+	 * @return inout data array
 	 * @throws IOException
+	 * @throws GedcomParserException
 	 */
 	public static DescendantModel[] load(String gedcomFileName) throws IOException, GedcomParserException {
 		final Gedcom gedcom = readGedcom(gedcomFileName);
 		final Map<String, IndividualWithChildCount> iwccMap = populateAncestors(gedcom);
 
-		DescendantModel dm;
-		final DescendantModel[] dma = new DescendantModel[iwccMap.size()];
+		DescendantModel model;
+		final DescendantModel[] array = new DescendantModel[iwccMap.size()];
 		int counter = 0;
 
 		for (final Map.Entry<String, IndividualWithChildCount> iwcc : iwccMap.entrySet()) {
-			dm = new DescendantModel();
-			dm.setDescendantCount(iwcc.getValue().getDescendantCount());
-			dm.setId(iwcc.getValue().getXref().replace("@", "").replace("I", ""));
-			dm.setName(iwcc.getValue().getFormattedName().replace("/", ""));
-			dma[counter] = dm;
+			model = new DescendantModel();
+			model.setDescendantCount(iwcc.getValue().getDescendantCount());
+			model.setId(iwcc.getValue().getXref().replace("@", "").replace("I", ""));
+			model.setName(iwcc.getValue().getFormattedName().replace("/", ""));
+			array[counter] = model;
 			counter++;
 		}
 
-		return dma;
+		return array;
 	}
 
 	/**

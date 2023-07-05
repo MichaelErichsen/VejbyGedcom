@@ -14,7 +14,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * @author Michael Erichsen
- * @version 28. jun. 2023
+ * @version 5. jul. 2023
  *
  */
 public class KeystrokeDialog extends Dialog {
@@ -22,7 +22,7 @@ public class KeystrokeDialog extends Dialog {
 	/**
 	 * Constructor
 	 *
-	 * @param parentShell
+	 * @param parentShell Parent shell
 	 */
 	public KeystrokeDialog(Shell parentShell) {
 		super(parentShell);

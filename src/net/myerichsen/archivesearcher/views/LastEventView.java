@@ -1,6 +1,5 @@
 package net.myerichsen.archivesearcher.views;
 
-import java.sql.SQLException;
 import java.util.Properties;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -237,8 +236,6 @@ public class LastEventView extends Composite {
 
 	/**
 	 * Populate the census duplicate tab from the database
-	 *
-	 * @throws SQLException
 	 */
 	public void populate(String location) {
 		thread = new Thread(() -> getInput(location));

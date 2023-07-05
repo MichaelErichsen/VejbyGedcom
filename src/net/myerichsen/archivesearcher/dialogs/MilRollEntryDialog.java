@@ -50,7 +50,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 3.jul 2023
+ * @version 5. jul 2023
  *
  */
 
@@ -63,8 +63,7 @@ public class MilRollEntryDialog {
 	/**
 	 * Launch the application.
 	 *
-	 * @param args
-	 * @wbp.parser.entryPoint
+	 * @param props Properties
 	 */
 	public static void main(Properties props) {
 		try {
@@ -854,7 +853,7 @@ public class MilRollEntryDialog {
 	/**
 	 * Set the error message in the message combo box
 	 *
-	 * @param string
+	 * @param string Error message
 	 *
 	 */
 	public void setErrorMessage(String string) {
@@ -865,7 +864,7 @@ public class MilRollEntryDialog {
 	/**
 	 * Set the message in the message combo box
 	 *
-	 * @param string
+	 * @param string Message
 	 *
 	 */
 	public void setMessage(String string) {
@@ -885,7 +884,7 @@ public class MilRollEntryDialog {
 	/**
 	 * Set properties
 	 *
-	 * @param props
+	 * @param props Properties
 	 */
 	public void setProperties(Properties props) {
 		this.props = props;

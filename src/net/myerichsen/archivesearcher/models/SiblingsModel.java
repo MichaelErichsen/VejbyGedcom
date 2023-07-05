@@ -106,7 +106,7 @@ public class SiblingsModel extends ASModel {
 	/**
 	 * Generic method to get a list of objects from the database
 	 *
-	 * @param sa
+	 * @param args
 	 * @return
 	 * @throws SQLException
 	 */
@@ -195,10 +195,10 @@ public class SiblingsModel extends ASModel {
 	}
 
 	/**
-	 * @param year the birth date to set
+	 * @param birthYear the birth year to set
 	 */
-	public void setBirthDate(int j) {
-		this.birthYear = j;
+	public void setBirthDate(int birthYear) {
+		this.birthYear = birthYear;
 	}
 
 	/**

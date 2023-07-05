@@ -33,9 +33,9 @@ public class LastEventModel extends ASModel {
 	private static final String SELECT4 = "SELECT GIVENNAME, SURNAME FROM INDIVIDUAL WHERE ID = ?";
 
 	/**
-	 * @param args3
-	 * @param args2
-	 * @param args
+	 * @param schema
+	 * @param dbPath
+	 * @param location
 	 * @return
 	 * @throws SQLException
 	 */
