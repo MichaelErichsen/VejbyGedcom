@@ -34,7 +34,7 @@ import net.myerichsen.vejby.gedcom.Individual;
  * The panel supports manual changes to the generated family structure by
  * definitions of up to four families.
  *
- * @version 02-04-2023
+ * @version 6. jul.-2023
  * @author Michael Erichsen
  *
  */
@@ -200,7 +200,6 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Delete family 2
 	 */
-	@SuppressWarnings("unchecked")
 	protected void deleteFamily2() {
 		Family family2 = selectedHousehold.getFamilies().get(2);
 		selectedHousehold.getFamilies().remove(family2);
@@ -220,7 +219,6 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Delete family 3
 	 */
-	@SuppressWarnings("unchecked")
 	protected void deleteFamily3() {
 		Family family3 = selectedHousehold.getFamilies().get(3);
 		selectedHousehold.getFamilies().remove(family3);
@@ -234,7 +232,6 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Delete family 4
 	 */
-	@SuppressWarnings("unchecked")
 	protected void deleteFamily4() {
 		Family family4 = selectedHousehold.getFamilies().get(4);
 		selectedHousehold.getFamilies().remove(family4);
@@ -375,7 +372,7 @@ public class HouseholdPanel extends JPanel {
 	 * @param dataVector
 	 * @param family0
 	 */
-	public void rebuildSinglesList(Vector<Vector> dataVector, Family family0) {
+	public void rebuildSinglesList(@SuppressWarnings("rawtypes") Vector<Vector> dataVector, Family family0) {
 		Individual individual;
 
 		// Read all rows and add unassigned to singles list
@@ -392,6 +389,7 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Update the singles list (family 0) and the first family.
 	 */
+	@SuppressWarnings("unchecked")
 	private void updateFamily1() {
 		Individual individual;
 
@@ -402,7 +400,7 @@ public class HouseholdPanel extends JPanel {
 		final Family family0 = new Family(selectedHousehold.getId(), 0);
 		final Family family1 = new Family(selectedHousehold.getId(), 1);
 
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
@@ -443,6 +441,7 @@ public class HouseholdPanel extends JPanel {
 	 * If this cannot be done concurrently, then family 0 must be deleted and then
 	 * populated by all individuals not in families 1-3.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void updateFamily2() {
 		Individual individual;
 
@@ -455,7 +454,6 @@ public class HouseholdPanel extends JPanel {
 		final Family family2 = new Family(selectedHousehold.getId(), 2);
 
 		// Read all rows and add to family 2
-		@SuppressWarnings("unchecked")
 		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
@@ -501,6 +499,7 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Update the singles list (family 0) and the third family.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void updateFamily3() {
 		Individual individual;
 
@@ -513,7 +512,6 @@ public class HouseholdPanel extends JPanel {
 		final Family family3 = new Family(selectedHousehold.getId(), 3);
 
 		// Read all rows and add to family 3
-		@SuppressWarnings("unchecked")
 		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 
@@ -559,6 +557,7 @@ public class HouseholdPanel extends JPanel {
 	/**
 	 * Update the singles list (family 0) and the fourth family.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void updateFamily4() {
 		Individual individual;
 
@@ -571,7 +570,6 @@ public class HouseholdPanel extends JPanel {
 		final Family family4 = new Family(selectedHousehold.getId(), 4);
 
 		// Read all rows and add to family 3
-		@SuppressWarnings("unchecked")
 		final Vector<Vector> dataVector = householdTableModel.getDataVector();
 		Vector<String> tableRowVector;
 

@@ -61,7 +61,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 6. jul. 2023
  *
  */
 
@@ -628,17 +628,19 @@ public class ArchiveSearcher extends Shell {
 	}
 
 	/**
-	 * Get Police Registry
+	 * Get Police Registry tables
 	 */
-	private void getPolReg() {
+	private void getPoliceRegistries() {
 		String[] sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
 				props.getProperty("cphSchema"), props.getProperty("policeAddress") };
 		final String message1 = LoadPoliceAddress.main(sa, this);
 		messageCombo.getDisplay().asyncExec(() -> setMessage(message1));
+		messageCombo.getDisplay().asyncExec(() -> indicator.setVisible(true));
 		sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
 				props.getProperty("cphSchema"), props.getProperty("policePosition") };
 		final String message2 = LoadPolicePosition.main(sa, this);
 		messageCombo.getDisplay().asyncExec(() -> setMessage(message2));
+		messageCombo.getDisplay().asyncExec(() -> indicator.setVisible(true));
 		sa = new String[] { props.getProperty("cphCsvFileDirectory"), props.getProperty("cphDbPath"),
 				props.getProperty("cphSchema"), props.getProperty("policePerson") };
 		final String message3 = LoadPolicePerson.main(sa, this);
@@ -811,7 +813,7 @@ public class ArchiveSearcher extends Shell {
 					+ props.getProperty("cphDbPath"));
 
 			indicator.setVisible(true);
-			new Thread(this::getPolReg).start();
+			new Thread(this::getPoliceRegistries).start();
 			break;
 		case SWT.CANCEL:
 			break;

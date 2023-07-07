@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * This class encodes a Danish name phonetically
  *
  * @author Michael Erichsen
- * @version 3. mar. 2023
+ * @version 6. jul. 2023
  */
 public class Fonkod {
 
@@ -74,9 +74,12 @@ public class Fonkod {
 
 		// skj -> sk & sj
 		p = Pattern.compile("skj");
-		m = p.matcher(out.substring(0, 3));
-		if (m.matches()) {
-			return out.replaceFirst("skj", "sk") + " " + out.replaceFirst("skj", "sj");
+
+		if (out.length() >= 3) {
+			m = p.matcher(out.substring(0, 3));
+			if (m.matches()) {
+				return out.replaceFirst("skj", "sk") + " " + out.replaceFirst("skj", "sj");
+			}
 		}
 
 		return out.replaceFirst("(sk)[^aeijoruyæøå]", "$1");

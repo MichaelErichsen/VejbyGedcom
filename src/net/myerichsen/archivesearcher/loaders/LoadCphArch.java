@@ -2,7 +2,9 @@ package net.myerichsen.archivesearcher.loaders;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -85,8 +87,6 @@ public abstract class LoadCphArch {
 		try {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
 		} catch (final SQLException e) {
-			// Shutdown message is expected
-//			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
 		conn = DriverManager.getConnection(dbURL);
 		final PreparedStatement statement = conn.prepareStatement(SET_SCHEMA);
@@ -164,18 +164,21 @@ public abstract class LoadCphArch {
 
 		final List<String> columnTypes = getColumnTypes(conn, getTablename());
 
-		PreparedStatement ps = conn.prepareStatement(getDelete());
-		ps.execute();
+		PreparedStatement statement = conn.prepareStatement(getDelete());
+		statement.execute();
 
-		final BufferedReader br = new BufferedReader(new FileReader(new File(args[0] + "/" + args[3])));
+		final BufferedReader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(new File(args[0] + "/" + args[3])), StandardCharsets.UTF_8));
+
+//		final BufferedReader br = new BufferedReader(new FileReader(new File(args[0] + "/" + args[3])));
 		String line;
 
 		// Ignore header line
-		line = br.readLine();
+		line = reader.readLine();
 
-		while ((line = br.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			while (!line.endsWith("\"")) {
-				line = line + br.readLine();
+				line = line + reader.readLine();
 			}
 
 			if (line.endsWith("\";\"")) {
@@ -207,19 +210,19 @@ public abstract class LoadCphArch {
 			try {
 				sb.append(")");
 				query = sb.toString();
-				ps = conn.prepareStatement(query);
-				ps.execute();
+				statement = conn.prepareStatement(query);
+				statement.execute();
 				counter++;
 			} catch (final SQLException e) {
 				if (!e.getSQLState().equals("42821")) {
-					br.close();
+					reader.close();
 					throw new SQLException(e);
 				}
 			}
 
 		}
 
-		br.close();
+		reader.close();
 
 	}
 
