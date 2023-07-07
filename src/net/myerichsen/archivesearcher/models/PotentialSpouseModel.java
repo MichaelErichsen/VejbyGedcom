@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a potential spouse
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 7. jul. 2023
  */
 
 public class PotentialSpouseModel extends ASModel {
@@ -38,15 +39,38 @@ public class PotentialSpouseModel extends ASModel {
 	private static final String SELECT_CENSUS_2 = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
 			+ "AND HUSSTANDS_FAMILIENR = ? AND MATR_NR_ADRESSE = ? AND KILDEHENVISNING = ? "
 			+ "AND FONNAVN <> ? AND (CIVILSTAND LIKE 'G%' OR CIVILSTAND LIKE 'V%')";
+	private static final String SELECT_HUSBAND = "SELECT HUSBAND FROM FAMILY WHERE WIFE = ?";
+	private static final String SELECT_WIFE = "SELECT WIFE FROM FAMILY WHERE HUSBAND = ?";
 
 	/**
-	 * @param gedcomSchema
-	 * @param gedcomDbPath
-	 * @param censusSchema
-	 * @param censusDbPath
-	 * @param individual
-	 * @return
-	 * @throws Exception
+	 * @param rs2
+	 * @param list
+	 * @param eventType
+	 * @throws SQLException
+	 */
+	private static void addNewModel(ResultSet rs2, final List<PotentialSpouseModel> list, String eventType)
+			throws SQLException {
+		PotentialSpouseModel model;
+		model = new PotentialSpouseModel();
+		model.setKildenavn(rs2.getString("GIVENNAME").trim() + " " + rs2.getString("SURNAME").trim());
+		model.setKoen(rs2.getString("SEX"));
+		model.setFoedt_kildedato(rs2.getString("BIRTHDATE"));
+		model.setKildefoedested(rs2.getString("BIRTHPLACE"));
+		model.setFonnavn(rs2.getString("PHONNAME").trim());
+		model.setSourceType(eventType);
+		list.add(model);
+	}
+
+	/**
+	 * Get an array of potential spouses
+	 *
+	 * @param gedcomSchema schema
+	 * @param gedcomDbPath database path
+	 * @param censusSchema schema
+	 * @param censusDbPath database path
+	 * @param individual   individual ID
+	 * @return an array of models
+	 * @throws Exception Various types of exceptions
 	 */
 	public static PotentialSpouseModel[] load(String gedcomSchema, String gedcomDbPath, String censusSchema,
 			String censusDbPath, String individual) throws Exception {
@@ -68,6 +92,7 @@ public class PotentialSpouseModel extends ASModel {
 		StringBuilder sb;
 		int birthYear1;
 		int birthYear2;
+		PreparedStatement gedcomStatement1;
 
 		final String gedcomDbURL = "jdbc:derby:" + gedcomDbPath;
 		final Connection gedcomConn = DriverManager.getConnection(gedcomDbURL);
@@ -76,9 +101,37 @@ public class PotentialSpouseModel extends ASModel {
 		gedcomStatement.setString(1, gedcomSchema);
 		gedcomStatement.execute();
 
-		gedcomStatement = gedcomConn.prepareStatement(SELECT_INDIVIDUAL);
+		gedcomStatement = gedcomConn.prepareStatement(SELECT_HUSBAND);
 		gedcomStatement.setString(1, individual);
 		ResultSet rs1 = gedcomStatement.executeQuery();
+
+		if (rs1.next()) {
+			gedcomStatement1 = gedcomConn.prepareStatement(SELECT_INDIVIDUAL);
+			gedcomStatement1.setString(1, rs1.getString("HUSBAND"));
+			rs2 = gedcomStatement1.executeQuery();
+
+			if (rs2.next()) {
+				addNewModel(rs2, list, "Vielse");
+			}
+		}
+
+		gedcomStatement = gedcomConn.prepareStatement(SELECT_WIFE);
+		gedcomStatement.setString(1, individual);
+		rs1 = gedcomStatement.executeQuery();
+
+		if (rs1.next()) {
+			gedcomStatement1 = gedcomConn.prepareStatement(SELECT_INDIVIDUAL);
+			gedcomStatement1.setString(1, rs1.getString("WIFE"));
+			rs2 = gedcomStatement1.executeQuery();
+
+			if (rs2.next()) {
+				addNewModel(rs2, list, "Vielse");
+			}
+		}
+
+		gedcomStatement = gedcomConn.prepareStatement(SELECT_INDIVIDUAL);
+		gedcomStatement.setString(1, individual);
+		rs1 = gedcomStatement.executeQuery();
 
 		if (!rs1.next()) {
 			return new PotentialSpouseModel[0];
@@ -91,7 +144,7 @@ public class PotentialSpouseModel extends ASModel {
 		gedcomStatement.setString(2, individual);
 		rs1 = gedcomStatement.executeQuery();
 
-		final PreparedStatement gedcomStatement1 = gedcomConn.prepareStatement(SELECT_INDIVIDUAL);
+		gedcomStatement1 = gedcomConn.prepareStatement(SELECT_INDIVIDUAL);
 
 		while (rs1.next()) {
 			fonkod.generateKey(rs1.getString("INDIVIDUAL"));
@@ -99,14 +152,7 @@ public class PotentialSpouseModel extends ASModel {
 			rs2 = gedcomStatement1.executeQuery();
 
 			while (rs2.next()) {
-				model = new PotentialSpouseModel();
-				model.setKildenavn(rs2.getString("GIVENNAME").trim() + " " + rs2.getString("SURNAME").trim());
-				model.setKoen(rs2.getString("SEX"));
-				model.setFoedt_kildedato(rs2.getString("BIRTHDATE"));
-				model.setKildefoedested(rs2.getString("BIRTHPLACE"));
-				model.setFonnavn(rs2.getString("PHONNAME").trim());
-				model.setSourceType("Hændelse " + rs1.getString("DATE").substring(0, 4));
-				list.add(model);
+				addNewModel(rs2, list, "Hændelse " + rs1.getString("DATE").substring(0, 4));
 			}
 		}
 

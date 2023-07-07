@@ -61,7 +61,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 6. jul. 2023
+ * @version 7. jul. 2023
  *
  */
 
@@ -559,7 +559,7 @@ public class ArchiveSearcher extends Shell {
 		lblFader.setText("Fader");
 
 		searchFather = new Text(searchComposite, SWT.BORDER);
-		searchFather.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
+		searchFather.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		final Label lblModer = new Label(searchComposite, SWT.NONE);
 		lblModer.setText("Moder");
@@ -885,6 +885,7 @@ public class ArchiveSearcher extends Shell {
 			} catch (final Exception e1) {
 			}
 
+			indicator.setVisible(true);
 			individualView.populate(individual);
 			relocationView.populate(phonName, birthDate);
 			censusView.populate(individual.getId(), phonName, birthDate, deathDate);
@@ -899,8 +900,6 @@ public class ArchiveSearcher extends Shell {
 
 			householdHeadView.populate(individual.getId());
 			potentialSpousesView.populate(individual.getId());
-
-			indicator.setVisible(true);
 		} catch (final SQLException e1) {
 			messageCombo.setText(e1.getMessage());
 			e1.printStackTrace();
@@ -930,6 +929,7 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		setMessage("Søger efter " + searchName.getText());
+		indicator.setVisible(true);
 
 		final Fonkod fk = new Fonkod();
 		try {
@@ -963,12 +963,10 @@ public class ArchiveSearcher extends Shell {
 				siblingsView.populate(searchFather.getText(), searchMother.getText());
 			}
 
-			indicator.setVisible(true);
 		} catch (final Exception e1) {
 			setMessage(e1.getMessage());
 			e1.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -1012,11 +1010,11 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		setMessage("Søger efter " + sb);
+		indicator.setVisible(true);
 
 		try {
 			siblingsView.populate(father, mother);
 			siblingsView.setFocus();
-			indicator.setVisible(true);
 		} catch (final Exception e2) {
 			setErrorMessage(e2.getMessage());
 			e2.printStackTrace();
