@@ -9,7 +9,7 @@ import net.myerichsen.archivesearcher.models.ProbateModel;
  * Filter for source column in probate table (Singleton)
  *
  * @author Michael Erichsen
- * @version 26. apr. 2023
+ * @version 9. jul. 2023
  *
  */
 public class ProbateSourceFilter extends ViewerFilter {
@@ -52,7 +52,7 @@ public class ProbateSourceFilter extends ViewerFilter {
 	}
 
 	public void setSearchText(String s) {
-		this.searchString = ".*" + s.toLowerCase() + ".*";
+		this.searchString = ".*" + s.replace("[", "").replace("]", "").toLowerCase() + ".*";
 	}
 
 }
