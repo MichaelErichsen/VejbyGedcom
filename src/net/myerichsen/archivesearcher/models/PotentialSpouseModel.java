@@ -21,7 +21,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a potential spouse
  *
  * @author Michael Erichsen
- * @version 7. jul. 2023
+ * @version 10. jul. 2023
  */
 
 public class PotentialSpouseModel extends ASModel {
@@ -36,7 +36,7 @@ public class PotentialSpouseModel extends ASModel {
 	private static final String SELECT_INDIVIDUAL_3 = "SELECT ID, BIRTHDATE FROM INDIVIDUAL WHERE PHONNAME = ?";
 	private static final String SELECT_EVENT_1 = "SELECT * FROM EVENT WHERE TYPE = 'Census' AND INDIVIDUAL = ? AND SUBTYPE <> 'Witness'";
 	private static final String SELECT_CENSUS_1 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND FONNAVN = ?";
-	private static final String SELECT_CENSUS_2 = "SELECT * FROM VEJBY.CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
+	private static final String SELECT_CENSUS_2 = "SELECT * FROM CENSUS WHERE KIPNR = ? AND KILDESTEDNAVN = ? "
 			+ "AND HUSSTANDS_FAMILIENR = ? AND MATR_NR_ADRESSE = ? AND KILDEHENVISNING = ? "
 			+ "AND FONNAVN <> ? AND (CIVILSTAND LIKE 'G%' OR CIVILSTAND LIKE 'V%')";
 	private static final String SELECT_HUSBAND = "SELECT HUSBAND FROM FAMILY WHERE WIFE = ?";

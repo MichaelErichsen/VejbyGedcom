@@ -13,7 +13,6 @@ import java.util.List;
  * Class representing a census duplicate
  *
  * @author Michael Erichsen
- * @version 4. jun. 2023
  *
  */
 public class CensusDupModel extends ASModel {
@@ -21,7 +20,7 @@ public class CensusDupModel extends ASModel {
 	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-	private static final String SELECT = "SELECT * FROM VEJBY.EVENT WHERE TYPE = 'Census'";
+	private static final String SELECT = "SELECT * FROM EVENT WHERE TYPE = 'Census'";
 
 	/**
 	 * Get a list of objects from the database

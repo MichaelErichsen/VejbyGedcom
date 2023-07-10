@@ -28,8 +28,8 @@ public class SettingsModel {
 	private String probatePath;
 	private String probateSchema;
 	private String relocationSearch;
-	private String vejbyPath;
-	private String vejbySchema;
+	private String parishPath;
+	private String parishSchema;
 	private String msgLogLen;
 	private String milrollPath;
 	private String milrollSchema;
@@ -56,8 +56,8 @@ public class SettingsModel {
 		probatePath = props.getProperty("probatePath");
 		probateSchema = props.getProperty("probateSchema");
 		relocationSearch = props.getProperty("relocationSearch");
-		vejbyPath = props.getProperty("vejbyPath");
-		vejbySchema = props.getProperty("vejbySchema");
+		parishPath = props.getProperty("parishPath");
+		parishSchema = props.getProperty("parishSchema");
 		msgLogLen = props.getProperty("msgLogLen");
 		milrollPath = props.getProperty("milrollPath");
 		milrollSchema = props.getProperty("milrollSchema");
@@ -162,6 +162,20 @@ public class SettingsModel {
 	}
 
 	/**
+	 * @return the parishPath
+	 */
+	public String getparishPath() {
+		return parishPath;
+	}
+
+	/**
+	 * @return the parishSchema
+	 */
+	public String getparishSchema() {
+		return parishSchema;
+	}
+
+	/**
 	 * @return the policeAddress
 	 */
 	public String getPoliceAddress() {
@@ -201,20 +215,6 @@ public class SettingsModel {
 	 */
 	public String getRelocationSearch() {
 		return relocationSearch;
-	}
-
-	/**
-	 * @return the vejbyPath
-	 */
-	public String getVejbyPath() {
-		return vejbyPath;
-	}
-
-	/**
-	 * @return the vejbySchema
-	 */
-	public String getVejbySchema() {
-		return vejbySchema;
 	}
 
 	/**
@@ -317,6 +317,20 @@ public class SettingsModel {
 	}
 
 	/**
+	 * @param parishPath the parishPath to set
+	 */
+	public void setparishPath(String parishPath) {
+		this.parishPath = parishPath;
+	}
+
+	/**
+	 * @param parishSchema the parishSchema to set
+	 */
+	public void setparishSchema(String parishSchema) {
+		this.parishSchema = parishSchema;
+	}
+
+	/**
 	 * @param policeAddress the policeAddress to set
 	 */
 	public void setPoliceAddress(String policeAddress) {
@@ -359,20 +373,6 @@ public class SettingsModel {
 	}
 
 	/**
-	 * @param vejbyPath the vejbyPath to set
-	 */
-	public void setVejbyPath(String vejbyPath) {
-		this.vejbyPath = vejbyPath;
-	}
-
-	/**
-	 * @param vejbySchema the vejbySchema to set
-	 */
-	public void setVejbySchema(String vejbySchema) {
-		this.vejbySchema = vejbySchema;
-	}
-
-	/**
 	 * @param props
 	 */
 	public String storeProperties(Properties props) {
@@ -392,8 +392,8 @@ public class SettingsModel {
 		props.setProperty("probatePath", probatePath);
 		props.setProperty("probateSchema", probateSchema);
 		props.setProperty("relocationSearch", relocationSearch);
-		props.setProperty("vejbyPath", vejbyPath);
-		props.setProperty("vejbySchema", vejbySchema);
+		props.setProperty("parishPath", parishPath);
+		props.setProperty("parishSchema", parishSchema);
 		props.setProperty("msgLogLen", msgLogLen);
 		props.setProperty("milrollPath", milrollPath);
 		props.setProperty("milrollSchema", milrollSchema);

@@ -77,20 +77,20 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	}
 
 	/**
-	 * @param vejbySchema
-	 * @param vejbyDbPath
+	 * @param parishSchema
+	 * @param parishDbPath
 	 * @param censusSchema
 	 * @param censusDbPath
 	 * @param relocatorId
 	 * @return
 	 * @throws Exception
 	 */
-	private static List<HouseholdHeadModel> getCensusEvents(String vejbySchema, String vejbyDbPath, String censusSchema,
-			String censusDbPath, String relocatorId) throws Exception {
+	private static List<HouseholdHeadModel> getCensusEvents(String parishSchema, String parishDbPath,
+			String censusSchema, String censusDbPath, String relocatorId) throws Exception {
 
-		final Connection connV = DriverManager.getConnection("jdbc:derby:" + vejbyDbPath);
+		final Connection connV = DriverManager.getConnection("jdbc:derby:" + parishDbPath);
 		PreparedStatement statementV = connV.prepareStatement(SET_SCHEMA);
-		statementV.setString(1, vejbySchema);
+		statementV.setString(1, parishSchema);
 		statementV.execute();
 
 		final Connection connC = DriverManager.getConnection("jdbc:derby:" + censusDbPath);
@@ -206,7 +206,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	}
 
 	/**
-	 * @param vejbyDbPath
+	 * @param milrollDbPath
 	 * @param milRollSchema
 	 * @param relocatorId
 	 * @return
@@ -316,8 +316,8 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	/**
 	 * Load from database
 	 *
-	 * @param vejbyDbPath
-	 * @param vejbySchema
+	 * @param parishDbPath
+	 * @param parishSchema
 	 * @param censusDbPath
 	 * @param censusSchema
 	 * @param milrollPath
@@ -326,10 +326,10 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 * @return
 	 * @throws Exception
 	 */
-	public static HouseholdHeadModel[] load(String vejbyDbPath, String vejbySchema, String censusDbPath,
+	public static HouseholdHeadModel[] load(String parishDbPath, String parishSchema, String censusDbPath,
 			String censusSchema, String milrollPath, String milrollSchema, String headId) throws Exception {
-		final List<HouseholdHeadModel> list = getRelocationEvents(vejbySchema, vejbyDbPath, headId);
-		final List<HouseholdHeadModel> lhhm1 = getCensusEvents(vejbySchema, vejbyDbPath, censusSchema, censusDbPath,
+		final List<HouseholdHeadModel> list = getRelocationEvents(parishSchema, parishDbPath, headId);
+		final List<HouseholdHeadModel> lhhm1 = getCensusEvents(parishSchema, parishDbPath, censusSchema, censusDbPath,
 				headId);
 		final List<HouseholdHeadModel> lhhm2 = getMilRollEvents(milrollPath, milrollSchema, headId);
 

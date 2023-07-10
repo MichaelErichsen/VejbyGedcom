@@ -38,7 +38,7 @@ public class CensusLoader {
 	/**
 	 * Constructor
 	 *
-	 * @param args gedcomFilePath, vejbyPath, vejbySchema
+	 * @param args gedcomFilePath, parishPath, parishSchema
 	 * @param as   ArchiveSearcher
 	 * @return Message
 	 */

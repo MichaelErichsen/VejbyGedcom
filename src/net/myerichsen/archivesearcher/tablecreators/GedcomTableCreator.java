@@ -54,14 +54,14 @@ public class GedcomTableCreator {
 	public static String createTables(Properties props) {
 		try {
 			final Connection conn = DriverManager
-					.getConnection("jdbc:derby:" + props.getProperty("vejbyPath") + ";create=true");
-			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("vejbySchema"));
+					.getConnection("jdbc:derby:" + props.getProperty("parishPath") + ";create=true");
+			PreparedStatement statement = conn.prepareStatement(CREATE_SCHEMA + props.getProperty("parishSchema"));
 			try {
 				statement.execute();
 			} catch (final Exception e) {
 			}
 			statement = conn.prepareStatement(SET_SCHEMA);
-			statement.setString(1, props.getProperty("vejbySchema"));
+			statement.setString(1, props.getProperty("parishSchema"));
 			statement.execute();
 			statement = conn.prepareStatement(TABLE_EVENT);
 			statement.execute();

@@ -29,7 +29,7 @@ public class CensusModel extends ASModel {
 	private static final String EIGHT_DIGITS = "\\d{8}";
 	private static final String FOUR_DIGITS = "\\d{4}";
 	private static final String DIGITS_ONLY = "\\d+";
-	private static final String INSERT = "INSERT INTO CENSUS (KIPNR, LOEBENR, AMT, HERRED, SOGN, "
+	private static final String INSERT = "INSERT INTO CENSUS (KIPNR, LOEBENR, AMT, HERRED, PARISH, "
 			+ "KILDESTEDNAVN, HUSSTANDS_FAMILIENR, MATR_NR_ADRESSE, KILDENAVN, FONNAVN, "
 			+ "KOEN, ALDER, CIVILSTAND, KILDEERHVERV, STILLING_I_HUSSTANDEN, "
 			+ "KILDEFOEDESTED, FOEDT_KILDEDATO, FOEDEAAR, ADRESSE, MATRIKEL, GADE_NR, "

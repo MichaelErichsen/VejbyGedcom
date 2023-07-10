@@ -55,7 +55,7 @@ public class MilRollEntryModel extends ASModel {
 			model.setLitra(rs.getString("LITRA"));
 			model.setRulletype(rs.getString("RULLETYPE").trim());
 			model.setLaegdnr(rs.getInt("LAEGDNR"));
-			model.setSogn(rs.getString("SOGN").trim());
+			model.setSogn(rs.getString("PARISH").trim());
 			model.setLaegdId(rs.getInt("LAEGDID"));
 			model.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
 			model.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
@@ -120,7 +120,7 @@ public class MilRollEntryModel extends ASModel {
 			model.setLitra(rs.getString("LITRA"));
 			model.setRulletype(rs.getString("RULLETYPE").trim());
 			model.setLaegdnr(rs.getInt("LAEGDNR"));
-			model.setSogn(rs.getString("SOGN").trim());
+			model.setSogn(rs.getString("PARISH").trim());
 			model.setLaegdId(laegdId);
 			model.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
 			model.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
@@ -180,7 +180,7 @@ public class MilRollEntryModel extends ASModel {
 			model.setLitra(rs.getString("LITRA"));
 			model.setRulletype(rs.getString("RULLETYPE").trim());
 			model.setLaegdnr(rs.getInt("LAEGDNR"));
-			model.setSogn(rs.getString("SOGN").trim());
+			model.setSogn(rs.getString("PARISH").trim());
 			model.setLaegdId(rs.getInt("LAEGDID"));
 			model.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
 			model.setPrevLaegdId(rs.getInt("PREVLAEGDID"));

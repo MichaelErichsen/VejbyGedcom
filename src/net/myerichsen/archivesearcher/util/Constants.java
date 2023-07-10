@@ -26,13 +26,13 @@ public class Constants {
 	public static final String PROBATEDB_SCHEMA = "GEDCOM";
 	public static final String PROBATE_SOURCE = "Kronborg";
 	public static final String PROPERTIES_PATH = System.getProperty("user.home") + "/ArchiveSearcher.properties";
-	public static final String VEJBYDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
-	public static final String VEJBYDB_SCHEMA = "VEJBY";
+	public static final String PARISHDB_PATH = System.getProperty("user.home") + "/VEJBYDB";
+	public static final String PARISHDB_SCHEMA = "VEJBY";
 	public static final String AMT = "Kronborg";
 	public static final String AAR = "1792";
 	public static final String HOVEDRULLE = "Hovedrulle";
 	public static final String LAEGDNR = "6";
-	public static final String SOGN = "Vejby";
+	public static final String PARISH = "Vejby";
 	public static final String MILROLLDB_PATH = System.getProperty("user.home") + "/laegd";
 	public static final String MILROLLDB_SCHEMA = "LAEGD";
 	public static final String MILROLL_URI = "https://www.sa.dk/ao-soegesider/da/billedviser?epid=16481031#17028,656192";

@@ -38,7 +38,7 @@ public class CensusHouseholdModel extends ASModel {
 	public static String getHeadOfHousehold(Properties props, CensusModel censusModel) throws SQLException {
 
 		final Connection conn1 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("censusPath"));
-		final Connection conn2 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
+		final Connection conn2 = DriverManager.getConnection("jdbc:derby:" + props.getProperty("parishPath"));
 		PreparedStatement statement1 = conn1.prepareStatement(SET_SCHEMA);
 		statement1.setString(1, props.getProperty("censusSchema"));
 		statement1.execute();
@@ -77,7 +77,7 @@ public class CensusHouseholdModel extends ASModel {
 			}
 
 			statement2 = conn2.prepareStatement(SET_SCHEMA);
-			statement2.setString(1, props.getProperty("vejbySchema"));
+			statement2.setString(1, props.getProperty("parishSchema"));
 			statement2.execute();
 			statement2 = conn2.prepareStatement(SELECT_HOUSEHOLD_HEAD_2);
 			statement2.setString(1, ftDate);

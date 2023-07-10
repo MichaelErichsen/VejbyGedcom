@@ -305,8 +305,8 @@ public class HouseholdHeadView extends Composite {
 	private void getInput(String headId) {
 		if (listener != null) {
 			try {
-				final String[] loadArgs = new String[] { props.getProperty("vejbyPath"),
-						props.getProperty("vejbySchema"), props.getProperty("censusPath"),
+				final String[] loadArgs = new String[] { props.getProperty("parishPath"),
+						props.getProperty("parishSchema"), props.getProperty("censusPath"),
 						props.getProperty("censusSchema"), props.getProperty("milrollPath"),
 						props.getProperty("milrollSchema"), headId };
 				final HouseholdHeadModel[] HouseholdHeadRecords = (HouseholdHeadModel[]) listener.load(loadArgs);

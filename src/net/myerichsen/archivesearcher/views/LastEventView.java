@@ -217,8 +217,8 @@ public class LastEventView extends Composite {
 				Display.getDefault()
 						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.getIndicator().setVisible(true));
-				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-						props.getProperty("vejbyPath"), location };
+				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
+						props.getProperty("parishPath"), location };
 				final LastEventModel[] array = (LastEventModel[]) listener.load(loadArgs);
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));

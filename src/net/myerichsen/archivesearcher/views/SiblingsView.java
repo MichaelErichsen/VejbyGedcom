@@ -237,8 +237,8 @@ public class SiblingsView extends Composite {
 	private void getInputbyId(String parents) {
 		if (listener != null) {
 			try {
-				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-						props.getProperty("vejbyPath"), parents };
+				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
+						props.getProperty("parishPath"), parents };
 				final SiblingsModel[] siblingRecords = (SiblingsModel[]) listener.load(loadArgs);
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
@@ -256,8 +256,8 @@ public class SiblingsView extends Composite {
 	private void getInputByParents(String fathersName, String mothersName) {
 		if (listener != null) {
 			try {
-				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-						props.getProperty("vejbyPath"), fathersName, mothersName };
+				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
+						props.getProperty("parishPath"), fathersName, mothersName };
 				final SiblingsModel[] SiblingRecords = (SiblingsModel[]) listener.load(loadArgs);
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));

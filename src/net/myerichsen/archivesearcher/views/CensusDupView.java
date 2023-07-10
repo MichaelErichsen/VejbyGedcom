@@ -172,9 +172,9 @@ public class CensusDupView extends Composite {
 				Display.getDefault()
 						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.getIndicator().setVisible(true));
-				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
+				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
 
-						props.getProperty("vejbyPath") };
+						props.getProperty("parishPath") };
 				final CensusDupModel[] censusdupRecords = (CensusDupModel[]) listener.load(loadArgs);
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));

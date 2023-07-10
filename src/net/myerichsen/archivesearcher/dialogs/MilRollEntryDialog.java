@@ -50,7 +50,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Input application for military roll entries
  *
  * @author Michael Erichsen
- * @version 5. jul 2023
+ * @version 10. jul 2023
  *
  */
 
@@ -612,7 +612,7 @@ public class MilRollEntryDialog {
 			props.setProperty("litra", Constants.LITRA);
 			props.setProperty("rulletype", Constants.HOVEDRULLE);
 			props.setProperty("laegdnr", Constants.LAEGDNR);
-			props.setProperty("sogn", Constants.SOGN);
+			props.setProperty("sogn", Constants.PARISH);
 			props.setProperty("milrollPath", Constants.MILROLLDB_PATH);
 			props.setProperty("milrollSchema", Constants.MILROLLDB_SCHEMA);
 			props.setProperty("laegdid", Constants.LAEGDID);
@@ -775,8 +775,8 @@ public class MilRollEntryDialog {
 			return;
 		}
 
-		final List<String> ls = IndividualModel.getDataFromPhonName(props.getProperty("vejbyPath"),
-				props.getProperty("vejbySchema"), phonName, birthDate);
+		final List<String> ls = IndividualModel.getDataFromPhonName(props.getProperty("parishPath"),
+				props.getProperty("parishSchema"), phonName, birthDate);
 
 		final String[] sa = new String[ls.size()];
 		for (int i = 0; i < ls.size(); i++) {

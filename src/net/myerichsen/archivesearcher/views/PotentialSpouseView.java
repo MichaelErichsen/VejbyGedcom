@@ -167,8 +167,8 @@ public class PotentialSpouseView extends Composite {
 	private void getInput(String id) {
 		if (listener != null) {
 			try {
-				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-						props.getProperty("vejbyPath"), props.getProperty("censusSchema"),
+				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
+						props.getProperty("parishPath"), props.getProperty("censusSchema"),
 						props.getProperty("censusPath"), id };
 
 				array = (PotentialSpouseModel[]) listener.load(loadArgs);
@@ -206,8 +206,18 @@ public class PotentialSpouseView extends Composite {
 		final StringBuilder sb = new StringBuilder(model.toString());
 		sb.append("\n\n");
 
-		final MessageDialog dialog = new MessageDialog(getShell(), "Folketælling", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Søg efter første ID" }, 0);
+		String[] buttonArray;
+		final String spouseId = ((PotentialSpouseModel) tia[0].getData()).getId();
+		final String[] idArray = spouseId.split(",");
+
+		if (idArray.length > 1) {
+			buttonArray = new String[] { "OK", "Kopier", "Søg efter første ID" };
+		} else {
+			buttonArray = new String[] { "OK", "Kopier" };
+		}
+
+		final MessageDialog dialog = new MessageDialog(getShell(), "Folketællinger", null, sb.toString(),
+				MessageDialog.INFORMATION, buttonArray, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -216,8 +226,6 @@ public class PotentialSpouseView extends Composite {
 			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
 			clipboard.dispose();
 		} else if (open == 2) {
-			final String spouseId = ((PotentialSpouseModel) tia[0].getData()).getId();
-			String[] idArray = spouseId.split(",");
 			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 			grandParent.getSearchId().setText(idArray[0]);
 			grandParent.searchById(null);

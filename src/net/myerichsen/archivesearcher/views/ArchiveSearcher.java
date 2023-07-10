@@ -603,8 +603,8 @@ public class ArchiveSearcher extends Shell {
 	 * Get GEDCOM file
 	 */
 	private void getGedcom() {
-		final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("vejbyPath"),
-				props.getProperty("vejbySchema") };
+		final String[] sa = new String[] { props.getProperty("gedcomFilePath"), props.getProperty("parishPath"),
+				props.getProperty("parishSchema") };
 		final String message = GedcomLoader.main(sa, this);
 		messageCombo.getDisplay().asyncExec(() -> setMessage(message));
 	}
@@ -683,10 +683,10 @@ public class ArchiveSearcher extends Shell {
 			props.setProperty("probateSource", Constants.PROBATE_SOURCE);
 			props.setProperty("relocationSearch", "true");
 			props.setProperty("rulletype", Constants.HOVEDRULLE);
-			props.setProperty("sogn", Constants.SOGN);
+			props.setProperty("sogn", Constants.PARISH);
 			props.setProperty("uri", Constants.MILROLL_URI);
-			props.setProperty("vejbyPath", Constants.VEJBYDB_PATH);
-			props.setProperty("vejbySchema", Constants.VEJBYDB_SCHEMA);
+			props.setProperty("parishPath", Constants.PARISHDB_PATH);
+			props.setProperty("parishSchema", Constants.PARISHDB_SCHEMA);
 			props.setProperty("width", Constants.width);
 			props.setProperty("x", Constants.x);
 			props.setProperty("y", Constants.y);
@@ -760,7 +760,7 @@ public class ArchiveSearcher extends Shell {
 		switch (buttonID) {
 		case SWT.OK:
 			setMessage("Data hentes fra " + props.getProperty("gedcomFilePath") + " ind i tabellerne i "
-					+ props.getProperty("vejbyPath"));
+					+ props.getProperty("parishPath"));
 
 			indicator.setVisible(true);
 			new Thread(this::getGedcom).start();
@@ -855,8 +855,8 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		try {
-			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("vejbyPath"));
-			final IndividualModel individual = new IndividualModel(conn, id, props.getProperty("vejbySchema"));
+			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("parishPath"));
+			final IndividualModel individual = new IndividualModel(conn, id, props.getProperty("parishSchema"));
 
 			if (individual.getName().equals("")) {
 				setErrorMessage("ID " + id + " findes ikke i databasen");

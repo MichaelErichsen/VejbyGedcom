@@ -51,7 +51,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
 /**
  * Census view
  *
- * @author 4. jul. 2023
+ * @author 10. jul. 2023
  */
 
 public class CensusView extends Composite {
@@ -219,8 +219,9 @@ public class CensusView extends Composite {
 				final Button button = (Button) e.widget;
 				final boolean selection = button.getSelection();
 				spouseFilterFlag = selection;
-
 				btngtefller.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				((ArchiveSearcher) ((TabFolder) getParent()).getParent()).getIndicator().setVisible(true);
+
 				try {
 					populate(id, phonName, birthDate, deathDate);
 				} catch (final SQLException e1) {
@@ -709,7 +710,7 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"),
+				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("parishPath"),
 						model.getKIPnr(), model.getKildestednavn(), model.getHusstands_familienr(),
 						model.getMatr_nr_Adresse(), model.getKildehenvisning(), props.getProperty("censusSchema"));
 
@@ -730,7 +731,7 @@ public class CensusView extends Composite {
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
-			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("vejbyPath"), model.getKIPnr(),
+			final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("parishPath"), model.getKIPnr(),
 					model.getKildestednavn(), model.getHusstands_familienr(), model.getMatr_nr_Adresse(),
 					model.getKildehenvisning(), props.getProperty("censusSchema"));
 			final CensusModel censusModel = lcr.get(0);

@@ -20,10 +20,10 @@ public class MilrollListModel extends ASModel {
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String LOAD = "SELECT * FROM LAEGD ORDER BY AMT ASC, AAR ASC, LITRA ASC, LAEGDNR ASC";
 	private static final String SELECT = "SELECT * FROM LAEGD.LAEGD WHERE LAEGDID = ? ";
-	private static final String INSERT = "INSERT INTO LAEGD ( AMT, AAR, LITRA, RULLETYPE, LAEGDNR, SOGN, LAEGDID, "
+	private static final String INSERT = "INSERT INTO LAEGD ( AMT, AAR, LITRA, RULLETYPE, LAEGDNR, PARISH, LAEGDID, "
 			+ "NEXTLAEGDID, PREVLAEGDID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String UPDATE = "UPDATE LAEGD SET AMT = ?, AAR = ?, LITRA = ?, RULLETYPE = ?, "
-			+ "LAEGDNR = ?, SOGN = ?, NEXTLAEGDID = ?, PREVLAEGDID =? WHERE LAEGDID = ?";
+			+ "LAEGDNR = ?, PARISH = ?, NEXTLAEGDID = ?, PREVLAEGDID =? WHERE LAEGDID = ?";
 	private static final String DELETE = "DELETE FROM LAEGD WHERE LAEGDID = ?";
 
 	/**
@@ -51,7 +51,7 @@ public class MilrollListModel extends ASModel {
 			m.setLitra(rs.getString("LITRA"));
 			m.setRulleType(rs.getString("RULLETYPE").trim());
 			m.setLaegdNr(rs.getInt("LAEGDNR"));
-			m.setSogn(rs.getString("SOGN").trim());
+			m.setSogn(rs.getString("PARISH").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
 			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
 			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));
@@ -94,7 +94,7 @@ public class MilrollListModel extends ASModel {
 			m.setLitra(rs.getString("LITRA"));
 			m.setRulleType(rs.getString("RULLETYPE").trim());
 			m.setLaegdNr(rs.getInt("LAEGDNR"));
-			m.setSogn(rs.getString("SOGN").trim());
+			m.setSogn(rs.getString("PARISH").trim());
 			m.setLaegdId(rs.getInt("LAEGDID"));
 			m.setNextLaegdId(rs.getInt("NEXTLAEGDID"));
 			m.setPrevLaegdId(rs.getInt("PREVLAEGDID"));

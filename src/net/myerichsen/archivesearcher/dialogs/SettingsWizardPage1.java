@@ -20,14 +20,14 @@ import net.myerichsen.archivesearcher.models.SettingsModel;
  * Wizard page to handle GEDCOM imports
  *
  * @author Michael Erichsen
- * @version 11. apr. 2023
+ * @version 10. jul. 2023
  *
  */
 
 public class SettingsWizardPage1 extends WizardPage {
 	private Text txtGedcomFilePath;
-	private Text txtVejbyPath;
-	private Text txtVejbySchema;
+	private Text txtparishPath;
+	private Text txtparishSchema;
 
 	private SettingsModel settings;
 
@@ -53,8 +53,8 @@ public class SettingsWizardPage1 extends WizardPage {
 		txtGedcomFilePath.addModifyListener(e -> {
 			settings.setGedcomFilePath(txtGedcomFilePath.getText());
 
-			if (settings.getGedcomFilePath().equals("") || settings.getVejbyPath().equals("")
-					|| settings.getVejbySchema().equals("")) {
+			if (settings.getGedcomFilePath().equals("") || settings.getparishPath().equals("")
+					|| settings.getparishSchema().equals("")) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -84,58 +84,58 @@ public class SettingsWizardPage1 extends WizardPage {
 			}
 		});
 
-		final Label lblVejbyDatabaseSti = new Label(container, SWT.NONE);
-		lblVejbyDatabaseSti.setText("Vejby database sti");
+		final Label lblParishDatabaseSti = new Label(container, SWT.NONE);
+		lblParishDatabaseSti.setText("Sognedatabase sti");
 
-		txtVejbyPath = new Text(container, SWT.BORDER);
-		txtVejbyPath.addModifyListener(e -> {
-			settings.setVejbyPath(txtVejbyPath.getText());
+		txtparishPath = new Text(container, SWT.BORDER);
+		txtparishPath.addModifyListener(e -> {
+			settings.setparishPath(txtparishPath.getText());
 
-			if (settings.getGedcomFilePath().equals("") || settings.getVejbyPath().equals("")
-					|| settings.getVejbySchema().equals("")) {
+			if (settings.getGedcomFilePath().equals("") || settings.getparishPath().equals("")
+					|| settings.getparishSchema().equals("")) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
 			}
 		});
-		txtVejbyPath.setText(settings.getVejbyPath());
-		txtVejbyPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtparishPath.setText(settings.getparishPath());
+		txtparishPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		final Button btnFindVejbyPath = new Button(container, SWT.NONE);
-		btnFindVejbyPath.setText("Find");
-		btnFindVejbyPath.addSelectionListener(new SelectionAdapter() {
+		final Button btnFindparishPath = new Button(container, SWT.NONE);
+		btnFindparishPath.setText("Find");
+		btnFindparishPath.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final Shell[] shells = e.widget.getDisplay().getShells();
 				final DirectoryDialog directoryDialog = new DirectoryDialog(shells[0]);
 
-				directoryDialog.setFilterPath(txtVejbyPath.getText());
+				directoryDialog.setFilterPath(txtparishPath.getText());
 				directoryDialog.setText("Vælg venligst en folder og klik OK");
 
 				final String dir = directoryDialog.open();
 				if (dir.equals("")) {
-					txtVejbyPath.setText(dir);
-					settings.setVejbyPath(dir);
+					txtparishPath.setText(dir);
+					settings.setparishPath(dir);
 				}
 			}
 		});
 
-		final Label lblVejbySchema = new Label(container, SWT.NONE);
-		lblVejbySchema.setText("Vejby database schema");
+		final Label lblparishSchema = new Label(container, SWT.NONE);
+		lblparishSchema.setText("Sognedatabase schema");
 
-		txtVejbySchema = new Text(container, SWT.BORDER);
-		txtVejbySchema.addModifyListener(e -> {
-			settings.setVejbySchema(txtVejbySchema.getText());
+		txtparishSchema = new Text(container, SWT.BORDER);
+		txtparishSchema.addModifyListener(e -> {
+			settings.setparishSchema(txtparishSchema.getText());
 
-			if (settings.getGedcomFilePath().equals("") || settings.getVejbyPath().equals("")
-					|| settings.getVejbySchema().equals("")) {
+			if (settings.getGedcomFilePath().equals("") || settings.getparishPath().equals("")
+					|| settings.getparishSchema().equals("")) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
 			}
 		});
-		txtVejbySchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		txtVejbySchema.setText(settings.getVejbySchema());
+		txtparishSchema.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtparishSchema.setText(settings.getparishSchema());
 		new Label(container, SWT.NONE);
 
 		setControl(container);

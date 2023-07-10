@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 10. jul. 2023
  */
 
 public class GedcomLoader {
@@ -96,7 +96,7 @@ public class GedcomLoader {
 	/**
 	 * Load and analyze GEDCOM file
 	 *
-	 * @param args Gedcom file path, vejby path, vejby schema
+	 * @param args Gedcom file path, parish path, parish schema
 	 * @param as   ArchiveSearcher
 	 * @return Message
 	 */

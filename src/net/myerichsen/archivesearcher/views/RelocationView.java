@@ -279,8 +279,8 @@ public class RelocationView extends Composite {
 	private void getInput(String phonName, String birthDate) {
 		if (listener != null) {
 			try {
-				final String[] loadArgs = new String[] { props.getProperty("vejbySchema"),
-						props.getProperty("vejbyPath"), phonName, birthDate };
+				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
+						props.getProperty("parishPath"), phonName, birthDate };
 				final RelocationModel[] relocationRecords = (RelocationModel[]) listener.load(loadArgs);
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(relocationRecords));
