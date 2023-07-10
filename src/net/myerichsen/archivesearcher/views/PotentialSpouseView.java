@@ -30,7 +30,7 @@ import net.myerichsen.archivesearcher.populators.PotentialSpousePopulator;
  * View of potential spouses
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 10. jul. 2023
  *
  */
 public class PotentialSpouseView extends Composite {
@@ -144,6 +144,7 @@ public class PotentialSpouseView extends Composite {
 		if (thread != null) {
 			thread.interrupt();
 		}
+
 		tableViewer.setInput(new PotentialSpouseModel[0]);
 	}
 
@@ -154,7 +155,7 @@ public class PotentialSpouseView extends Composite {
 		try {
 			popup();
 		} catch (final SQLException e1) {
-			e1.printStackTrace();
+			((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
 		}
 	}
 
@@ -177,7 +178,6 @@ public class PotentialSpouseView extends Composite {
 				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 						.setMessage("Mulige ægtefæller er hentet"));
 			} catch (final Exception e) {
-				e.printStackTrace();
 				Display.getDefault().asyncExec(
 						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 			}
@@ -207,7 +207,7 @@ public class PotentialSpouseView extends Composite {
 		sb.append("\n\n");
 
 		final MessageDialog dialog = new MessageDialog(getShell(), "Folketælling", null, sb.toString(),
-				MessageDialog.INFORMATION, new String[] { "OK", "Kopier" }, 0);
+				MessageDialog.INFORMATION, new String[] { "OK", "Kopier", "Søg efter første ID" }, 0);
 		final int open = dialog.open();
 
 		if (open == 1) {
@@ -215,6 +215,12 @@ public class PotentialSpouseView extends Composite {
 			final TextTransfer textTransfer = TextTransfer.getInstance();
 			clipboard.setContents(new String[] { sb.toString() }, new Transfer[] { textTransfer });
 			clipboard.dispose();
+		} else if (open == 2) {
+			final String spouseId = ((PotentialSpouseModel) tia[0].getData()).getId();
+			String[] idArray = spouseId.split(",");
+			final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
+			grandParent.getSearchId().setText(idArray[0]);
+			grandParent.searchById(null);
 		}
 	}
 
