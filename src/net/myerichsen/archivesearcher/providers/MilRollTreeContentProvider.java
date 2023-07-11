@@ -10,7 +10,7 @@ import net.myerichsen.archivesearcher.models.MilRollEntryModel;
 
 /**
  * @author Michael Erichsen
- * @version 14. maj 2023
+ * @version 10. jul. 2023
  *
  */
 public class MilRollTreeContentProvider implements ITreeContentProvider {

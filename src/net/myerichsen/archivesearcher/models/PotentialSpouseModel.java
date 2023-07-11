@@ -210,16 +210,18 @@ public class PotentialSpouseModel extends ASModel {
 				model.setKoen(rs4.getString("KOEN"));
 				birthDate = rs4.getString("FOEDT_KILDEDATO");
 
+				int ftAar = rs4.getInt("FTAAR");
+
 				if (birthDate.isBlank()) {
 					birthDate = rs4.getInt("FOEDEAAR") + "";
 
 					if (birthDate.trim().equals("0")) {
-						int ftAar = rs4.getInt("FTAAR");
 						ftAar = ftAar == 0 ? Integer.parseInt(kildeHenvisning) : ftAar;
 						birthDate = ftAar - rs4.getInt("ALDER") + "";
-						model.setSourceType("Folketælling " + ftAar);
 					}
 				}
+
+				model.setSourceType("Folketælling " + ftAar);
 				model.setFoedt_kildedato(birthDate);
 
 				model.setKildefoedested(rs4.getString("KILDEFOEDESTED"));

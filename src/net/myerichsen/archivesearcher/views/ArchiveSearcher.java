@@ -61,7 +61,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 7. jul. 2023
+ * @version 10. jul. 2023
  *
  */
 
@@ -899,7 +899,6 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			householdHeadView.populate(individual.getId());
-			potentialSpousesView.populate(individual.getId());
 		} catch (final SQLException e1) {
 			messageCombo.setText(e1.getMessage());
 			e1.printStackTrace();

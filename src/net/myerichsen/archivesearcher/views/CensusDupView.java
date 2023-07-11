@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 10. jul. 2023
  *
  */
 public class CensusDupView extends Composite {
