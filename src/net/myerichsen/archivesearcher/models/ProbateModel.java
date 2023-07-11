@@ -19,14 +19,13 @@ import net.myerichsen.archivesearcher.comparators.ProbateComparator;
  * Class representing a probate event
  *
  * @author Michael Erichsen
- * @version 16. jun. 2023
+ * @version 11. jul. 2023
  */
 public class ProbateModel extends ASModel {
 	/**
 	 * Constants
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
-
 	private static final String SELECT = "SELECT * FROM EVENT " + "JOIN INDIVIDUAL ON EVENT.ID = INDIVIDUAL.EVENT_ID "
 			+ "WHERE INDIVIDUAL.FONKOD = ? AND EVENT.FROMDATE >= ? AND TODATE <= ?";
 
@@ -199,6 +198,11 @@ public class ProbateModel extends ASModel {
 
 	@Override
 	public String toString() {
+		if (data.contains(source)) {
+			return (name != null ? name.trim() + ", " : "") + (fromDate != null ? fromDate.trim() + ", " : "")
+					+ (toDate != null ? toDate.trim() + ", " : "") + (place != null ? place.trim() + ", " : "")
+					+ (data != null ? data.trim() + ", " : "");
+		}
 		return (name != null ? name.trim() + ", " : "") + (fromDate != null ? fromDate.trim() + ", " : "")
 				+ (toDate != null ? toDate.trim() + ", " : "") + (place != null ? place.trim() + ", " : "")
 				+ (data != null ? data.trim() + ", " : "") + (source != null ? source : "");
