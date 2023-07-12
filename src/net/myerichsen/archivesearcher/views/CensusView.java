@@ -23,6 +23,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -51,7 +52,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
 /**
  * Census view
  *
- * @author 10. jul. 2023
+ * @author 12. jul. 2023
  */
 
 public class CensusView extends Composite {
@@ -60,7 +61,7 @@ public class CensusView extends Composite {
 	private Text txtCensusParish;
 	private Text txtCensusName;
 	private Text txtCensusAge;
-	private Text txtCensusBirthPlace;
+	private Combo censusBirthPlaceCombo;
 	private Text txtCensusBirthDate;
 	private TableViewer tableViewer;
 	private Table table;
@@ -181,16 +182,30 @@ public class CensusView extends Composite {
 		final Label lblFdested = new Label(filterComposite, SWT.NONE);
 		lblFdested.setText("F\u00F8dested");
 
-		txtCensusBirthPlace = new Text(filterComposite, SWT.BORDER);
-		txtCensusBirthPlace.addKeyListener(new KeyAdapter() {
+		censusBirthPlaceCombo = new Combo(filterComposite, SWT.BORDER);
+		censusBirthPlaceCombo.setToolTipText("Tryk ENTER for at gemme f\u00F8destednavnet, mens programmet er aktivt");
+		censusBirthPlaceCombo.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == SWT.CR) {
+					censusBirthPlaceCombo.add(censusBirthPlaceCombo.getText(), 0);
+					censusBirthPlaceCombo.select(0);
+
+					if (censusBirthPlaceCombo.getItemCount() > 5) {
+						censusBirthPlaceCombo.remove(5);
+					}
+				}
+			}
+
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (txtCensusBirthPlace.getText().length() > 0) {
-					txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
+				if (censusBirthPlaceCombo.getText().length() > 0) {
+					censusBirthPlaceCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
 				} else {
-					txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					censusBirthPlaceCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 				}
-				CensusBirthPlaceFilter.getInstance().setSearchText(txtCensusBirthPlace.getText());
+
+				CensusBirthPlaceFilter.getInstance().setSearchText(censusBirthPlaceCombo.getText());
 				tableViewer.refresh();
 			}
 		});
@@ -564,7 +579,7 @@ public class CensusView extends Composite {
 		CensusParishFilter.getInstance().setSearchText("");
 		CensusAgeFilter.getInstance().setSearchText("");
 		CensusYearFilter.getInstance().setSearchText("");
-		txtCensusBirthPlace.setText("");
+		censusBirthPlaceCombo.setText("");
 		txtCensusBirthDate.setText("");
 		txtCensusCounty.setText("");
 		txtCensusName.setText("");
@@ -572,7 +587,7 @@ public class CensusView extends Composite {
 		txtCensusAge.setText("");
 		txtCensusYear.setText("");
 		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		txtCensusBirthPlace.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		censusBirthPlaceCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusBirthDate.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusCounty.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		txtCensusName.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
