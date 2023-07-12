@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import net.myerichsen.archivesearcher.comparators.CensusComparator;
 import net.myerichsen.archivesearcher.filters.CensusAgeFilter;
 import net.myerichsen.archivesearcher.filters.CensusBirthDateFilter;
@@ -52,7 +53,8 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
 /**
  * Census view
  *
- * @author 12. jul. 2023
+ * @author Michael Erichsen
+ * @version 12. jul. 2023
  */
 
 public class CensusView extends Composite {
@@ -188,11 +190,14 @@ public class CensusView extends Composite {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.CR) {
-					censusBirthPlaceCombo.add(censusBirthPlaceCombo.getText(), 0);
-					censusBirthPlaceCombo.select(0);
+					String text = censusBirthPlaceCombo.getText();
+					if (!Arrays.asList(censusBirthPlaceCombo.getItems()).contains(text)) {
+						censusBirthPlaceCombo.add(text, 0);
+						censusBirthPlaceCombo.select(0);
 
-					if (censusBirthPlaceCombo.getItemCount() > 5) {
-						censusBirthPlaceCombo.remove(5);
+						if (censusBirthPlaceCombo.getItemCount() > 5) {
+							censusBirthPlaceCombo.remove(5);
+						}
 					}
 				}
 			}

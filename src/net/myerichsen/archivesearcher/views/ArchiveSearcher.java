@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import net.myerichsen.archivesearcher.dialogs.HelpDialog;
 import net.myerichsen.archivesearcher.dialogs.KeystrokeDialog;
 import net.myerichsen.archivesearcher.dialogs.MilRollEntryDialog;
@@ -61,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 10. jul. 2023
+ * @version 12. jul. 2023
  *
  */
 
@@ -846,13 +847,17 @@ public class ArchiveSearcher extends Shell {
 
 		final String idx = searchIdCombo.getText();
 		setMessage("Søger efter ID " + idx);
-		searchIdCombo.add(idx, 0);
-		final String id = idx.contains("@") ? idx : "@I" + searchIdCombo.getText().trim() + "@";
-		searchIdCombo.select(0);
 
-		if (searchIdCombo.getItemCount() > 8) {
-			searchIdCombo.remove(8);
+		if (!Arrays.asList(searchIdCombo.getItems()).contains(idx)) {
+			searchIdCombo.add(idx, 0);
+			searchIdCombo.select(0);
+
+			if (searchIdCombo.getItemCount() > 8) {
+				searchIdCombo.remove(8);
+			}
 		}
+
+		final String id = idx.contains("@") ? idx : "@I" + searchIdCombo.getText().trim() + "@";
 
 		try {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("parishPath"));

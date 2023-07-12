@@ -21,7 +21,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a potential spouse
  *
  * @author Michael Erichsen
- * @version 10. jul. 2023
+ * @version 12. jul. 2023
  */
 
 public class PotentialSpouseModel extends ASModel {
@@ -111,7 +111,7 @@ public class PotentialSpouseModel extends ASModel {
 			rs2 = gedcomStatement1.executeQuery();
 
 			if (rs2.next()) {
-				addNewModel(rs2, list, "Vielse");
+				addNewModel(rs2, list, "Familie");
 			}
 		}
 
