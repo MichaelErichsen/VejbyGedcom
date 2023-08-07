@@ -283,11 +283,11 @@ public class Family {
 
 		sb.append("1 MARR\n");
 
-		if (!marriageDate.equals("")) {
+		if (!"".equals(marriageDate)) {
 			sb.append("2 DATE " + marriageDate + "\n");
 		}
 
-		if (!marriagePlace.equals("")) {
+		if (!"".equals(marriagePlace)) {
 			sb.append("2 PLAC " + marriagePlace + "\n");
 		}
 

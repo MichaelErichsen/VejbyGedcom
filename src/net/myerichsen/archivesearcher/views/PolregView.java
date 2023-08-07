@@ -364,8 +364,8 @@ public class PolregView extends Composite {
 				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 						.setMessage("Politiets Registerblade er hentet"));
 			} catch (final Exception e) {
-				Display.getDefault().asyncExec(
-						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

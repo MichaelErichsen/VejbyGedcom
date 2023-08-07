@@ -195,12 +195,12 @@ public class BurialPanel extends FsPanel {
 				deceased.setName(deceasedName + " ?");
 			}
 
-			deceased.setSex(line[1].equals("male") ? "M" : "F");
+			deceased.setSex("male".equals(line[1]) ? "M" : "F");
 			deceased.setBirthDate(line[2]);
 			deceased.setDeathDate(line[3]);
 			deceased.setDeathPlace(line[4]);
 
-			if (deceased.getSex().equals("M")) {
+			if ("M".equals(deceased.getSex())) {
 				family.setFather(deceased);
 			} else {
 				family.setMother(deceased);
@@ -211,7 +211,7 @@ public class BurialPanel extends FsPanel {
 
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
-		if (!path.equals("")) {
+		if (!"".equals(path)) {
 			JOptionPane.showMessageDialog(new JFrame(), individualId - 1 + " dødsfald er gemt som GEDCOM fil " + path,
 					"Vejby Gedcom", JOptionPane.INFORMATION_MESSAGE);
 		}

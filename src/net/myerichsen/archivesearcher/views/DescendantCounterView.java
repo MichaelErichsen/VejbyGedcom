@@ -152,9 +152,8 @@ public class DescendantCounterView extends Composite {
 						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.setMessage("Efterkommere er hentet"));
 			} catch (final Exception e) {
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

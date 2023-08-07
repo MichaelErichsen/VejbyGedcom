@@ -196,12 +196,12 @@ public class GedcomLoader {
 			for (final FamilyEvent familyEvent : events) {
 				final String type = familyEvent.getType().getDisplay();
 
-				if (!type.equals("Census")) {
+				if (!"Census".equals(type)) {
 					continue;
 				}
 
 				for (final FamilyEvent familyEvent2 : events) {
-					if (!familyEvent2.getType().getDisplay().equals("Census") || familyEvent2.getPlace() == null) {
+					if (!"Census".equals(familyEvent2.getType().getDisplay()) || familyEvent2.getPlace() == null) {
 						continue;
 					}
 
@@ -209,7 +209,7 @@ public class GedcomLoader {
 					final List<CustomFact> customFacts2 = familyEvent2.getCustomFacts();
 
 					for (final CustomFact cf3 : customFacts2) {
-						if (cf3.getTag().equals("_SHAR")) {
+						if ("_SHAR".equals(cf3.getTag())) {
 							psINSERT_INDIVIDUAL_EVENT.setString(1, "Census");
 							psINSERT_INDIVIDUAL_EVENT.setString(2, "Witness");
 							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(familyEvent2.getDate()));
@@ -274,12 +274,12 @@ public class GedcomLoader {
 			for (final IndividualEvent individualEvent : individualEvents) {
 				final String type = individualEvent.getType().getDisplay();
 
-				if (!type.equals("Census")) {
+				if (!"Census".equals(type)) {
 					continue;
 				}
 
 				for (final IndividualEvent individualEvent2 : individualEvents) {
-					if (!individualEvent2.getType().getDisplay().equals("Census")) {
+					if (!"Census".equals(individualEvent2.getType().getDisplay())) {
 						continue;
 					}
 
@@ -287,7 +287,7 @@ public class GedcomLoader {
 					final List<CustomFact> customFacts2 = individualEvent2.getCustomFacts();
 
 					for (final CustomFact cf3 : customFacts2) {
-						if (cf3.getTag().equals("_SHAR")) {
+						if ("_SHAR".equals(cf3.getTag())) {
 							psINSERT_INDIVIDUAL_EVENT.setString(1, "Census");
 							psINSERT_INDIVIDUAL_EVENT.setString(2, "Witness");
 							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(individualEvent2.getDate()));
@@ -649,7 +649,7 @@ public class GedcomLoader {
 			psINSERT_INDIVIDUAL.execute();
 		} catch (final SQLException e) {
 			// Handle duplicates
-			if (!e.getSQLState().equals("23505")) {
+			if (!"23505".equals(e.getSQLState())) {
 				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 			}
 
@@ -698,7 +698,7 @@ public class GedcomLoader {
 		}
 
 		final IndividualEventType type = individualEvent.getType();
-		if (type.getDisplay().equals("Census")) {
+		if ("Census".equals(type.getDisplay())) {
 			final StringBuilder sb = new StringBuilder();
 			final List<CustomFact> witnessReferences = fha.getWitnessReferences(individualEvent);
 
@@ -778,7 +778,7 @@ public class GedcomLoader {
 			psINSERT_INDIVIDUAL.execute();
 		} catch (final SQLException e) {
 			// Handle duplicates
-			if (!e.getSQLState().equals("23505")) {
+			if (!"23505".equals(e.getSQLState())) {
 				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 			}
 
@@ -1126,7 +1126,7 @@ public class GedcomLoader {
 			} catch (final SQLException e) {
 
 				// Handle family not yet inserted
-				if (!e.getSQLState().equals("23503")) {
+				if (!"23503".equals(e.getSQLState())) {
 					throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 				}
 			}

@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 12. jul. 2023
+ * @version 7. aug. 2023
  *
  */
 
@@ -835,7 +835,7 @@ public class ArchiveSearcher extends Shell {
 		individualView.clear();
 		potentialSpousesView.clear();
 
-		if (searchIdCombo.getText().equals("")) {
+		if ("".equals(searchIdCombo.getText())) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
 			messageBox.setText("Advarsel");
@@ -863,8 +863,8 @@ public class ArchiveSearcher extends Shell {
 			final Connection conn = DriverManager.getConnection("jdbc:derby:" + props.getProperty("parishPath"));
 			final IndividualModel individual = new IndividualModel(conn, id, props.getProperty("parishSchema"));
 
-			if (individual.getName().equals("")) {
-				setErrorMessage("ID " + id + " findes ikke i databasen");
+			if ("".equals(individual.getName())) {
+				setErrorMessage("ID " + id + " findes ikke i databasen", null);
 				searchIdCombo.setFocus();
 				return;
 			}
@@ -922,7 +922,7 @@ public class ArchiveSearcher extends Shell {
 		householdHeadView.clear();
 		potentialSpousesView.clear();
 
-		if (searchName.getText().equals("")) {
+		if ("".equals(searchName.getText())) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
 			messageBox.setText("Advarsel");
@@ -940,7 +940,7 @@ public class ArchiveSearcher extends Shell {
 			final String phonName = fk.generateKey(searchName.getText());
 
 			String birthDate;
-			if (searchBirth.getText().equals("")) {
+			if ("".equals(searchBirth.getText())) {
 				birthDate = "0001-01-01";
 			} else if (searchBirth.getText().length() == 4) {
 				birthDate = searchBirth.getText() + "-01-01";
@@ -949,7 +949,7 @@ public class ArchiveSearcher extends Shell {
 			}
 
 			String deathDate;
-			if (searchDeath.getText().equals("")) {
+			if ("".equals(searchDeath.getText())) {
 				deathDate = "9999-12-31";
 			} else if (searchDeath.getText().length() == 4) {
 				deathDate = searchDeath.getText() + "-12-31";
@@ -986,7 +986,7 @@ public class ArchiveSearcher extends Shell {
 		householdHeadView.clear();
 		potentialSpousesView.clear();
 
-		if (searchFather.getText().equals("") && searchMother.getText().equals("")) {
+		if ("".equals(searchFather.getText()) && "".equals(searchMother.getText())) {
 			final Shell[] shells = e.widget.getDisplay().getShells();
 			final MessageBox messageBox = new MessageBox(shells[0], SWT.ICON_WARNING | SWT.OK);
 			messageBox.setText("Advarsel");
@@ -1020,7 +1020,7 @@ public class ArchiveSearcher extends Shell {
 			siblingsView.populate(father, mother);
 			siblingsView.setFocus();
 		} catch (final Exception e2) {
-			setErrorMessage(e2.getMessage());
+			setErrorMessage(e2.getMessage(), e2);
 			e2.printStackTrace();
 		}
 
@@ -1031,9 +1031,13 @@ public class ArchiveSearcher extends Shell {
 	 *
 	 * @param string the error message to set
 	 */
-	public void setErrorMessage(String string) {
+	public void setErrorMessage(String string, Exception e) {
 		setMessage(string);
 		messageCombo.setBackground(getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+
+		if (e != null) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

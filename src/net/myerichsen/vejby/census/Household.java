@@ -81,7 +81,7 @@ public class Household {
 
 			if (first) {
 				if (sexMappingKey == -1) {
-					if (individual.getFamilyRole1().equals("")) {
+					if ("".equals(individual.getFamilyRole1())) {
 						individual.setFamilyRole1("Fader");
 						individual.setSex("M");
 						family1.setFather(individual);
@@ -92,13 +92,13 @@ public class Household {
 				// mother according to
 				// sex
 				if (individual.getSex().startsWith("M")) {
-					if (individual.getFamilyRole1().equals("")) {
+					if ("".equals(individual.getFamilyRole1())) {
 						individual.setFamilyRole1("Fader");
 					}
 
 					family1.setFather(individual);
 				} else {
-					if (individual.getFamilyRole1().equals("")) {
+					if ("".equals(individual.getFamilyRole1())) {
 						individual.setFamilyRole1("Moder");
 					}
 
@@ -106,13 +106,13 @@ public class Household {
 				}
 				first = false;
 
-			} else if (individual.getFamilyRole1().equals("Fader")) {
+			} else if ("Fader".equals(individual.getFamilyRole1())) {
 				family1.setFather(individual);
-			} else if (individual.getFamilyRole1().equals("Moder")) {
+			} else if ("Moder".equals(individual.getFamilyRole1())) {
 				family1.setMother(individual);
-			} else if (individual.getFamilyRole1().equals("Barn")) {
+			} else if ("Barn".equals(individual.getFamilyRole1())) {
 				family1.getChildren().add(individual);
-			} else if (individual.getFamilyRole1().equals("")) {
+			} else if ("".equals(individual.getFamilyRole1())) {
 				family0.getSingles().add(individual);
 			}
 

@@ -201,14 +201,14 @@ public class BirthPanel extends FsPanel {
 				child.setName(childName + " ?");
 			}
 
-			child.setSex(line[1].equals("male") ? "M" : "F");
+			child.setSex("male".equals(line[1]) ? "M" : "F");
 			child.setBirthDate(line[2]);
 			child.setBirthPlace(line[3]);
 			child.setChristeningDate(line[4]);
 			child.setChristeningPlace(line[5]);
 			family.getChildren().add(child);
 
-			if (!line[6].equals("")) {
+			if (!"".equals(line[6])) {
 				father = new Individual(individualId);
 				individualId++;
 				father.setName(line[6]);
@@ -216,7 +216,7 @@ public class BirthPanel extends FsPanel {
 				family.setFather(father);
 			}
 
-			if (!line[7].equals("")) {
+			if (!"".equals(line[7])) {
 				mother = new Individual(individualId);
 				individualId++;
 				mother.setName(line[7]);
@@ -229,7 +229,7 @@ public class BirthPanel extends FsPanel {
 
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
-		if (!path.equals("")) {
+		if (!"".equals(path)) {
 			JOptionPane.showMessageDialog(new JFrame(), "Fødsler er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}

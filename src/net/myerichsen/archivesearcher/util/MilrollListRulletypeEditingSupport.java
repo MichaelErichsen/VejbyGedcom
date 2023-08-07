@@ -44,7 +44,7 @@ public class MilrollListRulletypeEditingSupport extends EditingSupport {
 	protected Object getValue(Object element) {
 		final MilrollListModel mrlm = (MilrollListModel) element;
 
-		if (mrlm.getRulleType().equals("Hovedrulle")) {
+		if ("Hovedrulle".equals(mrlm.getRulleType())) {
 			return 0;
 		}
 

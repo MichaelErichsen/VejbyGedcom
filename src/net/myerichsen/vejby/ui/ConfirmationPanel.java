@@ -208,13 +208,13 @@ public class ConfirmationPanel extends FsPanel {
 				child.setName(childName + " ?");
 			}
 
-			child.setSex(line[1].equals("male") ? "M" : "F");
+			child.setSex("male".equals(line[1]) ? "M" : "F");
 			child.setBirthDate(line[2]);
 			child.setBirthPlace(line[3]);
 
 			final String[] otherEventParts = line[6].split("/");
 
-			if (!otherEventParts[0].equals("CONFIRMATION")) {
+			if (!"CONFIRMATION".equals(otherEventParts[0])) {
 				JOptionPane.showMessageDialog(new JFrame(), "Other events: " + line[6], "Vejby Gedcom",
 						JOptionPane.INFORMATION_MESSAGE);
 				continue;
@@ -224,7 +224,7 @@ public class ConfirmationPanel extends FsPanel {
 			child.setConfirmationPlace(otherEventParts[3]);
 			family.getChildren().add(child);
 
-			if (!line[4].equals("")) {
+			if (!"".equals(line[4])) {
 				father = new Individual(individualId);
 				individualId++;
 				father.setName(line[4]);
@@ -232,7 +232,7 @@ public class ConfirmationPanel extends FsPanel {
 				family.setFather(father);
 			}
 
-			if (!line[5].equals("")) {
+			if (!"".equals(line[5])) {
 				mother = new Individual(individualId);
 				individualId++;
 				mother.setName(line[5]);
@@ -245,7 +245,7 @@ public class ConfirmationPanel extends FsPanel {
 
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
-		if (!path.equals("")) {
+		if (!"".equals(path)) {
 			JOptionPane.showMessageDialog(new JFrame(), "Konfirmationer er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}

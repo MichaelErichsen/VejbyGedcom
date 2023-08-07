@@ -506,10 +506,8 @@ public class MilRollEntryView extends Composite {
 						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.setMessage("Lægdsruller er hentet"));
 			} catch (final Exception e) {
-				e.printStackTrace();
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

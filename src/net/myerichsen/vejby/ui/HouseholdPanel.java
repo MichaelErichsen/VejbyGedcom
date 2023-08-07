@@ -379,8 +379,8 @@ public class HouseholdPanel extends JPanel {
 		for (int i = 0; i < dataVector.size(); i++) {
 			individual = selectedHousehold.getPerson(i);
 
-			if (individual.getFamilyRole1().equals("") && individual.getFamilyRole2().equals("")
-					&& individual.getFamilyRole3().equals("")) {
+			if ("".equals(individual.getFamilyRole1()) && "".equals(individual.getFamilyRole2())
+					&& "".equals(individual.getFamilyRole3())) {
 				family0.getSingles().add(individual);
 			}
 		}

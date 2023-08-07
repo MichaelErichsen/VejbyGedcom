@@ -128,43 +128,43 @@ public class CensusMappingPanel extends JPanel {
 		for (int i = 0; i < mappingTable.getRowCount(); i++) {
 			value = (String) mappingTable.getValueAt(i, 2);
 
-			if (value.equals(PrefKey.INDIVIDUAL_0)) {
+			if (PrefKey.INDIVIDUAL_0.equals(value)) {
 				mappingKeys[0] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_0, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_1)) {
+			} else if (PrefKey.INDIVIDUAL_1.equals(value)) {
 				mappingKeys[1] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_1, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_2)) {
+			} else if (PrefKey.INDIVIDUAL_2.equals(value)) {
 				mappingKeys[2] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_2, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_3)) {
+			} else if (PrefKey.INDIVIDUAL_3.equals(value)) {
 				mappingKeys[3] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_3, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_4)) {
+			} else if (PrefKey.INDIVIDUAL_4.equals(value)) {
 				mappingKeys[4] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_4, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_5)) {
+			} else if (PrefKey.INDIVIDUAL_5.equals(value)) {
 				mappingKeys[5] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_5, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_6)) {
+			} else if (PrefKey.INDIVIDUAL_6.equals(value)) {
 				mappingKeys[6] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_6, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_7)) {
+			} else if (PrefKey.INDIVIDUAL_7.equals(value)) {
 				mappingKeys[7] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_7, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_8)) {
+			} else if (PrefKey.INDIVIDUAL_8.equals(value)) {
 				mappingKeys[8] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_8, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_9)) {
+			} else if (PrefKey.INDIVIDUAL_9.equals(value)) {
 				mappingKeys[9] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_9, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_10)) {
+			} else if (PrefKey.INDIVIDUAL_10.equals(value)) {
 				mappingKeys[10] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_10, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_11)) {
+			} else if (PrefKey.INDIVIDUAL_11.equals(value)) {
 				mappingKeys[11] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_11, i);
-			} else if (value.equals(PrefKey.INDIVIDUAL_12)) {
+			} else if (PrefKey.INDIVIDUAL_12.equals(value)) {
 				mappingKeys[12] = i;
 				prefs.putInt(PrefKey.INDIVIDUAL_12, i);
 			}

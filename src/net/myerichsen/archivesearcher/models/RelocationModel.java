@@ -54,12 +54,12 @@ public class RelocationModel extends ASModel {
 		final int b = Integer.parseInt(a1);
 
 		String e = "";
-		if (!a.equals("0001-01-01")) {
+		if (!"0001-01-01".equals(a)) {
 			e = a.replace(a1, Integer.toString(b - 2));
 		} else {
 			e = a;
 		}
-		if (a.equals("0001-01-01")) {
+		if ("0001-01-01".equals(a)) {
 			a = "9999-12-31";
 		}
 
@@ -214,7 +214,7 @@ public class RelocationModel extends ASModel {
 	 * @return the sourceDetail
 	 */
 	public String getSourceDetail() {
-		return sourceDetail.equals("NULL") ? "" : sourceDetail;
+		return "NULL".equals(sourceDetail) ? "" : sourceDetail;
 	}
 
 	/**

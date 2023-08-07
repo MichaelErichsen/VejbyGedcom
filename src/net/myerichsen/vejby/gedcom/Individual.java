@@ -440,55 +440,55 @@ public class Individual {
 		// Surround with slashes to mark as family name
 		sb.append("/" + familyName + "/\n");
 
-		if (getSource() != null && !getSource().equals("")) {
+		if (getSource() != null && !"".equals(getSource())) {
 			sb.append("2 SOUR @S1@\n");
 			sb.append("3 PAGE " + getSource() + "\n");
 		}
 
 		// Default to M rather than having to fix all entries with "?"
-		if (getSex().equals(Sex.F) || getSex().equals("F")) {
+		if (Sex.F.equals(getSex()) || "F".equals(getSex())) {
 			sb.append("1 SEX F\n");
 		} else {
 			sb.append("1 SEX M\n");
 		}
 
-		if (getBirthDate() != null && !getBirthDate().equals("")) {
+		if (getBirthDate() != null && !"".equals(getBirthDate())) {
 			sb.append("1 BIRT\n");
 			sb.append("2 DATE " + getBirthDate() + "\n");
-			if (getBirthPlace() != null && !getBirthPlace().equals("")) {
+			if (getBirthPlace() != null && !"".equals(getBirthPlace())) {
 				sb.append("2 PLAC " + getBirthPlace() + ",\n");
 			}
 		}
 
-		if (getChristeningDate() != null && !getChristeningDate().equals("")) {
+		if (getChristeningDate() != null && !"".equals(getChristeningDate())) {
 			sb.append("1 CHR\n");
 			sb.append("2 DATE " + getChristeningDate() + "\n");
-			if (getChristeningPlace() != null && !getChristeningPlace().equals("")) {
+			if (getChristeningPlace() != null && !"".equals(getChristeningPlace())) {
 				sb.append("2 PLAC " + getChristeningPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if (getConfirmationDate() != null && !getConfirmationDate().equals("")) {
+		if (getConfirmationDate() != null && !"".equals(getConfirmationDate())) {
 			sb.append("1 CONF\n");
 			sb.append("2 DATE " + getConfirmationDate() + "\n");
-			if (getConfirmationPlace() != null && !getConfirmationPlace().equals("")) {
+			if (getConfirmationPlace() != null && !"".equals(getConfirmationPlace())) {
 				sb.append("2 PLAC " + getConfirmationPlace() + ",\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if (getDeathDate() != null && !getDeathDate().equals("")) {
+		if (getDeathDate() != null && !"".equals(getDeathDate())) {
 			sb.append("1 DEAT\n");
 			sb.append("2 DATE " + getDeathDate() + "\n");
 
-			if (getDeathPlace() != null && !getDeathPlace().equals("")) {
+			if (getDeathPlace() != null && !"".equals(getDeathPlace())) {
 				sb.append("2 PLAC " + getDeathPlace() + "\n");
 			}
 			sb.append("2 SOUR @S1@\n");
 		}
 
-		if (getTrade() != null && !getTrade().equals("")) {
+		if (getTrade() != null && !"".equals(getTrade())) {
 			sb.append("1 OCCU " + getTrade() + "\n");
 		}
 

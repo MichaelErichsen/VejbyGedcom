@@ -45,7 +45,7 @@ public class MillrollListAarEditingSupport extends EditingSupport {
 	@Override
 	protected void setValue(Object element, Object userInputValue) {
 		final String s = String.valueOf(userInputValue);
-		if (s.equals("")) {
+		if ("".equals(s)) {
 			((MilrollListModel) element).setAar(0);
 		} else {
 			((MilrollListModel) element).setAar(Integer.parseInt(s));

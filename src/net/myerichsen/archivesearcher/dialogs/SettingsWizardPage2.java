@@ -54,8 +54,8 @@ public class SettingsWizardPage2 extends WizardPage {
 		txtCensusCsvFileDirectory.addModifyListener(e -> {
 			settings.setCensusCsvFileDirectory(txtCensusCsvFileDirectory.getText());
 
-			if (settings.getCensusCsvFileDirectory().equals("") || settings.getKipTextFilename().equals("")
-					|| settings.getCensusPath().equals("") || settings.getCensusSchema().equals("")) {
+			if ("".equals(settings.getCensusCsvFileDirectory()) || "".equals(settings.getKipTextFilename())
+					|| "".equals(settings.getCensusPath()) || "".equals(settings.getCensusSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -90,8 +90,8 @@ public class SettingsWizardPage2 extends WizardPage {
 		txtKipTextFilename.addModifyListener(e -> {
 			settings.setKipTextFilename(txtKipTextFilename.getText());
 
-			if (settings.getCensusCsvFileDirectory().equals("") || settings.getKipTextFilename().equals("")
-					|| settings.getCensusPath().equals("") || settings.getCensusSchema().equals("")) {
+			if ("".equals(settings.getCensusCsvFileDirectory()) || "".equals(settings.getKipTextFilename())
+					|| "".equals(settings.getCensusPath()) || "".equals(settings.getCensusSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -107,8 +107,8 @@ public class SettingsWizardPage2 extends WizardPage {
 		txtCensusPath.addModifyListener(e -> {
 			settings.setCensusPath(txtCensusPath.getText());
 
-			if (settings.getCensusCsvFileDirectory().equals("") || settings.getKipTextFilename().equals("")
-					|| settings.getCensusPath().equals("") || settings.getCensusSchema().equals("")) {
+			if ("".equals(settings.getCensusCsvFileDirectory()) || "".equals(settings.getKipTextFilename())
+					|| "".equals(settings.getCensusPath()) || "".equals(settings.getCensusSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -129,7 +129,7 @@ public class SettingsWizardPage2 extends WizardPage {
 				directoryDialog.setText("Vælg venligst en folder og klik OK");
 
 				final String dir = directoryDialog.open();
-				if (dir.equals("")) {
+				if ("".equals(dir)) {
 					txtCensusPath.setText(dir);
 					settings.setCensusPath(dir);
 				}
@@ -143,8 +143,8 @@ public class SettingsWizardPage2 extends WizardPage {
 		txtCensusSchema.addModifyListener(e -> {
 			settings.setCensusSchema(txtCensusSchema.getText());
 
-			if (settings.getCensusCsvFileDirectory().equals("") || settings.getKipTextFilename().equals("")
-					|| settings.getCensusPath().equals("") || settings.getCensusSchema().equals("")) {
+			if ("".equals(settings.getCensusCsvFileDirectory()) || "".equals(settings.getKipTextFilename())
+					|| "".equals(settings.getCensusPath()) || "".equals(settings.getCensusSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);

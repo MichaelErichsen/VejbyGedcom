@@ -59,10 +59,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtCphCsvFileDirectory.addModifyListener(e -> {
 			settings.setCphCsvFileDirectory(txtCphCsvFileDirectory.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {
@@ -98,10 +98,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtBurialPersonComplete.addModifyListener(e -> {
 			settings.setBurialPersonComplete(txtBurialPersonComplete.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {
@@ -119,10 +119,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtPolicePerson.addModifyListener(e -> {
 			settings.setPolicePerson(txtPolicePerson.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {
@@ -140,10 +140,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtPoliceAddress.addModifyListener(e -> {
 			settings.setPoliceAddress(txtPoliceAddress.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {
@@ -161,10 +161,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtPolicePosition.addModifyListener(e -> {
 			settings.setPolicePosition(txtPolicePosition.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {
@@ -182,10 +182,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtCphDbPath.addModifyListener(e -> {
 			settings.setCphDbPath(txtCphDbPath.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {
@@ -221,10 +221,10 @@ public class SettingsWizardPage4 extends WizardPage {
 		txtCphSchema.addModifyListener(e -> {
 			settings.setCphSchema(txtCphSchema.getText());
 
-			if (settings.getCphCsvFileDirectory().equals("") || settings.getBurialPersonComplete().equals("")
-					|| settings.getPolicePerson().equals("") || settings.getPoliceAddress().equals("")
-					|| settings.getPolicePosition().equals("") || settings.getCphDbPath().equals("")
-					|| settings.getCphSchema().equals("")) {
+			if ("".equals(settings.getCphCsvFileDirectory()) || "".equals(settings.getBurialPersonComplete())
+					|| "".equals(settings.getPolicePerson()) || "".equals(settings.getPoliceAddress())
+					|| "".equals(settings.getPolicePosition()) || "".equals(settings.getCphDbPath())
+					|| "".equals(settings.getCphSchema())) {
 
 				setPageComplete(false);
 			} else {

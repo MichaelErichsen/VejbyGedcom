@@ -226,10 +226,8 @@ public class LastEventView extends Composite {
 						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.setMessage("Sidste hændelser i " + location + " er hentet"));
 			} catch (final Exception e) {
-				e.printStackTrace();
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

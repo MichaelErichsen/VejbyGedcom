@@ -90,7 +90,7 @@ public class MilRollListDialog extends Dialog {
 				try {
 					opret();
 				} catch (final SQLException e1) {
-					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage()));
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage(), e1));
 				}
 			}
 		});
@@ -103,7 +103,7 @@ public class MilRollListDialog extends Dialog {
 				try {
 					ret();
 				} catch (final SQLException e1) {
-					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage()));
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage(), e1));
 				}
 			}
 		});
@@ -116,7 +116,7 @@ public class MilRollListDialog extends Dialog {
 				try {
 					slet();
 				} catch (final SQLException e1) {
-					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage()));
+					Display.getDefault().asyncExec(() -> as.setErrorMessage(e1.getMessage(), e1));
 				}
 			}
 		});
@@ -313,7 +313,7 @@ public class MilRollListDialog extends Dialog {
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage(), e));
 				e.printStackTrace();
 			}
 		}
@@ -347,7 +347,7 @@ public class MilRollListDialog extends Dialog {
 		final TableItem[] tia = table.getSelection();
 
 		if (tia.length == 0) {
-			as.setErrorMessage("Intet valgt");
+			as.setErrorMessage("Intet valgt", null);
 			return 0;
 		}
 
@@ -375,7 +375,7 @@ public class MilRollListDialog extends Dialog {
 		final TableItem[] tia = table.getSelection();
 
 		if (tia.length == 0) {
-			as.setErrorMessage("Intet valgt");
+			as.setErrorMessage("Intet valgt", null);
 			return 0;
 		}
 
@@ -403,7 +403,7 @@ public class MilRollListDialog extends Dialog {
 		final TableItem[] tia = table.getSelection();
 
 		if (tia.length == 0) {
-			as.setErrorMessage("Intet valgt");
+			as.setErrorMessage("Intet valgt", null);
 			return 0;
 		}
 

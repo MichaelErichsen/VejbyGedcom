@@ -105,7 +105,7 @@ public class CensusLoader {
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		for (final KipTextEntry kipTextEntry : lkte) {
-			if (!kipTextEntry.getAar().equals("1771")) {
+			if (!"1771".equals(kipTextEntry.getAar())) {
 				parseCensusFile(args, kipTextEntry, as);
 			}
 		}
@@ -316,7 +316,7 @@ public class CensusLoader {
 				ci.insertIntoDb(statement.getConnection());
 			} catch (final SQLException e30) {
 				// Handle duplicates
-				if (!e30.getSQLState().equals("23505")) {
+				if (!"23505".equals(e30.getSQLState())) {
 					throw new Exception("sql Error Code: " + e30.getErrorCode() + ", sql State: " + e30.getSQLState());
 				}
 			}

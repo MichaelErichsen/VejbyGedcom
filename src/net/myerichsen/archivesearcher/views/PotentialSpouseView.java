@@ -178,8 +178,8 @@ public class PotentialSpouseView extends Composite {
 				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 						.setMessage("Mulige ægtefæller er hentet"));
 			} catch (final Exception e) {
-				Display.getDefault().asyncExec(
-						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

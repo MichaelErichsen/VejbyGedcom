@@ -51,8 +51,8 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtProbatePath.addModifyListener(e -> {
 			settings.setProbatePath(txtProbatePath.getText());
 
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getMilrollPath().equals("") || settings.getMilrollSchema().equals("")) {
+			if ("".equals(settings.getProbatePath()) || "".equals(settings.getProbateSchema())
+					|| "".equals(settings.getMilrollPath()) || "".equals(settings.getMilrollSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -86,8 +86,8 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtProbateSchema.addModifyListener(e -> {
 			settings.setProbateSchema(txtProbateSchema.getText());
 
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getMilrollPath().equals("") || settings.getMilrollSchema().equals("")) {
+			if ("".equals(settings.getProbatePath()) || "".equals(settings.getProbateSchema())
+					|| "".equals(settings.getMilrollPath()) || "".equals(settings.getMilrollSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -105,8 +105,8 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtMilRollPath.addModifyListener(e -> {
 			settings.setMilrollPath(txtMilRollPath.getText());
 
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getMilrollPath().equals("") || settings.getMilrollSchema().equals("")) {
+			if ("".equals(settings.getProbatePath()) || "".equals(settings.getProbateSchema())
+					|| "".equals(settings.getMilrollPath()) || "".equals(settings.getMilrollSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -142,8 +142,8 @@ public class SettingsWizardPage3 extends WizardPage {
 		txtMilRollSchema.addModifyListener(e -> {
 			settings.setMilrollSchema(txtMilRollSchema.getText());
 
-			if (settings.getProbatePath().equals("") || settings.getProbateSchema().equals("")
-					|| settings.getMilrollPath().equals("") || settings.getMilrollSchema().equals("")) {
+			if ("".equals(settings.getProbatePath()) || "".equals(settings.getProbateSchema())
+					|| "".equals(settings.getMilrollPath()) || "".equals(settings.getMilrollSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);

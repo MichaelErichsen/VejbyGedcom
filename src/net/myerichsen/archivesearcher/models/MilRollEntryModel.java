@@ -513,7 +513,7 @@ public class MilRollEntryModel extends ASModel {
 	@Override
 	public String toString() {
 		return (navn != null ? navn.trim() : "") + ", " + (amt != null ? amt.trim() + ", " : "") + aar + ", "
-				+ (!litra.equals(" ") ? litra + ", " : "") + laegdnr + ", " + (sogn != null ? sogn.trim() + ", " : "")
+				+ (!" ".equals(litra) ? litra + ", " : "") + laegdnr + ", " + (sogn != null ? sogn.trim() + ", " : "")
 				+ (fader != null ? fader.trim() + ", " : "") + (foedeSted != null ? foedeSted.trim() + ", " : "")
 				+ alder + ", " + stoerrelseITommer + ", " + (ophold != null ? ophold.trim() + ", " : "")
 				+ (anmaerkninger.length() > 0 ? anmaerkninger.trim() + ", " : "") + (foedt != null ? foedt + ", " : "")

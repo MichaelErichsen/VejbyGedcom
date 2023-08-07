@@ -54,7 +54,7 @@ import net.myerichsen.archivesearcher.populators.CensusPopulator;
  * Census view
  *
  * @author Michael Erichsen
- * @version 12. jul. 2023
+ * @version 13. jul. 2023
  */
 
 public class CensusView extends Composite {
@@ -185,18 +185,19 @@ public class CensusView extends Composite {
 		lblFdested.setText("F\u00F8dested");
 
 		censusBirthPlaceCombo = new Combo(filterComposite, SWT.BORDER);
-		censusBirthPlaceCombo.setToolTipText("Tryk ENTER for at gemme f\u00F8destednavnet, mens programmet er aktivt");
+		censusBirthPlaceCombo
+				.setToolTipText("Tryk ENTER for at gemme f\u00F8destednavnet, s\u00E5 l\u00E6nge programmet er aktivt");
 		censusBirthPlaceCombo.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.CR) {
-					String text = censusBirthPlaceCombo.getText();
+					final String text = censusBirthPlaceCombo.getText();
 					if (!Arrays.asList(censusBirthPlaceCombo.getItems()).contains(text)) {
 						censusBirthPlaceCombo.add(text, 0);
 						censusBirthPlaceCombo.select(0);
 
-						if (censusBirthPlaceCombo.getItemCount() > 5) {
-							censusBirthPlaceCombo.remove(5);
+						if (censusBirthPlaceCombo.getItemCount() > 10) {
+							censusBirthPlaceCombo.remove(10);
 						}
 					}
 				}
@@ -678,9 +679,8 @@ public class CensusView extends Composite {
 				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 						.setMessage("Folketællinger er hentet"));
 			} catch (final Exception e) {
-				e.printStackTrace();
-				Display.getDefault().asyncExec(
-						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}
@@ -720,7 +720,7 @@ public class CensusView extends Composite {
 					model.getMatr_nr_Adresse(), model.getKildehenvisning()));
 		} catch (final SQLException e) {
 			final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
-			as.setErrorMessage(e.getMessage());
+			as.setErrorMessage(e.getMessage(), e);
 			e.printStackTrace();
 		}
 
@@ -747,7 +747,7 @@ public class CensusView extends Composite {
 
 			} catch (final SQLException e) {
 				final ArchiveSearcher as = (ArchiveSearcher) getParent().getParent();
-				as.setErrorMessage(e.getMessage());
+				as.setErrorMessage(e.getMessage(), e);
 				e.printStackTrace();
 			}
 		} else if (open == 2) {
@@ -764,7 +764,7 @@ public class CensusView extends Composite {
 			final int buttonID = messageBox.open();
 
 			if (buttonID == SWT.OK && headOfHousehold != null && headOfHousehold.length() > 0
-					&& !headOfHousehold.equals("ikke fundet")) {
+					&& !"ikke fundet".equals(headOfHousehold)) {
 				final ArchiveSearcher grandParent = (ArchiveSearcher) getParent().getParent();
 				grandParent.getSearchId().setText(headOfHousehold);
 				grandParent.searchById(null);

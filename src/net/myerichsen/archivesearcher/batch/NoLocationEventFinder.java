@@ -131,8 +131,8 @@ public class NoLocationEventFinder {
 			rs2 = ps.executeQuery();
 
 			while (rs2.next()) {
-				if (rs2.getString("TYPE").trim().equals("Birth")
-						|| rs2.getString("TYPE").trim().equals("Christening")) {
+				if ("Birth".equals(rs2.getString("TYPE").trim())
+						|| "Christening".equals(rs2.getString("TYPE").trim())) {
 					place = rs2.getString("PLACE");
 
 					if (place != null && place.toLowerCase().contains(location)) {
@@ -189,7 +189,7 @@ public class NoLocationEventFinder {
 
 			while (rs2.next()) {
 				// Add birth year to individual
-				if (rs2.getString("TYPE").trim().equals("Birth")) {
+				if ("Birth".equals(rs2.getString("TYPE").trim())) {
 					year = rs2.getDate("DATE").toLocalDate().getYear();
 
 					if (year < 1789 || checkChildrenLocation(conn1, individual, location)) {

@@ -21,7 +21,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a potential spouse
  *
  * @author Michael Erichsen
- * @version 12. jul. 2023
+ * @version 7. aug. 2023
  */
 
 public class PotentialSpouseModel extends ASModel {
@@ -93,6 +93,7 @@ public class PotentialSpouseModel extends ASModel {
 		int birthYear1;
 		int birthYear2;
 		PreparedStatement gedcomStatement1;
+		String string;
 
 		final String gedcomDbURL = "jdbc:derby:" + gedcomDbPath;
 		final Connection gedcomConn = DriverManager.getConnection(gedcomDbURL);
@@ -125,7 +126,7 @@ public class PotentialSpouseModel extends ASModel {
 			rs2 = gedcomStatement1.executeQuery();
 
 			if (rs2.next()) {
-				addNewModel(rs2, list, "Vielse");
+				addNewModel(rs2, list, "Familie");
 			}
 		}
 
@@ -215,7 +216,7 @@ public class PotentialSpouseModel extends ASModel {
 				if (birthDate.isBlank()) {
 					birthDate = rs4.getInt("FOEDEAAR") + "";
 
-					if (birthDate.trim().equals("0")) {
+					if ("0".equals(birthDate.trim())) {
 						ftAar = ftAar == 0 ? Integer.parseInt(kildeHenvisning) : ftAar;
 						birthDate = ftAar - rs4.getInt("ALDER") + "";
 					}
@@ -245,10 +246,14 @@ public class PotentialSpouseModel extends ASModel {
 				birthYear1 = 0;
 				birthYear2 = 0;
 
-				matcher = yearPattern.matcher(rs1.getString("BIRTHDATE"));
+				string = rs1.getString("BIRTHDATE");
 
-				if (matcher.find()) {
-					birthYear1 = Integer.parseInt(matcher.group(0));
+				if (string != null) {
+					matcher = yearPattern.matcher(string);
+
+					if (matcher.find()) {
+						birthYear1 = Integer.parseInt(matcher.group(0));
+					}
 				}
 
 				matcher = yearPattern.matcher(psm.getFoedt_kildedato());

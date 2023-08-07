@@ -81,7 +81,7 @@ public class LastEventModel extends ASModel {
 					if (rs3.next()) {
 						type = rs3.getString("TYPE").trim();
 
-						if (!type.equals("Burial")) {
+						if (!"Burial".equals(type)) {
 							model.setType(type);
 							model.setSubType(rs3.getString("SUBTYPE").trim());
 							model.setSourceDetail(rs3.getString("SOURCEDETAIL").trim());

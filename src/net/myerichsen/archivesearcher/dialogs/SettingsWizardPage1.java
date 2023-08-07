@@ -53,8 +53,8 @@ public class SettingsWizardPage1 extends WizardPage {
 		txtGedcomFilePath.addModifyListener(e -> {
 			settings.setGedcomFilePath(txtGedcomFilePath.getText());
 
-			if (settings.getGedcomFilePath().equals("") || settings.getparishPath().equals("")
-					|| settings.getparishSchema().equals("")) {
+			if ("".equals(settings.getGedcomFilePath()) || "".equals(settings.getparishPath())
+					|| "".equals(settings.getparishSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -77,7 +77,7 @@ public class SettingsWizardPage1 extends WizardPage {
 
 				final String file = fileDialog.open();
 
-				if (file.equals("")) {
+				if ("".equals(file)) {
 					txtGedcomFilePath.setText(file);
 					settings.setGedcomFilePath(file);
 				}
@@ -91,8 +91,8 @@ public class SettingsWizardPage1 extends WizardPage {
 		txtparishPath.addModifyListener(e -> {
 			settings.setparishPath(txtparishPath.getText());
 
-			if (settings.getGedcomFilePath().equals("") || settings.getparishPath().equals("")
-					|| settings.getparishSchema().equals("")) {
+			if ("".equals(settings.getGedcomFilePath()) || "".equals(settings.getparishPath())
+					|| "".equals(settings.getparishSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);
@@ -113,7 +113,7 @@ public class SettingsWizardPage1 extends WizardPage {
 				directoryDialog.setText("Vælg venligst en folder og klik OK");
 
 				final String dir = directoryDialog.open();
-				if (dir.equals("")) {
+				if ("".equals(dir)) {
 					txtparishPath.setText(dir);
 					settings.setparishPath(dir);
 				}
@@ -127,8 +127,8 @@ public class SettingsWizardPage1 extends WizardPage {
 		txtparishSchema.addModifyListener(e -> {
 			settings.setparishSchema(txtparishSchema.getText());
 
-			if (settings.getGedcomFilePath().equals("") || settings.getparishPath().equals("")
-					|| settings.getparishSchema().equals("")) {
+			if ("".equals(settings.getGedcomFilePath()) || "".equals(settings.getparishPath())
+					|| "".equals(settings.getparishSchema())) {
 				setPageComplete(false);
 			} else {
 				setPageComplete(true);

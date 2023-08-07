@@ -197,12 +197,12 @@ public class ConscriptsPanel extends FsPanel {
 				child.setName(childName + " ?");
 			}
 
-			child.setSex(line[1].equals("male") ? "M" : "F");
+			child.setSex("male".equals(line[1]) ? "M" : "F");
 			child.setBirthDate(line[2]);
 			child.setBirthPlace(line[3]);
 			family.getChildren().add(child);
 
-			if (!line[4].equals("")) {
+			if (!"".equals(line[4])) {
 				father = new Individual(individualId);
 				individualId++;
 				father.setName(line[4]);
@@ -217,7 +217,7 @@ public class ConscriptsPanel extends FsPanel {
 
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
-		if (!path.equals("")) {
+		if (!"".equals(path)) {
 			JOptionPane.showMessageDialog(new JFrame(), "Lægdsruller er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}

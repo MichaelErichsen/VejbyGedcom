@@ -147,8 +147,8 @@ public class FindLocationIndividuals {
 			rs2 = ps.executeQuery();
 
 			while (rs2.next()) {
-				if (rs2.getString("TYPE").trim().equals("Birth")
-						|| rs2.getString("TYPE").trim().equals("Christening")) {
+				if ("Birth".equals(rs2.getString("TYPE").trim())
+						|| "Christening".equals(rs2.getString("TYPE").trim())) {
 					place = rs2.getString("PLACE");
 
 					if (place != null && place.toLowerCase().contains(location)) {
@@ -201,8 +201,8 @@ public class FindLocationIndividuals {
 
 			while (rs2.next()) {
 				// Add birth year and place to individual
-				if (rs2.getString("TYPE").trim().equals("Birth")
-						|| rs2.getString("TYPE").trim().equals("Christening")) {
+				if ("Birth".equals(rs2.getString("TYPE").trim())
+						|| "Christening".equals(rs2.getString("TYPE").trim())) {
 					individual.setBirthYear(rs2.getDate("DATE").toLocalDate().getYear());
 					place = rs2.getString("PLACE");
 
@@ -212,7 +212,7 @@ public class FindLocationIndividuals {
 				}
 
 				// Add death year to individual
-				if (rs2.getString("TYPE").trim().equals("Death") || rs2.getString("TYPE").trim().equals("Burial")) {
+				if ("Death".equals(rs2.getString("TYPE").trim()) || "Burial".equals(rs2.getString("TYPE").trim())) {
 					year = rs2.getDate("DATE");
 
 					if (year != null) {

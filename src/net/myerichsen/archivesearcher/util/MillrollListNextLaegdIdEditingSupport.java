@@ -44,7 +44,7 @@ public class MillrollListNextLaegdIdEditingSupport extends EditingSupport {
 
 	@Override
 	protected void setValue(Object element, Object userInputValue) {
-		if (userInputValue.equals("")) {
+		if ("".equals(userInputValue)) {
 			((MilrollListModel) element).setNextLaegdId(0);
 		} else {
 			((MilrollListModel) element).setNextLaegdId(Integer.parseInt(String.valueOf(userInputValue)));

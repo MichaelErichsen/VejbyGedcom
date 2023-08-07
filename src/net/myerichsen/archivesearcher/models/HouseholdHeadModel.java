@@ -466,7 +466,7 @@ public class HouseholdHeadModel extends ASModel implements Cloneable {
 	 * @return the sourceDetail
 	 */
 	public String getSourceDetail() {
-		return sourceDetail.equals("NULL") ? "" : sourceDetail;
+		return "NULL".equals(sourceDetail) ? "" : sourceDetail;
 	}
 
 	/**

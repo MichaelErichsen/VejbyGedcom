@@ -37,7 +37,7 @@ public class PolregModel extends ASModel {
 	 */
 	public static PolregModel[] load(String schema, String dbPath, String phonName, String birthDate, String deathDate)
 			throws SQLException {
-		final Date bd = birthDate.equals("") ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate);
+		final Date bd = "".equals(birthDate) ? Date.valueOf("0001-01-01") : Date.valueOf(birthDate);
 		int calcYear = 0;
 
 		final Connection conn = DriverManager.getConnection("jdbc:derby:" + dbPath);

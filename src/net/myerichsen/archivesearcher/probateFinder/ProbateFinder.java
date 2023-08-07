@@ -131,7 +131,7 @@ public class ProbateFinder {
 		final String pattern = ".*" + location + ".*";
 
 		for (final ProbatePerson probatePerson : listPp) {
-			if (location.equalsIgnoreCase("all") || probatePerson.getLastPlace().toLowerCase().matches(pattern)) {
+			if ("all".equalsIgnoreCase(location) || probatePerson.getLastPlace().toLowerCase().matches(pattern)) {
 				writer.write(probatePerson.toString() + "\n");
 				counter++;
 			}

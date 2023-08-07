@@ -70,7 +70,7 @@ public abstract class LoadCphArch {
 		if (!columnType.startsWith("BOOLEAN")) {
 			throw new Exception("Unknown column type: " + columnType);
 		}
-		if (string.equals("b'\\x00'")) {
+		if ("b'\\x00'".equals(string)) {
 			return "TRUE";
 		}
 		return "FALSE";
@@ -191,7 +191,7 @@ public abstract class LoadCphArch {
 
 			columns = line.replace("\",\"", "\";\"").split(";");
 
-			if (columns[0].equals("\"id\"")) {
+			if ("\"id\"".equals(columns[0])) {
 				continue;
 			}
 
@@ -214,7 +214,7 @@ public abstract class LoadCphArch {
 				statement.execute();
 				counter++;
 			} catch (final SQLException e) {
-				if (!e.getSQLState().equals("42821")) {
+				if (!"42821".equals(e.getSQLState())) {
 					reader.close();
 					throw new SQLException(e);
 				}

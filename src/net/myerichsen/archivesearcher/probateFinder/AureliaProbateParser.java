@@ -87,7 +87,7 @@ public class AureliaProbateParser {
 		final String pattern = ".*" + location + ".*";
 
 		for (final Probate probate : listP) {
-			if (location.equalsIgnoreCase("all") || probate.getLocation().matches(pattern)) {
+			if ("all".equalsIgnoreCase(location) || probate.getLocation().matches(pattern)) {
 				writer.write(probate + "\n");
 				System.out.println(probate);
 				counter++;

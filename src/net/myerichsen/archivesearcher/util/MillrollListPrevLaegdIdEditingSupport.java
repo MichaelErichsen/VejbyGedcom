@@ -44,7 +44,7 @@ public class MillrollListPrevLaegdIdEditingSupport extends EditingSupport {
 
 	@Override
 	protected void setValue(Object element, Object userInputValue) {
-		if (userInputValue.equals("")) {
+		if ("".equals(userInputValue)) {
 			((MilrollListModel) element).setPrevLaegdId(0);
 		} else {
 			((MilrollListModel) element).setPrevLaegdId(Integer.parseInt(String.valueOf(userInputValue)));

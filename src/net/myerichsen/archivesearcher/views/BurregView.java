@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.populators.BurregPopulator;
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 26. jul. 2023
  *
  */
 public class BurregView extends Composite {
@@ -69,14 +69,14 @@ public class BurregView extends Composite {
 
 		listener = new BurregPopulator();
 
-		final Composite burregFilterComposite = new Composite(this, SWT.BORDER);
-		burregFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		burregFilterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+		final Composite filterComposite = new Composite(this, SWT.BORDER);
+		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		filterComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
-		final Label bLabel = new Label(burregFilterComposite, SWT.NONE);
+		final Label bLabel = new Label(filterComposite, SWT.NONE);
 		bLabel.setText("Filtre: Fornavn");
 
-		txtBurregGiven = new Text(burregFilterComposite, SWT.BORDER);
+		txtBurregGiven = new Text(filterComposite, SWT.BORDER);
 
 		txtBurregGiven.addKeyListener(new KeyAdapter() {
 			@Override
@@ -91,10 +91,10 @@ public class BurregView extends Composite {
 			}
 		});
 
-		final Label lblEfternavn = new Label(burregFilterComposite, SWT.NONE);
+		final Label lblEfternavn = new Label(filterComposite, SWT.NONE);
 		lblEfternavn.setText("Efternavn");
 
-		txtBurregSurname = new Text(burregFilterComposite, SWT.BORDER);
+		txtBurregSurname = new Text(filterComposite, SWT.BORDER);
 		txtBurregSurname.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -108,10 +108,10 @@ public class BurregView extends Composite {
 			}
 		});
 
-		final Label lblFder = new Label(burregFilterComposite, SWT.NONE);
+		final Label lblFder = new Label(filterComposite, SWT.NONE);
 		lblFder.setText("F\u00F8de\u00E5r");
 
-		txtBurregBirthYear = new Text(burregFilterComposite, SWT.BORDER);
+		txtBurregBirthYear = new Text(filterComposite, SWT.BORDER);
 		txtBurregBirthYear.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -125,7 +125,7 @@ public class BurregView extends Composite {
 			}
 		});
 
-		final Button btnRydFelterne_2 = new Button(burregFilterComposite, SWT.NONE);
+		final Button btnRydFelterne_2 = new Button(filterComposite, SWT.NONE);
 		btnRydFelterne_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -134,13 +134,13 @@ public class BurregView extends Composite {
 		});
 		btnRydFelterne_2.setText("Ryd felterne");
 
-		final ScrolledComposite burregScroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		burregScroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		burregScroller.setSize(0, 0);
-		burregScroller.setExpandHorizontal(true);
-		burregScroller.setExpandVertical(true);
+		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		scroller.setSize(0, 0);
+		scroller.setExpandHorizontal(true);
+		scroller.setExpandVertical(true);
 
-		tableViewer = new TableViewer(burregScroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer = new TableViewer(scroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.addDoubleClickListener(event -> popup(getDisplay()));
 		table = tableViewer.getTable();
@@ -443,8 +443,8 @@ public class BurregView extends Composite {
 			}
 		});
 
-		burregScroller.setContent(table);
-		burregScroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scroller.setContent(table);
+		scroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
 
@@ -496,8 +496,8 @@ public class BurregView extends Composite {
 				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
 						.setMessage("Begravelsesregisteret er hentet"));
 			} catch (final Exception e) {
-				Display.getDefault().asyncExec(
-						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

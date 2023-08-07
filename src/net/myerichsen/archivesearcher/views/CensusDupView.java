@@ -35,7 +35,7 @@ import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 10. jul. 2023
+ * @version 27. jul. 2023
  *
  */
 public class CensusDupView extends Composite {
@@ -57,16 +57,15 @@ public class CensusDupView extends Composite {
 
 		listener = new CensusDupPopulator();
 
-		final ScrolledComposite scrolledComposite = new ScrolledComposite(this,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		final GridData gd_censusdupScroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_censusdupScroller.widthHint = 617;
-		scrolledComposite.setLayoutData(gd_censusdupScroller);
-		scrolledComposite.setSize(0, 0);
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setExpandVertical(true);
+		scroller.setLayoutData(gd_censusdupScroller);
+		scroller.setSize(0, 0);
+		scroller.setExpandHorizontal(true);
+		scroller.setExpandVertical(true);
 
-		tableViewer = new TableViewer(scrolledComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
+		tableViewer = new TableViewer(scroller, SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.addDoubleClickListener(event -> popup(getDisplay()));
 		table = tableViewer.getTable();
@@ -143,8 +142,8 @@ public class CensusDupView extends Composite {
 		});
 		btnFind.setText("Find");
 
-		scrolledComposite.setContent(table);
-		scrolledComposite.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scroller.setContent(table);
+		scroller.setMinSize(table.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
 	@Override
@@ -182,9 +181,8 @@ public class CensusDupView extends Composite {
 						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
 								.setMessage("Folketællingsdubletter er hentet"));
 			} catch (final Exception e) {
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage(e.getMessage()));
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 		}
 	}

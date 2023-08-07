@@ -243,7 +243,8 @@ public class SiblingsView extends Composite {
 
 				Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
 			} catch (final Exception e) {
-				e.printStackTrace();
+				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+						.setErrorMessage(e.getMessage(), e));
 			}
 
 		}

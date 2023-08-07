@@ -184,12 +184,12 @@ public class MarriagePanel extends FsPanel {
 			family = new Family(0, i);
 
 			// MilRollEntryDialog for principal's sex
-			if (line[1].equals("male")) {
+			if ("male".equals(line[1])) {
 				groom = new Individual(individualId);
 				individualId++;
 				groom.setName(line[0]);
 
-				if (!line[2].equals("")) {
+				if (!"".equals(line[2])) {
 					groom.setBirthDate(line[2]);
 				}
 
@@ -201,7 +201,7 @@ public class MarriagePanel extends FsPanel {
 				individualId++;
 				bride.setName(line[0]);
 
-				if (!line[2].equals("")) {
+				if (!"".equals(line[2])) {
 					bride.setBirthDate(line[2]);
 				}
 
@@ -222,7 +222,7 @@ public class MarriagePanel extends FsPanel {
 
 		final String path = gedcomFile.saveFsExtract(fileNameStub);
 
-		if (!path.equals("")) {
+		if (!"".equals(path)) {
 			JOptionPane.showMessageDialog(new JFrame(), "Vielser er gemt som GEDCOM fil " + path, "Vejby Gedcom",
 					JOptionPane.INFORMATION_MESSAGE);
 		}
