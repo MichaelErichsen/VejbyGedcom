@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 7. aug. 2023
+ * @version 8. aug. 2023
  *
  */
 
@@ -846,7 +846,6 @@ public class ArchiveSearcher extends Shell {
 		}
 
 		final String idx = searchIdCombo.getText();
-		setMessage("Søger efter ID " + idx);
 
 		if (!Arrays.asList(searchIdCombo.getItems()).contains(idx)) {
 			searchIdCombo.add(idx, 0);
@@ -869,6 +868,9 @@ public class ArchiveSearcher extends Shell {
 				return;
 			}
 
+			setMessage("Søger efter ID " + idx);
+			indicator.setVisible(true);
+
 			searchName.setText(individual.getName());
 			final String phonName = individual.getPhonName();
 			final String birthDate = individual.getBirthDate().toString();
@@ -890,7 +892,6 @@ public class ArchiveSearcher extends Shell {
 			} catch (final Exception e1) {
 			}
 
-			indicator.setVisible(true);
 			individualView.populate(individual);
 			relocationView.populate(phonName, birthDate);
 			censusView.populate(individual.getId(), phonName, birthDate, deathDate);
@@ -993,7 +994,6 @@ public class ArchiveSearcher extends Shell {
 			messageBox.setMessage("Indtast venligst fader og/eller moder");
 			messageBox.open();
 			searchFather.setFocus();
-
 			return;
 		}
 
