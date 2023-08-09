@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 10. jul. 2023
+ * @version 9. aug. 2023
  */
 
 public class GedcomLoader {
@@ -173,14 +173,22 @@ public class GedcomLoader {
 	}
 
 	/**
-	 * Add census events marked as shared
+	 * Add census and relocation family events marked as shared
 	 *
 	 * @throws SQLException
 	 *
 	 */
-	private void addSharedCensusEvents() throws SQLException {
+	private void addSharedCensusAndRelocationEvents() throws SQLException {
 		Family family;
 		String string;
+		String type;
+		String subType;
+		String place;
+		List<CustomFact> customFacts2;
+		List<AbstractCitation> citations;
+		CitationWithSource cfs;
+		StringWithCustomFacts whereInSource;
+		List<CustomFact> customFacts1;
 
 		final Map<String, Family> families = gedcom.getFamilies();
 
@@ -194,41 +202,50 @@ public class GedcomLoader {
 			}
 
 			for (final FamilyEvent familyEvent : events) {
-				final String type = familyEvent.getType().getDisplay();
+				type = familyEvent.getType().getDisplay();
 
-				if (!"Census".equals(type)) {
+				if (familyEvent.getSubType() != null) {
+					subType = familyEvent.getSubType().getValue();
+				} else {
+					subType = "Witness";
+				}
+
+				if ("Marriage".equals(type) || "Engagement".equals(type) || "Divorce".equals(type)
+						|| "Adkomst".equals(subType) || "Faeste".equals(subType) || "Event-Misc".equals(subType)) {
 					continue;
 				}
 
-				for (final FamilyEvent familyEvent2 : events) {
-					if (!"Census".equals(familyEvent2.getType().getDisplay()) || familyEvent2.getPlace() == null) {
-						continue;
-					}
+				if (familyEvent.getPlace() != null) {
+					place = familyEvent.getPlace().getPlaceName();
+				} else {
+					place = "";
+				}
 
-					final String place = familyEvent2.getPlace().getPlaceName();
-					final List<CustomFact> customFacts2 = familyEvent2.getCustomFacts();
+				customFacts2 = familyEvent.getCustomFacts();
 
+				if (customFacts2 != null) {
 					for (final CustomFact cf3 : customFacts2) {
 						if ("_SHAR".equals(cf3.getTag())) {
-							psINSERT_INDIVIDUAL_EVENT.setString(1, "Census");
-							psINSERT_INDIVIDUAL_EVENT.setString(2, "Witness");
-							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(familyEvent2.getDate()));
+							psINSERT_INDIVIDUAL_EVENT.setString(1, type);
+							psINSERT_INDIVIDUAL_EVENT.setString(2, subType);
+							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(familyEvent.getDate()));
 							psINSERT_INDIVIDUAL_EVENT.setString(4, cf3.getDescription().getValue());
 							psINSERT_INDIVIDUAL_EVENT.setString(5, familyNode.getKey());
 							psINSERT_INDIVIDUAL_EVENT.setString(6, place);
 							psINSERT_INDIVIDUAL_EVENT.setString(7, "");
 
-							final List<AbstractCitation> citations = familyEvent2.getCitations();
+							citations = familyEvent.getCitations();
+
 							if (citations == null) {
 								psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 							} else {
-								final CitationWithSource cfs = (CitationWithSource) citations.get(0);
-								final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
+								cfs = (CitationWithSource) citations.get(0);
+								whereInSource = cfs.getWhereInSource();
 
 								if (whereInSource == null) {
 									psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 								} else {
-									final List<CustomFact> customFacts1 = whereInSource.getCustomFacts();
+									customFacts1 = whereInSource.getCustomFacts();
 
 									if (customFacts1 == null) {
 										if (whereInSource.getValue() != null) {
@@ -272,65 +289,66 @@ public class GedcomLoader {
 			}
 
 			for (final IndividualEvent individualEvent : individualEvents) {
-				final String type = individualEvent.getType().getDisplay();
+				type = individualEvent.getType().getDisplay();
+
+				if (individualEvent.getSubType() != null) {
+					subType = individualEvent.getSubType().getValue();
+				} else {
+					subType = "";
+				}
 
 				if (!"Census".equals(type)) {
 					continue;
 				}
 
-				for (final IndividualEvent individualEvent2 : individualEvents) {
-					if (!"Census".equals(individualEvent2.getType().getDisplay())) {
-						continue;
-					}
+				place = individualEvent.getPlace().getPlaceName();
+				customFacts2 = individualEvent.getCustomFacts();
 
-					final String place = individualEvent2.getPlace().getPlaceName();
-					final List<CustomFact> customFacts2 = individualEvent2.getCustomFacts();
+				for (final CustomFact cf3 : customFacts2) {
+					if ("_SHAR".equals(cf3.getTag())) {
+						psINSERT_INDIVIDUAL_EVENT.setString(1, type);
+						psINSERT_INDIVIDUAL_EVENT.setString(2, subType);
+						psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(individualEvent.getDate()));
+						psINSERT_INDIVIDUAL_EVENT.setString(4, cf3.getDescription().getValue());
+						psINSERT_INDIVIDUAL_EVENT.setString(5, individualNode.getKey());
+						psINSERT_INDIVIDUAL_EVENT.setString(6, place);
+						psINSERT_INDIVIDUAL_EVENT.setString(7, "");
 
-					for (final CustomFact cf3 : customFacts2) {
-						if ("_SHAR".equals(cf3.getTag())) {
-							psINSERT_INDIVIDUAL_EVENT.setString(1, "Census");
-							psINSERT_INDIVIDUAL_EVENT.setString(2, "Witness");
-							psINSERT_INDIVIDUAL_EVENT.setDate(3, formatDate(individualEvent2.getDate()));
-							psINSERT_INDIVIDUAL_EVENT.setString(4, cf3.getDescription().getValue());
-							psINSERT_INDIVIDUAL_EVENT.setString(5, individualNode.getKey());
-							psINSERT_INDIVIDUAL_EVENT.setString(6, place);
-							psINSERT_INDIVIDUAL_EVENT.setString(7, "");
+						citations = individualEvent.getCitations();
 
-							final List<AbstractCitation> citations = individualEvent2.getCitations();
-							if (citations == null) {
+						if (citations == null) {
+							psINSERT_INDIVIDUAL_EVENT.setString(8, "");
+						} else {
+							cfs = (CitationWithSource) citations.get(0);
+							whereInSource = cfs.getWhereInSource();
+
+							if (whereInSource == null) {
 								psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 							} else {
-								final CitationWithSource cfs = (CitationWithSource) citations.get(0);
-								final StringWithCustomFacts whereInSource = cfs.getWhereInSource();
+								customFacts1 = whereInSource.getCustomFacts();
 
-								if (whereInSource == null) {
-									psINSERT_INDIVIDUAL_EVENT.setString(8, "");
-								} else {
-									final List<CustomFact> customFacts1 = whereInSource.getCustomFacts();
-
-									if (customFacts1 == null) {
-										if (whereInSource.getValue() != null) {
-											psINSERT_INDIVIDUAL_EVENT.setString(8, whereInSource.getValue());
-										} else {
-											psINSERT_INDIVIDUAL_EVENT.setString(8, "");
-										}
+								if (customFacts1 == null) {
+									if (whereInSource.getValue() != null) {
+										psINSERT_INDIVIDUAL_EVENT.setString(8, whereInSource.getValue());
 									} else {
-										final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
-
-										for (final CustomFact customFact : customFacts1) {
-											sb2.append(customFact.getDescription().getValue());
-										}
-
-										string = sb2.toString().replace("'", "¤");
-										string = string.length() > 256 ? string.substring(0, 255) : string;
-										string = string + "', '";
-										psINSERT_INDIVIDUAL_EVENT.setString(8, string);
+										psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 									}
+								} else {
+									final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
+
+									for (final CustomFact customFact : customFacts1) {
+										sb2.append(customFact.getDescription().getValue());
+									}
+
+									string = sb2.toString().replace("'", "¤");
+									string = string.length() > 256 ? string.substring(0, 255) : string;
+									string = string + "', '";
+									psINSERT_INDIVIDUAL_EVENT.setString(8, string);
 								}
 							}
-
-							psINSERT_INDIVIDUAL_EVENT.executeUpdate();
 						}
+
+						psINSERT_INDIVIDUAL_EVENT.executeUpdate();
 					}
 				}
 			}
@@ -404,8 +422,9 @@ public class GedcomLoader {
 		Display.getDefault().asyncExec(() -> as.setMessage("Forældre er analyseret"));
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
-		addSharedCensusEvents();
-		Display.getDefault().asyncExec(() -> as.setMessage("Yderligere folketællingshændelser er indsat"));
+		addSharedCensusAndRelocationEvents();
+		Display.getDefault()
+				.asyncExec(() -> as.setMessage("Yderligere folketællings- og flytningshændelser er indsat"));
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		addChildBirthEvents(conn, schema);
