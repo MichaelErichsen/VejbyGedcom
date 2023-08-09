@@ -14,7 +14,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing siblings from the parents table
  *
  * @author Michael Erichsen
- * @version 18. maj 2023
+ * @version 8. aug. 2023
  *
  */
 
@@ -33,7 +33,7 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] load(String schema, String dbPath, String parents) throws SQLException {
+	public static SiblingsModel[] load(String schema, String dbPath, String parents) throws SQLException {
 		if (parents.length() == 0) {
 			return new SiblingsModel[0];
 		}
@@ -56,7 +56,7 @@ public class SiblingsModel extends ASModel {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static SiblingsModel[] load(String schema, String dbPath, String fathersName, String mothersName)
+	public static SiblingsModel[] load(String schema, String dbPath, String fathersName, String mothersName)
 			throws SQLException {
 		String fatherPhonetic;
 		String motherPhonetic;
@@ -101,26 +101,6 @@ public class SiblingsModel extends ASModel {
 		}
 
 		return sra;
-	}
-
-	/**
-	 * Generic method to get a list of objects from the database
-	 *
-	 * @param args
-	 * @return
-	 * @throws SQLException
-	 */
-	public static SiblingsModel[] load(String[] args) throws SQLException {
-		switch (args.length) {
-		case 3: {
-			return load(args[0], args[1], args[2]);
-		}
-		case 4: {
-			return load(args[0], args[1], args[2], args[3]);
-		}
-		default:
-			throw new IllegalArgumentException("Unexpected value: " + args.length + ": '" + args[0] + "'");
-		}
 	}
 
 	/**

@@ -25,8 +25,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import net.myerichsen.archivesearcher.models.MilrollListModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.MilrollListPopulator;
 import net.myerichsen.archivesearcher.util.MillrollListAarEditingSupport;
 import net.myerichsen.archivesearcher.util.MillrollListAmtEditingSupport;
 import net.myerichsen.archivesearcher.util.MillrollListLaegdIdEditingSupport;
@@ -42,7 +40,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Military rolls dialog
  *
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 
@@ -57,7 +55,6 @@ public class MilRollListDialog extends Dialog {
 	private Properties props;
 	private Thread thread;
 	private TableViewer tableViewer;
-	private ASPopulator listener;
 	private final ArchiveSearcher as;
 
 	/**
@@ -288,7 +285,6 @@ public class MilRollListDialog extends Dialog {
 		});
 		tableViewerColumn_10.setEditingSupport(new MillrollListPrevLaegdIdEditingSupport(tableViewer));
 
-		listener = new MilrollListPopulator();
 		populate();
 		return container;
 	}
@@ -305,17 +301,14 @@ public class MilRollListDialog extends Dialog {
 	 * Get the military roll list
 	 */
 	private void getMilRollList() {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
-						props.getProperty("milrollSchema") };
-				final MilrollListModel[] array = (MilrollListModel[]) listener.load(loadArgs);
+		try {
+			final MilrollListModel[] array = MilrollListModel.load(props.getProperty("milrollPath"),
+					props.getProperty("milrollSchema"));
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage(), e));
-				e.printStackTrace();
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage(), e));
+			e.printStackTrace();
 		}
 	}
 

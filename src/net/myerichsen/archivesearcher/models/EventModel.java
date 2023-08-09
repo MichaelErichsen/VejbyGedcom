@@ -73,7 +73,7 @@ public class EventModel extends ASModel {
 		final String l = location.toLowerCase().trim();
 
 		if (place != null && place.toLowerCase().contains(l)
-				|| subType != null && "Flytning".equals(subType) && note != null && note.toLowerCase().contains(l)) {
+				|| "Flytning".equals(subType) && note != null && note.toLowerCase().contains(l)) {
 			return true;
 		}
 

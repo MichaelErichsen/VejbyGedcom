@@ -28,20 +28,17 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import net.myerichsen.archivesearcher.models.CensusDupModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.CensusDupPopulator;
 
 /**
  * Census duplicates view
  *
  * @author Michael Erichsen
- * @version 27. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class CensusDupView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 
@@ -54,8 +51,6 @@ public class CensusDupView extends Composite {
 	public CensusDupView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new CensusDupPopulator();
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		final GridData gd_censusdupScroller = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
@@ -166,24 +161,18 @@ public class CensusDupView extends Composite {
 	 *
 	 */
 	private void getInput() {
-		if (listener != null) {
-			try {
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.getIndicator().setVisible(true));
-				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
+		try {
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.getIndicator().setVisible(true));
+			final CensusDupModel[] censusdupRecords = CensusDupModel.load(props.getProperty("parishSchema"),
+					props.getProperty("parishPath"));
 
-						props.getProperty("parishPath") };
-				final CensusDupModel[] censusdupRecords = (CensusDupModel[]) listener.load(loadArgs);
-
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage("Folketællingsdubletter er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.setMessage("Folketællingsdubletter er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

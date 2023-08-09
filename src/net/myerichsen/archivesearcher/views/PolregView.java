@@ -37,20 +37,17 @@ import net.myerichsen.archivesearcher.filters.PolregAddressFilter;
 import net.myerichsen.archivesearcher.filters.PolregBirthdateFilter;
 import net.myerichsen.archivesearcher.filters.PolregNameFilter;
 import net.myerichsen.archivesearcher.models.PolregModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.PolregPopulator;
 
 /**
  * Police registry view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class PolregView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Text txtPolregAddress;
 	private Text txtPolregBirthDate;
@@ -66,8 +63,6 @@ public class PolregView extends Composite {
 	public PolregView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new PolregPopulator();
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
 		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -354,19 +349,16 @@ public class PolregView extends Composite {
 	 * @param deathDate
 	 */
 	private void getInput(String phonName, String birthDate, String deathDate) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("cphSchema"), props.getProperty("cphDbPath"),
-						phonName, birthDate, deathDate };
-				final PolregModel[] PolregRecords = (PolregModel[]) listener.load(loadArgs);
+		try {
+			final PolregModel[] PolregRecords = PolregModel.load(props.getProperty("cphSchema"),
+					props.getProperty("cphDbPath"), phonName, birthDate, deathDate);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(PolregRecords));
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Politiets Registerblade er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(PolregRecords));
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+					.setMessage("Politiets Registerblade er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

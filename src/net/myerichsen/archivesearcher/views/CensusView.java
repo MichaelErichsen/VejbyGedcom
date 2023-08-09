@@ -47,14 +47,12 @@ import net.myerichsen.archivesearcher.filters.CensusParishFilter;
 import net.myerichsen.archivesearcher.filters.CensusYearFilter;
 import net.myerichsen.archivesearcher.models.CensusHouseholdModel;
 import net.myerichsen.archivesearcher.models.CensusModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.CensusPopulator;
 
 /**
  * Census view
  *
  * @author Michael Erichsen
- * @version 13. jul. 2023
+ * @version 8. aug. 2023
  */
 
 public class CensusView extends Composite {
@@ -67,17 +65,16 @@ public class CensusView extends Composite {
 	private Text txtCensusBirthDate;
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private List<CensusModel> household;
 	private Properties props;
 	private Thread thread;
 	private boolean spouseFilterFlag;
-	private CensusModel[] array;
 	private String id;
 	private String phonName;
 	private String birthDate;
 	private String deathDate;
 	private Button btngtefller;
+	private CensusModel[] array;
 
 	/**
 	 * Create the view
@@ -88,8 +85,6 @@ public class CensusView extends Composite {
 	public CensusView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new CensusPopulator();
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
 		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -661,27 +656,22 @@ public class CensusView extends Composite {
 	 * @param deathDate
 	 */
 	private void getInput(String id, String phonName, String birthDate, String deathDate) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("censusSchema"),
-						props.getProperty("censusPath"), phonName, birthDate.substring(0, 4),
-						deathDate.substring(0, 4) };
+		try {
+			array = CensusModel.load(props.getProperty("censusSchema"), props.getProperty("censusPath"), phonName,
+					birthDate.substring(0, 4), deathDate.substring(0, 4));
 
-				array = (CensusModel[]) listener.load(loadArgs);
-
-				if (spouseFilterFlag && !id.isBlank()) {
-					array = CensusModel.filterForSpouses(props.getProperty("censusPath"),
-							props.getProperty("censusSchema"), id, array);
-				}
-
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Folketællinger er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
+			if (spouseFilterFlag && !id.isBlank()) {
+				array = CensusModel.filterForSpouses(props.getProperty("censusPath"), props.getProperty("censusSchema"),
+						id, array);
 			}
+
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
+
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+					.setMessage("Folketællinger er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

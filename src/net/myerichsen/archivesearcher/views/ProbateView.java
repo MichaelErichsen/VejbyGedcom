@@ -35,20 +35,17 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import net.myerichsen.archivesearcher.filters.ProbatePlaceFilter;
 import net.myerichsen.archivesearcher.filters.ProbateSourceFilter;
 import net.myerichsen.archivesearcher.models.ProbateModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.ProbatePopulator;
 
 /**
  * Probate view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class ProbateView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 	private Text txtProbateSource;
@@ -63,8 +60,6 @@ public class ProbateView extends Composite {
 	public ProbateView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new ProbatePopulator();
 
 		final Composite ProbateFilterComposite = new Composite(this, SWT.BORDER);
 		ProbateFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -246,19 +241,16 @@ public class ProbateView extends Composite {
 	 * @param deathDate
 	 */
 	private void getInput(String phonName, String birthDate, String deathDate) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("probateSchema"),
-						props.getProperty("probatePath"), phonName, birthDate, deathDate };
-				final ProbateModel[] modelArray = (ProbateModel[]) listener.load(loadArgs);
+		try {
+			final ProbateModel[] modelArray = ProbateModel.load(props.getProperty("probateSchema"),
+					props.getProperty("probatePath"), phonName, birthDate, deathDate);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(modelArray));
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Skifter er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(modelArray));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Skifter er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

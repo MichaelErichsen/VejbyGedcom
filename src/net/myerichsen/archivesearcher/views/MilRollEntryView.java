@@ -43,14 +43,12 @@ import net.myerichsen.archivesearcher.filters.MilrollIDFilter;
 import net.myerichsen.archivesearcher.filters.MilrollNameFilter;
 import net.myerichsen.archivesearcher.filters.MilrollYearFilter;
 import net.myerichsen.archivesearcher.models.MilRollEntryModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.MilrollPopulator;
 
 /**
  * Military roll entry view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 
@@ -61,7 +59,6 @@ public class MilRollEntryView extends Composite {
 	private Text txtMilrollId;
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 	private Shell shell;
@@ -76,8 +73,6 @@ public class MilRollEntryView extends Composite {
 		super(parent, style);
 		shell = getShell();
 		setLayout(new GridLayout(1, false));
-
-		listener = new MilrollPopulator();
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
 		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -491,24 +486,19 @@ public class MilRollEntryView extends Composite {
 	 *
 	 */
 	private void getInput() {
-		if (listener != null) {
-			try {
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.getIndicator().setVisible(true));
-				final String[] loadArgs = new String[] { props.getProperty("milrollPath"),
-						props.getProperty("milrollSchema") };
-				final MilRollEntryModel[] MilrollRecords = (MilRollEntryModel[]) listener.load(loadArgs);
+		try {
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.getIndicator().setVisible(true));
+			final MilRollEntryModel[] MilrollRecords = MilRollEntryModel.load(props.getProperty("milrollPath"),
+					props.getProperty("milrollSchema"));
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(MilrollRecords));
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(MilrollRecords));
 
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage("Lægdsruller er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.setMessage("Lægdsruller er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

@@ -31,21 +31,18 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import net.myerichsen.archivesearcher.models.LastEventModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.LastEventViewPopulator;
 
 /**
  * Display all events for a location that are the last events for the given
  * individual to search for burials
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class LastEventView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 	private Text textLocation;
@@ -60,7 +57,6 @@ public class LastEventView extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 
-		listener = new LastEventViewPopulator();
 		new Label(this, SWT.NONE);
 
 		final ScrolledComposite scrolledComposite = new ScrolledComposite(this,
@@ -212,23 +208,18 @@ public class LastEventView extends Composite {
 	 * @param location
 	 */
 	private void getInput(String location) {
-		if (listener != null) {
-			try {
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.getIndicator().setVisible(true));
-				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
-						props.getProperty("parishPath"), location };
-				final LastEventModel[] array = (LastEventModel[]) listener.load(loadArgs);
+		try {
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.getIndicator().setVisible(true));
+			final LastEventModel[] array = LastEventModel.load(props.getProperty("parishSchema"),
+					props.getProperty("parishPath"), location);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage("Sidste hændelser i " + location + " er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.setMessage("Sidste hændelser i " + location + " er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

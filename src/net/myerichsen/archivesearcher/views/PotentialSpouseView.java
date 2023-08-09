@@ -23,18 +23,15 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import net.myerichsen.archivesearcher.models.PotentialSpouseModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.PotentialSpousePopulator;
 
 /**
  * View of potential spouses
  *
  * @author Michael Erichsen
- * @version 10. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class PotentialSpouseView extends Composite {
-	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 	private PotentialSpouseModel[] array;
@@ -50,8 +47,6 @@ public class PotentialSpouseView extends Composite {
 	public PotentialSpouseView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new PotentialSpousePopulator();
 
 		final ScrolledComposite scroller = new ScrolledComposite(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scroller.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -165,22 +160,17 @@ public class PotentialSpouseView extends Composite {
 	 * @param id
 	 */
 	private void getInput(String id) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
-						props.getProperty("parishPath"), props.getProperty("censusSchema"),
-						props.getProperty("censusPath"), id };
+		try {
+			array = PotentialSpouseModel.load(props.getProperty("parishSchema"), props.getProperty("parishPath"),
+					props.getProperty("censusSchema"), props.getProperty("censusPath"), id);
 
-				array = (PotentialSpouseModel[]) listener.load(loadArgs);
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Mulige ægtefæller er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+					.setMessage("Mulige ægtefæller er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

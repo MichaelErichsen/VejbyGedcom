@@ -23,17 +23,14 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import net.myerichsen.archivesearcher.comparators.DescendantComparator;
 import net.myerichsen.archivesearcher.models.DescendantModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.DescendantPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class DescendantCounterView extends Composite {
 	private Table table;
-	private ASPopulator listener;
 	private TableViewer tableViewer;
 	private Properties props;
 	private Thread thread;
@@ -47,8 +44,6 @@ public class DescendantCounterView extends Composite {
 	public DescendantCounterView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new DescendantPopulator();
 
 		final ScrolledComposite descendantScroller = new ScrolledComposite(this,
 				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -138,23 +133,18 @@ public class DescendantCounterView extends Composite {
 	 *
 	 */
 	private void getInput() {
-		if (listener != null) {
-			try {
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.getIndicator().setVisible(true));
-				final String[] loadArgs = new String[] { props.getProperty("gedcomFilePath") };
-				final DescendantModel[] descendantRecords = (DescendantModel[]) listener.load(loadArgs);
+		try {
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.getIndicator().setVisible(true));
+			final DescendantModel[] array = DescendantModel.load(props.getProperty("gedcomFilePath"));
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(descendantRecords));
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 
-				Display.getDefault()
-						.asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-								.setMessage("Efterkommere er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+					.setMessage("Efterkommere er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

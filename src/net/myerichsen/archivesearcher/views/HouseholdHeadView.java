@@ -37,18 +37,15 @@ import net.myerichsen.archivesearcher.filters.HouseholdHeadNameFilter;
 import net.myerichsen.archivesearcher.filters.HouseholdHeadPlaceFilter;
 import net.myerichsen.archivesearcher.filters.HouseholdHeadTypeFilter;
 import net.myerichsen.archivesearcher.models.HouseholdHeadModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.HouseholdHeadPopulator;
 
 /**
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class HouseholdHeadView extends Composite {
 	private TableViewer tableViever;
 	private Table table;
-	private ASPopulator listener;
 	private Text txtHouseholdPlace;
 	private Text txtHouseholdRelocatorName;
 	private Combo txtHouseholdEventType;
@@ -64,8 +61,6 @@ public class HouseholdHeadView extends Composite {
 	public HouseholdHeadView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new HouseholdHeadPopulator();
 
 		final Composite HouseholdHeadFilterComposite = new Composite(this, SWT.BORDER);
 		HouseholdHeadFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -303,21 +298,18 @@ public class HouseholdHeadView extends Composite {
 	 * @param headId
 	 */
 	private void getInput(String headId) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("parishPath"),
-						props.getProperty("parishSchema"), props.getProperty("censusPath"),
-						props.getProperty("censusSchema"), props.getProperty("milrollPath"),
-						props.getProperty("milrollSchema"), headId };
-				final HouseholdHeadModel[] HouseholdHeadRecords = (HouseholdHeadModel[]) listener.load(loadArgs);
+		try {
+			final HouseholdHeadModel[] array = HouseholdHeadModel.load(props.getProperty("parishPath"),
+					props.getProperty("parishSchema"), props.getProperty("censusPath"),
+					props.getProperty("censusSchema"), props.getProperty("milrollPath"),
+					props.getProperty("milrollSchema"), headId);
 
-				Display.getDefault().asyncExec(() -> tableViever.setInput(HouseholdHeadRecords));
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Husbond er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViever.setInput(array));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Husbond er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

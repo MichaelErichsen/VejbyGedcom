@@ -35,14 +35,12 @@ import net.myerichsen.archivesearcher.comparators.RelocationComparator;
 import net.myerichsen.archivesearcher.filters.RelocationGivenFilter;
 import net.myerichsen.archivesearcher.filters.RelocationSurnameFilter;
 import net.myerichsen.archivesearcher.models.RelocationModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.RelocationPopulator;
 
 /**
  * Relocation view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class RelocationView extends Composite {
@@ -50,7 +48,6 @@ public class RelocationView extends Composite {
 	private Text txtRelocationGiven;
 	private Text txtRelocationSurname;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Thread thread;
 
@@ -63,8 +60,6 @@ public class RelocationView extends Composite {
 	public RelocationView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new RelocationPopulator();
 
 		final Composite relocationFilterComposite = new Composite(this, SWT.BORDER);
 		relocationFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -277,19 +272,16 @@ public class RelocationView extends Composite {
 	 * @param birthDate
 	 */
 	private void getInput(String phonName, String birthDate) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
-						props.getProperty("parishPath"), phonName, birthDate };
-				final RelocationModel[] relocationRecords = (RelocationModel[]) listener.load(loadArgs);
+		try {
+			final RelocationModel[] relocationRecords = RelocationModel.load(props.getProperty("parishSchema"),
+					props.getProperty("parishPath"), phonName, birthDate);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(relocationRecords));
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Flytninger er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(relocationRecords));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Flytninger er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

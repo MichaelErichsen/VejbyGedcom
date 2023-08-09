@@ -37,20 +37,17 @@ import net.myerichsen.archivesearcher.filters.BurregBirthDateFilter;
 import net.myerichsen.archivesearcher.filters.BurregGivenFilter;
 import net.myerichsen.archivesearcher.filters.BurregSurnameFilter;
 import net.myerichsen.archivesearcher.models.BurregModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.BurregPopulator;
 
 /**
  * Burial registry view
  *
  * @author Michael Erichsen
- * @version 26. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class BurregView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Text txtBurregSurname;
 	private Text txtBurregBirthYear;
@@ -66,8 +63,6 @@ public class BurregView extends Composite {
 	public BurregView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new BurregPopulator();
 
 		final Composite filterComposite = new Composite(this, SWT.BORDER);
 		filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -486,19 +481,16 @@ public class BurregView extends Composite {
 	 * @param deathDate
 	 */
 	private void getInput(String phonName, String birthDate, String deathDate) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("cphSchema"), props.getProperty("cphDbPath"),
-						phonName, birthDate, deathDate };
-				final BurregModel[] burregRecords = (BurregModel[]) listener.load(loadArgs);
+		try {
+			final BurregModel[] array = BurregModel.load(props.getProperty("cphSchema"), props.getProperty("cphDbPath"),
+					phonName, birthDate, deathDate);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(burregRecords));
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Begravelsesregisteret er hentet"));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
+					.setMessage("Begravelsesregisteret er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

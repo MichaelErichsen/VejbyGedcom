@@ -36,20 +36,17 @@ import net.myerichsen.archivesearcher.comparators.SiblingComparator;
 import net.myerichsen.archivesearcher.filters.SiblingsParentsFilter;
 import net.myerichsen.archivesearcher.filters.SiblingsPlaceFilter;
 import net.myerichsen.archivesearcher.models.SiblingsModel;
-import net.myerichsen.archivesearcher.populators.ASPopulator;
-import net.myerichsen.archivesearcher.populators.SiblingsPopulator;
 
 /**
  * Siblings view
  *
  * @author Michael Erichsen
- * @version 1. jul. 2023
+ * @version 8. aug. 2023
  *
  */
 public class SiblingsView extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
-	private ASPopulator listener;
 	private Properties props;
 	private Text txtSiblingsPlace;
 	private Text txtSiblingsParents;
@@ -64,8 +61,6 @@ public class SiblingsView extends Composite {
 	public SiblingsView(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-
-		listener = new SiblingsPopulator();
 
 		final Composite SiblingsFilterComposite = new Composite(this, SWT.BORDER);
 		SiblingsFilterComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -235,18 +230,14 @@ public class SiblingsView extends Composite {
 	 * @param parents
 	 */
 	private void getInputbyId(String parents) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
-						props.getProperty("parishPath"), parents };
-				final SiblingsModel[] siblingRecords = (SiblingsModel[]) listener.load(loadArgs);
+		try {
+			final SiblingsModel[] siblingRecords = SiblingsModel.load(props.getProperty("parishSchema"),
+					props.getProperty("parishPath"), parents);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setErrorMessage(e.getMessage(), e));
-			}
-
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 
@@ -255,20 +246,17 @@ public class SiblingsView extends Composite {
 	 * @param mothersName
 	 */
 	private void getInputByParents(String fathersName, String mothersName) {
-		if (listener != null) {
-			try {
-				final String[] loadArgs = new String[] { props.getProperty("parishSchema"),
-						props.getProperty("parishPath"), fathersName, mothersName };
-				final SiblingsModel[] SiblingRecords = (SiblingsModel[]) listener.load(loadArgs);
+		try {
+			final SiblingsModel[] SiblingRecords = SiblingsModel.load(props.getProperty("parishSchema"),
+					props.getProperty("parishPath"), fathersName, mothersName);
 
-				Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));
-				Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-						.setMessage("Søskende er hentet"));
+			Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Søskende er hentet"));
 
-			} catch (final Exception e) {
-				Display.getDefault().asyncExec(
-						() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
-			}
+		} catch (final Exception e) {
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
 		}
 	}
 
