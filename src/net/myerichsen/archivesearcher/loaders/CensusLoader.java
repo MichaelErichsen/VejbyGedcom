@@ -24,7 +24,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * It loads all KIP files into a Derby database table
  *
  * @author Michael Erichsen
- * @version 5. jul. 2023
+ * @version 20. aug. 2023
  */
 public class CensusLoader {
 	/**
@@ -32,8 +32,10 @@ public class CensusLoader {
 	 */
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String SELECT_COUNT = "SELECT COUNT(*) AS COUNT FROM CENSUS WHERE KIPNR = ?";
+
 	private static PreparedStatement statement;
 	private static int counter = 0;
+	private static ArchiveSearcher as;
 
 	/**
 	 * Constructor
@@ -87,7 +89,8 @@ public class CensusLoader {
 	 * @param as
 	 * @throws Exception
 	 */
-	private void execute(String[] args, ArchiveSearcher as) throws Exception {
+	private void execute(String[] args, ArchiveSearcher archiveSearcher) throws Exception {
+		as = archiveSearcher;
 
 		// Connect to Derby
 		connectToDB(args);
@@ -106,7 +109,7 @@ public class CensusLoader {
 
 		for (final KipTextEntry kipTextEntry : lkte) {
 			if (!"1771".equals(kipTextEntry.getAar())) {
-				parseCensusFile(args, kipTextEntry, as);
+				parseCensusFile(args, kipTextEntry);
 			}
 		}
 
@@ -138,17 +141,22 @@ public class CensusLoader {
 	 * @return
 	 * @throws IOException
 	 */
-	private List<String> getCensusFileLines(String csvfiledirectory, String kipNr) throws IOException {
+	private List<String> getCensusFileLines(String csvfiledirectory, String kipNr) {
 		final List<String> kipLines = new ArrayList<>();
 		String line;
 
-		final BufferedReader br = new BufferedReader(new FileReader(new File(csvfiledirectory + "/" + kipNr + ".csv")));
+		try {
+			final BufferedReader br = new BufferedReader(
+					new FileReader(new File(csvfiledirectory + "/" + kipNr + ".csv")));
 
-		while ((line = br.readLine()) != null) {
-			kipLines.add(line);
+			while ((line = br.readLine()) != null) {
+				kipLines.add(line);
+			}
+
+			br.close();
+		} catch (Exception e) {
+			Display.getDefault().asyncExec(() -> as.setMessage(e.getMessage()));
 		}
-
-		br.close();
 		return kipLines;
 	}
 
@@ -160,7 +168,10 @@ public class CensusLoader {
 	 * @param as
 	 * @throws Exception
 	 */
-	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry, ArchiveSearcher as) throws Exception {
+	private void parseCensusFile(String[] args, KipTextEntry kipTextEntry) throws Exception {
+		CensusModel ci;
+		String[] fields;
+
 		statement = conn.prepareStatement(SELECT_COUNT);
 		statement.setString(1, kipTextEntry.getKipNr());
 		final ResultSet rs = statement.executeQuery();
@@ -181,8 +192,10 @@ public class CensusLoader {
 				+ kipTextEntry.getAmt() + ", " + kipTextEntry.getHerred() + ", " + kipTextEntry.getSogn()));
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 		final List<String> censusFileLines = getCensusFileLines(args[1], kipTextEntry.getKipNr());
-		CensusModel ci;
-		String[] fields;
+
+		if (censusFileLines.isEmpty()) {
+			return;
+		}
 
 		final String[] columnNames = censusFileLines.get(0).split(";");
 
