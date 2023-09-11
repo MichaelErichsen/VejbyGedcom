@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 9. aug. 2023
+ * @version 22. aug. 2023
  */
 
 public class GedcomLoader {
@@ -54,6 +54,7 @@ public class GedcomLoader {
 	private static final String[] filter = new String[] { "af", "bager", "gamle", "gmd", "hustru", "i", "inds",
 			"junior", "kirkesanger", "pige", "pigen", "portner", "proprietær", "sadelmager", "skolelærer", "skovfoged",
 			"slagter", "smed", "smedesvend", "snedker", "søn", "ugift", "ugifte", "unge", "ungkarl", "uægte", "år" };
+	private static final String YYMMDD = "[1-9][0-9][0-9]{2}-([0][1-9]|[1][0-2])-([1-2][0-9]|[0][1-9]|[3][0-1])";
 
 	private static final String SET_SCHEMA = "SET SCHEMA = ?";
 	private static final String DELETE_EVENT = "DELETE FROM EVENT";
@@ -512,6 +513,10 @@ public class GedcomLoader {
 			date = split[0].replace("BET ", "").trim();
 		}
 
+		if (date.matches(YYMMDD)) {
+			return Date.valueOf(date);
+		}
+
 		if (date.length() == 8) {
 			date = "01 " + date;
 		}
@@ -524,6 +529,11 @@ public class GedcomLoader {
 		} catch (final Exception e) {
 			outDate = date + "-01-01";
 		}
+
+		if (outDate.length() > 10) {
+			outDate = outDate.substring(0, 10);
+		}
+
 		return Date.valueOf(outDate);
 	}
 
@@ -674,6 +684,8 @@ public class GedcomLoader {
 
 			updateIndividualFamc(individual);
 			updateIndividualParents(individual);
+		} catch (final Exception ignore) {
+
 		}
 	}
 
@@ -803,6 +815,8 @@ public class GedcomLoader {
 
 			updateIndividualFamc(individual);
 			updateIndividualParents(individual);
+		} catch (final Exception ignore) {
+
 		}
 	}
 
@@ -833,22 +847,33 @@ public class GedcomLoader {
 			family = familyNode.getValue();
 
 			if (family.getHusband() != null) {
-				husband = family.getHusband().getIndividual();
-				insertIndividual(husband);
-				updateFamilyHusband(key, husband);
+				try {
+					husband = family.getHusband().getIndividual();
+					insertIndividual(husband);
+					updateFamilyHusband(key, husband);
+				} catch (final Exception e) {
+				}
 			}
 
 			if (family.getWife() != null) {
-				wife = family.getWife().getIndividual();
-				insertIndividual(wife);
-				updateFamilyWife(key, wife);
+				try {
+					wife = family.getWife().getIndividual();
+					insertIndividual(wife);
+					updateFamilyWife(key, wife);
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 			final List<IndividualReference> children = family.getChildren();
 
 			if (children != null) {
 				for (final IndividualReference individualReference : children) {
-					insertIndividualWithFamily(individualReference.getIndividual());
+					try {
+						insertIndividualWithFamily(individualReference.getIndividual());
+					} catch (final Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -872,9 +897,13 @@ public class GedcomLoader {
 		final Map<String, Individual> individuals = gedcom.getIndividuals();
 
 		for (final Entry<String, Individual> individualNode : individuals.entrySet()) {
-			individual = individualNode.getValue();
-			insertIndividualWithFamily(individual);
-			findIndividualEvents(individual);
+			try {
+				individual = individualNode.getValue();
+				insertIndividualWithFamily(individual);
+				findIndividualEvents(individual);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -919,6 +948,7 @@ public class GedcomLoader {
 						sb.append(family.getHusband().getIndividual().getNames().get(0));
 						husb = true;
 					} catch (final Exception e) {
+						e.printStackTrace();
 					}
 
 					// Get the mother
@@ -932,9 +962,11 @@ public class GedcomLoader {
 						sb.append(w);
 						wife = true;
 					} catch (final Exception e) {
+						e.printStackTrace();
 					}
 				}
 			} catch (final Exception e) {
+				e.printStackTrace();
 			}
 
 			if (sb.length() > 0) {
@@ -950,6 +982,7 @@ public class GedcomLoader {
 						birthYear = extractBirthYear(christening.getDate().getValue());
 						sted = christening.getPlace().getPlaceName().toString();
 					} catch (final Exception e1) {
+//						e.printStackTrace();
 					}
 				}
 			}
@@ -979,6 +1012,7 @@ public class GedcomLoader {
 				a = fonkod.generateKey(splitParents[0]);
 				a = a.length() > 64 ? a.substring(0, 63) : a;
 			} catch (final Exception e) {
+				e.printStackTrace();
 			}
 
 			psINSERT_PARENTS.setString(5, a);
@@ -987,6 +1021,7 @@ public class GedcomLoader {
 				b = fonkod.generateKey(splitParents[1]);
 				b = b.length() > 64 ? b.substring(0, 63) : b;
 			} catch (final Exception e) {
+				e.printStackTrace();
 			}
 
 			psINSERT_PARENTS.setString(6, b);
@@ -1175,6 +1210,7 @@ public class GedcomLoader {
 				psUPDATE_INDIVIDUAL_PARENTS.setString(2, individual.getXref());
 				psUPDATE_INDIVIDUAL_PARENTS.execute();
 			} catch (final Exception e) {
+				// e.printStackTrace();
 			}
 		}
 	}

@@ -30,6 +30,14 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>17</release>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -116,5 +124,6 @@
 	<url>https://www.myerichsen.net/vejby/downloads/ArchiveSearcher.jar</url>
 	<properties>
 		<project.build.sourceEncoding>windows-1252</project.build.sourceEncoding>
+		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 </project>

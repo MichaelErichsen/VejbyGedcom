@@ -10,7 +10,7 @@ import java.util.Properties;
  * Class to create Derby tables for the program
  *
  * @author Michael Erichsen
- * @version 25. maj 2023
+ * @version 22. aug. 2023
  *
  */
 public class GedcomTableCreator {
@@ -46,10 +46,10 @@ public class GedcomTableCreator {
 	private static final String CRM = "ALTER TABLE EVENT ADD CONSTRAINT Event_PK PRIMARY KEY (ID)";
 	private static final String CRN = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT Individual_PK PRIMARY KEY (ID)";
 //	private static final String CRO = "ALTER TABLE FAMILY ADD CONSTRAINT Family_PK PRIMARY KEY (ID)";
-	private static final String CRP = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F1 FOREIGN KEY (HUSBAND) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
-	private static final String CRQ = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT INDIVIDUA_FAMIL_FK FOREIGN KEY (FAMC) REFERENCES FAMILY (ID) ON DELETE CASCADE";
-	private static final String CRR = "ALTER TABLE EVENT ADD CONSTRAINT EVEN_INDIVIDUA_FK FOREIGN KEY (INDIVIDUAL) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
-	private static final String CRS = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F2 FOREIGN KEY (WIFE) REFERENCES INDIVIDUAL (ID)ON DELETE CASCADE";
+//	private static final String CRP = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F1 FOREIGN KEY (HUSBAND) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
+//	private static final String CRQ = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT INDIVIDUA_FAMIL_FK FOREIGN KEY (FAMC) REFERENCES FAMILY (ID) ON DELETE CASCADE";
+//	private static final String CRR = "ALTER TABLE EVENT ADD CONSTRAINT EVEN_INDIVIDUA_FK FOREIGN KEY (INDIVIDUAL) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
+//	private static final String CRS = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F2 FOREIGN KEY (WIFE) REFERENCES INDIVIDUAL (ID)ON DELETE CASCADE";
 
 	public static String createTables(Properties props) {
 		try {
@@ -96,14 +96,6 @@ public class GedcomTableCreator {
 			statement = conn.prepareStatement(CRM);
 			statement.execute();
 			statement = conn.prepareStatement(CRN);
-			statement.execute();
-			statement = conn.prepareStatement(CRP);
-			statement.execute();
-			statement = conn.prepareStatement(CRQ);
-			statement.execute();
-			statement = conn.prepareStatement(CRR);
-			statement.execute();
-			statement = conn.prepareStatement(CRS);
 			statement.execute();
 			return "GEDCOM-tabellerne er dannet";
 		} catch (final SQLException e) {

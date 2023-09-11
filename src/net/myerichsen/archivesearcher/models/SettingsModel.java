@@ -8,31 +8,31 @@ import java.util.Properties;
  * Class representing all application settings
  *
  * @author Michael Erichsen
- * @version 26. jun. 2023
+ * @version 5. sep. 2023
  *
  */
 public class SettingsModel {
-	private String burialPersonComplete;
-	private String burregSearch;
-	private String censusCsvFileDirectory;
-	private String censusPath;
-	private String censusSchema;
-	private String cphCsvFileDirectory;
-	private String cphDbPath;
-	private String cphSchema;
-	private String gedcomFilePath;
-	private String kipTextFilename;
-	private String policeAddress;
-	private String policePerson;
-	private String policePosition;
-	private String probatePath;
-	private String probateSchema;
-	private String relocationSearch;
-	private String parishPath;
-	private String parishSchema;
-	private String msgLogLen;
-	private String milrollPath;
-	private String milrollSchema;
+	private String burialPersonComplete = "";
+//	private String burregSearch = "";
+	private String censusCsvFileDirectory = "";
+	private String censusPath = "";
+	private String censusSchema = "";
+	private String cphCsvFileDirectory = "";
+	private String cphDbPath = "";
+	private String cphSchema = "";
+	private String gedcomFilePath = "";
+	private String kipTextFilename = "";
+	private String policeAddress = "";
+	private String policePerson = "";
+	private String policePosition = "";
+	private String probatePath = "";
+	private String probateSchema = "";
+//	private String relocationSearch = "";
+	private String parishPath = "";
+	private String parishSchema = "";
+	private String msgLogLen = "";
+	private String milrollPath = "";
+	private String milrollSchema = "";
 
 	/**
 	 * Constructor
@@ -41,7 +41,7 @@ public class SettingsModel {
 	 */
 	public SettingsModel(Properties props) {
 		burialPersonComplete = props.getProperty("burialPersonComplete");
-		burregSearch = props.getProperty("burregSearch");
+//		burregSearch = props.getProperty("burregSearch");
 		censusCsvFileDirectory = props.getProperty("censusCsvFileDirectory");
 		censusPath = props.getProperty("censusPath");
 		censusSchema = props.getProperty("censusSchema");
@@ -55,7 +55,7 @@ public class SettingsModel {
 		policePosition = props.getProperty("policePosition");
 		probatePath = props.getProperty("probatePath");
 		probateSchema = props.getProperty("probateSchema");
-		relocationSearch = props.getProperty("relocationSearch");
+//		relocationSearch = props.getProperty("relocationSearch");
 		parishPath = props.getProperty("parishPath");
 		parishSchema = props.getProperty("parishSchema");
 		msgLogLen = props.getProperty("msgLogLen");
@@ -70,12 +70,12 @@ public class SettingsModel {
 		return burialPersonComplete;
 	}
 
-	/**
-	 * @return the burregSearch
-	 */
-	public String getBurregSearch() {
-		return burregSearch;
-	}
+//	/**
+//	 * @return the burregSearch
+//	 */
+//	public String getBurregSearch() {
+//		return burregSearch;
+//	}
 
 	/**
 	 * @return the censusCsvFileDirectory
@@ -210,12 +210,12 @@ public class SettingsModel {
 		return probateSchema;
 	}
 
-	/**
-	 * @return the relocationSearch
-	 */
-	public String getRelocationSearch() {
-		return relocationSearch;
-	}
+//	/**
+//	 * @return the relocationSearch
+//	 */
+//	public String getRelocationSearch() {
+//		return relocationSearch;
+//	}
 
 	/**
 	 * @param burialPersonComplete the burialPersonComplete to set
@@ -224,12 +224,12 @@ public class SettingsModel {
 		this.burialPersonComplete = burialPersonComplete;
 	}
 
-	/**
-	 * @param burregSearch the burregSearch to set
-	 */
-	public void setBurregSearch(String burregSearch) {
-		this.burregSearch = burregSearch;
-	}
+//	/**
+//	 * @param burregSearch the burregSearch to set
+//	 */
+//	public void setBurregSearch(String burregSearch) {
+//		this.burregSearch = burregSearch;
+//	}
 
 	/**
 	 * @param censusCsvFileDirectory the censusCsvFileDirectory to set
@@ -365,19 +365,19 @@ public class SettingsModel {
 		this.probateSchema = probateSchema;
 	}
 
-	/**
-	 * @param relocationSearch the relocationSearch to set
-	 */
-	public void setRelocationSearch(String relocationSearch) {
-		this.relocationSearch = relocationSearch;
-	}
+//	/**
+//	 * @param relocationSearch the relocationSearch to set
+//	 */
+//	public void setRelocationSearch(String relocationSearch) {
+//		this.relocationSearch = relocationSearch;
+//	}
 
 	/**
 	 * @param props
 	 */
 	public String storeProperties(Properties props) {
 		props.setProperty("burialPersonComplete", burialPersonComplete);
-		props.setProperty("burregSearch", burregSearch);
+//		props.setProperty("burregSearch", burregSearch);
 		props.setProperty("censusCsvFileDirectory", censusCsvFileDirectory);
 		props.setProperty("censusPath", censusPath);
 		props.setProperty("censusSchema", censusSchema);
@@ -391,7 +391,7 @@ public class SettingsModel {
 		props.setProperty("policePosition", policePosition);
 		props.setProperty("probatePath", probatePath);
 		props.setProperty("probateSchema", probateSchema);
-		props.setProperty("relocationSearch", relocationSearch);
+//		props.setProperty("relocationSearch", relocationSearch);
 		props.setProperty("parishPath", parishPath);
 		props.setProperty("parishSchema", parishSchema);
 		props.setProperty("msgLogLen", msgLogLen);
