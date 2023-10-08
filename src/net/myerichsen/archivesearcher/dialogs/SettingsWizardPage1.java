@@ -20,7 +20,7 @@ import net.myerichsen.archivesearcher.models.SettingsModel;
  * Wizard page to handle GEDCOM imports
  *
  * @author Michael Erichsen
- * @version 10. jul. 2023
+ * @version 8.okt. 2023
  *
  */
 
@@ -77,7 +77,7 @@ public class SettingsWizardPage1 extends WizardPage {
 
 				final String file = fileDialog.open();
 
-				if ("".equals(file)) {
+				if (!"".equals(file)) {
 					txtGedcomFilePath.setText(file);
 					settings.setGedcomFilePath(file);
 				}
@@ -113,7 +113,7 @@ public class SettingsWizardPage1 extends WizardPage {
 				directoryDialog.setText("Vælg venligst en folder og klik OK");
 
 				final String dir = directoryDialog.open();
-				if ("".equals(dir)) {
+				if (!"".equals(dir)) {
 					txtparishPath.setText(dir);
 					settings.setparishPath(dir);
 				}
