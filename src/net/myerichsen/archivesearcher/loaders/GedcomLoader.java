@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 22. aug. 2023
+ * @version 8. okt. 2023
  */
 
 public class GedcomLoader {
@@ -126,13 +126,16 @@ public class GedcomLoader {
 	 */
 	private void addChildBirthEvents(Connection conn, String schema) throws SQLException {
 		Family family;
+		List<IndividualReference> children;
+		String xref = "";
+		IndividualModel model;
 
 		final Map<String, Family> families = gedcom.getFamilies();
 
 		for (final Entry<String, Family> familyNode : families.entrySet()) {
 			family = familyNode.getValue();
 
-			final List<IndividualReference> children = family.getChildren();
+			children = family.getChildren();
 
 			if (children == null) {
 				continue;
@@ -140,8 +143,8 @@ public class GedcomLoader {
 
 			for (final IndividualReference individualReference : children) {
 				if (family.getHusband() != null) {
-					final String xref = individualReference.getIndividual().getXref();
-					final IndividualModel model = IndividualModel.getIndividualFromId(conn, schema, xref);
+					xref = individualReference.getIndividual().getXref();
+					model = IndividualModel.getIndividualFromId(conn, schema, xref);
 
 					psINSERT_INDIVIDUAL_EVENT.setString(1, "Child");
 					psINSERT_INDIVIDUAL_EVENT.setString(2, "Birth");
@@ -155,8 +158,8 @@ public class GedcomLoader {
 				}
 
 				if (family.getWife() != null) {
-					final String xref = individualReference.getIndividual().getXref();
-					final IndividualModel model = IndividualModel.getIndividualFromId(conn, schema, xref);
+					xref = individualReference.getIndividual().getXref();
+					model = IndividualModel.getIndividualFromId(conn, schema, xref);
 
 					psINSERT_INDIVIDUAL_EVENT.setString(1, "Child");
 					psINSERT_INDIVIDUAL_EVENT.setString(2, "Birth");
@@ -190,13 +193,16 @@ public class GedcomLoader {
 		CitationWithSource cfs;
 		StringWithCustomFacts whereInSource;
 		List<CustomFact> customFacts1;
+		List<FamilyEvent> events;
+		StringBuilder sb2;
+		List<IndividualEvent> individualEvents;
 
 		final Map<String, Family> families = gedcom.getFamilies();
 
 		for (final Entry<String, Family> familyNode : families.entrySet()) {
 			family = familyNode.getValue();
 
-			final List<FamilyEvent> events = family.getEvents();
+			events = family.getEvents();
 
 			if (events == null) {
 				continue;
@@ -255,7 +261,7 @@ public class GedcomLoader {
 											psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 										}
 									} else {
-										final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
+										sb2 = new StringBuilder(whereInSource.getValue() + ", ");
 
 										for (final CustomFact customFact : customFacts1) {
 											sb2.append(customFact.getDescription().getValue());
@@ -283,7 +289,7 @@ public class GedcomLoader {
 		for (final Entry<String, Individual> individualNode : individuals.entrySet()) {
 			individual = individualNode.getValue();
 
-			final List<IndividualEvent> individualEvents = individual.getEvents();
+			individualEvents = individual.getEvents();
 
 			if (individualEvents == null) {
 				continue;
@@ -335,7 +341,7 @@ public class GedcomLoader {
 										psINSERT_INDIVIDUAL_EVENT.setString(8, "");
 									}
 								} else {
-									final StringBuilder sb2 = new StringBuilder(whereInSource.getValue() + ", ");
+									sb2 = new StringBuilder(whereInSource.getValue() + ", ");
 
 									for (final CustomFact customFact : customFacts1) {
 										sb2.append(customFact.getDescription().getValue());
@@ -847,22 +853,15 @@ public class GedcomLoader {
 			family = familyNode.getValue();
 
 			if (family.getHusband() != null) {
-				try {
-					husband = family.getHusband().getIndividual();
-					insertIndividual(husband);
-					updateFamilyHusband(key, husband);
-				} catch (final Exception e) {
-				}
+				husband = family.getHusband().getIndividual();
+				insertIndividual(husband);
+				updateFamilyHusband(key, husband);
 			}
 
 			if (family.getWife() != null) {
-				try {
-					wife = family.getWife().getIndividual();
-					insertIndividual(wife);
-					updateFamilyWife(key, wife);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
+				wife = family.getWife().getIndividual();
+				insertIndividual(wife);
+				updateFamilyWife(key, wife);
 			}
 
 			final List<IndividualReference> children = family.getChildren();
@@ -921,6 +920,9 @@ public class GedcomLoader {
 		IndividualEvent christening;
 		boolean husb = false;
 		boolean wife = false;
+		List<FamilyChild> familiesWhereChild;
+		Family family;
+		PersonalName w;
 
 		// For each individual
 		final Map<String, Individual> individuals = gedcom.getIndividuals();
@@ -937,36 +939,28 @@ public class GedcomLoader {
 			wife = false;
 
 			// Get all families where the individual is a child
-			try {
-				final List<FamilyChild> familiesWhereChild = individual.getFamiliesWhereChild(false);
+			familiesWhereChild = individual.getFamiliesWhereChild(false);
 
+			if (familiesWhereChild != null) {
 				for (final FamilyChild familyWhereChild : familiesWhereChild) {
-					final Family family = familyWhereChild.getFamily();
+					family = familyWhereChild.getFamily();
 
 					// Get the father
-					try {
+					if (family.getHusband() != null) {
 						sb.append(family.getHusband().getIndividual().getNames().get(0));
 						husb = true;
-					} catch (final Exception e) {
-						e.printStackTrace();
 					}
 
 					// Get the mother
-					try {
-						final PersonalName w = family.getWife().getIndividual().getNames().get(0);
-
+					if (family.getWife() != null) {
+						w = family.getWife().getIndividual().getNames().get(0);
 						if (husb) {
 							sb.append(" og ");
 						}
-
 						sb.append(w);
 						wife = true;
-					} catch (final Exception e) {
-						e.printStackTrace();
 					}
 				}
-			} catch (final Exception e) {
-				e.printStackTrace();
 			}
 
 			if (sb.length() > 0) {
@@ -1019,7 +1013,7 @@ public class GedcomLoader {
 
 			try {
 				b = fonkod.generateKey(splitParents[1]);
-				b = b.length() > 64 ? b.substring(0, 63) : b;
+				b = b.length() > 63 ? b.substring(0, 63) : b;
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

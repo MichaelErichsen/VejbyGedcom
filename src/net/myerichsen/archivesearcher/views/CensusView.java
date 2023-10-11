@@ -52,7 +52,7 @@ import net.myerichsen.archivesearcher.models.CensusModel;
  * Census view
  *
  * @author Michael Erichsen
- * @version 8. aug. 2023
+ * @version 9. okt. 2023
  */
 
 public class CensusView extends Composite {
@@ -720,7 +720,7 @@ public class CensusView extends Composite {
 
 		if (open == 1) {
 			try {
-				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("parishPath"),
+				final List<CensusModel> lcr = CensusHouseholdModel.load(props.getProperty("censusPath"),
 						model.getKIPnr(), model.getKildestednavn(), model.getHusstands_familienr(),
 						model.getMatr_nr_Adresse(), model.getKildehenvisning(), props.getProperty("censusSchema"));
 

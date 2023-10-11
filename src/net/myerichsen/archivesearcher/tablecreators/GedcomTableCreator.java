@@ -10,7 +10,7 @@ import java.util.Properties;
  * Class to create Derby tables for the program
  *
  * @author Michael Erichsen
- * @version 22. aug. 2023
+ * @version 8. okt. 2023
  *
  */
 public class GedcomTableCreator {
@@ -25,7 +25,7 @@ public class GedcomTableCreator {
 			+ " SUBTYPE VARCHAR(32), DATE DATE, INDIVIDUAL CHAR(12), FAMILY CHAR(12),"
 			+ " PLACE VARCHAR(256), NOTE VARCHAR(16000), SOURCEDETAIL VARCHAR(16000) )";
 	private static String TABLE_INDIVIDUAL = "CREATE TABLE INDIVIDUAL ( ID CHAR(12) NOT NULL, "
-			+ " GIVENNAME CHAR(64), SURNAME CHAR(64), SEX CHAR(1), "
+			+ " GIVENNAME VARCHAR(128), SURNAME VARCHAR(128), SEX CHAR(1), "
 			+ " FAMC CHAR(12), PHONNAME CHAR(64), BIRTHDATE DATE, "
 			+ " BIRTHPLACE VARCHAR(256), DEATHDATE DATE, DEATHPLACE VARCHAR(256), PARENTS VARCHAR(256) )";
 	private static String TABLE_PARENTS = "CREATE TABLE PARENTS ( INDIVIDUALKEY CHAR(12) NOT NULL, "
@@ -45,11 +45,6 @@ public class GedcomTableCreator {
 	private static final String CRL = "CREATE INDEX SQL230124103428540 ON FAMILY (WIFE ASC)";
 	private static final String CRM = "ALTER TABLE EVENT ADD CONSTRAINT Event_PK PRIMARY KEY (ID)";
 	private static final String CRN = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT Individual_PK PRIMARY KEY (ID)";
-//	private static final String CRO = "ALTER TABLE FAMILY ADD CONSTRAINT Family_PK PRIMARY KEY (ID)";
-//	private static final String CRP = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F1 FOREIGN KEY (HUSBAND) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
-//	private static final String CRQ = "ALTER TABLE INDIVIDUAL ADD CONSTRAINT INDIVIDUA_FAMIL_FK FOREIGN KEY (FAMC) REFERENCES FAMILY (ID) ON DELETE CASCADE";
-//	private static final String CRR = "ALTER TABLE EVENT ADD CONSTRAINT EVEN_INDIVIDUA_FK FOREIGN KEY (INDIVIDUAL) REFERENCES INDIVIDUAL (ID) ON DELETE CASCADE";
-//	private static final String CRS = "ALTER TABLE FAMILY ADD CONSTRAINT Famil_Individua_F2 FOREIGN KEY (WIFE) REFERENCES INDIVIDUAL (ID)ON DELETE CASCADE";
 
 	public static String createTables(Properties props) {
 		try {
