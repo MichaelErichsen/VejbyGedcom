@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 8. okt. 2023
+ * @version 14. okt. 2023
  */
 
 public class GedcomLoader {
@@ -413,7 +413,7 @@ public class GedcomLoader {
 		Display.getDefault().asyncExec(() -> as.setMessage("Tabellerne er ryddet"));
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
-		parseAllFamilies();
+		parseAllFamilies(as);
 		Display.getDefault().asyncExec(() -> as.setMessage("Familier er analyseret"));
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
@@ -670,7 +670,7 @@ public class GedcomLoader {
 	 * @param individual
 	 * @throws Exception
 	 */
-	private void insertIndividual(Individual individual) throws Exception {
+	private void insertIndividual(Individual individual, ArchiveSearcher as) throws Exception {
 		try {
 			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
 			final String given = split[0].trim();
@@ -685,7 +685,9 @@ public class GedcomLoader {
 		} catch (final SQLException e) {
 			// Handle duplicates
 			if (!"23505".equals(e.getSQLState())) {
-				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+				Display.getDefault().asyncExec(
+						() -> as.setMessage("SQL Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState()));
+				e.printStackTrace();
 			}
 
 			updateIndividualFamc(individual);
@@ -839,7 +841,7 @@ public class GedcomLoader {
 	 *
 	 * @throws Exception
 	 */
-	private void parseAllFamilies() throws Exception {
+	private void parseAllFamilies(ArchiveSearcher as) throws Exception {
 		String key;
 		Family family;
 		Individual husband, wife;
@@ -854,13 +856,13 @@ public class GedcomLoader {
 
 			if (family.getHusband() != null) {
 				husband = family.getHusband().getIndividual();
-				insertIndividual(husband);
+				insertIndividual(husband, as);
 				updateFamilyHusband(key, husband);
 			}
 
 			if (family.getWife() != null) {
 				wife = family.getWife().getIndividual();
-				insertIndividual(wife);
+				insertIndividual(wife, as);
 				updateFamilyWife(key, wife);
 			}
 

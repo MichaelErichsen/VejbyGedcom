@@ -62,7 +62,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * included views.
  *
  * @author Michael Erichsen
- * @version 8. aug. 2023
+ * @version 14.okt. 2023
  *
  */
 
@@ -873,7 +873,12 @@ public class ArchiveSearcher extends Shell {
 
 			searchName.setText(individual.getName());
 			final String phonName = individual.getPhonName();
-			final String birthDate = individual.getBirthDate().toString();
+			final String birthDate;
+			if (individual.getBirthDate() != null) {
+				birthDate = individual.getBirthDate().toString();
+			} else {
+				birthDate = "0001-01-01";
+			}
 			searchBirth.setText(birthDate);
 			final String deathDate = individual.getDeathDate() == null ? "9999-12-31"
 					: individual.getDeathDate().toString();
