@@ -44,9 +44,9 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 14. okt. 2023
+ * @version 23. dec. 2023
  */
-
+// FIXME Message Database 'C:\Users\michael\Blistrup2Db' not found.
 public class GedcomLoader {
 	/**
 	 * Static constants and variables
@@ -102,10 +102,10 @@ public class GedcomLoader {
 	 * @return Message
 	 */
 	public static String main(String[] args, ArchiveSearcher as) {
-		final GedcomLoader ir = new GedcomLoader();
+		final GedcomLoader gl = new GedcomLoader();
 
 		try {
-			ir.execute(args, as);
+			gl.execute(args, as);
 		} catch (final Exception e) {
 			e.printStackTrace();
 			return e.getMessage();
@@ -396,6 +396,8 @@ public class GedcomLoader {
 		try {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
 		} catch (final SQLException e) {
+			// TODO
+			System.out.println(e.getMessage());
 			// Shutdown message is expected
 		}
 		final Connection conn = DriverManager.getConnection(dbURL);
@@ -551,12 +553,45 @@ public class GedcomLoader {
 	 */
 	private String getParentsFromSource(Individual value) {
 		try {
-			final IndividualEvent christening = value.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
-			birthYear = extractBirthYear(christening.getDate().getValue());
-			sted = christening.getPlace().getPlaceName().toString();
-			final CitationWithSource citation = (CitationWithSource) christening.getCitations().get(0);
-			return citation.getWhereInSource().toString();
+			final List<IndividualEvent> eventsOfType = value.getEventsOfType(IndividualEventType.CHRISTENING);
+			if (eventsOfType == null) {
+				return "";
+			}
+			final int size = eventsOfType.size();
+			if (size == 0) {
+				return "";
+			}
+			final IndividualEvent christening = eventsOfType.get(0);
+			final StringWithCustomFacts date = christening.getDate();
+			if (date == null) {
+				birthYear = 1;
+			} else {
+				birthYear = extractBirthYear(christening.getDate().getValue());
+			}
+
+			final Place place = christening.getPlace();
+			if (place == null) {
+				sted = "";
+			} else {
+				sted = place.getPlaceName().toString();
+			}
+
+			final List<AbstractCitation> citations = christening.getCitations();
+			String string = "";
+			if (citations != null) {
+				final CitationWithSource citation = (CitationWithSource) citations.get(0);
+
+				final StringWithCustomFacts whereInSource = citation.getWhereInSource();
+
+				if (whereInSource != null) {
+					string = whereInSource.toString();
+				}
+			}
+
+			return string.contains("KBDEL") ? "" : string;
 		} catch (final Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		return "";
@@ -673,14 +708,29 @@ public class GedcomLoader {
 	private void insertIndividual(Individual individual, ArchiveSearcher as) throws Exception {
 		try {
 			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
-			final String given = split[0].trim();
-			final String surname = split[1];
+			String given = split[0].trim();
 
 			psINSERT_INDIVIDUAL.setString(1, individual.getXref());
 			psINSERT_INDIVIDUAL.setString(2, given);
+			String surname = "?";
+			if (split.length > 1) {
+				surname = split[1];
+			}
 			psINSERT_INDIVIDUAL.setString(3, surname);
-			psINSERT_INDIVIDUAL.setString(4, individual.getSex().getValue());
-			psINSERT_INDIVIDUAL.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
+			final StringWithCustomFacts sex = individual.getSex();
+			String sexValue = "?";
+			if (sex != null) {
+				sexValue = sex.getValue();
+			}
+			psINSERT_INDIVIDUAL.setString(4, sexValue);
+			if (given.length() > 63) {
+				given = given.substring(0, 63);
+			}
+			String s = fonkod.generateKey(given) + " " + fonkod.generateKey(surname);
+			if (s.length() > 63) {
+				s = s.substring(0, 63);
+			}
+			psINSERT_INDIVIDUAL.setString(5, s);
 			psINSERT_INDIVIDUAL.execute();
 		} catch (final SQLException e) {
 			// Handle duplicates
@@ -693,7 +743,8 @@ public class GedcomLoader {
 			updateIndividualFamc(individual);
 			updateIndividualParents(individual);
 		} catch (final Exception ignore) {
-
+			System.out.println(ignore.getMessage());
+			ignore.printStackTrace();
 		}
 	}
 
@@ -804,27 +855,43 @@ public class GedcomLoader {
 	 * @throws Exception
 	 */
 	private void insertIndividualWithFamily(Individual individual) throws Exception {
+		String given = "";
+		String surname = "";
+
 		try {
 			final String[] split = individual.getNames().get(0).getBasic().replace("'", "").split("/");
-			final String given = split[0].trim();
-			final String surname = split[1];
+			given = split[0].trim();
+
+			if (split.length == 1) {
+				surname = "?";
+			} else {
+				surname = split[1];
+			}
 
 			psINSERT_INDIVIDUAL.setString(1, individual.getXref());
 			psINSERT_INDIVIDUAL.setString(2, given);
 			psINSERT_INDIVIDUAL.setString(3, surname);
-			psINSERT_INDIVIDUAL.setString(4, individual.getSex().getValue());
-			psINSERT_INDIVIDUAL.setString(5, fonkod.generateKey(given) + " " + fonkod.generateKey(surname));
+
+			final StringWithCustomFacts sex = individual.getSex();
+			final String sexValue = sex == null ? "?" : sex.getValue();
+			psINSERT_INDIVIDUAL.setString(4, sexValue);
+			String s = fonkod.generateKey(given) + " " + fonkod.generateKey(surname);
+			if (s.length() > 63) {
+				s = s.substring(0, 63);
+			}
+			psINSERT_INDIVIDUAL.setString(5, s);
 			psINSERT_INDIVIDUAL.execute();
 		} catch (final SQLException e) {
 			// Handle duplicates
 			if (!"23505".equals(e.getSQLState())) {
-				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
+				throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState() + " "
+						+ given + " " + surname);
 			}
 
 			updateIndividualFamc(individual);
 			updateIndividualParents(individual);
 		} catch (final Exception ignore) {
-
+			System.out.println(ignore.getMessage() + " " + given + " " + surname);
 		}
 	}
 
@@ -969,16 +1036,26 @@ public class GedcomLoader {
 				parents = sb.toString().replace("/", "");
 
 				try {
-					christening = individual.getEventsOfType(IndividualEventType.CHRISTENING).get(0);
-					birthYear = extractBirthYear(christening.getDate().getValue());
-					sted = christening.getPlace().getPlaceName().toString();
+					final List<IndividualEvent> eventsOfType = individual
+							.getEventsOfType(IndividualEventType.CHRISTENING);
+					birthYear = 1;
+					sted = "";
+					if (eventsOfType != null && eventsOfType.size() > 0) {
+						christening = eventsOfType.get(0);
+						if (christening.getDate() != null) {
+							birthYear = extractBirthYear(christening.getDate().getValue());
+						}
+						if (christening.getPlace() != null) {
+							sted = christening.getPlace().getPlaceName().toString();
+						}
+					}
 				} catch (final Exception e) {
 					try {
 						christening = individual.getEventsOfType(IndividualEventType.BIRTH).get(0);
 						birthYear = extractBirthYear(christening.getDate().getValue());
 						sted = christening.getPlace().getPlaceName().toString();
 					} catch (final Exception e1) {
-//						e.printStackTrace();
+						e.printStackTrace();
 					}
 				}
 			}
@@ -1014,7 +1091,12 @@ public class GedcomLoader {
 			psINSERT_PARENTS.setString(5, a);
 
 			try {
-				b = fonkod.generateKey(splitParents[1]);
+				if (splitParents.length > 1) {
+					b = fonkod.generateKey(splitParents[1]);
+				} else {
+					b = fonkod.generateKey(splitParents[0]);
+				}
+
 				b = b.length() > 63 ? b.substring(0, 63) : b;
 			} catch (final Exception e) {
 				e.printStackTrace();
@@ -1179,6 +1261,9 @@ public class GedcomLoader {
 				if (!"23503".equals(e.getSQLState())) {
 					throw new Exception("sql Error Code: " + e.getErrorCode() + ", sql State: " + e.getSQLState());
 				}
+
+				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -1195,18 +1280,27 @@ public class GedcomLoader {
 		if (familiesWhereChild == null) {
 			try {
 				final List<IndividualEvent> eventsOfType = individual.getEventsOfType(IndividualEventType.CHRISTENING);
+				if (eventsOfType.size() == 0) {
+					return;
+				}
+
 				final IndividualEvent event = eventsOfType.get(0);
 				final List<AbstractCitation> citations = event.getCitations();
-				final CitationWithSource citation = (CitationWithSource) citations.get(0);
-				final StringWithCustomFacts whereInSource = citation.getWhereInSource();
-				String parents = whereInSource.toString();
-				parents = parents.length() > 256 ? parents.substring(0, 255) : parents;
+				String parents = "";
+				if (citations != null) {
+					final CitationWithSource citation = (CitationWithSource) citations.get(0);
+					final StringWithCustomFacts whereInSource = citation.getWhereInSource();
 
+					if (whereInSource != null) {
+						parents = whereInSource.toString();
+						parents = parents.length() > 256 ? parents.substring(0, 255) : parents;
+					}
+				}
 				psUPDATE_INDIVIDUAL_PARENTS.setString(1, parents);
 				psUPDATE_INDIVIDUAL_PARENTS.setString(2, individual.getXref());
 				psUPDATE_INDIVIDUAL_PARENTS.execute();
 			} catch (final Exception e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 	}
