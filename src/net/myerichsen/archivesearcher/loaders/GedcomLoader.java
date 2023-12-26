@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 23. dec. 2023
+ * @version 29. dec. 2023
  */
 // FIXME Message Database 'C:\Users\michael\Blistrup2Db' not found.
 public class GedcomLoader {
@@ -396,8 +396,6 @@ public class GedcomLoader {
 		try {
 			DriverManager.getConnection(dbURL + ";shutdown=true");
 		} catch (final SQLException e) {
-			// TODO
-			System.out.println(e.getMessage());
 			// Shutdown message is expected
 		}
 		final Connection conn = DriverManager.getConnection(dbURL);
@@ -441,7 +439,6 @@ public class GedcomLoader {
 		Display.getDefault().asyncExec(() -> as.getIndicator().setVisible(true));
 
 		conn.close();
-
 	}
 
 	/**
@@ -992,6 +989,7 @@ public class GedcomLoader {
 		List<FamilyChild> familiesWhereChild;
 		Family family;
 		PersonalName w;
+		String replace = "";
 
 		// For each individual
 		final Map<String, Individual> individuals = gedcom.getIndividuals();
@@ -1078,7 +1076,11 @@ public class GedcomLoader {
 
 			psINSERT_PARENTS.setString(1, individualMapEntry.getKey().replace("@I", "").replace("@", ""));
 			psINSERT_PARENTS.setInt(2, birthYear);
-			psINSERT_PARENTS.setString(3, individual.getFormattedName().replace("/", ""));
+
+			replace = individual.getFormattedName().replace("/", "");
+			replace = replace.length() > 255 ? replace.substring(0, 255) : replace;
+			psINSERT_PARENTS.setString(3, replace);
+
 			psINSERT_PARENTS.setString(4, parents.replace("  ", " "));
 
 			try {

@@ -21,7 +21,7 @@ import net.myerichsen.archivesearcher.util.Fonkod;
  * Class representing a potential spouse
  *
  * @author Michael Erichsen
- * @version 7. aug. 2023
+ * @version 25. dec. 2023
  */
 
 public class PotentialSpouseModel extends ASModel {
@@ -254,6 +254,10 @@ public class PotentialSpouseModel extends ASModel {
 					if (matcher.find()) {
 						birthYear1 = Integer.parseInt(matcher.group(0));
 					}
+				}
+
+				if (psm.getFoedt_kildedato() == null) {
+					continue;
 				}
 
 				matcher = yearPattern.matcher(psm.getFoedt_kildedato());
