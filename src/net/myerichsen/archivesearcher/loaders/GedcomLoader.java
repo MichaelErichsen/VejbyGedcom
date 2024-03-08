@@ -44,7 +44,7 @@ import net.myerichsen.archivesearcher.views.ArchiveSearcher;
  * Read and analyze a GEDCOM file and load the data into a Derby database
  *
  * @author Michael Erichsen
- * @version 29. dec. 2023
+ * @version 8. marts 2024
  */
 // FIXME Message Database 'C:\Users\michael\Blistrup2Db' not found.
 public class GedcomLoader {
@@ -539,7 +539,11 @@ public class GedcomLoader {
 			outDate = outDate.substring(0, 10);
 		}
 
-		return Date.valueOf(outDate);
+		try {
+			return Date.valueOf(outDate);
+		} catch (Exception e) {
+			return Date.valueOf("0001-01-01");
+		}
 	}
 
 	/**
@@ -1252,8 +1256,18 @@ public class GedcomLoader {
 			}
 
 			psUPDATE_INDIVIDUAL_FAMC.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
+
+			int l = parents.length();
+
+			if (l > 255) {
+				parents = parents.substring(l - 255, l - 1);
+			}
+
 			psUPDATE_INDIVIDUAL_FAMC.setString(2, parents);
 			psUPDATE_INDIVIDUAL_FAMC.setString(3, individual.getXref());
+
+//			System.out.println(individual.getFamiliesWhereChild().get(0).getFamily().getXref() + ", " + parents + ", "
+//					+ individual.getXref());
 
 			try {
 				psUPDATE_INDIVIDUAL_FAMC.execute();

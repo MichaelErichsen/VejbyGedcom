@@ -584,7 +584,7 @@ public class CensusView extends Composite {
 		txtCensusBirthDate.setText("");
 		txtCensusCounty.setText("");
 		txtCensusName.setText("");
-		txtCensusParish.setText("");
+		txtCensusParish.setText("Bli");
 		txtCensusAge.setText("");
 		txtCensusYear.setText("");
 		txtCensusAge.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
