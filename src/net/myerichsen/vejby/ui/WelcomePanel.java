@@ -10,11 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import net.miginfocom.swing.MigLayout;
-
 /**
  * @author Michael Erichsen
- * @version 11-09-2020
+ * @version 18-08-2025 Miglayout removed
  *
  */
 public class WelcomePanel extends JPanel {
@@ -44,7 +42,7 @@ public class WelcomePanel extends JPanel {
 		final JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
 		scrollPane.setViewportView(panel);
-		panel.setLayout(new MigLayout("", "[685px]", "[80px][125px][70px][120px][70px]"));
+//		panel.setLayout(new MigLayout("", "[685px]", "[80px][125px][70px][120px][70px]"));
 
 		final JTextArea lblNewLabel = new JTextArea("Vejby Gedcom, \r\nVersion 1.0, september 2020");
 		lblNewLabel.setEditable(false);

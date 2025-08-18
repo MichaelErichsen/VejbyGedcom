@@ -9,7 +9,7 @@ import net.myerichsen.archivesearcher.models.ProbateModel;
  * Filter for place column in probate table (Singleton)
  *
  * @author Michael Erichsen
- * @version 4. apr. 2023
+ * @version 18-08-2025 Filter fixed for "["
  *
  */
 public class ProbatePlaceFilter extends ViewerFilter {
@@ -52,7 +52,7 @@ public class ProbatePlaceFilter extends ViewerFilter {
 	}
 
 	public void setSearchText(String s) {
-		this.searchString = ".*" + s.toLowerCase() + ".*";
+		this.searchString = ".*" + s.replace("[", "").replace("]", "").toLowerCase() + ".*";
 	}
 
 }
