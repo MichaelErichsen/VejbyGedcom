@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -134,17 +133,17 @@ public class DescendantCounterView extends Composite {
 	 */
 	private void getInput() {
 		try {
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-					.getIndicator().setVisible(true));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) getParent().getParent().getParent()).getIndicator().setVisible(true));
 			final DescendantModel[] array = DescendantModel.load(props.getProperty("gedcomFilePath"));
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-					.setMessage("Efterkommere er hentet"));
-		} catch (final Exception e) {
 			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+					() -> ((ArchiveSearcher) getParent().getParent().getParent()).setMessage("Efterkommere er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

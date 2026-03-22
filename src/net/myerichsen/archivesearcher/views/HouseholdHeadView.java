@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -305,11 +304,11 @@ public class HouseholdHeadView extends Composite {
 					props.getProperty("milrollSchema"), headId);
 
 			Display.getDefault().asyncExec(() -> tableViever.setInput(array));
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Husbond er hentet"));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setMessage("Husbond er hentet"));
 		} catch (final Exception e) {
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

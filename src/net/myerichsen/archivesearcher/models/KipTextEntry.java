@@ -28,13 +28,6 @@ public class KipTextEntry {
 	}
 
 	/**
-	 * @return the aar
-	 */
-	public String getAar() {
-		return aar;
-	}
-
-	/**
 	 * @return the amt
 	 */
 	public String getAmt() {
@@ -60,5 +53,12 @@ public class KipTextEntry {
 	 */
 	public String getSogn() {
 		return sogn;
+	}
+
+	/**
+	 * @return the aar
+	 */
+	public String getAar() {
+		return aar;
 	}
 }

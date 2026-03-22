@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -131,7 +130,7 @@ public class CensusDupView extends Composite {
 				try {
 					populate();
 				} catch (final SQLException e1) {
-					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+					((ArchiveSearcher) getParent().getParent()).setMessage(e1.getMessage());
 				}
 			}
 		});
@@ -162,17 +161,17 @@ public class CensusDupView extends Composite {
 	 */
 	private void getInput() {
 		try {
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-					.getIndicator().setVisible(true));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) getParent().getParent().getParent()).getIndicator().setVisible(true));
 			final CensusDupModel[] censusdupRecords = CensusDupModel.load(props.getProperty("parishSchema"),
 					props.getProperty("parishPath"));
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(censusdupRecords));
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) getParent().getParent().getParent())
 					.setMessage("Folketællingsdubletter er hentet"));
 		} catch (final Exception e) {
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

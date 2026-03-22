@@ -541,7 +541,7 @@ public class GedcomLoader {
 
 		try {
 			return Date.valueOf(outDate);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return Date.valueOf("0001-01-01");
 		}
 	}
@@ -1257,7 +1257,7 @@ public class GedcomLoader {
 
 			psUPDATE_INDIVIDUAL_FAMC.setString(1, individual.getFamiliesWhereChild().get(0).getFamily().getXref());
 
-			int l = parents.length();
+			final int l = parents.length();
 
 			if (l > 255) {
 				parents = parents.substring(l - 255, l - 1);

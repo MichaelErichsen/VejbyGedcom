@@ -154,7 +154,7 @@ public class CensusLoader {
 			}
 
 			br.close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Display.getDefault().asyncExec(() -> as.setErrorMessage(e.getMessage(), e));
 		}
 		return kipLines;

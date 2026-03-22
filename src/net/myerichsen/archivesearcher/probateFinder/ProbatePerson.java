@@ -89,41 +89,35 @@ public class ProbatePerson {
 	 * @return month as two digit string
 	 */
 	private String convertMonth(String month) {
-		if ("JAN".equals(month)) {
-			return "01";
-		}
-		if ("FEB".equals(month)) {
-			return "02";
-		}
-		if ("MAR".equals(month)) {
-			return "03";
-		}
-		if ("APR".equals(month)) {
-			return "04";
-		}
-		if ("MAY".equals(month)) {
-			return "05";
-		}
-		if ("JUN".equals(month)) {
-			return "06";
-		}
-		if ("JUL".equals(month)) {
-			return "07";
-		}
-		if ("AUG".equals(month)) {
-			return "08";
-		}
-		if ("SEP".equals(month)) {
-			return "09";
-		}
-		if ("OCT".equals(month)) {
-			return "10";
-		}
-		if ("NOV".equals(month)) {
-			return "11";
-		}
-		if ("DEC".equals(month)) {
-			return "12";
+		if (month != null) {
+			switch (month) {
+			case "JAN":
+				return "01";
+			case "FEB":
+				return "02";
+			case "MAR":
+				return "03";
+			case "APR":
+				return "04";
+			case "MAY":
+				return "05";
+			case "JUN":
+				return "06";
+			case "JUL":
+				return "07";
+			case "AUG":
+				return "08";
+			case "SEP":
+				return "09";
+			case "OCT":
+				return "10";
+			case "NOV":
+				return "11";
+			case "DEC":
+				return "12";
+			default:
+				break;
+			}
 		}
 		return "01";
 	}

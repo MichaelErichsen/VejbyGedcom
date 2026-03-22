@@ -17,7 +17,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -150,7 +149,7 @@ public class PotentialSpouseView extends Composite {
 		try {
 			popup();
 		} catch (final SQLException e1) {
-			((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+			((ArchiveSearcher) getParent().getParent()).setMessage(e1.getMessage());
 		}
 	}
 
@@ -166,11 +165,11 @@ public class PotentialSpouseView extends Composite {
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-					.setMessage("Mulige ægtefæller er hentet"));
-		} catch (final Exception e) {
 			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+					() -> ((ArchiveSearcher) getParent().getParent()).setMessage("Mulige ægtefæller er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -236,8 +235,8 @@ public class SiblingsView extends Composite {
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(siblingRecords));
 		} catch (final Exception e) {
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 
@@ -251,12 +250,12 @@ public class SiblingsView extends Composite {
 					props.getProperty("parishPath"), fathersName, mothersName);
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(SiblingRecords));
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage("Søskende er hentet"));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setMessage("Søskende er hentet"));
 
 		} catch (final Exception e) {
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e.getMessage()));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setMessage(e.getMessage()));
 		}
 	}
 

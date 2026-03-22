@@ -66,7 +66,7 @@ public class Census {
 	 * @return message
 	 */
 	public String createHouseholds(int householdFieldNumber) {
-		setHouseholds(new ArrayList<Household>());
+		setHouseholds(new ArrayList<>());
 		Household currentHousehold = null;
 		String currentHouseholdNumber = "";
 		String newHouseholdNumber = "";

@@ -34,7 +34,7 @@ public class GedcomFile {
 	 *
 	 */
 	public GedcomFile() {
-		setFamilies(new ArrayList<Family>());
+		setFamilies(new ArrayList<>());
 	}
 
 	/**

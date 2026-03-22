@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -421,7 +420,7 @@ public class MilRollEntryView extends Composite {
 				try {
 					populate();
 				} catch (final SQLException e1) {
-					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+					((ArchiveSearcher) getParent().getParent()).setMessage(e1.getMessage());
 				}
 			}
 		});
@@ -431,7 +430,7 @@ public class MilRollEntryView extends Composite {
 		btnLgdsrulleliste.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				((ArchiveSearcher) ((TabFolder) getParent()).getParent()).laegdsRulleListe();
+				((ArchiveSearcher) getParent().getParent()).laegdsRulleListe();
 			}
 		});
 		btnLgdsrulleliste.setText("L\u00E6gdsrulleliste");
@@ -487,18 +486,18 @@ public class MilRollEntryView extends Composite {
 	 */
 	private void getInput() {
 		try {
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-					.getIndicator().setVisible(true));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) getParent().getParent().getParent()).getIndicator().setVisible(true));
 			final MilRollEntryModel[] MilrollRecords = MilRollEntryModel.load(props.getProperty("milrollPath"),
 					props.getProperty("milrollSchema"));
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(MilrollRecords));
 
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-					.setMessage("Lægdsruller er hentet"));
-		} catch (final Exception e) {
 			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+					() -> ((ArchiveSearcher) getParent().getParent().getParent()).setMessage("Lægdsruller er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

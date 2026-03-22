@@ -132,13 +132,6 @@ public class MilrollListModel extends ASModel {
 	}
 
 	/**
-	 * @return the aar
-	 */
-	public int getAar() {
-		return aar;
-	}
-
-	/**
 	 * @return the amt
 	 */
 	public String getAmt() {
@@ -195,6 +188,13 @@ public class MilrollListModel extends ASModel {
 	}
 
 	/**
+	 * @return the aar
+	 */
+	public int getAar() {
+		return aar;
+	}
+
+	/**
 	 * @param dbPath
 	 * @param schema
 	 * @throws SQLException
@@ -219,13 +219,6 @@ public class MilrollListModel extends ASModel {
 		final int executeUpdate = statement.executeUpdate();
 		return executeUpdate;
 
-	}
-
-	/**
-	 * @param aar the aar to set
-	 */
-	public void setAar(int aar) {
-		this.aar = aar;
 	}
 
 	/**
@@ -282,6 +275,13 @@ public class MilrollListModel extends ASModel {
 	 */
 	public void setSogn(String sogn) {
 		this.sogn = sogn;
+	}
+
+	/**
+	 * @param aar the aar to set
+	 */
+	public void setAar(int aar) {
+		this.aar = aar;
 	}
 
 	/**

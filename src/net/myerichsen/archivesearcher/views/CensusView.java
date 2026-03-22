@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -236,12 +235,12 @@ public class CensusView extends Composite {
 				final boolean selection = button.getSelection();
 				spouseFilterFlag = selection;
 				btngtefller.setBackground(SWTResourceManager.getColor(SWT.COLOR_YELLOW));
-				((ArchiveSearcher) ((TabFolder) getParent()).getParent()).getIndicator().setVisible(true);
+				((ArchiveSearcher) getParent().getParent()).getIndicator().setVisible(true);
 
 				try {
 					populate(id, phonName, birthDate, deathDate);
 				} catch (final SQLException e1) {
-					((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setMessage(e1.getMessage());
+					((ArchiveSearcher) getParent().getParent()).setMessage(e1.getMessage());
 				}
 			}
 		});
@@ -667,11 +666,11 @@ public class CensusView extends Composite {
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
 
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-					.setMessage("Folketællinger er hentet"));
-		} catch (final Exception e) {
 			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+					() -> ((ArchiveSearcher) getParent().getParent()).setMessage("Folketællinger er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -159,7 +158,7 @@ public class LastEventView extends Composite {
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.CR) {
 					if (textLocation.getText().isBlank()) {
-						((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+						((ArchiveSearcher) getParent().getParent().getParent())
 								.setMessage("Indtast venligst et sted og tryk ENTER");
 						textLocation.setFocus();
 					} else {
@@ -209,17 +208,17 @@ public class LastEventView extends Composite {
 	 */
 	private void getInput(String location) {
 		try {
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
-					.getIndicator().setVisible(true));
+			Display.getDefault().asyncExec(
+					() -> ((ArchiveSearcher) getParent().getParent().getParent()).getIndicator().setVisible(true));
 			final LastEventModel[] array = LastEventModel.load(props.getProperty("parishSchema"),
 					props.getProperty("parishPath"), location);
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent().getParent())
+			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) getParent().getParent().getParent())
 					.setMessage("Sidste hændelser i " + location + " er hentet"));
 		} catch (final Exception e) {
-			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 

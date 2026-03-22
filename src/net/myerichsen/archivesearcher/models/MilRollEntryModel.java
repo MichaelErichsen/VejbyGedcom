@@ -68,8 +68,7 @@ public class MilRollEntryModel extends ASModel {
 	 * @throws SQLException
 	 */
 	private static MilRollEntryModel newModel(final ResultSet rs) throws SQLException {
-		MilRollEntryModel model;
-		model = new MilRollEntryModel();
+		final MilRollEntryModel model = new MilRollEntryModel();
 		model.setAmt(rs.getString("AMT").trim());
 		model.setAar(rs.getInt("AAR"));
 		model.setLitra(rs.getString("LITRA"));
@@ -187,13 +186,6 @@ public class MilRollEntryModel extends ASModel {
 	private String navn = "";
 	private String faderFon = "";
 	private String soenFon = "";
-
-	/**
-	 * @return the aar
-	 */
-	public int getAar() {
-		return aar;
-	}
 
 	/**
 	 * @return the alder
@@ -350,10 +342,10 @@ public class MilRollEntryModel extends ASModel {
 	}
 
 	/**
-	 * @param aar the aar to set
+	 * @return the aar
 	 */
-	public void setAar(int aar) {
-		this.aar = aar;
+	public int getAar() {
+		return aar;
 	}
 
 	/**
@@ -508,6 +500,13 @@ public class MilRollEntryModel extends ASModel {
 	 */
 	public void setStoerrelseITommer(BigDecimal stoerrelseITommer) {
 		this.stoerrelseITommer = stoerrelseITommer;
+	}
+
+	/**
+	 * @param aar the aar to set
+	 */
+	public void setAar(int aar) {
+		this.aar = aar;
 	}
 
 	@Override

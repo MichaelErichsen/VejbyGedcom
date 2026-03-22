@@ -170,11 +170,10 @@ public abstract class LoadCphArch {
 		final BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new FileInputStream(new File(args[0] + "/" + args[3])), StandardCharsets.UTF_8));
 
-//		final BufferedReader br = new BufferedReader(new FileReader(new File(args[0] + "/" + args[3])));
-		String line;
+
 
 		// Ignore header line
-		line = reader.readLine();
+		String line = reader.readLine();
 
 		while ((line = reader.readLine()) != null) {
 			while (!line.endsWith("\"")) {

@@ -50,8 +50,7 @@ public class PotentialSpouseModel extends ASModel {
 	 */
 	private static void addNewModel(ResultSet rs2, final List<PotentialSpouseModel> list, String eventType)
 			throws SQLException {
-		PotentialSpouseModel model;
-		model = new PotentialSpouseModel();
+		final PotentialSpouseModel model = new PotentialSpouseModel();
 		model.setKildenavn(rs2.getString("GIVENNAME").trim() + " " + rs2.getString("SURNAME").trim());
 		model.setKoen(rs2.getString("SEX"));
 		model.setFoedt_kildedato(rs2.getString("BIRTHDATE"));

@@ -39,7 +39,7 @@ public class Household {
 	public Household(int id) {
 		rows = new ArrayList<>();
 		families = new ArrayList<>();
-		setPersons(new ArrayList<Individual>());
+		setPersons(new ArrayList<>());
 		this.id = id;
 		mappingKeys = Mapping.getInstance().getMappingKeys();
 	}

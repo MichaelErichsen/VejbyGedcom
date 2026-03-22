@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -486,11 +485,11 @@ public class BurregView extends Composite {
 					phonName, birthDate, deathDate);
 
 			Display.getDefault().asyncExec(() -> tableViewer.setInput(array));
-			Display.getDefault().asyncExec(() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent())
-					.setMessage("Begravelsesregisteret er hentet"));
-		} catch (final Exception e) {
 			Display.getDefault().asyncExec(
-					() -> ((ArchiveSearcher) ((TabFolder) getParent()).getParent()).setErrorMessage(e.getMessage(), e));
+					() -> ((ArchiveSearcher) getParent().getParent()).setMessage("Begravelsesregisteret er hentet"));
+		} catch (final Exception e) {
+			Display.getDefault()
+					.asyncExec(() -> ((ArchiveSearcher) getParent().getParent()).setErrorMessage(e.getMessage(), e));
 		}
 	}
 
